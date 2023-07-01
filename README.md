@@ -7,6 +7,7 @@
 	* `Dash to Panel` 
 	* `Arc Menu` 
 	* `Forge` 
+	    * Disable <super>+w shortcut.
     * Import extension settings manually.
 	
 2. Mount external partitions with gnome-disks

@@ -1,0 +1,19 @@
+[/]
+left-panel-width=175
+menu-background-color='rgba(48,48,49,0.98)'
+menu-border-color='rgb(60,60,60)'
+menu-button-appearance='Icon'
+menu-foreground-color='rgb(223,223,223)'
+menu-height=600
+menu-item-active-bg-color='rgb(25,98,163)'
+menu-item-active-fg-color='rgb(255,255,255)'
+menu-item-hover-bg-color='rgb(21,83,158)'
+menu-item-hover-fg-color='rgb(255,255,255)'
+menu-layout='Windows'
+menu-separator-color='rgba(255,255,255,0.1)'
+pinned-app-list=['Firefox Web Browser', 'firefox', 'firefox.desktop', 'Files', 'system-file-manager', 'nemo --existing-window ', 'Sayonara Player', 'sayonara', 'com.sayonara-player.Sayonara.desktop', 'Lutris', 'lutris', 'net.lutris.Lutris.desktop', 'Virtual Machine Manager', 'virt-manager', 'virt-manager.desktop', 'Qt Creator', 'QtProject-qtcreator', 'org.qt-project.qtcreator.desktop', 'drawio', '/mnt/shared/applications/lin/appimage_logos/drawio.png', 'alacarte-made-2.desktop', 'kitty', '', 'kitty.desktop']
+prefs-visible-page=0
+recently-installed-apps=['waydroid.org.lineageos.eleven.desktop', 'waydroid.com.android.deskclock.desktop', 'waydroid.com.android.contacts.desktop', 'waydroid.com.android.settings.desktop', 'waydroid.com.android.gallery3d.desktop', 'waydroid.com.android.documentsui.desktop', 'waydroid.org.lineageos.recorder.desktop', 'waydroid.org.lineageos.jelly.desktop', 'Xilinx Information Center_1676293157963.desktop', 'minicom.desktop', 'green-tunnel.desktop']
+right-panel-width=305
+search-entry-border-radius=(true, 25)
+windows-disable-frequent-apps=true

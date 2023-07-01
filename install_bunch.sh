@@ -11,7 +11,6 @@ sudo apt-get -y install neovim
 sudo apt-get -y install tmux
 sudo apt-get -y install kitty
 sudo apt-get -y install fzf
-sudo apt-get -y install zsh
 sudo apt-get -y install gnome-shell-extension-manager
 sudo apt-get -y install expect
 sudo apt-get -y install gnome-tweaks
@@ -117,10 +116,6 @@ gsettings set org.gnome.desktop.background show-desktop-icons false
 gsettings set org.nemo.desktop show-desktop-icons true
 
 
-# set default shell
-chsh -s $(which zsh)
-
-
 # set default terminal
 sudo update-alternatives --set x-terminal-emulator "$(which kitty)"
 gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
@@ -137,6 +132,11 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 python3 $SCRIPT_DIR/scripts/installation_scripts/n2o.py
 python3 $SCRIPT_DIR/scripts/installation_scripts/ffcss.py
 python3 $SCRIPT_DIR/scripts/installation_scripts/gnome_bks.py restore
+
+
+# Symlink configs
+rm -r ~/.config/kitty
+ln -s ~/dotfiles/config/kitty ~/.config/kitty
 
 
 # Requires EULA, user interaction
