@@ -58,6 +58,13 @@ rm JetBrainsMono.zip
 
 
 # Install pip applications
+# woeusb-ng
+sudo apt-get -y install python3-wxgtk4.0
+sudo apt-get -y install grub2-common
+sudo apt-get -y install parted
+sudo apt-get -y install dosfstools
+sudo apt-get -y install ntfs-3g
+sudo apt-get -y install grub-pc-bin
 sudo pip3 install WoeUSB-ng
 
 
@@ -143,8 +150,10 @@ ln -s ~/dotfiles/config/kitty ~/.config/kitty
 sudo apt-get -y install ubuntu-restricted-extras
 
 
-
-
+# 32 bit support for wine
+sudo dpkg --add-architecture i386 
+sudo apt update 
+sudo apt install -y libvulkan1 libvulkan1:i386
 
 
 
