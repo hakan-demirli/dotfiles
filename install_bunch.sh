@@ -7,7 +7,6 @@ sudo apt-get upgrade -y
 # Install the apps I use
 sudo apt-get -y install crontab
 sudo apt-get -y install sayonara
-sudo apt-get -y install neovim
 sudo apt-get -y install tmux
 sudo apt-get -y install kitty
 sudo apt-get -y install fzf
@@ -50,9 +49,8 @@ sudo apt-get -y install yaru-theme-gnome-shell
 sudo apt-get -y install yaru-theme-icon
 sudo apt-get -y install yaru-theme-unity
 # Install a Nerd Font
-echo "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip"
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
-unzip DroidSansMono.zip -d ~/.fonts
+unzip JetBrainsMono.zip -d ~/.fonts
 fc-cache -fv
 rm JetBrainsMono.zip
 
@@ -77,6 +75,15 @@ sudo adduser $USER libvirt
 sudo adduser $USER kvm
 sudo systemctl enable --now libvirtd
 sudo apt-get -y install virt-manager
+
+
+# Install neovim
+wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
+mkdir -p ~/.local/bin
+cp ./nvim.appimage ~/.local/bin/nvim
+chmod +x ~/.local/bin/nvim
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+rm ./nvim.appimage
 
 # Intel GPU Tools
 # sudo apt-get -y install intel-gpu-tools
@@ -154,7 +161,6 @@ sudo apt-get -y install ubuntu-restricted-extras
 sudo dpkg --add-architecture i386 
 sudo apt update 
 sudo apt install -y libvulkan1 libvulkan1:i386
-
 
 
 reboot

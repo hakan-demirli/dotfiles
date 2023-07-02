@@ -27,13 +27,11 @@
   * Import Sidebery data
 
 5. Edit Gnome Settings
-  * Dark mode
-  * touch to click
-  * gnome-tweaks 
   * RegionFormat > United Kingdom
   * Mouse Settings
     * Tap to click
     * Natural scrolling
+  * Create fixed 9 workspace
   
 6. Login to whatsapp web.
 
