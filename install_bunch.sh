@@ -83,7 +83,10 @@ mkdir -p ~/.local/bin
 cp ./nvim.appimage ~/.local/bin/nvim
 chmod +x ~/.local/bin/nvim
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+echo 'alias vi='nvim'' >> ~/.bashrc
+echo 'alias vim='nvim'' >> ~/.bashrc
 rm ./nvim.appimage
+
 
 # Intel GPU Tools
 # sudo apt-get -y install intel-gpu-tools
