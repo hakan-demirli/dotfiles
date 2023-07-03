@@ -253,6 +253,9 @@ vim.o.termguicolors = true
 -- Enable relative numbers
 vim.o.relativenumber = true
 
+-- Auto Change Directory
+vim.o.autochdir = false
+vim.o.autoshelldir = false
 
 -- MY KEMAPS
 

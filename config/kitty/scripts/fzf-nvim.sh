@@ -2,6 +2,7 @@
 
 result=$(find * -type d | fzf)
 if [[ -n "$result" ]]; then
-  nvim "$result"
+    cd $result
+    tmux new-session 'nvim .'
 fi
 
