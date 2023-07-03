@@ -87,6 +87,8 @@ echo 'alias vi='nvim'' >> ~/.bashrc
 echo 'alias vim='nvim'' >> ~/.bashrc
 rm ./nvim.appimage
 
+# Install tmux plugin manager
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Intel GPU Tools
 # sudo apt-get -y install intel-gpu-tools
@@ -152,8 +154,10 @@ python3 $SCRIPT_DIR/scripts/installation_scripts/gnome_bks.py restore
 
 
 # Symlink configs
-rm -r ~/.config/kitty
-ln -s ~/dotfiles/config/kitty ~/.config/kitty
+rm -rf ~/.config/kitty
+ln -s $SCRIPT_DIR/config/kitty ~/.config/kitty
+rm -rf ~/.config/nvim
+ln -s $SCRIPT_DIR/config/nvim ~/.config/nvim
 
 
 # Requires EULA, user interaction
