@@ -18,6 +18,16 @@ local keymaps = {
   -- Fast Escape
   {
     mode = { "i" },
+    lhs = "KJ",
+    rhs = "<Esc>",
+  },
+  {
+    mode = { "i" },
+    lhs = "JK",
+    rhs = "<Esc>",
+  },
+  {
+    mode = { "i" },
     lhs = "jk",
     rhs = "<Esc>",
   },

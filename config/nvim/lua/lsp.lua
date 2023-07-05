@@ -1,78 +1,106 @@
 local has_lspconfig, lspconfig = pcall(require, "lspconfig")
 
+-- If `https://github.com/neovim/nvim-lspconfig` is not available we return
+-- early.
 if not has_lspconfig then
   return
 end
 
-local has_cmp, cmp = pcall(require, "cmp_nvim_lsp")
+local api = vim.api
+local keymap = vim.keymap
+local lsp = vim.lsp
 
-local capabilities =
-    has_cmp
-    and cmp.default_capabilities()
-    or vim.lsp.protocol.make_client_capabilities()
+local lsp_augroup_id = api.nvim_create_augroup("Lsp", {})
 
-local lsp_group = vim.api.nvim_create_augroup("Lsp", {})
+local on_attach = function(_ --[[ client ]] , bufnr)
+  local opts = { buffer = bufnr }
 
-vim.api.nvim_create_autocmd(
-  "BufWritePre",
-  {
-    group = lsp_group,
-    desc = "Formats the buffer before it gets saved to disk",
-    callback = function()
-      vim.lsp.buf.format({ timeout_ms = 1000 })
-    end,
-  }
-)
+  -- Display infos about the symbol under the cursor in a floating window.
+  keymap.set("n", "K", lsp.buf.hover, opts)
+
+  -- Rename the symbol under the cursor.
+  keymap.set("n", "rn", lsp.buf.rename, opts)
+
+  -- Selects a code action available at the current cursor position.
+  keymap.set("n", "ca", lsp.buf.code_action, opts)
+
+  -- Jumps to the definition of the symbol under the cursor.
+  keymap.set("n", "gd", lsp.buf.definition, opts)
+
+  -- Jumps to the definition of the type of the symbol under the cursor.
+  keymap.set("n", "gtd", lsp.buf.type_definition, opts)
+
+  -- Format buffer on save w/ a 1s timeout.
+  api.nvim_create_autocmd(
+    "BufWritePre",
+    {
+      group = lsp_augroup_id,
+      buffer = bufnr,
+      desc = "Formats the buffer before saving it to disk",
+      callback = function() lsp.buf.format({}, 1000) end,
+    }
+  )
+end
+
+-- Lua -> https://github.com/sumneko/lua-language-server
+local rtp = vim.split(package.path, ";")
+table.insert(rtp, "lua/?.lua")
+table.insert(rtp, "lua/?/init.lua")
 
 lspconfig.lua_ls.setup({
-  capabilities = capabilities,
+  on_attach = on_attach,
   settings = {
-    Lua = {
-      diagnostics = {
-        globals = { "vim" },
-        neededFileStatus = {
-          ["codestyle-check"] = "Any",
-        },
-      },
-      -- https://github.com/LuaLS/lua-language-server/wiki/Formatter#lua
-      format = {
-        enable = true,
-        defaultConfig = {
-          indent_style = "space",
-          indent_size = "2",
-        },
-      },
+    ["Lua"] = {
       runtime = {
         version = "LuaJIT",
+        path = rtp,
+      },
+      diagnostics = {
+        globals = { "vim" }
+      },
+      workspace = {
+        library = api.nvim_get_runtime_file("", true),
       },
       telemetry = {
         enable = false,
       },
     },
-  },
+  }
 })
 
+-- Nix -> https://github.com/nix-community/rnix-lsp
+lspconfig.rnix.setup({
+  on_attach = on_attach,
+})
+
+-- Python -> https://github.com/microsoft/pyright
+lspconfig.pyright.setup({
+  on_attach = on_attach,
+})
+
+-- Rust -> https://github.com/rust-lang/rust-analyzer
 lspconfig.rust_analyzer.setup({
-  capabilities = capabilities,
+  on_attach = on_attach,
   settings = {
     ["rust-analyzer"] = {
-      check = {
-        command = "clippy",
-      },
-      completion = {
-        limit = 69,
-        privateEditable = {
-          enable = true,
-        },
-      },
-      imports = {
-        merge = {
-          blob = false,
-        },
-      },
-      procMacro = {
-        enable = true,
-      },
-    },
-  },
+      -- checkOnSave = { command = "clippy" },
+      procMacro = { enable = true },
+    }
+  }
 })
+
+-- Swift -> https://github.com/apple/sourcekit-lsp
+lspconfig.sourcekit.setup({
+  on_attach = on_attach,
+  filetypes = { "swift" },
+})
+
+
+
+
+
+
+
+
+
+
