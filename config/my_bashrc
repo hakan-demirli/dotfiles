@@ -1,13 +1,17 @@
 
 set_paths () {
-
-    local MY_STORAGE_DIR=/mnt/second
-    local MY_APP_DIR=$MY_STORAGE_DIR/software
-    local MY_REP_DIR=$MY_STORAGE_DIR/rep
+    # local MY_TMP_DIR=/mnt/tmp
+    
+    export MY_STORAGE_DIR=/mnt/second
+    export MY_APP_DIR=$MY_STORAGE_DIR/software
+    export MY_REP_DIR=$MY_STORAGE_DIR/rep
+    export MY_MUSIC_DIR=$MY_STORAGE_DIR/music
+    export MY_SCRIPT_DIR=$MY_REP_DIR/dotfiles/scripts
+    export MY_TTS_DIR=$MY_APP_DIR/lin/piper
 
     export PATH=/usr/local/bin:$PATH
     export PATH=~/.local/bin:$PATH
-    export PATH=$MY_REP_DIR/dotfiles/scripts:$PATH
+    export PATH=$MY_SCRIPT_DIR:$PATH
     export PATH=$MY_APP_DIR/lin/quartus/nios2eds/sdk2/bin:$PATH
     export PATH=$MY_APP_DIR/lin/quartus/quartus/bin:$PATH
     export PATH=$MY_APP_DIR/lin/verible:$PATH

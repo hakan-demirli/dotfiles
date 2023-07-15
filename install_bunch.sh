@@ -3,11 +3,12 @@
 sudo pacman -Syu
 
 # Install yay
-sudo pacman -S --noconfirm --needed git 
-sudo pacman -S --noconfirm --needed base-devel 
+sudo pacman -S --noconfirm --needed git
+sudo pacman -S --noconfirm --needed base-devel
 git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm
 
 # Install the apps I use
+sudo pacman -S --noconfirm xclip
 sudo pacman -S --noconfirm cronie
 sudo pacman -S --noconfirm tmux
 sudo pacman -S --noconfirm kitty
@@ -15,7 +16,7 @@ sudo pacman -S --noconfirm fzf
 sudo pacman -S --noconfirm expect
 sudo pacman -S --noconfirm base-devel
 sudo pacman -S --noconfirm python
-sudo pacman -S --noconfirm python-virtualenv                 
+sudo pacman -S --noconfirm python-virtualenv
 sudo pacman -S --noconfirm python-pipx
 sudo pacman -S --noconfirm python-pip
 sudo pacman -S --noconfirm git
@@ -44,17 +45,18 @@ sudo pacman -S --noconfirm qgnomeplatform-qt5
 sudo pacman -S --noconfirm dconf-editor
 sudo pacman -S --noconfirm wine
 sudo pacman -S --noconfirm lutris
+sudo pacman -S --noconfirm yt-dlp
 sudo pacman -S --noconfirm --needed nvidia
-sudo pacman -S --noconfirm --needed nvidia-utils 
-sudo pacman -S --noconfirm --needed lib32-nvidia-utils 
-sudo pacman -S --noconfirm --needed nvidia-settings 
-sudo pacman -S --noconfirm --needed vulkan-icd-loader 
+sudo pacman -S --noconfirm --needed nvidia-utils
+sudo pacman -S --noconfirm --needed lib32-nvidia-utils
+sudo pacman -S --noconfirm --needed nvidia-settings
+sudo pacman -S --noconfirm --needed vulkan-icd-loader
 sudo pacman -S --noconfirm --needed lib32-vulkan-icd-loader
 sudo yay -S --noconfirm --answerdiff=None extension-manager
 sudo yay -S --noconfirm --answerdiff=None green-tunnel
-sudo yay -S --noconfirm --answerdiff=None tor-browser 
-sudo yay -S --noconfirm --answerdiff=None sayonara-player 
-sudo yay -S --noconfirm --answerdiff=None woeusb-ng 
+sudo yay -S --noconfirm --answerdiff=None tor-browser
+sudo yay -S --noconfirm --answerdiff=None sayonara-player
+sudo yay -S --noconfirm --answerdiff=None woeusb-ng
 
 
 # Install a Nerd Font
@@ -142,3 +144,25 @@ if [ -f $SCRIPT_DIR/config/my_bashrc ]; then
     . $SCRIPT_DIR/config/my_bashrc
 fi"
 echo -e "$code_snippet" >> ~/.bashrc
+
+# Give exectue permissions to all scripts which are in PATH
+chmod +x $SCRIPT_DIR/scripts/*
+
+
+
+
+# Add open with neovim action to nemo right click menu
+
+cd ~/.local/share/nemo/actions
+touch code.nvim.nemo_action
+
+cat << EOF > code.nvim.nemo_action
+[Nemo Action]
+Name=Open in Neovim
+Comment=Open the folder in 'nvim' editor
+Exec=kitty -e nvim %F
+Icon-Name=Neovim
+Selection=any
+Extensions=dir;
+EOF
+

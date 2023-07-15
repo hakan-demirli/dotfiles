@@ -1,2 +1,3 @@
 #!/bin/bash
-( cd /mnt/second/music/ && python3 ./youtube_sync.py )
+python3 $MY_SCRIPT_DIR/python_scripts/youtube_sync.py
+
