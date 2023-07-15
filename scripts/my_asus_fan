@@ -1,0 +1,30 @@
+#!/bin/bash
+
+printf "Current profile: "
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+
+printf "Change it to: Performance(p/P) or Silent(s/S) or Normal(n/N) \n"
+read PREF
+
+case $PREF in
+
+  N | n)
+    echo 0 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    ;;
+
+  P | p)
+    echo 1 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    ;;
+
+  s | S)
+    echo 2 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    ;;
+
+  *)
+    printf "Abort. Unknown profile\n"
+    ;;
+esac
+
+printf ""
+read -p "Press any key to exit. " -n1 -s
+

@@ -3,11 +3,13 @@
 # TODO After Installation
 
 1. Install Gnome Extensions:
+    * Enable User Themes extension from gnome extensions. From the green one it is already installed.
     * Using gnome extension manager:	
 	* `Dash to Panel` 
 	* `Arc Menu` 
-	* `Forge` 
-	    * Disable <super>+w shortcut.
+	* ~~`Forge`~~
+	    * ~~Disable <super>+w shortcut.~~
+	    * Forge is [buggy.](https://github.com/forge-ext/forge/issues/258) Use [PopShell.](https://github.com/pop-os/shell)
     * Import extension settings manually.
 	
 2. Mount external partitions with gnome-disks

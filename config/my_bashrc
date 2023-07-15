@@ -1,0 +1,41 @@
+
+set_paths () {
+
+    local MY_STORAGE_DIR=/mnt/second
+    local MY_APP_DIR=$MY_STORAGE_DIR/software
+    local MY_REP_DIR=$MY_STORAGE_DIR/rep
+
+    export PATH=/usr/local/bin:$PATH
+    export PATH=~/.local/bin:$PATH
+    export PATH=$MY_REP_DIR/dotfiles/scripts:$PATH
+    export PATH=$MY_APP_DIR/lin/quartus/nios2eds/sdk2/bin:$PATH
+    export PATH=$MY_APP_DIR/lin/quartus/quartus/bin:$PATH
+    export PATH=$MY_APP_DIR/lin/verible:$PATH
+    export PATH=$MY_APP_DIR/lin/oss-cad-suite/bin:$PATH
+    export PATH=$MY_APP_DIR/lin/quartus/questa_fse/bin:$PATH
+
+    export QSYS_ROOTDIR=$MY_APP_DIR/lin/quartus/quartus/sopc_builder/bin
+    export LM_LICENSE_FILE=$MY_APP_DIR/lin/quartus/license.dat
+    export SWT_GTK3=0
+    export SWT_WEBKIT2=1
+
+    # Path for 32 bit modelsim
+    # export PATH=$MY_APP_DIR/lin/modelsim/modelsim_ase/bin:$PATH
+    # export PATH=/home/emre/miniconda3/bin:$PATH
+
+    # export RISCV=$MY_APP_DIR/lin/riscv64_gnu_toolchain
+    # export PATH=$MY_APP_DIR/lin/riscv64_gnu_toolchain/bin:$PATH
+
+
+    # Run everything using prime_run
+    # export __NV_PRIME_RENDER_OFFLOAD=1
+    # export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    # export __VK_LAYER_NV_optimus=NVIDIA_only
+    # export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json
+    # export XDG_RUNTIME_DIR=/home/emre/Documents/NoMachine
+    # export RUNLEVEL=3
+}
+
+set_paths
+
+unset -f set_paths
