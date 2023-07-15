@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from playsound import playsound
 from pathlib import Path
 import threading,queue,time,sys,os,string,re,random,logging,pyclip,multiprocessing,tempfile,subprocess
 # sudo apt install xclip
@@ -8,10 +7,8 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 TEMPO      = 1
 OUTPUT_DIR = tempfile.gettempdir()
-TTS_PATH   = Path(os.getenv('MY_MUSIC_DIR')) #Path(__file__).parent
-TTS_PATH   = "tts_models/en/ljspeech/tacotron2-DDC"
-MODEL_PATH = "tts_models/en/ljspeech/tacotron2-DDC"
-model_file  = "en_GB-jenny_dioco-medium.onnx"
+TTS_PATH   = os.getenv('MY_TTS_DIR') #Path(__file__).parent
+MODEL_PATH = TTS_PATH + "/en_GB-jenny_dioco-medium.onnx"
 GPU = True
 RETRY_TIMES = 5
 DELIMETERS = '[?.!]'
@@ -161,9 +158,10 @@ def get_random_string():
 
 @retry(times=RETRY_TIMES)
 def tts_to_file(txt,file_path):
-    command = f"echo '{text}' | ./piper --output_file {file_path} --model {MODEL_PATH}"
+    print(MODEL_PATH)
+    command = f"echo '{txt}' | {TTS_PATH}/piper --output_file {file_path} --model {MODEL_PATH}"
     subprocess.call(command, shell=True)
-    
+
 def convert_txt_to_wav(txt_queue,wav_queue):
     t = threading.current_thread()
     while getattr(t, "do_run", True):
