@@ -1,23 +1,12 @@
 # dotfiles
 
 # TODO After Installation
-
-1. Install Gnome Extensions:
-    * Enable User Themes extension from gnome extensions. From the green one it is already installed.
-    * Using gnome extension manager:	
-	* `Dash to Panel` 
-	* `Arc Menu` 
-	* ~~`Forge`~~
-	    * ~~Disable <super>+w shortcut.~~
-	    * Forge is [buggy.](https://github.com/forge-ext/forge/issues/258) Use [PopShell.](https://github.com/pop-os/shell)
-    * Import extension settings manually.
-	
-2. Mount external partitions with gnome-disks
+1. Mount external partitions
     * all by label
 
-3. Add fav folders to gnome bookmarks
+2. Add fav folders to nemo bookmarks
 
-4. Edit firefox settings
+3. Edit firefox settings
   * Settings > General > Startup > Open previous windows and tabs > True
   * Go to the `about:config` URL
     * Set `toolkit.legacyUserProfileCustomizations.stylesheets` to true
@@ -28,14 +17,7 @@
     * Customize Toolbar > Density > Compact
   * Import Sidebery data
 
-5. Edit Gnome Settings
-  * RegionFormat > United Kingdom
-  * Mouse Settings
-    * Tap to click
-    * Natural scrolling
-  * Create fixed 9 workspace
-  
-6. Login to whatsapp web.
+4. Login to whatsapp web.
 
 
-  
+

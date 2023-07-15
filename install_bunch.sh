@@ -31,8 +31,6 @@ sudo pacman -S --noconfirm gdb
 sudo pacman -S --noconfirm nemo
 sudo pacman -S --noconfirm ffmpeg
 sudo pacman -S --noconfirm wget
-sudo pacman -S --noconfirm gnome-shell-extensions
-sudo pacman -S --noconfirm gnome-tweaks
 sudo pacman -S --noconfirm net-tools
 sudo pacman -S --noconfirm flex
 sudo pacman -S --noconfirm ncurses
@@ -52,9 +50,7 @@ sudo pacman -S --noconfirm --needed lib32-nvidia-utils
 sudo pacman -S --noconfirm --needed nvidia-settings
 sudo pacman -S --noconfirm --needed vulkan-icd-loader
 sudo pacman -S --noconfirm --needed lib32-vulkan-icd-loader
-sudo yay -S --noconfirm --answerdiff=None extension-manager
 sudo yay -S --noconfirm --answerdiff=None green-tunnel
-sudo yay -S --noconfirm --answerdiff=None tor-browser
 sudo yay -S --noconfirm --answerdiff=None sayonara-player
 sudo yay -S --noconfirm --answerdiff=None woeusb-ng
 
@@ -86,13 +82,6 @@ echo 'alias vi="nvim"' >> ~/.bashrc
 echo 'alias vim="nvim"' >> ~/.bashrc
 rm ./nvim.appimage
 
-
-# Remove Unused Apps
-sudo pacman -R --noconfirm nautilus
-sudo pacman -R --noconfirm gnome-music
-sudo pacman -R --noconfirm gnome-terminal
-sudo pacman -R --noconfirm kgx
-
 # Set nemo default file explorer
 xdg-mime default nemo.desktop inode/directory application/x-gnome-saved-search
 gsettings set org.gnome.desktop.background show-desktop-icons false
@@ -111,17 +100,9 @@ sudo localectl set-locale LC_MONETARY=en_GB.UTF-8
 sudo localectl set-locale LC_PAPER=en_GB.UTF-8
 sudo localectl set-locale LC_MEASUREMENT=en_GB.UTF-8
 
-# Change theme
-gsettings get org.gnome.desktop.interface gtk-theme
-yay -S  --noconfirm --answerdiff=None  arc-gtk-theme
-gsettings set org.gnome.desktop.interface gtk-theme Arc-Dark
-
-
 # Run Scripts
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-python3 $SCRIPT_DIR/scripts/installation_scripts/n2o.py
 python3 $SCRIPT_DIR/scripts/installation_scripts/ffcss.py
-python3 $SCRIPT_DIR/scripts/installation_scripts/gnome_bks.py restore
 
 # Symlink configs
 rm -rf ~/.config/kitty
@@ -165,4 +146,9 @@ Icon-Name=Neovim
 Selection=any
 Extensions=dir;
 EOF
+
+
+wget https://raw.github.com/nwg-piotr/nwg-shell/main/install/arch.sh && chmod u+x arch.sh && ./arch.sh && rm arch.sh
+
+
 
