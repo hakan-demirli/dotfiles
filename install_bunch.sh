@@ -24,6 +24,14 @@ sudo pacman -S --noconfirm --needed ranger
 sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
 sudo pacman -R --noconfirm vim
 
+sudo pacman -S --noconfirm --needed blueman
+sudo pacman -S --noconfirm --needed bluez
+sudo systemctl start bluetooth.service
+
+yay -S input-remapper-git
+sudo systemctl restart input-remapper
+sudo systemctl enable input-remapper
+
 sudo sed -i '/^#\[multilib\]/{N;s/#//g}' /etc/pacman.conf
 sudo pacman -Sy
 sudo pacman -S --noconfirm --needed wine
@@ -35,7 +43,8 @@ yay -S --noconfirm --answerdiff=None visual-studio-code-bin
 yay -S --noconfirm --answerdiff=None green-tunnel
 yay -S --noconfirm --answerdiff=None sayonara-player
 yay -S --noconfirm --answerdiff=None woeusb-ng
-
+yay -S --noconfirm --answerdiff=None swww
+yay -S --noconfirm --answerdiff=None python-pyclip
 
 # Install a Nerd Font
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
@@ -67,10 +76,20 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 python3 $SCRIPT_DIR/scripts/installation_scripts/ffcss.py
 
 # Symlink configs
-rm -rf ~/.config/kitty
-ln -s $SCRIPT_DIR/config/kitty ~/.config/kitty
-rm -rf ~/.config/nvim
-ln -s $SCRIPT_DIR/config/nvim ~/.config/nvim
+# Loop through folders inside $SCRIPT_DIR/config
+for path in "$SCRIPT_DIR/config"/*; do
+    # Check if the current item is a directory
+    if [[ -d "$path" ]]; then
+        # Extract the folder name
+        folder_name=$(basename "$path")
+
+        # Remove existing folder in ~/.config (if it exists)
+        rm -rf "$HOME/.config/$folder_name"
+
+        # Create a symbolic link to the folder
+        ln -s "$path" "$HOME/.config/$folder_name"
+    fi
+done
 
 # Include custom bashrc
 code_snippet="# include .bashrc if it exists

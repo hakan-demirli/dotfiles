@@ -1,0 +1,6 @@
+{
+    "version": "2.0.0",
+    "autoload": {
+        "AT Translated Set 2 keyboard": "new preset"
+    }
+}

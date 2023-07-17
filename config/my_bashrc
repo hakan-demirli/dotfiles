@@ -1,11 +1,12 @@
 
 set_paths () {
     # local MY_TMP_DIR=/mnt/tmp
-    
+
     export MY_STORAGE_DIR=/mnt/second
     export MY_APP_DIR=$MY_STORAGE_DIR/software
     export MY_REP_DIR=$MY_STORAGE_DIR/rep
     export MY_MUSIC_DIR=$MY_STORAGE_DIR/music
+    export MY_IMAGE_DIR=$MY_STORAGE_DIR/images
     export MY_TTS_DIR=$MY_APP_DIR/lin/piper
     export MY_DOTFILE_DIR=$MY_REP_DIR/dotfiles
     export MY_SCRIPT_DIR=$MY_DOTFILE_DIR/scripts
