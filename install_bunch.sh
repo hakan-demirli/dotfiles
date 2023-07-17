@@ -35,6 +35,8 @@ sudo systemctl enable input-remapper
 sudo sed -i '/^#\[multilib\]/{N;s/#//g}' /etc/pacman.conf
 sudo pacman -Sy
 sudo pacman -S --noconfirm --needed wine
+sudo pacman -S --noconfirm --needed winetricks
+sudo pacman -S --noconfirm --needed zenity
 sudo pacman -S --noconfirm --needed lutris
 sudo pacman -S --noconfirm --needed lib32-nvidia-utils
 sudo pacman -S --noconfirm --needed xdg-desktop-portal-hyprland
@@ -45,6 +47,9 @@ yay -S --noconfirm --answerdiff=None sayonara-player
 yay -S --noconfirm --answerdiff=None woeusb-ng
 yay -S --noconfirm --answerdiff=None swww
 yay -S --noconfirm --answerdiff=None python-pyclip
+
+yay -S --noconfirm --answerdiff=None asusctl
+yay -S --noconfirm --answerdiff=None rog-control-center
 
 # Install a Nerd Font
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
@@ -104,5 +109,9 @@ chmod +x $SCRIPT_DIR/scripts/*
 
 gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.cinnamon.desktop.default-applications.terminal exec foot
+
+
+systemctl daemon-reload && systemctl restart asusd
+reboot
 
 
