@@ -1,12 +1,24 @@
 # dotfiles
 
-# TODO After Installation
-1. Mount external partitions
+# Installation
+* Download Arch Linux ISO, boot from it.
+* Connect to wifi using iwctl
+* `archinstall`
+  * profile -> desktop -> sway.
+    * Propriatery Nvidia Drivers
+  * audio -> pipewire.
+  * Configure network -> Use NetworkManager.
+  *  Reboot & and login as the user you created.
+* ```wget https://raw.github.com/nwg-piotr/nwg-shell/main/install/arch.sh && chmod u+x arch.sh && ./arch.sh && rm arch.sh```
+* Hyprland -> yes
+* Reboot
+* `nwg-shell-config-hyprland` -> backup -> restore -> dotfiles/config/nwg
+* Run `install_bunch.sh`
+* Reboot
+* Gnome Disks
+  * Mount external partitions
     * all by label
-
-2. Add fav folders to nemo bookmarks
-
-3. Edit firefox settings
+* Edit firefox settings
   * Settings > General > Startup > Open previous windows and tabs > True
   * Go to the `about:config` URL
     * Set `toolkit.legacyUserProfileCustomizations.stylesheets` to true
@@ -16,8 +28,4 @@
   * Enable compact mode
     * Customize Toolbar > Density > Compact
   * Import Sidebery data
-
-4. Login to whatsapp web.
-
-
 

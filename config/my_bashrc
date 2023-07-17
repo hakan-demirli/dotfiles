@@ -6,8 +6,9 @@ set_paths () {
     export MY_APP_DIR=$MY_STORAGE_DIR/software
     export MY_REP_DIR=$MY_STORAGE_DIR/rep
     export MY_MUSIC_DIR=$MY_STORAGE_DIR/music
-    export MY_SCRIPT_DIR=$MY_REP_DIR/dotfiles/scripts
     export MY_TTS_DIR=$MY_APP_DIR/lin/piper
+    export MY_DOTFILE_DIR=$MY_REP_DIR/dotfiles
+    export MY_SCRIPT_DIR=$MY_DOTFILE_DIR/scripts
 
     export PATH=/usr/local/bin:$PATH
     export PATH=~/.local/bin:$PATH

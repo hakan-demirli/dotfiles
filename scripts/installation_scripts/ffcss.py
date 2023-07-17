@@ -15,8 +15,9 @@ def find_firefox_profile_folder():
         if os.path.exists(location):
             with open(location, 'r') as file:
                 for line in file:
-                    if line.startswith('Path='):
-                        folder_name = line.strip()[5:]
+                    key = 'Default='
+                    if line.startswith(key):
+                        folder_name = line.strip().replace(key, "").strip()
                         return os.path.join(os.path.dirname(location), folder_name)
 
     return None
