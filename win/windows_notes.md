@@ -36,7 +36,10 @@
     * WizTree
 
 * **How to assign a key to another key/key combination**
-    * [SharpKeys](https://www.randyrants.com/category/sharpkeys/)
+    * Permanent:
+        * [SharpKeys](https://www.randyrants.com/category/sharpkeys/)
+    * Temp:
+        * AutoHotKey
 
 * **How to make taskbar thinner (vertical)**
     * Unlock the taskbar (right-click on taskbar > unlock the taskbar) and put it on the left or right

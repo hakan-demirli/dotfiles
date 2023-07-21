@@ -24,6 +24,7 @@ choco install -y musicbee
 choco install -y sudo
 choco install -y vscode
 choco install -y autohotkey
-
+choco install -y cmake
+choco install -y mingw
 # Install packages using Windows Package Manager (winget)
 winget install -e --id Valve.Steam

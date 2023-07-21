@@ -1,0 +1,8 @@
+Parameters
+Active: 1920 1080
+Front porch: 24 3
+Sync width:32 5
+@Back porch:32 10
+Sync polarity: + +
+
+@Refresh rate: 108.849
