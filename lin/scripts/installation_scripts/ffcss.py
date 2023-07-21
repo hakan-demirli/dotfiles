@@ -9,7 +9,8 @@ def find_firefox_profile_folder():
     # Search for profiles.ini in both locations
     locations = [
         os.path.expanduser('~/.mozilla/firefox/profiles.ini'),
-        os.path.expanduser('~/snap/firefox/common/.mozilla/firefox/profiles.ini')
+        os.path.expanduser('~/snap/firefox/common/.mozilla/firefox/profiles.ini'),
+        os.path.expanduser('~/AppData/Roaming/Mozilla/Firefox/profiles.ini')
     ]
     for location in locations:
         if os.path.exists(location):
