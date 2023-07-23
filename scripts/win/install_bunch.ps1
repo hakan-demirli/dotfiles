@@ -1,15 +1,13 @@
 
-# choco install -y vcredist140
 # choco install -y green-tunnel-gui
-# choco install -y powertoys
-# choco install -y autoruns
-# choco install -y sudo
 
 # winget install -e --id Valve.Steam        # I don't need
-# winget install -e --id MusicBee.MusicBee  # unexpected error. I use AIMP instead
-# winget install -e --id Lexikos.AutoHotkey # not found
-# winget install -e --id Guru3D.Afterburner # unexpected error
-# winget install -e --id Rufus.Rufus        # Buggy
+# winget install -e --id Lexikos.AutoHotkey # Get an exe
+# winget install -e --id Guru3D.Afterburner # Get an exe
+# winget install -e --id Rufus.Rufus        # Get an exe
+# winget install -e --id Gyan.FFmpeg        # Get an exe
+# winget install yt-dlp                     # Get an exe
+
 winget install -e --id Microsoft.DotNet.Runtime.7
 winget install -e --id Mozilla.Firefox
 winget install -e --id TorProject.TorBrowser
@@ -28,5 +26,4 @@ winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id AIMP.AIMP
 winget install -e --id Microsoft.DirectX
 winget install -e --id Microsoft.PowerToys
-
 
