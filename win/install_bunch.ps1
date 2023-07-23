@@ -1,30 +1,32 @@
-# Set the execution policy and update security protocol
-Set-ExecutionPolicy Bypass -Scope Process -Force
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
 
-# Install Chocolatey
-iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+# choco install -y vcredist140
+# choco install -y green-tunnel-gui
+# choco install -y powertoys
+# choco install -y autoruns
+# choco install -y sudo
 
-# Install packages using Chocolatey
-choco install -y firefox
-choco install -y msiafterburner
-choco install -y dotnet-7.0-desktopruntime
-choco install -y tor-browser
-choco install -y python --version=3.10.0
-choco install -y 7zip.install
-choco install -y qbittorrent
-# Note: The following line is commented out since 'microsoft-windows-terminal' is not working through Chocolatey
-# choco install -y microsoft-windows-terminal
-choco install -y git
-choco install -y vcredist140
-choco install -y green-tunnel-gui
-choco install -y powertoys
-choco install -y autoruns
-choco install -y musicbee
-choco install -y sudo
-choco install -y vscode
-choco install -y autohotkey
-choco install -y cmake
-choco install -y mingw
-# Install packages using Windows Package Manager (winget)
-winget install -e --id Valve.Steam
+# winget install -e --id Valve.Steam        # I don't need
+# winget install -e --id MusicBee.MusicBee  # unexpected error. I use AIMP instead
+# winget install -e --id Lexikos.AutoHotkey # not found
+# winget install -e --id Guru3D.Afterburner # unexpected error
+# winget install -e --id Rufus.Rufus        # Buggy
+winget install -e --id Microsoft.DotNet.Runtime.7
+winget install -e --id Mozilla.Firefox
+winget install -e --id TorProject.TorBrowser
+winget install -e --id Anaconda.Miniconda3
+winget install -e --id Git.Git
+winget install -e --id Microsoft.VisualStudioCode --override '/SILENT /mergetasks="!runcode,addcontextmenufiles,addcontextmenufolders"'
+winget install -e --id Kitware.CMake
+winget install -e --id 7zip.7zip
+winget install -e --id qBittorrent.qBittorrent
+winget install -e --id Microsoft.VCRedist.2015+.x86
+winget install -e --id Microsoft.VCRedist.2015+.x64
+winget install -e --id Microsoft.DotNet.DesktopRuntime.3_1
+winget install -e --id Microsoft.DotNet.DesktopRuntime.7
+winget install -e --id Microsoft.WindowsTerminal
+winget install -e --id OpenJS.NodeJS.LTS
+winget install -e --id AIMP.AIMP
+winget install -e --id Microsoft.DirectX
+winget install -e --id Microsoft.PowerToys
+
+

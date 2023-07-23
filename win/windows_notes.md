@@ -23,7 +23,7 @@
     * Create a cmd file with the follwing content and add it to startup folder Win+R (shell:startup)
         * python path\to\your\script.py
 
-- **Windows 10 style start menu for Windows 11**
+- **Windows 10 style start menu and vertical taskbar for Windows 11**
     * https://github.com/valinet/ExplorerPatcher
 
 - **Overclock monitor (display/refresh rate/Hz/cru)**
@@ -73,6 +73,7 @@
 * **Execution of scripts is disabled on this system**
     * Enable scripts:
         * `Set-ExecutionPolicy RemoteSigned`
+        * `Set-ExecutionPolicy unrestricted`
     * Disable again:
         * `Set-ExecutionPolicy Restricted`
 
@@ -162,7 +163,7 @@
         * Identify the default or the current Operating System and delete the other one.
 
 * **Open Source Asus Armor Create Alternative**
-    * [GHelper](https://github.com/seerge/g-helper/releases/download/v0.91/GHelper.zip)
+    * [GHelper](https://github.com/seerge/g-helper)
 
 - **Open a new tab in the running instance of Windows Terminal**
     * wt settings -> Startup -> Attach to the most rececently used.
