@@ -41,6 +41,12 @@
     * Temp:
         * AutoHotKey
 
+* **Duplicate file finder**
+    * 1st option:
+        * CCleaner Portable.
+    * 2nd option:
+        * WSL + Bash script.
+
 * **How to make taskbar thinner (vertical)**
     * Unlock the taskbar (right-click on taskbar > unlock the taskbar) and put it on the left or right
     * Enable small taskbar buttons
@@ -168,7 +174,8 @@
 - **Open a new tab in the running instance of Windows Terminal**
     * wt settings -> Startup -> Attach to the most rececently used.
 
-
+- **Usable partition manager**
+    * EaseUS Partition Master Free
 
 | AHK Shortcuts  | Description                   |
 | -----------    | -----------                   |

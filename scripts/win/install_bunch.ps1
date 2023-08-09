@@ -27,3 +27,5 @@ winget install -e --id AIMP.AIMP
 winget install -e --id Microsoft.DirectX
 winget install -e --id Microsoft.PowerToys
 
+# Install Install Visual Studio with C++ Desktop dev kit.
+# Install Cuda toolkit

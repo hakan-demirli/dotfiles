@@ -26,13 +26,6 @@ processKey(key_i, key_o) {
     }
 }
 
-toggleMode() {
-    global mode
-    mode := (mode == 0) ? 1 : 0
-    createIndicator((mode == 0) ? "I" : "V", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
-    changeVSCodeCursor((mode == 0) ? "block" : "line",(mode == 0) ? "line" : "block")
-}
-
 ReplaceStringInFile(inputFile, searchString, replacementString) {
     FileRead, fileContents, %inputFile%
     fileContents := StrReplace(fileContents, searchString, replacementString)
@@ -47,4 +40,11 @@ changeVSCodeCursor(from, to) {
     ReplacementString := """editor.cursorStyle"": """ . to . ""","
 
     ReplaceStringInFile(InputFilePath, SearchString, ReplacementString)
+}
+
+toggleMode() {
+    global mode
+    mode := (mode == 0) ? 1 : 0
+    createIndicator((mode == 0) ? "I" : "V", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+    changeVSCodeCursor((mode == 0) ? "block" : "line",(mode == 0) ? "line" : "block")
 }

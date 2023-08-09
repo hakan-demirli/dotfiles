@@ -6,12 +6,13 @@ sudo pacman -Syu
 sudo pacman -S --noconfirm --needed git
 sudo pacman -S --noconfirm --needed base-devel
 git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
+
+# Bunch of utility tools
 sudo pacman -S --noconfirm --needed ntfs-3g
 sudo pacman -S --noconfirm --needed gnome-disk-utility
 sudo pacman -S --noconfirm --needed gnome-system-monitor
 sudo pacman -S --noconfirm --needed drawing
 sudo pacman -S --noconfirm --needed nemo-fileroller
-sudo pacman -S --noconfirm --needed neovim
 sudo pacman -S --noconfirm --needed yt-dlp
 sudo pacman -S --noconfirm --needed xclip
 sudo pacman -S --noconfirm --needed cronie
@@ -22,7 +23,35 @@ sudo pacman -S --noconfirm --needed wofi
 sudo pacman -S --noconfirm --needed unrar
 sudo pacman -S --noconfirm --needed ranger
 sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
-sudo pacman -R --noconfirm vim
+
+# AGS
+sudo pacman -S --noconfirm --needed typescript
+sudo pacman -S --noconfirm --needed npm
+sudo pacman -S --noconfirm --needed meson
+sudo pacman -S --noconfirm --needed gjs
+sudo pacman -S --noconfirm --needed gtk3
+sudo pacman -S --noconfirm --needed gtk-layer-shell
+sudo pacman -S --noconfirm --needed socat
+sudo pacman -S --noconfirm --needed gnome-bluetooth-3.0
+sudo pacman -S --noconfirm --needed upower
+sudo pacman -S --noconfirm --needed networkmanager
+sudo pacman -S --noconfirm --needed gobject-introspection
+# Extra
+sudo pacman -S --noconfirm --needed swww
+sudo pacman -S --noconfirm --needed sassc
+sudo pacman -S --noconfirm --needed brightnessctl
+sudo pacman -S --noconfirm --needed asusctl
+sudo pacman -S --noconfirm --needed hyprpicker
+sudo pacman -S --noconfirm --needed slurp
+sudo pacman -S --noconfirm --needed wf-recorder
+sudo pacman -S --noconfirm --needed imagemagick
+sudo pacman -S --noconfirm --needed watershot
+sudo pacman -S --noconfirm --needed wl-gammactl
+sudo pacman -S --noconfirm --needed pavucontrol
+
+#
+sudo pacman -R --noconfirm --needed vim
+sudo pacman -S --noconfirm --needed neovim
 
 sudo pacman -S --noconfirm --needed blueman
 sudo pacman -S --noconfirm --needed bluez
