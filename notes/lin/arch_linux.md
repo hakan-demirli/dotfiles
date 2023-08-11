@@ -9,6 +9,8 @@ sudo woeusb /mnt/second/software/isos/Win10_22H2_English_x64v1.iso --device /dev
 sudo woeusb /mnt/second/software/isos/Win10_22H2_English_x64v1.iso --device /dev/sdb
 
 
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+
 
 
 * Arch Linux System Freeze on Startup
@@ -17,6 +19,25 @@ sudo woeusb /mnt/second/software/isos/Win10_22H2_English_x64v1.iso --device /dev
 * Gparted is a gtk based disk tool. Better than gnome disks etc.
 * "Drawing" is an alternative to kolourpaint on gnome.
 
+
+
+* **Add windows to grub menu**
+	* `lsblk` find disk of windows
+	* `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of windows
+	* `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
+		```
+		menuentry "Windows 10" {
+			insmod part_gpt
+			insmod fat
+			insmod search_fs_uuid
+			insmod chain
+			search --fs-uuid --no-floppy --set=root XXXXXXXXX
+			chainloader (${root})/efi/Microsoft/Boot/bootmgfw.efi
+		}
+		```
+	* `sudo chmod +x /etc/grub.d/40_custom` Set permissions.
+	* `sudo grub-mkconfig -o /boot/grub/grub.cfg` regen grub.cfg
+	* reboot.
 
 # Live USB
 * **How to connect to wifi**
@@ -212,11 +233,13 @@ Use "-j$(nproc)" to give you the number of cores available to the system. This a
 
 
 
+OpenSnitch is a GNU/Linux interactive application firewall
 
 
+RustDesk – The Open Source Remote Desktop Access Software
 
 
+Frog - Extract text from images
 
-
-
+cassowary - Run Windows Applications on Linux as if they are native. WSL like.
 

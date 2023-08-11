@@ -21,7 +21,9 @@ sudo pacman -S --noconfirm --needed kitty
 sudo pacman -S --noconfirm --needed fzf
 sudo pacman -S --noconfirm --needed wofi
 sudo pacman -S --noconfirm --needed unrar
+sudo pacman -S --noconfirm --needed p7zip
 sudo pacman -S --noconfirm --needed ranger
+sudo pacman -S --noconfirm --needed wget
 sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
 
 # AGS
@@ -37,17 +39,20 @@ sudo pacman -S --noconfirm --needed upower
 sudo pacman -S --noconfirm --needed networkmanager
 sudo pacman -S --noconfirm --needed gobject-introspection
 # Extra
-sudo pacman -S --noconfirm --needed swww
 sudo pacman -S --noconfirm --needed sassc
 sudo pacman -S --noconfirm --needed brightnessctl
-sudo pacman -S --noconfirm --needed asusctl
-sudo pacman -S --noconfirm --needed hyprpicker
+yay -S --noconfirm --answerdiff=None swww
+yay -S --noconfirm --answerdiff=None asusctl
+yay -S --noconfirm --answerdiff=None rog-control-center
+# sudo pacman -S --noconfirm --needed hyprpicker
+#---
 sudo pacman -S --noconfirm --needed slurp
 sudo pacman -S --noconfirm --needed wf-recorder
 sudo pacman -S --noconfirm --needed imagemagick
 sudo pacman -S --noconfirm --needed watershot
 sudo pacman -S --noconfirm --needed wl-gammactl
 sudo pacman -S --noconfirm --needed pavucontrol
+#---
 
 #
 sudo pacman -R --noconfirm --needed vim
@@ -74,11 +79,8 @@ yay -S --noconfirm --answerdiff=None visual-studio-code-bin
 yay -S --noconfirm --answerdiff=None green-tunnel
 yay -S --noconfirm --answerdiff=None sayonara-player
 yay -S --noconfirm --answerdiff=None woeusb-ng
-yay -S --noconfirm --answerdiff=None swww
 yay -S --noconfirm --answerdiff=None python-pyclip
 
-yay -S --noconfirm --answerdiff=None asusctl
-yay -S --noconfirm --answerdiff=None rog-control-center
 
 # Install a Nerd Font
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
