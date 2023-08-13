@@ -3,6 +3,7 @@ import time
 import mylib
 import subprocess
 import requests
+from PIL import Image
 
 
 def filter_ics_content(content):
@@ -29,6 +30,14 @@ def main():
     subprocess.run(["python", f"{script_dir}/ics2overlay.py"])
     subprocess.run(["python", f"{script_dir}/overlayImages.py"])
     mylib.changeWallpaper(mylib.OVERLAYED_FILE)
+
+    image = Image.open(mylib.OVERLAYED_FILE)
+    width, height = image.size
+    crop_box = (137, 26, width, height)
+    cropped_image = image.crop(crop_box)
+    cropped_image.save(mylib.OVERLAYED_FILE)
+    image.close()
+
     mylib.setFirefoxWallpaper(mylib.OVERLAYED_FILE)
 
 

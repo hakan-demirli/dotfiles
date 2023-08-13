@@ -1,2 +1,3 @@
 *.exe
+*.wav
 *__pycache__*

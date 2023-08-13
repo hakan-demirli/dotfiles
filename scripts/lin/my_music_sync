@@ -1,3 +1,0 @@
-#!/bin/bash
-python3 $MY_SCRIPT_DIR/python_scripts/youtube_sync.py
-
