@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import threading, queue, time, sys, os, string, re, random, logging, pyclip, multiprocessing, tempfile, subprocess
+import threading, queue, time, sys, os, string, re, random, logging, clipboard, multiprocessing, tempfile, subprocess
+import mylib
 
 # sudo apt install xclip
 
@@ -8,8 +9,7 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 TEMPO = 1
 OUTPUT_DIR = tempfile.gettempdir()
-TTS_PATH = os.getenv("MY_TTS_DIR")  # Path(__file__).parent
-MODEL_PATH = TTS_PATH + "/en_GB-jenny_dioco-medium.onnx"
+MODEL_PATH = mylib.TTS_DIR + "/models/en_GB-jenny_dioco-medium.onnx"
 GPU = True
 RETRY_TIMES = 5
 DELIMETERS = "[?.!]"
@@ -129,6 +129,10 @@ CONTRACTIONS = {
     "you'll've": "you will have",
     "you've": "you have",
     " multiline ": "multi line",
+    "- ": "",
+    " to ": " 2 ",
+    " CPU ": " see pi you ",
+    " CPU": " see pi you",
 }
 
 
@@ -156,16 +160,14 @@ def retry(times):
     return decorator
 
 
-def get_random_string():
-    letters = string.ascii_lowercase
-    return "".join(random.choice(letters) for i in range(RAND_SIZE))
-
-
 @retry(times=RETRY_TIMES)
 def tts_to_file(txt, file_path):
-    print(MODEL_PATH)
-    command = f"echo '{txt}' | {TTS_PATH}/piper --output_file {file_path} --model {MODEL_PATH}"
-    subprocess.call(command, shell=True)
+    piper_path = os.path.abspath(f"{mylib.TTS_DIR}/piper")
+    command = (
+        f"echo '{txt}' | {piper_path} --output_file {file_path} --model {MODEL_PATH}"
+    )
+    print(command)
+    subprocess.run(command, shell=True)
 
 
 def convert_txt_to_wav(txt_queue, wav_queue):
@@ -173,7 +175,7 @@ def convert_txt_to_wav(txt_queue, wav_queue):
     while getattr(t, "do_run", True):
         txts = txt_queue.get()
         for txt in txts:
-            file_path = OUTPUT_DIR + f"/{get_random_string()}.wav"
+            file_path = OUTPUT_DIR + f"/{mylib.getRandomFileName()}.wav"
             t0 = threading.Thread(target=tts_to_file, args=[txt, file_path])
             t0.start()
             t0.join(INFERENCE_TIMEOUT)
@@ -183,7 +185,7 @@ def convert_txt_to_wav(txt_queue, wav_queue):
 
 def change_wav_speed(wav_file):
     f = Path(wav_file)
-    tf = f.stem + (get_random_string() + ".wav")
+    tf = f.stem + (mylib.getRandomFileName() + ".wav")
     subprocess.call(
         f'ffmpeg -i {f} -filter:a "atempo={TEMPO}" {tf}  > /dev/null',
         shell=True,
@@ -201,13 +203,42 @@ def play_wav(wav_queue):
         if TEMPO != 1:
             change_wav_speed(wav_file)
         try:
-            subprocess.call(["paplay", wav_file])
+            subprocess.call(
+                [
+                    "ffplay",
+                    "-nodisp",
+                    "-autoexit",
+                    "-t",
+                    str(float(get_duration(wav_file)) - 0.2),
+                    wav_file,
+                ]
+            )
         except:
             pass
         try:
             os.remove(wav_file)
         except:
             pass
+
+
+def get_duration(wav_file):
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-i",
+            wav_file,
+            "-show_entries",
+            "format=duration",
+            "-v",
+            "quiet",
+            "-of",
+            "csv=p=0",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    duration = result.stdout.strip()
+    return duration
 
 
 def sanitizeString(in_str):
@@ -217,10 +248,6 @@ def sanitizeString(in_str):
         in_str.replace(key, value)
 
     in_str = " ".join(in_str.splitlines())
-    in_str = in_str.replace("- ", "")
-    in_str = in_str.replace(" to ", " 2 ")
-    in_str = in_str.replace(" CPU ", " see pi you ")
-    in_str = in_str.replace(" CPU", " see pi you")
     pattern = r"\d+\.\d+"
     floats = re.findall(pattern, in_str)
     for f in floats:
@@ -235,7 +262,7 @@ def listen_clipboard(txt_queue, wav_queue):
     recent_value = ""
     new_value = ""
     while getattr(t, "do_run", True):
-        new_value = pyclip.paste(text=True)
+        new_value = clipboard.paste()
         if (new_value != recent_value) and (len(new_value) < MAX_STR_SIZE):
             recent_value = new_value
             val = sanitizeString(new_value)

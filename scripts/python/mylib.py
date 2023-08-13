@@ -8,6 +8,7 @@ import tkinter
 import string
 import random
 import tempfile
+import shutil
 
 from PIL import Image
 
@@ -15,25 +16,29 @@ from PIL import Image
 """
 Dependencies:
     Windows      :
-        Pillow, yt-dlp, ffmpeg, pyclip
+        Pillow, yt-dlp, ffmpeg, clipboard
     Arch Hyprland:
         sudo pacman -S --noconfirm --needed  ffmpeg
         sudo pacman -S --noconfirm --needed  tk
         sudo pacman -S --noconfirm --needed  yt-dlp
         sudo pacman -S --noconfirm --needed  python-pillow
-        yay -S --noconfirm --answerdiff=None python-pyclip
+        sudo pacman -S --noconfirm --needed  xclip
+        yay -S --noconfirm --answerdiff=None python-clipboard
         yay -S --noconfirm --answerdiff=None swww
 """
 
 ##########
 if "nt" in os.name:
     SECOND_ROOT_DIR = "D:"
+    TTS_DIR = SECOND_ROOT_DIR + "/software/win/piper"
 else:
     SECOND_ROOT_DIR = "/mnt/second"
+    TTS_DIR = SECOND_ROOT_DIR + "/software/lin/piper"
 
 MUSIC_DIR = SECOND_ROOT_DIR + "/music"
 WALLPAPERS_PC_DIR = SECOND_ROOT_DIR + "/images/art/wallpapers_pc"
 
+APPLET_ICON_FILE = SECOND_ROOT_DIR + "/images/icons/gear.ico"
 PLAYLIST_FILE = MUSIC_DIR + "/playlists.txt"
 ICS_FILE = tempfile.gettempdir() + "/calendar_events.ics"
 OVERLAY_FILE = tempfile.gettempdir() + "/overlay.png"
@@ -44,6 +49,43 @@ FIREFOX_CSS_URL = "https://github.com/hakan-demirli/Firefox_Custom_CSS"
 # Secrets
 ICS_URL = "https://calendar.google.com/calendar/ical/12345%40group.calendar.google.com/public/basic.ics"
 ########
+
+
+def changeStringInPlace(old_string: str, new_string: str, file: str) -> None:
+    with open(file) as f:
+        s = f.read()
+        if old_string not in s:
+            print(f'"{old_string}" not found')
+            return
+
+    with open(file, "w") as f:
+        s = s.replace(old_string, new_string)
+        f.write(s)
+
+
+def removeAllFiles(dir: str, extensions: list) -> None:
+    for ext in extensions:
+        for index, path in enumerate(pathlib.Path(dir).glob(ext)):
+            os.remove(path)
+
+
+def setFirefoxWallpaper(wallpaper_path: str) -> None:
+    chrome_folder_path = chromeFolderPath()
+    css_file = chrome_folder_path + "userContent.css"
+    types = [".jpg", ".png", ".jpeg"]
+    removeAllFiles(chromeFolderPath(), types)  # del old wp
+    new_wallpaper_path = pathlib.Path(wallpaper_path)
+    shutil.copy2(wallpaper_path, chrome_folder_path)
+    new_wallpaper_name = (
+        chrome_folder_path + "my_wallpaper" + str(new_wallpaper_path.suffix)
+    )
+
+    shutil.move(
+        chrome_folder_path + str(new_wallpaper_path.stem + new_wallpaper_path.suffix),
+        new_wallpaper_name,
+    )
+    for type in types:
+        changeStringInPlace(type, str(new_wallpaper_path.suffix), css_file)
 
 
 def chromeFolderPath() -> str:

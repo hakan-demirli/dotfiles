@@ -1,17 +1,28 @@
-from traymenu import TrayMenu, quitsystray
+from dep.traymenu import TrayMenu, quitsystray
+import mylib
+import subprocess
+import pathlib
 
 
 if __name__ == "__main__":
-    # Adapted from: https://gist.github.com/jasonbot/5759510 (Python 2)
+    script_dir = pathlib.Path(__file__).parent.absolute()
 
     tm = TrayMenu(
-        icon=r"C:/Users/emre/Downloads/gear.ico",
+        icon=mylib.APPLET_ICON_FILE,
         functions=(
-            ("Men1", lambda: print(331)),
-            ("Men2", False),  # not clickable
-            ("!Default", lambda: print(22)),  # default [bold]
+            (
+                "🎵 youtubeSync",
+                lambda: subprocess.run(["python", f"{script_dir}/youtubeSync.py"]),
+            ),
+            (
+                "🗓️ updateOverlay",
+                lambda: subprocess.run(["python", f"{script_dir}/updateOverlay.py"]),
+            ),
             "--",  # Separator
-            ("Men3", lambda: print(str(1))),
+            (
+                "🗣️ clipboardTTS",
+                lambda: subprocess.run(["python", f"{script_dir}/clipboardTTS.py"]),
+            ),
             ("Quit", lambda: quitsystray()),
         ),
     )

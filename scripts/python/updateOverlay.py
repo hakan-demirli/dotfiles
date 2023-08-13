@@ -24,19 +24,12 @@ def getICS(ics_file, url):
 
 
 def main():
-    last_ics_content = None
     script_dir = pathlib.Path(__file__).parent.absolute()
-    while True:
-        getICS(mylib.ICS_FILE, mylib.ICS_URL)
-
-        with open(mylib.ICS_FILE, "rb") as f:
-            new_ics_content = f.read()
-
-        if last_ics_content is not None and new_ics_content != last_ics_content:
-            subprocess.run(["python", f"{script_dir}/ics2overlay.py"])
-
-        last_ics_content = new_ics_content
-        time.sleep(120)
+    getICS(mylib.ICS_FILE, mylib.ICS_URL)
+    subprocess.run(["python", f"{script_dir}/ics2overlay.py"])
+    subprocess.run(["python", f"{script_dir}/overlayImages.py"])
+    mylib.changeWallpaper(mylib.OVERLAYED_FILE)
+    mylib.setFirefoxWallpaper(mylib.OVERLAYED_FILE)
 
 
 if __name__ == "__main__":
