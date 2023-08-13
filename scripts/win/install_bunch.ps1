@@ -25,6 +25,7 @@ winget install -e --id Microsoft.WindowsTerminal
 # winget install -e --id Anaconda.Miniconda3
 winget install -e --id Git.Git
 winget install -e --id Microsoft.VisualStudioCode --override '/SILENT /mergetasks="!runcode,addcontextmenufiles,addcontextmenufolders"'
+winget install -e --id Neovim.Neovim
 winget install -e --id Kitware.CMake
 winget install -e --id qBittorrent.qBittorrent
 winget install -e --id Microsoft.PowerToys

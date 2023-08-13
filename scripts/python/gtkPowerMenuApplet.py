@@ -32,19 +32,19 @@ class AppIndicatorExample:
         )
         self.add_menu_item(
             menu,
-            "Shutdown",
-            self.confirm_action,
-            "Shutdown",
-            "Are you sure you want to shut down?",
-        )
-        self.add_menu_item(
-            menu,
             "Reboot",
             self.confirm_action,
             "Reboot",
             "Are you sure you want to reboot?",
         )
-        self.add_menu_item(menu, "Quit", self.quit)
+        self.add_menu_item(
+            menu,
+            "Shutdown",
+            self.confirm_action,
+            "Shutdown",
+            "Are you sure you want to shut down?",
+        )
+        # self.add_menu_item(menu, "Quit", self.quit)
 
         menu.show_all()
         return menu

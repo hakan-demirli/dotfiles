@@ -30,7 +30,9 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 ; RunWait,komorebic.exe complete-configuration, Detached
 ; SetWorkingDir, %A_WorkingDir%
 
-RunWait,python %A_ScriptDir%\..\..\python\change_wallpaper_firefox.py, ,hide
+RunWait,python %A_ScriptDir%\..\..\python\changeWallpaperFirefox.py, ,hide
+Run,python %A_ScriptDir%\..\..\python\service.updateOverlayOnICSChange.py, ,hide
+Run,python %A_ScriptDir%\..\..\python\service.changeWallpaperOnOverlayChange.py, ,hide
 
 ; BINDINGS BELOW
 ;-------------------------------------------------

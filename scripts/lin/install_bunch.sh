@@ -44,27 +44,28 @@ sudo pacman -S --noconfirm --needed brightnessctl
 yay -S --noconfirm --answerdiff=None swww
 yay -S --noconfirm --answerdiff=None asusctl
 yay -S --noconfirm --answerdiff=None rog-control-center
-# sudo pacman -S --noconfirm --needed hyprpicker
 #---
 sudo pacman -S --noconfirm --needed slurp
 sudo pacman -S --noconfirm --needed wf-recorder
-sudo pacman -S --noconfirm --needed imagemagick
-sudo pacman -S --noconfirm --needed watershot
 sudo pacman -S --noconfirm --needed wl-gammactl
 sudo pacman -S --noconfirm --needed pavucontrol
+yay -S --noconfirm --answerdiff=None hyprshot
+yay -S --noconfirm --answerdiff=None nwg-displays
+yay -S --noconfirm --answerdiff=None wlr-randr
+yay -S --noconfirm --answerdiff=None swaync
+
 #---
 
 #
-sudo pacman -R --noconfirm --needed vim
 sudo pacman -S --noconfirm --needed neovim
 
 sudo pacman -S --noconfirm --needed blueman
 sudo pacman -S --noconfirm --needed bluez
 sudo systemctl start bluetooth.service
 
-yay -S input-remapper-git
-sudo systemctl restart input-remapper
-sudo systemctl enable input-remapper
+# yay -S input-remapper-git
+# sudo systemctl restart input-remapper
+# sudo systemctl enable input-remapper
 
 sudo sed -i '/^#\[multilib\]/{N;s/#//g}' /etc/pacman.conf
 sudo pacman -Sy
@@ -139,7 +140,7 @@ chmod +x $SCRIPT_DIR/scripts/*
 
 
 gsettings set org.gnome.desktop.interface color-scheme prefer-dark
-gsettings set org.cinnamon.desktop.default-applications.terminal exec foot
+gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
 
 
 systemctl daemon-reload && systemctl restart asusd

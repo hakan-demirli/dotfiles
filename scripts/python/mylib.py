@@ -7,15 +7,47 @@ import ctypes
 import tkinter
 import string
 import random
+import tempfile
+
 from PIL import Image
 
 
 """
 Dependencies:
-    Gnome: Pillow
-    Hyprland,SWAY: swww, Pillow
-    Windows: Pillow
+    Windows      :
+        Pillow, yt-dlp, ffmpeg, pyclip
+    Arch Hyprland:
+        sudo pacman -S --noconfirm --needed  ffmpeg
+        sudo pacman -S --noconfirm --needed  tk
+        sudo pacman -S --noconfirm --needed  yt-dlp
+        sudo pacman -S --noconfirm --needed  python-pillow
+        yay -S --noconfirm --answerdiff=None python-pyclip
+        yay -S --noconfirm --answerdiff=None swww
 """
+
+##########
+if "nt" in os.name:
+    SECOND_ROOT_DIR = "D:"
+else:
+    SECOND_ROOT_DIR = "/mnt/second"
+
+MUSIC_DIR = SECOND_ROOT_DIR + "/music"
+WALLPAPERS_PC_DIR = SECOND_ROOT_DIR + "/images/art/wallpapers_pc"
+
+PLAYLIST_FILE = MUSIC_DIR + "/playlists.txt"
+ICS_FILE = tempfile.gettempdir() + "/calendar_events.ics"
+OVERLAY_FILE = tempfile.gettempdir() + "/overlay.png"
+OVERLAYED_FILE = tempfile.gettempdir() + "/overlayed.png"
+ANON_FONT_FILE = SECOND_ROOT_DIR + "/fonts/anonymous.ttf"
+
+FIREFOX_CSS_URL = "https://github.com/hakan-demirli/Firefox_Custom_CSS"
+# Secrets
+ICS_URL = "https://calendar.google.com/calendar/ical/12345%40group.calendar.google.com/public/basic.ics"
+########
+
+
+def chromeFolderPath() -> str:
+    return f"{findFirefoxProfileFolder()}/chrome/"
 
 
 def checkFileModification(filename, last_mod_time):
@@ -112,7 +144,7 @@ def daysSinceEpoch():
     return (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).days
 
 
-def findFirefoxPorfileFolder():
+def findFirefoxProfileFolder():
     # Search for profiles.ini in all locations
     locations = [
         os.path.expanduser("~/.mozilla/firefox/profiles.ini"),

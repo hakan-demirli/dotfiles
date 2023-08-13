@@ -298,30 +298,3 @@ if __name__ == "__main__":
             for thread in threads:
                 thread.join(EXIT_TIMEOUT)
             sys.exit(1)
-
-
-"""
-0 / 1 files viewed
-3
-src/pyperclip/__init__.py
-Marking files as viewed can help keep track of your progress, but will not affect your submitted review
-Viewed
-@@ -559,6 +559,9 @@ def determine_clipboard():
-    if HAS_DISPLAY:
-    if HAS_DISPLAY:
-        try:
-        try:
-            import gtk  # check if gtk is installed
-            import gtk  # check if gtk is installed
-            gtk.Clipboard()
-        except AttributeError:
-            pass
-        except ImportError:
-        except ImportError:
-            pass # We want to fail fast for all non-ImportError exceptions.
-            pass # We want to fail fast for all non-ImportError exceptions.
-        else:
-        else:
-
-
-"""
