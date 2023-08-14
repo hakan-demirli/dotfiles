@@ -1,3 +1,4 @@
 *.exe
 *.wav
+*.json
 *__pycache__*

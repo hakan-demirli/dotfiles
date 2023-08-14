@@ -16,13 +16,20 @@ from PIL import Image
 """
 Dependencies:
     Windows      :
-        Pillow, yt-dlp, ffmpeg, clipboard
+        winget install -e --id JohnMacFarlane.Pandoc
+        winget install -e --id Gyan.FFmpeg
+        winget install -e --id yt-dlp.yt-dlp
+        pip install clipboard
+        pip install Pillow
+        pip install gcalcli
+        pip install pandoc
     Arch Hyprland:
         sudo pacman -S --noconfirm --needed  ffmpeg
         sudo pacman -S --noconfirm --needed  tk
         sudo pacman -S --noconfirm --needed  yt-dlp
         sudo pacman -S --noconfirm --needed  python-pillow
         sudo pacman -S --noconfirm --needed  xclip
+        sudo pacman -S --noconfirm --needed  pandoc
         yay -S --noconfirm --answerdiff=None python-clipboard
         yay -S --noconfirm --answerdiff=None swww
 """
@@ -31,9 +38,11 @@ Dependencies:
 if "nt" in os.name:
     SECOND_ROOT_DIR = "D:"
     TTS_DIR = SECOND_ROOT_DIR + "/software/win/piper"
+    TERMINAL = "wt"
 else:
     SECOND_ROOT_DIR = "/mnt/second"
     TTS_DIR = SECOND_ROOT_DIR + "/software/lin/piper"
+    TERMINAL = "kitty"
 
 MUSIC_DIR = SECOND_ROOT_DIR + "/music"
 WALLPAPERS_PC_DIR = SECOND_ROOT_DIR + "/images/art/wallpapers_pc"
@@ -41,7 +50,9 @@ WALLPAPERS_PC_DIR = SECOND_ROOT_DIR + "/images/art/wallpapers_pc"
 APPLET_ICON_FILE = SECOND_ROOT_DIR + "/images/icons/gear.ico"
 PLAYLIST_FILE = MUSIC_DIR + "/playlists.txt"
 ICS_FILE = tempfile.gettempdir() + "/calendar_events.ics"
-OVERLAY_FILE = tempfile.gettempdir() + "/overlay.png"
+CALENDAR_OVERLAY_FILE = tempfile.gettempdir() + "/calendar_overlay.png"
+TASKS_OVERLAY_FILE = tempfile.gettempdir() + "/tasks_overlay.png"
+TASKS_FILE = tempfile.gettempdir() + "/tasks.md"
 OVERLAYED_FILE = tempfile.gettempdir() + "/overlayed.png"
 ANON_FONT_FILE = SECOND_ROOT_DIR + "/fonts/anonymous.ttf"
 
@@ -102,14 +113,16 @@ def getRandomFileName(length=32) -> str:
     return "".join(random.choice(letters) for _ in range(length))
 
 
-def overlayImages(background_image: str, overlay_image: str, output_image: str) -> None:
+def overlayImages(
+    background_image: str,
+    overlay_image: str,
+    output_image: str,
+    x_offset: int,
+    y_offset: int,
+) -> None:
     # Open the background and overlay images
     background = Image.open(background_image)
     overlay = Image.open(overlay_image)
-
-    # Calculate the position for overlay (top right corner)
-    x_offset = background.width - overlay.width
-    y_offset = 0
 
     # Create a copy of the background image to work with
     combined = background.copy()

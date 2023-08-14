@@ -18,6 +18,10 @@ if __name__ == "__main__":
                 "🗓️ updateOverlay",
                 lambda: subprocess.run(["python", f"{script_dir}/updateOverlay.py"]),
             ),
+            (
+                "📝 editTasks",
+                lambda: subprocess.run(["python", f"{script_dir}/editTasks.py"]),
+            ),
             "--",  # Separator
             (
                 "🗣️ clipboardTTS",

@@ -3,10 +3,11 @@ import subprocess
 import tempfile
 import mylib
 import pathlib
+from PIL import Image
 
 
 def main():
-    overlay_file = mylib.OVERLAY_FILE
+    overlay_file = mylib.CALENDAR_OVERLAY_FILE
     wp_folder = mylib.WALLPAPERS_PC_DIR
     types = [".jpg", ".png", ".jpeg"]
 
@@ -19,14 +20,26 @@ def main():
     monitor_width, monitor_height = mylib.getMonitorResolution()
     if monitor_width and monitor_height:
         try:
-            with tempfile.TemporaryDirectory() as temp_dir:
-                resized_image = os.path.join(
-                    temp_dir, f"{mylib.getRandomFileName()}.png"
-                )
+            with tempfile.NamedTemporaryFile(
+                suffix=".png", delete=False
+            ) as resized_image:
                 mylib.resizeImage(
                     wallpapers[idx], resized_image, monitor_width, monitor_height
                 )
-                mylib.overlayImages(resized_image, overlay_file, mylib.OVERLAYED_FILE)
+
+                background = Image.open(resized_image)
+                overlay = Image.open(overlay_file)
+
+                # Calculate the position for overlay (top right corner)
+                x_offset = background.width - overlay.width
+                y_offset = 0
+                mylib.overlayImages(
+                    resized_image,
+                    overlay_file,
+                    mylib.OVERLAYED_FILE,
+                    x_offset,
+                    y_offset,
+                )
 
         except FileNotFoundError:
             print("Input image files not found.")

@@ -164,10 +164,7 @@ def dateTuple(month_year_string):
 
 
 def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
-    font = ImageFont.truetype(
-        mylib.ANON_FONT_FILE, size=10
-    )  # Adjust font size as needed
-
+    font = ImageFont.truetype(mylib.ANON_FONT_FILE, size=10)
     # Define the start and end dates for your loop
     start_date = datetime.date(2020, 1, 1)
     end_date = datetime.date(2030, 12, 31)
@@ -251,7 +248,7 @@ def main():
         x_offset += column_width
 
     # Save the image
-    image.save(mylib.OVERLAY_FILE)
+    image.save(mylib.CALENDAR_OVERLAY_FILE)
 
 
 if __name__ == "__main__":
