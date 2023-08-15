@@ -1,8 +1,6 @@
-import os
 import subprocess
 import tempfile
 import mylib
-import pathlib
 from PIL import Image
 
 

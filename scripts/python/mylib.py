@@ -2,21 +2,21 @@ import pathlib
 import datetime
 import subprocess
 import os
-import platform
 import ctypes
 import tkinter
 import string
 import random
+import sys
 import tempfile
 import shutil
-
+import importlib.util
 from PIL import Image
 
 
 """
 Dependencies:
     Windows      :
-        winget install -e --id JohnMacFarlane.Pandoc
+        Pandoc.exe == pandoc 2.19.2
         winget install -e --id Gyan.FFmpeg
         winget install -e --id yt-dlp.yt-dlp
         pip install clipboard
@@ -44,6 +44,7 @@ else:
     TTS_DIR = SECOND_ROOT_DIR + "/software/lin/piper"
     TERMINAL = "kitty"
 
+SECRETS_DIR = SECOND_ROOT_DIR + "/rep/personal_repo/secrets"
 MUSIC_DIR = SECOND_ROOT_DIR + "/music"
 WALLPAPERS_PC_DIR = SECOND_ROOT_DIR + "/images/art/wallpapers_pc"
 
@@ -57,9 +58,16 @@ OVERLAYED_FILE = tempfile.gettempdir() + "/overlayed.png"
 ANON_FONT_FILE = SECOND_ROOT_DIR + "/fonts/anonymous.ttf"
 
 FIREFOX_CSS_URL = "https://github.com/hakan-demirli/Firefox_Custom_CSS"
+
 # Secrets
-ICS_URL = "https://calendar.google.com/calendar/ical/12345%40group.calendar.google.com/public/basic.ics"
-########
+sys.path.append(SECRETS_DIR)
+try:
+    from my_secrets import *
+except:
+    pass
+
+
+#############
 
 
 def changeStringInPlace(old_string: str, new_string: str, file: str) -> None:

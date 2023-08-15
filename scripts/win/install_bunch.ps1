@@ -5,7 +5,6 @@
 # winget install -e --id Lexikos.AutoHotkey # Get an exe
 # winget install -e --id Guru3D.Afterburner # Get an exe
 # winget install -e --id Rufus.Rufus        # Get an exe
-# winget install yt-dlp                     # Get an exe
 
 # dependencies
 winget install -e --id Microsoft.DotNet.Runtime.7
@@ -17,7 +16,7 @@ winget install -e --id Microsoft.DirectX
 winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id Gyan.FFmpeg
 winget install -e --id yt-dlp.yt-dlp
-
+winget install -e --id Discord.Discord
 
 # Browsers, tools, development
 winget install -e --id Mozilla.Firefox

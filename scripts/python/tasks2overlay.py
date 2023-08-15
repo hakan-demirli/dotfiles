@@ -1,7 +1,6 @@
 import mylib
 from PIL import Image, ImageDraw, ImageFont
 from xdg import xdg_cache_home
-import os
 import subprocess
 
 """
@@ -14,6 +13,8 @@ Dependencies:
 Modify the package after installation.
 Editor.py:
     self.editor = "code"
+cli.py:
+    str.lower -> str
 """
 
 
@@ -39,7 +40,7 @@ def main():
     image = Image.new("RGBA", (width, height), background_color)
     draw = ImageDraw.Draw(image)
 
-    command = "gtasks-md view"
+    command = "gtasks-md --status needsAction view"
     font = ImageFont.truetype(font_file, size=font_size)
     output = subprocess.check_output(command, shell=True, text=True)
     lines = output.split("\n")

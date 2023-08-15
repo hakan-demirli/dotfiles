@@ -1,5 +1,4 @@
 import pathlib
-import time
 import mylib
 import subprocess
 import requests
