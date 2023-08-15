@@ -61,6 +61,7 @@ sudo pacman -S --noconfirm --needed neovim
 
 sudo pacman -S --noconfirm --needed blueman
 sudo pacman -S --noconfirm --needed bluez
+sudo systemctl enable bluetooth.service
 sudo systemctl start bluetooth.service
 
 # yay -S input-remapper-git
