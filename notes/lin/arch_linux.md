@@ -1,103 +1,81 @@
-https://confluence.jaytaala.com/display/TKB/Use+a+swap+file+and+enable+hibernation+on+Arch+Linux+-+including+on+a+LUKS+root+partition#UseaswapfileandenablehibernationonArchLinuxincludingonaLUKSrootpartition-Enablehibernation
+* **Enable Hibernation**
+    * [tutorial](https://confluence.jaytaala.com/display/TKB/Use+a+swap+file+and+enable+hibernation+on+Arch+Linux+-+including+on+a+LUKS+root+partition#UseaswapfileandenablehibernationonArchLinuxincludingonaLUKSrootpartition-Enablehibernation)
+    * ```systemctl hibernate```
 
-```systemctl hibernate```
+* **Use woeusb without gui**
+    * ```sudo woeusb /mnt/second/software/isos/Win10_22H2_English_x64v1.iso --device /dev/sdb```
 
+* **Set theme preference for gnome**
+    * ```gsettings set org.gnome.desktop.interface color-scheme prefer-dark```
 
-sudo woeusb /mnt/second/software/isos/Win10_22H2_English_x64v1.iso --device /dev/sdb
+* **Gnome disks alternative**
+    * Gparted
 
+* **Kolourpaint alternative**
+    * Drawing
 
-sudo woeusb /mnt/second/software/isos/Win10_22H2_English_x64v1.iso --device /dev/sdb
-
-
-gsettings set org.gnome.desktop.interface color-scheme prefer-dark
-
-
-
-* Arch Linux System Freeze on Startup
-    * try setting media.rdd-ffmpeg.enabled to false
-    *
-* Gparted is a gtk based disk tool. Better than gnome disks etc.
-* "Drawing" is an alternative to kolourpaint on gnome.
-
-
+* **How to downgrade a package**
+    * ```yay -S downgrade```
+    * ```sudo downgrade <package_name>```
 
 * **Add windows to grub menu**
-	* `lsblk` find disk of windows
-	* `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of windows
-	* `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
-		```
-		menuentry "Windows 10" {
-			insmod part_gpt
-			insmod fat
-			insmod search_fs_uuid
-			insmod chain
-			search --fs-uuid --no-floppy --set=root XXXXXXXXX
-			chainloader (${root})/efi/Microsoft/Boot/bootmgfw.efi
-		}
-		```
-	* `sudo chmod +x /etc/grub.d/40_custom` Set permissions.
-	* `sudo grub-mkconfig -o /boot/grub/grub.cfg` regen grub.cfg
-	* reboot.
+    * `lsblk` find disk of windows
+    * `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of windows
+    * `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
+        ```
+        menuentry "Windows 10" {
+            insmod part_gpt
+            insmod fat
+            insmod search_fs_uuid
+            insmod chain
+            search --fs-uuid --no-floppy --set=root XXXXXXXXX
+            chainloader (${root})/efi/Microsoft/Boot/bootmgfw.efi
+        }
+        ```
+    * `sudo chmod +x /etc/grub.d/40_custom` Set permissions.
+    * `sudo grub-mkconfig -o /boot/grub/grub.cfg` regen grub.cfg
+    * reboot.
 
-# Live USB
-* **How to connect to wifi**
-	* ```iwctl```
-	* ```device list```
-	* ```station <device> scan```
-	* ```station <device> get-networks```
-	* ```station <device> connect <SSID>```
+* **How to connect to wifi (live usb)**
+    * ```iwctl```
+    * ```device list```
+    * ```station <device> scan```
+    * ```station <device> get-networks```
+    * ```station <device> connect <SSID>```
 
-* **How to install arch linux**
-	* ```archinstall```
-	* Set drive and partition
-		* Do not create a separate enviroment for home!
-		* It gives 20GB for root. We don't want that.
-	* Add user
-	* Set profile for desktop enviroment (minimal)
-	* Set Audio (pipewire)
-	* Set network manager
-	* Install.
+* **How to install arch linux (live usb)**
+    * ```archinstall```
+    * Set drive and partition
+        * Do not create a separate enviroment for home!
+        * It gives 20GB for root. We don't want that.
+    * Add user
+    * Set profile for desktop enviroment (minimal)
+    * Set Audio (pipewire)
+    * Set network manager
+    * Install.
 
-# Installed
 * **How to install yay**
-	* ```pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si```
+    * ```pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si```
 
 * **How to connect to wifi**
-	* nm-connection-editor
+    * nm-connection-editor
 
-* **How to install hyprland and eww**
-	* ```yay -S --noconfirm --answerdiff=None hyprland eww-wayland ttf-ubuntu-nerd socat jq acpi inotify-tools bluez pavucontrol brightnessctl playerctl nm-connection-editor imagemagick gjs gnome-bluetooth-3.0 upower networkmanager gtk3 wl-gammactl wlsunset wl-clipboard hyprpicker hyprshot blueberry polkit-gnome kitty neovim```
+* **Dope dotfiles**
+    * ```git clone https://github.com/Aylur/dotfiles.git```
 
-* **Dope hyprland and eww configs**
-	* ```   git clone https://github.com/Aylur/dotfiles.git
-		cp -r dotfiles/.config/eww ~/.config/eww
-		cp -r dotfiles/.config/hypr ~/.config/hypr
-		mv ~/.config/hypr/_hyprland.conf ~/.config/hypr/hyprland.conf```
-	* ```Hyprland```
-	* ```gtk-update-icon-cache```
+* **"[libseat/backend/seatd.c:70] Could not connect to socket /run/seatd.sock: no such file or directory" after updating wlroots, Sway and libseat on Arch**
+    * DIDN'T WORK FOR HYPRLAND
+    * add this to `/etc/environment`
+        * ```LIBSEAT_BACKEND=logind```
 
-
-
-**"[libseat/backend/seatd.c:70] Could not connect to socket /run/seatd.sock: no such file or directory" after updating wlroots, Sway and libseat on Arch**
-	* DIDN'T WORK FOR HYPRLAND
-	* add this to `/etc/environment`
-		* ```LIBSEAT_BACKEND=logind```
-
-**Launch Graphical Applicaiton with sudo on Wayland**
+* **Launch Graphical Applicaiton with sudo on Wayland**
     * Situation:
-    	* https://discussion.fedoraproject.org/t/graphical-applications-cant-be-run-as-root-in-wayland/75412
+        * https://discussion.fedoraproject.org/t/graphical-applications-cant-be-run-as-root-in-wayland/75412
     * For example `gnome-disks`
         * ```sudo --preserve-env=XDG_RUNTIME_DIR,WAYLAND_DISPLAY gnome-disks```
 
-**Mount NTFS and EXT4 disks**
+* **Mount NTFS and EXT4 disks**
     * ```yay -S ntfs-3g```
-
-**Connect to wifi**
-    * Install iwctl if it is not installed
-        * ```yay -S iwd```
-        * ```sudo systemctl start iwd```
-    * ```iwctl```
-    * ```
 
 * **Nemo missing right click options**
     * ```yay -S nemo-fileroller```
@@ -108,138 +86,85 @@ gsettings set org.gnome.desktop.interface color-scheme prefer-dark
     * ```yay -S arc-gtk-theme```
     * ```gsettings set org.gnome.desktop.interface gtk-theme Arc-Dark```
 
-* **Login manager**
-	* WORKS
-		* ```yay -S swaylock-effects-git```
-	* DOES NOT WORK!
-		* ```pacman -S gcc make pkgconf scdoc pam wayland gtk3 gtk-layer-shell```
-		* ```yay -S gtklock```
-
-    yay -S kolourpaint
-    yay -S breeze-icons
-
-    amberol
-    # timedatectl set-timezone Asia/Istanbul
-
-    backup kitty, hypr, eww, swaylock, nemo, nvim,
-    https://github.com/kovidgoyal/kitty-themes
-
-yay -S zsh
-
-
-
-symlik dotfiles
-
-yay -S starship]
-
-pacman -S exa
-
-
 * **How to change locale**
-	* List available locales
-		* locale -a
-	* Uncomment the one if it is not there
-		* /etc/locale.gen
-	* Regenerate locales
-		* locale-gen
-	* Change locale
-		* localectl set-locale LANG=en_GB.UTF-8
+    * List available locales
+        * locale -a
+    * Uncomment the one if it is not there
+        * /etc/locale.gen
+    * Regenerate locales
+        * locale-gen
+    * Change locale
+        * localectl set-locale LANG=en_GB.UTF-8
 
 * **How to make OBS screen capture work**
-	* We need screen capture pipewire:
-		* yay -S xdg-desktop-portal-hyprland-git
-
+    * We need screen capture pipewire:
+        * yay -S xdg-desktop-portal-hyprland-git
 
 * **Equivalent of sudo apt update/upgrade**
-	* yay
+    * yay
 
 * **Hyrpland list all windows**
-	* ```hyprctl clients```
+    * ```hyprctl clients```
 
-# Neovim
-
-% to create file in default file tree
-d to create directory
-D to delete file
-
-scrcpy yay
-
-yay s vlc
-
-yay s lutris
-
-
-eww has a log leak. 500GB log file is not acceptable.
-link it to dev/null
-ln -sf /dev/null ~/.cache/eww_*.log
-
-otf-font-awesome
-
-sudo nmcli device wifi connect <SSID> password <password>
-
-restart waybar
-killall waybar
-https://github.com/Alexays/Waybar/issues/2177
-
-
-ln -s ~/dotfiles/dots/eww ~/.config/eww
-
-bluez-utils
-modprobe btusb
-systemctl start bluetooth.service
-
+* **Kill an app**
+    * ```killall -SIGUSR2 waybar```
 
 * **Blueberry can not scan**
     * Install blueman
         * yay - S blueman
     * Run manager
         * blueman-manager
- hyprctl keyword monitor DP-4,preferred,auto,1,transform,1
-
-yay s cronie
-
- yay -S noto-fonts-cjk
-
-bind control f to fzf command for zsh shell
-bindkey -s '^F' 'fzf^M'
-
-https://github.com/rust-lang/cargo/issues/3381
-r
-
 
 * **KDE How to remove volume/sound icon from firefox**
-	* It is Icons-Only-Task-Manager widget.
-		* Settingsof the widget -> mark ...
+    * It is Icons-Only-Task-Manager widget.
+        * Settingsof the widget -> mark ...
+
+* **How to use multiple cores for AUR packages**
+    * /etc/makepkg.conf:
+        * uncomment the following line
+            * MAKEFLAGS="-j4"
+        * Use MAKEFLAGS="-j$(nproc)"
+
+* **How to install gem5**
+    * Install dependencies
+        ```
+        sudo pacman -S --noconfirm --needed git
+        sudo pacman -S --noconfirm --needed gcc
+        sudo pacman -S --noconfirm --needed clang
+        sudo pacman -S --noconfirm --needed scons
+        sudo pacman -S --noconfirm --needed python
+        sudo pacman -S --noconfirm --needed protobuf
+        sudo pacman -S --noconfirm --needed boost
+
+        sudo pacman -S --noconfirm --needed base-devel
+        sudo pacman -S --noconfirm --needed m4
+        sudo pacman -S --noconfirm --needed zlib
+        sudo pacman -S --noconfirm --needed gperftools
+        sudo pacman -S --noconfirm --needed pkg-config
 
 
+        # Downgrade protobuf to 21.12.2
+        ```
 
+* **How to install Xschem**
+    * ```yay -S --noconfirm --answerdiff=None xschem```
 
+* **How to find deb/ubuntu equivalent of package**
+    * Look up the package and its filelist on Debian's package archive.
+        * For example, https://packages.debian.org/bullseye/amd64/lib32z1-dev/filelist
+        * Note any files that are in directories specified by the linux filesystem hierarchy.
+            * For example, I pick /usr/lib32/libz.so
+    * Search for a file using pacman or pkgfile.
+        * For example, ```pkgfile -s /usr/lib/32/libz.so```
+            * multilib/lib32-zlib
+    * Therefore the file is in lib32-zlib
 
-gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+# LATER
+OpenSnitch - is a GNU/Linux interactive application firewall
 
-gsettings set org.gnome.desktop.interface color-scheme prefer-light
+RustDesk   – The Open Source Remote Desktop Access Software
 
+Frog       - Extract text from images
 
-There is a variable in /etc/makepkg.conf which does exactly that for every package: MAKEFLAGS="-j4"
-105
-User avatar
-level 2
-ubersketch
-·
-7 yr. ago
-Helpful
-
-Use "-j$(nproc)" to give you the number of cores available to the system. This allows for portability between machines
-
-
-
-OpenSnitch is a GNU/Linux interactive application firewall
-
-
-RustDesk – The Open Source Remote Desktop Access Software
-
-
-Frog - Extract text from images
-
-cassowary - Run Windows Applications on Linux as if they are native. WSL like.
+cassowary  - Run Windows Applications on Linux as if they are native. WSL like.
 

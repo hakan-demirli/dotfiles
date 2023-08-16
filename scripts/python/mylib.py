@@ -44,6 +44,8 @@ else:
     TTS_DIR = SECOND_ROOT_DIR + "/software/lin/piper"
     TERMINAL = "kitty"
 
+MYLIB_DIR = str(pathlib.Path(__file__).parent.absolute())
+CONFIG_DIR = MYLIB_DIR + "/../../.config"
 SECRETS_DIR = SECOND_ROOT_DIR + "/rep/personal_repo/secrets"
 MUSIC_DIR = SECOND_ROOT_DIR + "/music"
 WALLPAPERS_PC_DIR = SECOND_ROOT_DIR + "/images/art/wallpapers_pc"

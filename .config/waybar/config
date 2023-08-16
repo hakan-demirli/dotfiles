@@ -1,0 +1,127 @@
+// -*- mode: json -*-
+{
+  "layer": "top",
+  "position": "right",
+  "modules-left": [
+    "wlr/workspaces",
+  ],
+  "modules-center": [
+    "clock#1",
+    "custom/left-arrow-dark",
+    "clock#2",
+    "custom/left-arrow-dark",
+    "clock#3",
+  ],
+  "modules-right": [
+    "memory",
+    "custom/left-arrow-dark",
+    "pulseaudio",
+    "custom/left-arrow-dark",
+    "battery",
+    "custom/left-arrow-dark",
+    "custom/notification",
+    "custom/left-arrow-dark",
+    "tray"
+  ],
+  "custom/left-arrow-dark": {
+    "format": " ",
+    "tooltip": false
+  },
+  "custom/right-arrow-dark": {
+    "format": " ",
+    "tooltip": false
+  },
+  "wlr/workspaces": {
+    "format": "{icon}",
+    "on-scroll-up": "hyprctl dispatch workspace -1",
+    "on-scroll-down": "hyprctl dispatch workspace r+1",
+    "on-click": "activate",
+    "disable-scroll-wraparound": true,
+    "persistent_workspaces": {
+      "1": [],
+      "2": [],
+      "3": []
+    }
+  },
+  "clock#1": {
+    "format": "{:%a}",
+    "tooltip": false
+  },
+  "clock#2": {
+    "format": "{:%H:%M}",
+    "tooltip": false
+  },
+  "clock#3": {
+    "format": "{:%m-%d}",
+    "tooltip": false
+  },
+  "memory": {
+    "format": " \n{}%\n",
+    "on-click": "gnome-system-monitor"
+  },
+  "pulseaudio": {
+    "format": " {icon}\n {volume}% \n {format_source}",
+    "format-bluetooth": "{volume}% {icon} {format_source}",
+    "format-bluetooth-muted": " {icon} {format_source}",
+    "format-muted": " {format_source}",
+    "format-source": " \n{volume}%",
+    "format-source-muted": "",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "on-click": "pavucontrol"
+  },
+  "battery": {
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 15
+    },
+    "format": "{icon}\n {capacity}%",
+    "format-charging": " \n{capacity}%",
+    "format-plugged": " \n{capacity}%",
+    "format-alt": " {icon}\n{time}",
+    "format-icons": [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "on-scroll-up": "exec brightnessctl s 10%+",
+    "on-scroll-down": "exec brightnessctl s 10%-"
+  },
+  "custom/notification": {
+    "tooltip": false,
+    "format": "{icon}",
+    "format-icons": {
+      "notification": "<span foreground='red'><sup></sup></span>",
+      "none": "",
+      "dnd-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-none": "",
+      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "inhibited-none": "",
+      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-inhibited-none": ""
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "sh -c 'sleep 0.1s; swaync-client -t -sw; sleep 0.1s'",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  },
+  "tray": {
+    "icon-size": 20
+  }
+}
