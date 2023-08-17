@@ -1,6 +1,5 @@
 import mylib
 from PIL import Image, ImageDraw, ImageFont
-from xdg import xdg_cache_home
 
 """
 Dependencies:

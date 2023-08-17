@@ -54,6 +54,8 @@ yay -S --noconfirm --answerdiff=None nwg-displays
 yay -S --noconfirm --answerdiff=None wlr-randr
 yay -S --noconfirm --answerdiff=None swaync
 
+
+sudo pacman -S --noconfirm --needed discord
 #---
 
 #
@@ -81,8 +83,7 @@ yay -S --noconfirm --answerdiff=None visual-studio-code-bin
 yay -S --noconfirm --answerdiff=None green-tunnel
 yay -S --noconfirm --answerdiff=None sayonara-player
 yay -S --noconfirm --answerdiff=None woeusb-ng
-yay -S --noconfirm --answerdiff=None python-pyclip
-
+yay -S --noconfirm --answerdiff=None python-clipboard
 
 # Install a Nerd Font
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip

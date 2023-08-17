@@ -1,6 +1,5 @@
 import mylib
 from PIL import Image, ImageDraw, ImageFont
-from xdg import xdg_cache_home
 import subprocess
 
 """
@@ -28,8 +27,6 @@ def main():
     text_position = (40, 40)
     font_size = 14
     text_color = (255, 255, 255)
-
-    cache_dir = f"{xdg_cache_home()}/gtasks-md/default"
 
     wallpapers = mylib.getFilesByType(wp_folder, types)
 
