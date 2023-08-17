@@ -72,16 +72,17 @@ except:
 #############
 
 
-def changeStringInPlace(old_string: str, new_string: str, file: str) -> None:
+def changeStringInPlace(old_string: str, new_string: str, file: str) -> int:
     with open(file) as f:
         s = f.read()
         if old_string not in s:
             print(f'"{old_string}" not found')
-            return
-
+            return -1
     with open(file, "w") as f:
         s = s.replace(old_string, new_string)
         f.write(s)
+
+    return 0
 
 
 def removeAllFiles(dir: str, extensions: list) -> None:

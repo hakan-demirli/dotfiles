@@ -70,6 +70,11 @@ sudo systemctl start bluetooth.service
 # sudo systemctl restart input-remapper
 # sudo systemctl enable input-remapper
 
+yay -S --noconfirm --answerdiff=None xremap-hypr-bin
+sudo gpasswd -a $USER input
+echo 'KERNEL=="uinput", GROUP="input", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/input.rules
+
+
 sudo sed -i '/^#\[multilib\]/{N;s/#//g}' /etc/pacman.conf
 sudo pacman -Sy
 sudo pacman -S --noconfirm --needed wine

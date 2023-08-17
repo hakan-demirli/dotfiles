@@ -3,6 +3,7 @@
 import os
 import subprocess
 import mylib
+import shutil
 
 
 def cloneRepoToChromeFolder():
@@ -10,9 +11,11 @@ def cloneRepoToChromeFolder():
     if profile_folder:
         chrome_folder_path = mylib.chromeFolderPath()
 
-        os.makedirs(chrome_folder_path, exist_ok=True)
+        if os.path.exists(chrome_folder_path):
+            shutil.rmtree(chrome_folder_path)
 
-        # Clone the repository using Git
+        os.makedirs(chrome_folder_path)
+
         git_command = ["git", "clone", mylib.FIREFOX_CSS_URL, chrome_folder_path]
         subprocess.run(git_command, check=True)
         print("Repository cloned successfully.")

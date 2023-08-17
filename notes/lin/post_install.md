@@ -54,6 +54,7 @@
   * Set `browser.compactmode.show` to true
   * Set `browser.startup.preXulSkeletonUI` to false
   * Set `browser.sessionstore.restore_pinned_tabs_on_demand` to true
+  * Set `menuAccessKeyFocuses` to false
 * Enable compact mode
   * Customize Toolbar > Density > Compact
 * Import Sidebery data

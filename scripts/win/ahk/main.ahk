@@ -6,7 +6,7 @@ SendMode Input ; Recommended for new scripts due to its superior speed and relia
 SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 #NoEnv
 
-#Include %A_ScriptDir%\lib\window_drag.ahk
+#Include %A_ScriptDir%\lib\windowControl.ahk
 #Include %A_ScriptDir%\lib\desktop_switcher.ahk
 #Include %A_ScriptDir%\lib\vimmode.ahk
 #Include %A_ScriptDir%\lib\winMouseScroll.ahk
@@ -36,6 +36,7 @@ Run,python %A_ScriptDir%\..\..\python\windowsApplet.py, ,hide
 ;-------------------------------------------------
 ; General
 #q::Send, !{F4}
+#+f::Send, {F11}
 #f::Run, explorer
 #w::Run, firefox
 #t::Run, wt

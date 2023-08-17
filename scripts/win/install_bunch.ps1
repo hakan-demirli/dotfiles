@@ -5,6 +5,7 @@
 # winget install -e --id Lexikos.AutoHotkey # Get an exe
 # winget install -e --id Guru3D.Afterburner # Get an exe
 # winget install -e --id Rufus.Rufus        # Get an exe
+# winget install -e --id Kitware.CMake      # dont bother. Use wsl
 
 # dependencies
 winget install -e --id Microsoft.DotNet.Runtime.7
@@ -27,11 +28,11 @@ winget install -e --id Microsoft.WindowsTerminal
 winget install -e --id Git.Git
 winget install -e --id Microsoft.VisualStudioCode --override '/SILENT /mergetasks="!runcode,addcontextmenufiles,addcontextmenufolders"'
 winget install -e --id Neovim.Neovim
-winget install -e --id Kitware.CMake
 winget install -e --id qBittorrent.qBittorrent
 winget install -e --id Microsoft.PowerToys
 winget install -e --id AIMP.AIMP
 
-# Install Install Visual Studio with C++ Desktop dev kit.
-# Install Cuda toolkit
+# Prevent Pandoc from updating
+winget pin add --id JohnMacFarlane.Pandoc --blocking
+
 

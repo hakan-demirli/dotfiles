@@ -1,0 +1,22 @@
+default_mode: insert
+keymap:
+  - mode: insert
+    remap:
+      Alt-i:  [
+          launch:
+            ["python","/mnt/second/rep/dotfiles/scripts/python/changeVscodeCursor.py","--style",  "block"],
+          { set_mode: normal },
+        ]
+  - mode: normal
+    remap:
+      Alt-i:  [
+          launch:
+            ["python","/mnt/second/rep/dotfiles/scripts/python/changeVscodeCursor.py", "--style", "line"],
+          { set_mode: insert },
+        ]
+      h: Left
+      j: Down
+      k: Up
+      l: Right
+      x: Delete
+      0: Home
