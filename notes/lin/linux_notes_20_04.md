@@ -1020,7 +1020,7 @@ l
             * ```-y ./, -y ./rtl, -I ./ , -I ./rtl/```
 
 * **Add custom context item to nemo**
-    * Go to ```/home/emre/.local/share/nemo/actions```
+    * Go to ```~/.local/share/nemo/actions```
     * Create a file named ```code.nemo_action```
     * Paste the following code
     ```
@@ -1028,7 +1028,7 @@ l
 
     Name=Open in Code
     Comment=Open the 'code' editor in the selected folder
-    Exec=/mnt/second/applications/lin/VSCode/code %F
+    Exec=code %F
     Icon-Name=VSCode
     Selection=any
     Extensions=dir;

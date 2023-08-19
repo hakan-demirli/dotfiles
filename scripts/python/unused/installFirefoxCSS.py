@@ -2,12 +2,17 @@
 
 import os
 import subprocess
-import mylib
 import shutil
+import pathlib
+import sys
+
+script_dir = str(pathlib.Path(__file__).parent.absolute())
+sys.path.append(script_dir + "/..")
+import mylib
 
 
 def cloneRepoToChromeFolder():
-    profile_folder = mylib.findFirefoxPorfileFolder()
+    profile_folder = mylib.findFirefoxProfileFolder()
     if profile_folder:
         chrome_folder_path = mylib.chromeFolderPath()
 

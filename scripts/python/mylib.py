@@ -24,14 +24,7 @@ Dependencies:
         pip install gcalcli
         pip install pandoc
     Arch Hyprland:
-        sudo pacman -S --noconfirm --needed  ffmpeg
-        sudo pacman -S --noconfirm --needed  tk
-        sudo pacman -S --noconfirm --needed  yt-dlp
-        sudo pacman -S --noconfirm --needed  python-pillow
-        sudo pacman -S --noconfirm --needed  xclip
         sudo pacman -S --noconfirm --needed  pandoc
-        yay -S --noconfirm --answerdiff=None python-clipboard
-        yay -S --noconfirm --answerdiff=None swww
 """
 
 ##########

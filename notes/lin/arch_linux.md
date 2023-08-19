@@ -122,8 +122,8 @@
 * **How to use multiple cores for AUR packages**
     * /etc/makepkg.conf:
         * uncomment the following line
-            * MAKEFLAGS="-j4"
-        * Use MAKEFLAGS="-j$(nproc)"
+            * `MAKEFLAGS="-j4"`
+        * Change it to `MAKEFLAGS="-j$(nproc)"`
 
 * **How to install gem5**
     * Install dependencies
