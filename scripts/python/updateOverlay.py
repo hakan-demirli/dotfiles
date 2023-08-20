@@ -1,6 +1,6 @@
 import pathlib
 import mylib
-import subprocess
+import tempfile
 import requests
 from PIL import Image
 
@@ -36,10 +36,11 @@ def main():
     width, height = image.size
     crop_box = (137, 26, width, height)
     cropped_image = image.crop(crop_box)
-    cropped_image.save(mylib.OVERLAYED_FILE)
+    tmp_image = tempfile.gettempdir() + mylib.getRandomFileName(".png")
+    cropped_image.save(tmp_image)
     image.close()
 
-    mylib.setFirefoxWallpaper(mylib.OVERLAYED_FILE)
+    mylib.setFirefoxWallpaper(tmp_image)
 
 
 if __name__ == "__main__":

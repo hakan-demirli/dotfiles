@@ -175,7 +175,7 @@ def convert_txt_to_wav(txt_queue, wav_queue):
     while getattr(t, "do_run", True):
         txts = txt_queue.get()
         for txt in txts:
-            file_path = OUTPUT_DIR + f"/{mylib.getRandomFileName()}.wav"
+            file_path = OUTPUT_DIR + f"/{mylib.getRandomFileName('.wav')}"
             t0 = threading.Thread(target=tts_to_file, args=[txt, file_path])
             t0.start()
             t0.join(INFERENCE_TIMEOUT)
@@ -185,7 +185,7 @@ def convert_txt_to_wav(txt_queue, wav_queue):
 
 def change_wav_speed(wav_file):
     f = Path(wav_file)
-    tf = f.stem + (mylib.getRandomFileName() + ".wav")
+    tf = f.stem + (mylib.getRandomFileName(".wav"))
     subprocess.call(
         f'ffmpeg -i {f} -filter:a "atempo={TEMPO}" {tf}  > /dev/null',
         shell=True,

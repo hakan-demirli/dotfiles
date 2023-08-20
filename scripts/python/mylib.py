@@ -115,9 +115,9 @@ def checkFileModification(filename, last_mod_time):
     return current_mod_time > last_mod_time
 
 
-def getRandomFileName(length=32) -> str:
+def getRandomFileName(extension: str, length: int = 32) -> str:
     letters = string.ascii_lowercase
-    return "".join(random.choice(letters) for _ in range(length))
+    return "".join(random.choice(letters) for _ in range(length)) + extension
 
 
 def overlayImages(
