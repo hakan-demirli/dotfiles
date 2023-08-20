@@ -1,3 +1,35 @@
+
+
+* **/mnt/c/Windows/Explorer.exe: cannot execute binary file: Exec format error**
+    * Run the following commands in order:
+        ```
+        wsl> sudo apt install binfmt-support
+        wsl> sudo sh -c 'echo :WSLInterop:M::MZ::/init:PF > /usr/lib/binfmt.d/WSLInterop.conf'
+        wsl> exit
+        powershell> wsl --shutdown
+        powershell> wsl
+        wsl> /mnt/c/WINDOWS/explorer.exe
+        ```
+
+* **How to backup/restore WSL**
+    * List installed:
+        * ```wsl --list --verbose```
+    * Export it:
+        * ```wsl --export Ubuntu D:/backups/Ubuntu_backup.tar```
+    * Import tar:
+        * ```wsl --import Ubuntu D:/wsl D:/backups/Ubuntu_backup.tar```
+    * Import vhdx:
+        * ```wsl --import-in-place Ubuntu D:/backups/Ubuntu_backup.vhdx```
+    * Delete it:
+        * ```wsl.exe --unregister Ubuntu```
+
+* **Exported and imported WSL user became root**
+    *  Set default user by adding the below entry to /etc/wsl.conf
+    ```
+    [user]
+        default=emre
+    ```
+
 * **How to Delete the EFI System Partition**
     * EaseUS Partition Master Free
 
@@ -11,6 +43,17 @@
     Exec=/path/to/app
     EOF'
     ```
+
+* **WSL2 Dconf error/warning**
+    * Reboot
+    * try again
+    * Install gnome-tweaks
+    * Add this to bash: `export DISPLAY=:0`
+    * try again
+    * Reboot
+    * remove this from bash: `export DISPLAY=:0`
+    * Reboot
+    * try again
 
 * **Change line endings recursively crlf (line endings/\r\n)**
     * Install git and git bash.

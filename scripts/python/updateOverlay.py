@@ -36,7 +36,7 @@ def main():
     width, height = image.size
     crop_box = (137, 26, width, height)
     cropped_image = image.crop(crop_box)
-    tmp_image = tempfile.gettempdir() + mylib.getRandomFileName(".png")
+    tmp_image = tempfile.gettempdir() + "/" + mylib.getRandomFileName(".png")
     cropped_image.save(tmp_image)
     image.close()
 
