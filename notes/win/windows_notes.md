@@ -1,3 +1,6 @@
+* **How to Delete the EFI System Partition**
+    * EaseUS Partition Master Free
+
 - **How to create windows shortcut for wsl application**
     * So to create a Windows Start Menu item, just create a corresponding `/usr/share/applications/.desktop':
     ```bash
