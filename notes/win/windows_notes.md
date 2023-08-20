@@ -12,6 +12,11 @@
     EOF'
     ```
 
+* **Change line endings recursively crlf (line endings/\r\n)**
+    * Install git and git bash.
+        * ```find ./ -type f -print0 | xargs -0 dos2unix --```
+    * Or install wsl and same command
+
 - **Scan for bad sectors**
     * HD Tune Pro
 

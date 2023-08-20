@@ -24,7 +24,7 @@ winget install -e --id Mozilla.Firefox
 winget install -e --id TorProject.TorBrowser
 winget install -e --id 7zip.7zip
 winget install -e --id Microsoft.WindowsTerminal
-# winget install -e --id Anaconda.Miniconda3
+
 winget install -e --id Git.Git
 winget install -e --id Microsoft.VisualStudioCode --override '/SILENT /mergetasks="!runcode,addcontextmenufiles,addcontextmenufolders"'
 winget install -e --id Neovim.Neovim
@@ -32,9 +32,8 @@ winget install -e --id qBittorrent.qBittorrent
 winget install -e --id Microsoft.PowerToys
 winget install -e --id AIMP.AIMP
 winget install -e --id AntibodySoftware.WizTree
-
-# Install pandoc 2.19.2 using an exe
-# Prevent Pandoc from updating
-# winget pin add --id JohnMacFarlane.Pandoc --blocking
+winget install -e --id Python.Python.3.10
 
 
+winget install -e --id JohnMacFarlane.Pandoc -v 2.19.2
+winget pin add --id JohnMacFarlane.Pandoc --blocking

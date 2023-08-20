@@ -9,4 +9,4 @@ if __name__ == "__main__":
     command = terminal + " gtasks-md edit"
 
     subprocess.run(command, check=True)
-    subprocess.run(["python", f"{script_dir}/updateOverlay.py"]),
+    mylib.runInVenv(f"{script_dir}/updateOverlay.py"),

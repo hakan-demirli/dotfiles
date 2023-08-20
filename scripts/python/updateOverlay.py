@@ -26,10 +26,10 @@ def getICS(ics_file, url):
 def main():
     script_dir = pathlib.Path(__file__).parent.absolute()
     getICS(mylib.ICS_FILE, mylib.ICS_URL)
-    subprocess.run(["python", f"{script_dir}/ics2overlay.py"])
-    subprocess.run(["python", f"{script_dir}/tasks2overlay.py"])
-    subprocess.run(["python", f"{script_dir}/overlayCalendar.py"])
-    subprocess.run(["python", f"{script_dir}/overlayTasks.py"])
+    mylib.runInVenv(f"{script_dir}/ics2overlay.py")
+    mylib.runInVenv(f"{script_dir}/tasks2overlay.py")
+    mylib.runInVenv(f"{script_dir}/overlayCalendar.py")
+    mylib.runInVenv(f"{script_dir}/overlayTasks.py")
     mylib.changeWallpaper(mylib.OVERLAYED_FILE)
 
     image = Image.open(mylib.OVERLAYED_FILE)

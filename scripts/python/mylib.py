@@ -15,16 +15,15 @@ from PIL import Image
 
 """
 Dependencies:
-    Windows      :
-        Pandoc.exe == pandoc 2.19.2
-        winget install -e --id Gyan.FFmpeg
-        winget install -e --id yt-dlp.yt-dlp
+    Windows:
+        python -m venv venv
         pip install clipboard
         pip install Pillow
         pip install gcalcli
+        pip install gtasks-md
         pip install pandoc
-    Arch Hyprland:
-        sudo pacman -S --noconfirm --needed  pandoc
+        # Pandoc.exe == pandoc 2.19.2
+        # gtasks-md auth ./credentials.json
 """
 
 ##########
@@ -63,6 +62,10 @@ except:
 
 
 #############
+
+
+def runInVenv(python_script_path):
+    subprocess.run([sys.executable, python_script_path])
 
 
 def changeStringInPlace(old_string: str, new_string: str, file: str) -> int:

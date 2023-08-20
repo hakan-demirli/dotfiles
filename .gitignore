@@ -2,3 +2,4 @@
 *.wav
 *.json
 *__pycache__*
+*venv*

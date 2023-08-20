@@ -900,8 +900,8 @@ l
     * Uninstall (Reset Wine color scheme)
         * ```wine regedit wine-reset-theme.reg```
 
-* **Apply dos2unix recursively (line endings/\r\n)**
-    * ```find /path -type f -print0 | xargs -0 dos2unix --```
+* **Apply dos2unix recursively crlf (line endings/\r\n)**
+    * ```find ./ -type f -print0 | xargs -0 dos2unix --```
 
 * **Backup system**
     * Timeshift

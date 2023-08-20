@@ -1,4 +1,4 @@
-﻿#MaxHotkeysPerInterval 9999 ; Disable 71 hotkey have been receiced in... warning
+#MaxHotkeysPerInterval 9999 ; Disable 71 hotkey have been receiced in... warning
 
 #NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
@@ -29,8 +29,7 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 ; RunWait,komorebic.exe named-workspace-padding "I", 2
 ; RunWait,komorebic.exe complete-configuration, Detached
 ; SetWorkingDir, %A_WorkingDir%
-
-Run,python %A_ScriptDir%\..\..\python\windowsApplet.py, ,hide
+Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv\Scripts\python %A_ScriptDir%\..\..\python\windowsApplet.py,, hide
 
 ; BINDINGS BELOW
 ;-------------------------------------------------
