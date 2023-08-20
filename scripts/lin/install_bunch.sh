@@ -80,8 +80,7 @@ yay -S --noconfirm --answerdiff=None gtklock
 
 yay -S --noconfirm --answerdiff=None xremap-hypr-bin
 sudo gpasswd -a $USER input
-echo 'KERNEL=="uinput", GROUP="input", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/input.rules
-
+echo 'KERNEL=="uinput", GROUP="input", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/99-input.rules
 
 # Windows Emulation/Layer
 sudo sed -i '/^#\[multilib\]/{N;s/#//g}' /etc/pacman.conf

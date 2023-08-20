@@ -1,3 +1,6 @@
+* **Convert pip package to PKGBUILD**
+    * yay -S pip2pkgbuild
+
 * **Enable Hibernation**
     * [tutorial](https://confluence.jaytaala.com/display/TKB/Use+a+swap+file+and+enable+hibernation+on+Arch+Linux+-+including+on+a+LUKS+root+partition#UseaswapfileandenablehibernationonArchLinuxincludingonaLUKSrootpartition-Enablehibernation)
     * ```systemctl hibernate```
@@ -19,22 +22,25 @@
     * ```sudo downgrade <package_name>```
 
 * **Add windows to grub menu**
-    * `lsblk` find disk of windows
-    * `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of windows
-    * `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
-        ```
-        menuentry "Windows 10" {
-            insmod part_gpt
-            insmod fat
-            insmod search_fs_uuid
-            insmod chain
-            search --fs-uuid --no-floppy --set=root XXXXXXXXX
-            chainloader (${root})/efi/Microsoft/Boot/bootmgfw.efi
-        }
-        ```
-    * `sudo chmod +x /etc/grub.d/40_custom` Set permissions.
-    * `sudo grub-mkconfig -o /boot/grub/grub.cfg` regen grub.cfg
-    * reboot.
+    * GUI tool:
+        * Grub Customizer
+    * Manual way:
+        * `lsblk` find disk of windows
+        * `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of windows
+        * `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
+            ```
+            menuentry "Windows 10" {
+                insmod part_gpt
+                insmod fat
+                insmod search_fs_uuid
+                insmod chain
+                search --fs-uuid --no-floppy --set=root XXXXXXXXX
+                chainloader (${root})/efi/Microsoft/Boot/bootmgfw.efi
+            }
+            ```
+        * `sudo chmod +x /etc/grub.d/40_custom` Set permissions.
+        * `sudo grub-mkconfig -o /boot/grub/grub.cfg` regen grub.cfg
+        * reboot.
 
 * **How to connect to wifi (live usb)**
     * ```iwctl```
@@ -101,6 +107,7 @@
         * yay -S xdg-desktop-portal-hyprland-git
 
 * **Equivalent of sudo apt update/upgrade**
+    * pacman -Syu
     * yay
 
 * **Hyrpland list all windows**
@@ -142,12 +149,13 @@
         sudo pacman -S --noconfirm --needed gperftools
         sudo pacman -S --noconfirm --needed pkg-config
 
-
-        # Downgrade protobuf to 21.12.2
+        echo "you must downgrade protobuf to 21.12.2"
         ```
 
 * **How to install Xschem**
     * ```yay -S --noconfirm --answerdiff=None xschem```
+    * ```yay -S --noconfirm --answerdiff=None gaw-xschem-git```
+    * ```sudo pacman -S --noconfirm --needed xterm```
 
 * **How to find deb/ubuntu equivalent of package**
     * Look up the package and its filelist on Debian's package archive.

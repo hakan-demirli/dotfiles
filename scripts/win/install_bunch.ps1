@@ -1,4 +1,3 @@
-
 # choco install -y green-tunnel-gui
 
 # winget install -e --id Valve.Steam        # I don't need
@@ -18,7 +17,7 @@ winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id Gyan.FFmpeg
 winget install -e --id yt-dlp.yt-dlp
 winget install -e --id Discord.Discord
-
+winget install --id=valinet.ExplorerPatcher  -e
 # Browsers, tools, development
 winget install -e --id Mozilla.Firefox
 winget install -e --id TorProject.TorBrowser
@@ -32,7 +31,8 @@ winget install -e --id qBittorrent.qBittorrent
 winget install -e --id Microsoft.PowerToys
 winget install -e --id AIMP.AIMP
 
+# Install pandoc 2.19.2 using an exe
 # Prevent Pandoc from updating
-winget pin add --id JohnMacFarlane.Pandoc --blocking
+# winget pin add --id JohnMacFarlane.Pandoc --blocking
 
 
