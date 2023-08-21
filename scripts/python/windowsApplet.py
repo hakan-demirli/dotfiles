@@ -1,7 +1,5 @@
 from dep.traymenu import TrayMenu, quitsystray
 import mylib
-import os
-import signal
 import pathlib
 import sys
 import subprocess
@@ -15,19 +13,12 @@ class IndicatorApp:
 
         self.add_menu_item(
             "🎵 youtubeSync",
-            lambda: self.toggle_script("🎵 youtubeSync", f"{script_dir}/youtubeSync.py"),
+            lambda: mylib.runInVenv(f"{script_dir}/youtubeSync.py"),
         )
 
         self.add_menu_item(
             "🗓️ updateOverlay",
-            lambda: self.toggle_script(
-                "🗓️ updateOverlay", f"{script_dir}/updateOverlay.py"
-            ),
-        )
-
-        self.add_menu_item(
-            "📝 editTasks",
-            lambda: self.toggle_script("📝 editTasks", f"{script_dir}/editTasks.py"),
+            lambda: mylib.runInVenv(f"{script_dir}/updateOverlay.py"),
         )
 
         self.tray_functions.append(("--"))

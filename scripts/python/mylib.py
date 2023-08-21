@@ -12,6 +12,7 @@ import shutil
 import importlib.util
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = 933120000
 
 """
 Dependencies:

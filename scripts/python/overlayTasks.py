@@ -20,7 +20,7 @@ def main():
     x_offset = 200
     y_offset = 0
     mylib.overlayImages(
-        overlayed_file, overlay_file, mylib.OVERLAYED_FILE, x_offset, y_offset
+        overlayed_file, overlay_file, overlayed_file, x_offset, y_offset
     )
 
 

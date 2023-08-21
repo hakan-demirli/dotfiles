@@ -170,6 +170,7 @@ def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
     end_date = datetime.date(2030, 12, 31)
 
     # Loop through all days, months, and years
+    # Add annotations
     current_date = start_date
     while current_date <= end_date:
         day = current_date.day
@@ -202,12 +203,17 @@ def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
         draw.text(text_position, raw_cal_txt, fill=text_color, font=font)
 
     # Previous days should be in gray
-    if isThisMonth(raw_cal_txt.strip().split("\n")[0]):
+    month_title = raw_cal_txt.strip().split("\n")[0]
+    if isThisMonth(month_title):
+        lines = raw_cal_txt.split("\n")
+        month_title = lines[0]
+        raw_cal_txt = "\n".join(lines[1:])
         yesterday = (datetime.date.today() - datetime.timedelta(days=1)).day
         calendar_parts = raw_cal_txt.split(str(yesterday))
         # Delete all characters in the second part except newlines
         second_part = "\n".join(line for line in calendar_parts[1] if line == "\n")
         modified_calendar = f"{calendar_parts[0]}{yesterday}{second_part}"
+        modified_calendar = month_title + "\n" + modified_calendar
         text_color = (55, 55, 55)  # gray color
         draw.text(text_position, modified_calendar, fill=text_color, font=font)
 
