@@ -43,7 +43,7 @@ SECRETS_DIR = SECOND_ROOT_DIR + "/rep/personal_repo/secrets"
 MUSIC_DIR = SECOND_ROOT_DIR + "/music"
 WALLPAPERS_PC_DIR = SECOND_ROOT_DIR + "/images/art/wallpapers_pc"
 
-APPLET_ICON_FILE = SECOND_ROOT_DIR + "/images/icons/gear.ico"
+APPLET_ICON_FILE = SECOND_ROOT_DIR + "/images/icons/gear_light.ico"
 PLAYLIST_FILE = MUSIC_DIR + "/playlists.txt"
 ICS_FILE = tempfile.gettempdir() + "/calendar_events.ics"
 CALENDAR_OVERLAY_FILE = tempfile.gettempdir() + "/calendar_overlay.png"

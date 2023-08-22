@@ -38,6 +38,8 @@ def main():
     lines = lines[6:]
     tasks = "\n".join(lines)
     tasks = tasks.replace("\n\n", "\n")
+    tasks = tasks.replace("\n\n", "\n")
+    tasks = tasks.replace("\n", "\n\n")
     draw.text(text_position, tasks, fill=text_color, font=font)
     image.save(overlay_file)
 

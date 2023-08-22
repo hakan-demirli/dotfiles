@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import threading, queue, time, sys, os, string, re, random, logging, clipboard, multiprocessing, tempfile, subprocess
+from queue import Queue
+import threading, time, sys, os, string, re, random, logging, clipboard, multiprocessing, tempfile, subprocess
 import mylib
+import shutil
 
 # sudo apt install xclip
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-TEMPO = 1
+TEMPO = 1.3
 OUTPUT_DIR = tempfile.gettempdir()
 MODEL_PATH = mylib.TTS_DIR + "/models/en_GB-jenny_dioco-medium.onnx"
 GPU = True
@@ -19,9 +21,11 @@ INFERENCE_TIMEOUT = 2.85
 PLAY_TIMEOUT = 20
 EXIT_TIMEOUT = 2
 MIN_SPEED = 0.6
-MAX_SPEED = 3
+MAX_SPEED = 10
 PREFERRED_SPEED = 1.7
 DEFAULT_SPEED = 1
+CUTOFF_DEFAULT = 0.35
+CUTOFF = CUTOFF_DEFAULT / (TEMPO / 2)
 BANNED_CHARACTERS = """\/*<>|`[]()^#%&@:+=}"{'~“”—"""
 CONTRACTIONS = {
     "can't've": "cannot have",
@@ -166,11 +170,10 @@ def tts_to_file(txt, file_path):
     command = (
         f"echo '{txt}' | {piper_path} --output_file {file_path} --model {MODEL_PATH}"
     )
-    print(command)
     subprocess.run(command, shell=True)
 
 
-def convert_txt_to_wav(txt_queue, wav_queue):
+def convert_txt_to_wav(txt_queue: Queue, wav_queue: Queue):
     t = threading.current_thread()
     while getattr(t, "do_run", True):
         txts = txt_queue.get()
@@ -184,24 +187,29 @@ def convert_txt_to_wav(txt_queue, wav_queue):
 
 
 def change_wav_speed(wav_file):
-    f = Path(wav_file)
-    tf = f.stem + (mylib.getRandomFileName(".wav"))
-    subprocess.call(
-        f'ffmpeg -i {f} -filter:a "atempo={TEMPO}" {tf}  > /dev/null',
-        shell=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-    )
-    os.remove(f"{f}")
-    os.system(f"mv {tf} {f}")
+    o_path = OUTPUT_DIR + f"/{mylib.getRandomFileName('.wav')}"
+    try:
+        command = ["ffmpeg", "-i", wav_file, "-filter:a", f"atempo={TEMPO}", o_path]
+        print(" ".join(command))
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        print("Command output:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error:", e)
+    return o_path
 
 
-def play_wav(wav_queue):
+def play_wav(wav_queue: Queue):
     t = threading.current_thread()
     while getattr(t, "do_run", True):
         wav_file = wav_queue.get()
+        f_wav_file = wav_file
         if TEMPO != 1:
-            change_wav_speed(wav_file)
+            f_wav_file = change_wav_speed(wav_file)
         try:
             subprocess.call(
                 [
@@ -209,12 +217,18 @@ def play_wav(wav_queue):
                     "-nodisp",
                     "-autoexit",
                     "-t",
-                    str(float(get_duration(wav_file)) - 0.2),
-                    wav_file,
+                    str(float(get_duration(f_wav_file)) - CUTOFF),
+                    f_wav_file,
                 ]
             )
         except:
             pass
+
+        try:
+            os.remove(f_wav_file)
+        except:
+            pass
+
         try:
             os.remove(wav_file)
         except:
@@ -241,7 +255,7 @@ def get_duration(wav_file):
     return duration
 
 
-def sanitizeString(in_str):
+def sanitizeString(in_str: str) -> str:
     for banned_character in BANNED_CHARACTERS:
         in_str = str(in_str).replace(banned_character, "")
     for key, value in CONTRACTIONS.items():
@@ -257,7 +271,7 @@ def sanitizeString(in_str):
     return in_str
 
 
-def listen_clipboard(txt_queue, wav_queue):
+def listen_clipboard(txt_queue: Queue, wav_queue: Queue):
     t = threading.current_thread()
     recent_value = ""
     new_value = ""
@@ -269,7 +283,7 @@ def listen_clipboard(txt_queue, wav_queue):
             logging.info(f"Value changed: {val}")
             txts = re.split(DELIMETERS, val)
             txts_clean = []
-            for idx, txt in enumerate(txts):
+            for txt in txts:
                 if (txt == "") or (txt == " "):
                     continue
                 if txt[-1] not in DELIMETERS[1:-1]:
@@ -284,8 +298,8 @@ def listen_clipboard(txt_queue, wav_queue):
 if __name__ == "__main__":
     threads = []
 
-    txt_queue = queue.Queue()
-    wav_queue = queue.Queue()
+    txt_queue = Queue()
+    wav_queue = Queue()
     threads.append(
         threading.Thread(target=listen_clipboard, args=[txt_queue, wav_queue])
     )
@@ -301,16 +315,16 @@ if __name__ == "__main__":
         try:
             time.sleep(1)
             command = input(str)
-            if (command == "u") and (TEMPO < MAX_SPEED):
+            if (command == "d") and (TEMPO < MAX_SPEED):
                 TEMPO = TEMPO + 0.1
-            if (command == "d") and (TEMPO > MIN_SPEED):
+            if (command == "s") and (TEMPO > MIN_SPEED):
                 TEMPO = TEMPO - 0.1
             if command == "g":
                 toggle = not toggle
                 if toggle:
                     TEMPO = PREFERRED_SPEED
                 else:
-                    TEMP = DEFAULT_SPEED
+                    TEMPO = DEFAULT_SPEED
             if (
                 (command.isdigit())
                 and (int(command, 10) > MIN_SPEED)

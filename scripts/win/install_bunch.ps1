@@ -19,7 +19,7 @@ winget install -e --id=AppWork.JDownloader
 # winget install -e --id=valinet.ExplorerPatcher
 winget install -e --id=StartIsBack.StartAllBack
 # Browsers, tools, development
-winget install -e --id Discord.Discord
+# winget install -e --id Discord.Discord
 winget install -e --id Mozilla.Firefox
 winget install -e --id TorProject.TorBrowser
 winget install -e --id 7zip.7zip

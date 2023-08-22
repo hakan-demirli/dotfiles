@@ -11,6 +11,16 @@
         wsl> /mnt/c/WINDOWS/explorer.exe
         ```
 
+* **Hyprv how to share folders**
+    * Do not login in the default screen.
+    * Click to enchanced session when login screen pops up. Then login from there.
+    * ```sudo apt-get install x2goserver```
+
+* **Hyprv enchanced session blue screen**
+    * Do not login in the default screen.
+    * Click to enchanced session when login screen pops up. Then login from there.
+    * ```sudo apt-get install x2goserver```
+
 * **How to backup/restore WSL**
     * List installed:
         * ```wsl --list --verbose```
@@ -86,17 +96,29 @@
 - **Windirstat faster alternative(Free/storage/size/bloat)**
     * WizTree
 
+* **How to enable Hypr-v**
+    * Turn on windows features on/off
+        * Hyprv
+        * Windows sandbox
+
 * **How to assign a key to another key/key combination**
     * Permanent:
         * [SharpKeys](https://www.randyrants.com/category/sharpkeys/)
     * Temp:
         * AutoHotKey
 
+* **Invert icon file using ffmpeg**
+    * ```ffmpeg -i gear.ico gear.png```
+    * ```ffmpeg -i gear.png -vf "negate" inverted_gear.png```
+    * ```ffmpeg -i inverted_gear.png -s 256x256 gear_inverted.ico```
+
 * **Duplicate file finder**
     * 1st option:
         * CCleaner Portable.
     * 2nd option:
         * WSL + Bash script.
+    * 3rd option:
+        * [czkawka](https://github.com/qarmin/czkawka)
 
 * **How to make taskbar thinner (vertical)**
     * Unlock the taskbar (right-click on taskbar > unlock the taskbar) and put it on the left or right
@@ -174,7 +196,7 @@
 
 * **How to add an app to start menu manually**
     * Copy the shortcut here or here
-        * `%AppData%\Microsoft\Windows\Start Menu\Programs`
+        <!--* `%AppData%\Microsoft\Windows\Start Menu\Programs`-->
         * `C:\ProgramData\Microsoft\Windows\Start Menu\Programs`
     * Go to your "All apps" list under the Start button
     * Right click on this file from the "Apps list" and click "Pin to start".
@@ -222,11 +244,14 @@
 * **Open Source Asus Armor Create Alternative**
     * [GHelper](https://github.com/seerge/g-helper)
 
-- **Open a new tab in the running instance of Windows Terminal**
+* **Open a new tab in the running instance of Windows Terminal**
     * wt settings -> Startup -> Attach to the most rececently used.
 
-- **Usable partition manager**
+* **Usable partition manager**
     * EaseUS Partition Master Free
+
+* **Windhawk**
+    * The customization marketplace for Windows programs
 
 | AHK Shortcuts  | Description                   |
 | -----------    | -----------                   |
