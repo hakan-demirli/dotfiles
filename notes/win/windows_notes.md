@@ -237,6 +237,10 @@
             * Variable name: DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1
             * Variable value: 1
 
+* **Ranger alternative**
+    * lf
+    * [dotfiles](https://github.com/Goxore/dotfiles/tree/main/configs/.config/lf)
+
 * **Remove the duplicate entires of the Operating Systems from the boot manager?**
     * msconfig > boot tab
         * Identify the default or the current Operating System and delete the other one.

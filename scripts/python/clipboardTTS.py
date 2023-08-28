@@ -25,7 +25,7 @@ MAX_SPEED = 10
 PREFERRED_SPEED = 1.7
 DEFAULT_SPEED = 1
 CUTOFF_DEFAULT = 0.35
-CUTOFF = CUTOFF_DEFAULT / (TEMPO / 2)
+CUTOFF = CUTOFF_DEFAULT / (TEMPO)
 BANNED_CHARACTERS = """\/*<>|`[]()^#%&@:+=}"{'~“”—"""
 CONTRACTIONS = {
     "can't've": "cannot have",
