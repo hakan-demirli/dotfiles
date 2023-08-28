@@ -33,15 +33,25 @@
     };
   };
 
-  # TODO: Set your username
   home = {
     username = "emre";
     homeDirectory = "/home/emre";
     packages = with pkgs; [
-    	git
-    	neovim
-    	firefox
-    	vscode
+      git
+      neovim
+      firefox
+      vscode
+      nixpkgs-fmt # for nix-ide extension on vscode
+      pciutils # for lspci command
+      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      (lutris.override {
+        extraLibraries = pkgs: [
+          # List library dependencies here
+        ];
+        extraPkgs = pkgs: [
+          # List package dependencies here
+        ];
+      })
     ];
   };
 

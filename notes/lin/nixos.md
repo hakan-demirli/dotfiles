@@ -3,6 +3,8 @@
     * It controls the OS configuration. You want to install a package you modify it.
     * It is a bad practice to leave it in it's default location. Use flakes instead.
 
+* **Where to find packages**
+    * https://search.nixos.org/packages
 
 * **Install git**
     * Temporarily:
@@ -16,23 +18,14 @@
         * ```sudo nixos-rebuild switch```
 
 * **Enable NTFS support**
-    * 
-
-Add the line
-
-boot.supportedFilesystems = [ "ntfs" ];
-
-to your /etc/nixos/configuration.nix.
-
-Issue
-
-sudo nixos-rebuild switch
-
-
+    * ```sudo nano /etc/nixos/configuration.nix```
+    * Add
+        * ```boot.supportedFilesystems = [ "ntfs" ];```
+    * ```sudo nixos-rebuild switch```
 
 * **Enable flakes**
     * Via configuration.nix
-        * ```sudo nano /etc/nixos/configuration.nix```
+        *
         ```nix
             { pkgs, ... }: {
                 nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -68,5 +61,10 @@ sudo nixos-rebuild switch
             └── hardware-configuration.nix
     ```
 
+* **Installing Nvidia Drivers**
+    * [Manual](https://nixos.wiki/wiki/Nvidia)
 
-
+* **How to rollback home-manager**
+    * ```home-manager generations```
+    * Choose a generation and run the activate string inside it. Example:
+        * ```/nix/store/<hash_of_the_generation_you_have_chosen>-home-manager-generation/activate```
