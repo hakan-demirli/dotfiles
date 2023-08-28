@@ -41,6 +41,20 @@
       neovim
       firefox
       vscode
+      kitty
+      drawing
+      sayonara
+      wofi
+      waybar
+      yt-dlp-light
+      ffmpeg
+      virt-manager
+      dconf
+      asusctl
+      gnome.gnome-control-center
+      gnome.gnome-system-monitor
+      gnome.gnome-disk-utility
+      cinnamon.nemo-with-extensions
       nixpkgs-fmt # for nix-ide extension on vscode
       pciutils # for lspci command
       (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
@@ -53,15 +67,34 @@
         ];
       })
     ];
+    sessionVariables = {
+      EDITOR = "code";
+      BROWSER = "firefox";
+      TERMINAL = "kitty";
+      TERM = "kitty";
+    };
   };
 
-  # Add stuff for your user as you see fit:
-  # programs.neovim.enable = true;
-  # home.packages = with pkgs; [ steam ];
 
-  # Enable home-manager and git
+  dconf.settings = {
+    # for virt-manager
+    "org/virt-manager/virt-manager/connections" = {
+      autoconnect = [ "qemu:///system" ];
+      uris = [ "qemu:///system" ];
+    };
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      gtk-theme = "Adwaita-dark";
+    };
+    "org/gnome/desktop/default-applications/terminal" = {
+      exec = "kitty";
+    };
+    "org/cinnamon/desktop/applications/terminal" = {
+      exec = "kitty";
+    };
+  };
+
   programs.home-manager.enable = true;
-  programs.git.enable = true;
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";
