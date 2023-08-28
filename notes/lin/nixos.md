@@ -5,12 +5,29 @@
 
 
 * **Install git**
-    * ```sudo nano /etc/nixos/configuration.nix```
-    ```nix
-        environment.systemPackages = with pkgs; [
-        gitMinimal  ];
-    ```
-    * ```sudo nixos-rebuild switch```
+    * Temporarily:
+        * ```nix shell nixpkgs#git```
+    * Via configuration.nix
+        * ```sudo nano /etc/nixos/configuration.nix```
+        ```nix
+            environment.systemPackages = with pkgs; [
+            gitMinimal  ];
+        ```
+        * ```sudo nixos-rebuild switch```
+
+* **Enable NTFS support**
+    * 
+
+Add the line
+
+boot.supportedFilesystems = [ "ntfs" ];
+
+to your /etc/nixos/configuration.nix.
+
+Issue
+
+sudo nixos-rebuild switch
+
 
 
 * **Enable flakes**
