@@ -68,3 +68,15 @@
     * ```home-manager generations```
     * Choose a generation and run the activate string inside it. Example:
         * ```/nix/store/<hash_of_the_generation_you_have_chosen>-home-manager-generation/activate```
+
+* **How to mount disks at boot**
+    *  Every time you rebuild the system, the fstab file is changed according to the (by default) hardware-configuration.nix file. So, you have to add your disks to hardware-configuration.nix to make it mount at default.
+    * You may try to mount them via gnome-disks and then generate a config file by running ```nixos-generate-config```. But, this will not work as there is [a bug](https://github.com/NixOS/nixpkgs/issues/14624) in Nixos.
+    * Hence, only option is to add them manually. Add this to hardware-configuration.nix:
+    ```nix
+      fileSystems."/mnt/second" =
+        {
+            device = "/dev/disk/by-uuid/0D11E693467F5A53";
+            options = [ "uid=1000" "gid=1000" "dmask=007" "fmask=117" ];
+        };
+    ```
