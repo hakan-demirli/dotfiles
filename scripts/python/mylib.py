@@ -3,7 +3,6 @@ import datetime
 import subprocess
 import os
 import ctypes
-import tkinter
 import string
 import random
 import sys
@@ -53,6 +52,9 @@ OVERLAYED_FILE = tempfile.gettempdir() + "/overlayed.png"
 ANON_FONT_FILE = SECOND_ROOT_DIR + "/fonts/anonymous.ttf"
 
 FIREFOX_CSS_URL = "https://github.com/hakan-demirli/Firefox_Custom_CSS"
+
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
 
 # Secrets
 sys.path.append(SECRETS_DIR)
@@ -196,10 +198,13 @@ def getMonitorResolution() -> tuple[int, int]:
     """
     Get the monitor's screen width and height in pixels.
     """
-    root = tkinter.Tk()
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-    root.destroy()
+    # I don't want tkinter dependency
+    ## root = tkinter.Tk()
+    ## screen_width = root.winfo_screenwidth()
+    ## screen_height = root.winfo_screenheight()
+    ## root.destroy()
+    screen_width = SCREEN_WIDTH
+    screen_height = SCREEN_HEIGHT
     return screen_width, screen_height
 
 

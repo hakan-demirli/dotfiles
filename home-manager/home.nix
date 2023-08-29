@@ -51,6 +51,7 @@
       virt-manager
       dconf
       asusctl
+      python310
       gnome.gnome-control-center
       gnome.gnome-system-monitor
       gnome.gnome-disk-utility

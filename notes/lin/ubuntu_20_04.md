@@ -432,6 +432,9 @@
     * Remove limiter for an interface
         * ```sudo wondershaper clear wlp7s0```
 
+* **Virt-manager network default is not active**
+    * ```sudo virsh net-start default```
+
 * **Produce high CPU load on a Linux (benchmark)**
     * ```openssl speed -multi $(grep -ci processor /proc/cpuinfo)```
 
@@ -950,29 +953,84 @@ l
         * `sudo apt-get install virt-manager`
     * Run virt-manager as sudo
         * `sudo virt-manager`
-    * You can use the VM as it is now. But, follow along if you want more performance.
+    * You can use the VM as it is now. But, follow along if you want more performance. You are still on your host(linux) machine.
     * Download virtio drivers stable iso.
         * [link](https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md)
     * Create a new virtual machine.
-    * Select windows 10 iso.
+    * Select windows iso.
     * Select/Create a virtual harddisk.
     * Select customize before install
     * CPUs -> Current Allocation -> 8
-    * CPUs -> Topology -> Manually set -> 1 socket, 4 core, 8 threads
+    * CPUs -> Topology -> Manually set -> 1 socket, 8 core, 1 threads
     * Add hardware -> Storage -> New CDROM : Bus type -> Sata
     * Select CDROM -> Source -> Virtio driver iso
     * IDE/SATA Disk 1 -> Advanced -> Disk Bus -> VirtIO
     * NIC:XX:xx:xx -> Device Model -> VirtIO
     * Video QXL -> Model -> Virtio : 3D enable
+        * If it says opengl is not available
+            * Display Spice > Listen type: None > Check OpenGL box
     * Begin Installation
-    * It will not find the storage automatically.
+    * It will not find the storage automatically. It will ask for drivers. Select Load Driver option.
         * Install drivers from virtIO iso.
         * If they don't pop automatically look into amd64 folder.
-    * After the install open Device Manager.
-        * Select Windows Basic Display Adapter
-        * Search for drivers.
-            * Point to the iso
-        * Do the same for the ethernet driver
+    * After the install:
+        * Open the ISO and run driver installer.
+        * Open Device Manager.
+            * Verify if drivers are ok.
+            * If not manually install them.
+                * Search for drivers.
+                    * Point to the iso
+                * Do the same for the all missing ones.
+    * Install [spice guest drivers.](https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe)
+    * If you feel ok keep using. If you want more performance keep reading.
+    * Apply all available Hyper-V enlightenments - the <hyperv> section of your XML should look like this:
+        ```xml
+        <hyperv>
+            <relaxed state='on'/>
+            <vapic state='on'/>
+            <spinlocks state='on' retries='8191'/>
+            <vpindex state='on'/>
+            <synic state='on'/>
+            <stimer state='on'>
+                <direct state='on'/>
+            </stimer>
+            <reset state='on'/>
+            <frequencies state='on'/>
+            <reenlightenment state='on'/>
+            <tlbflush state='on'/>
+            <ipi state='on'/>
+        </hyperv>
+        ```
+    * Disable all timers except for the hypervclock - the <clock> section of your XML should look like this:
+        ```xml
+        <clock offset='localtime'>
+            <timer name='rtc' present='no' tickpolicy='catchup'/>
+            <timer name='pit' present='no' tickpolicy='delay'/>
+            <timer name='hpet' present='no'/>
+            <timer name='kvmclock' present='no'/>
+            <timer name='hypervclock' present='yes'/>
+        </clock>
+        ```
+    * CPU Pinning:
+        ```xml
+            <vcpu placement='static'>6</vcpu>
+            <iothreads>1</iothreads>
+            <cputune>
+                <vcpupin vcpu='0' cpuset='1'/>
+                <vcpupin vcpu='1' cpuset='5'/>
+                <vcpupin vcpu='2' cpuset='2'/>
+                <vcpupin vcpu='3' cpuset='6'/>
+                <vcpupin vcpu='4' cpuset='3'/>
+                <vcpupin vcpu='5' cpuset='7'/>
+                <emulatorpin cpuset='0,4'/>
+                <iothreadpin iothread='1' cpuset='0,4'/>
+            </cputune>
+        ```
+
+* **KVM/QEMU Virt-Manager Change disk to Virtio**
+    * You have created a disk then manually changed it to Virtio and now you get bluescreen.
+    * Good job. You fucked. Install it again by following the guide.
+    * There are alternatives but they don't worth it.
 
 * **How to share folder KVM/QEMU Virt-Manager**
     * Virtiofs (Not supported in Ubuntu 20.04)[source](https://askubuntu.com/questions/1401151/unable-to-add-virtiofs-filesystem-to-qemu-vm-in-ubuntu-server-20-04-due-to-incom)
