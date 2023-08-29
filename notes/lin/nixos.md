@@ -80,3 +80,8 @@
             options = [ "uid=1000" "gid=1000" "dmask=007" "fmask=117" ];
         };
     ```
+
+* **Virtiofs not working**
+    * ```internal error: virtiofsd binary '/run/current-system/sw/bin/virtiofsd' is not executable. This happened because Qemu stopped bundling virtiofsd. I added it to system config to make it appear on that path again and encountered an error operation failed: Unable to find a satisfying virtiofsd```
+    * No solution.
+    * try 9p drivers

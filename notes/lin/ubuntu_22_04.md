@@ -73,7 +73,6 @@
         * You can immediately start the service by running ```sc start VirtioFsSvc```.
         * The letter will be `Z`. Be sure it is available.
 
-
 * **How to mount multiple folders QEMU-KVM Virtiofs**
     * The tutorials didn't work.
     * Mount /mnt/ folder. Since all drives are there. You can access them all.

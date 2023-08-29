@@ -432,7 +432,7 @@
     * Remove limiter for an interface
         * ```sudo wondershaper clear wlp7s0```
 
-* **Virt-manager network default is not active**
+* **QEMU/KVM Virt-Manager network default is not active**
     * ```sudo virsh net-start default```
 
 * **Produce high CPU load on a Linux (benchmark)**
@@ -1034,7 +1034,8 @@ l
 
 * **How to share folder KVM/QEMU Virt-Manager**
     * Virtiofs (Not supported in Ubuntu 20.04)[source](https://askubuntu.com/questions/1401151/unable-to-add-virtiofs-filesystem-to-qemu-vm-in-ubuntu-server-20-04-due-to-incom)
-    * You have to build QEMU and KVM yourself.
+    * You have to build QEMU and KVM yourself on Ubuntu 20.04.
+    * Hence, use Ubuntu 22.04 and checkout it's notes.
 
 * **Windows VM suddenly run very slow in KVM/QEMU**
     * [SOURCE](https://serverfault.com/questions/1092404/windows-vm-suddenly-run-very-slow-in-kvm-qemu)
