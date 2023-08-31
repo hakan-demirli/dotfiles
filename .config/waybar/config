@@ -59,7 +59,7 @@
     "on-click": "gnome-system-monitor"
   },
   "pulseaudio": {
-    "format": " {icon}\n {volume}% \n {format_source}",
+    "format": "<span> {icon}\n</span>{volume}%\n {format_source}",
     "format-bluetooth": "{volume}% {icon} {format_source}",
     "format-bluetooth-muted": " {icon} {format_source}",
     "format-muted": " {format_source}",
@@ -81,7 +81,7 @@
     "on-click": "pavucontrol"
   },
   "battery": {
-    "format": "<span font='Font Awesome 5 Free 11'> {icon}\n</span>  {capacity}%\n{time}",
+    "format": "<span font='Font Awesome 5 Free 11'>{icon}\n</span>{capacity}%\n{time}",
     "format-icons": {
       "default": [
         "",
@@ -125,6 +125,8 @@
     "escape": true
   },
   "tray": {
-    "icon-size": 20
+    "icon-size": 21,
+    "spacing": 5,
+    "reverse-direction": true
   }
 }

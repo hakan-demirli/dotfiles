@@ -116,15 +116,37 @@
 * **Kill an app**
     * ```killall -SIGUSR2 waybar```
 
+* **Print freq of each core**
+    * ```grep "MHz" /proc/cpuinfo | awk '{print "Core", NR-1, ":", $4, "MHz"}'```
+
 * **Blueberry can not scan**
     * Install blueman
         * yay - S blueman
     * Run manager
         * blueman-manager
 
+* **Nix occupy too much space**
+    * ```nix-collect-garbage -d ```
+
+* **Searching and installing old versions of Nix packages**
+    * [This site.](https://lazamar.co.uk/nix-versions/)
+    * Click to hash it will show how to use it.
+    * But I prefer adding the url as a new package like this:
+        * ```inputs.protobuf_pin.url = "github:NixOS/nixpkgs/976fa3369d722e76f37c77493d99829540d43845";```
+    * Then you can do this:
+        * ```pkgs_for_protobuf = protobuf_pin.legacyPackages.${system};```
+        * ```pkgs_for_protobuf.protobuf```
+
+* **How to get sha256 of a nixpkg version**
+    * ```nix-prefetch-url --unpack "https://github.com/NixOS/nixpkgs/archive/976fa3369d722e76f37c77493d99829540d43845.tar.gz```
+    * This will print it
+
 * **KDE How to remove volume/sound icon from firefox**
     * It is Icons-Only-Task-Manager widget.
         * Settingsof the widget -> mark ...
+
+* **How to check power consumption**
+    * ```sudo pacman -S powertop```
 
 * **How to use multiple cores for AUR packages**
     * /etc/makepkg.conf:
@@ -149,7 +171,7 @@
         sudo pacman -S --noconfirm --needed gperftools
         sudo pacman -S --noconfirm --needed pkg-config
 
-        echo "you must downgrade protobuf to 21.12.2"
+        echo "you must downgrade protobuf to 21.12.2. Otherwise: DSO missing from command line."
         ```
 
 * **How to install Xschem**
@@ -166,6 +188,27 @@
         * For example, ```pkgfile -s /usr/lib/32/libz.so```
             * multilib/lib32-zlib
     * Therefore the file is in lib32-zlib
+
+* **Reproducible Shell environments via Nix Flakes**
+    * Install nix
+    * Activate flakes:
+        * ```~/.config/nix/nix.conf:```
+            * ```experimental-features = nix-command flakes```
+    * Create a flake.
+    * ```nix develop```
+    * Now you are in the shell which has the packages.
+
+* **Create direnv flake project**
+    * Install nix
+    * Activate flakes:
+        * ```~/.config/nix/nix.conf:```
+            * ```experimental-features = nix-command flakes```
+    * Install direnv
+        * Use your default package manager: pacman
+        * ```echo 'eval "$(direnv hook bash)"' >> ~/.bashrc```
+    * Create a flake template
+        * ```nix flake new -t github:nix-community/nix-direnv <desired output path>```
+        * ```direnv allow```
 
 # LATER
 OpenSnitch - is a GNU/Linux interactive application firewall

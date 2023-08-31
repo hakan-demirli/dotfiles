@@ -50,15 +50,15 @@ sudo pacman -S --noconfirm --needed networkmanager
 sudo pacman -S --noconfirm --needed network-manager-applet
 sudo pacman -S --noconfirm --needed brightnessctl
 sudo pacman -S --noconfirm --needed polkit-gnome
+sudo pacman -S --noconfirm --needed gnome-keyring
 sudo pacman -S --noconfirm --needed pavucontrol
 sudo pacman -S --noconfirm --needed ffmpeg
 sudo pacman -S --noconfirm --needed tk
 sudo pacman -S --noconfirm --needed yt-dlp
-sudo pacman -S --noconfirm --needed python-pillow
 sudo pacman -S --noconfirm --needed gnome-themes-extra
 sudo pacman -S --noconfirm --needed adwaita-qt5
 sudo pacman -S --noconfirm --needed adwaita-qt6
-
+sudo pacman -S --noconfirm --needed swayidle
 
 sudo pacman -S --noconfirm --needed blueman
 sudo pacman -S --noconfirm --needed bluez
@@ -73,7 +73,6 @@ yay -S --noconfirm --answerdiff=None hyprshot
 yay -S --noconfirm --answerdiff=None nwg-displays
 yay -S --noconfirm --answerdiff=None wlr-randr
 yay -S --noconfirm --answerdiff=None woeusb-ng
-yay -S --noconfirm --answerdiff=None python-clipboard
 yay -S --noconfirm --answerdiff=None swaync
 yay -S --noconfirm --answerdiff=None gtklock
 
@@ -126,6 +125,9 @@ gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
 
+# Set default apps
+xdg-mime default nemo.desktop inode/directory application/x-gnome-saved-search
+xdg-settings set default-web-browser firefox.desktop
 
 # Create a custom context item for Nemo
 nemo_dir="$HOME/.local/share/nemo/actions"
@@ -141,6 +143,14 @@ Icon-Name=VSCode
 Selection=any
 Extensions=dir;
 EOF
+
+sudo pacman -S --noconfirm --needed nix
+yay -S --noconfirm --answerdiff=None nixpkgs-fmt
+sudo systemctl enable --now nix-daemon.service
+sudo gpasswd -a $USER nix-users
+nix-channel --add https://nixos.org/channels/nixpkgs-unstable
+nix-channel --update
+
 
 # systemctl daemon-reload && systemctl restart asusd
 reboot

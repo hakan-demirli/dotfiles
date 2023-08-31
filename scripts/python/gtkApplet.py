@@ -19,11 +19,6 @@ class IndicatorApp:
         self.menu_items = {}
 
         item_callback = lambda _: self.toggle_process(
-            "📝 editTasks", f"python {script_dir}/editTasks.py"
-        )
-        self.add_menu_item("📝 editTasks", item_callback)
-
-        item_callback = lambda _: self.toggle_process(
             "🗣️ clipboardTTS", f"python {script_dir}/clipboardTTS.py"
         )
         self.add_menu_item("🗣️ clipboardTTS", item_callback)
@@ -38,9 +33,7 @@ class IndicatorApp:
         )
         self.add_menu_item("🎵 youtubeSync", item_callback)
 
-
-
-        self.add_menu_item("--", lambda _: print('---'))
+        self.add_menu_item("--", lambda _: print("---"))
 
         self.add_menu_item("Quit", self.quit)
 
@@ -56,30 +49,30 @@ class IndicatorApp:
     def add_menu_item(self, label, callback):
         item = Gtk.MenuItem(label=label)
         item.connect("activate", callback)
-        self.menu_items[label] = {'status':False, 'item': item, 'process': None}
+        self.menu_items[label] = {"status": False, "item": item, "process": None}
         self.menu.append(item)
 
     def toggle_process(self, label, command):
         process_info = self.menu_items[label]
-        if process_info['process']:
-            os.killpg(os.getpgid(process_info['process'].pid), signal.SIGTERM)
-            process_info['process'] = None
-            process_info['item'].set_label(label)
+        if process_info["process"]:
+            os.killpg(os.getpgid(process_info["process"].pid), signal.SIGTERM)
+            process_info["process"] = None
+            process_info["item"].set_label(label)
             return
         else:
-            process_info['process'] = subprocess.Popen(
+            process_info["process"] = subprocess.Popen(
                 command.split(" "), preexec_fn=os.setsid
             )
-            process_info['item'].set_label(label + "⌛")
+            process_info["item"].set_label(label + "⌛")
             return
-        process_info['item'].set_label(label)
+        process_info["item"].set_label(label)
         return
 
     def quit(self, _):
         for label in self.menu_items:
             menu_item = self.menu_items[label]
-            status = menu_item['status']
-            process = menu_item['process']
+            status = menu_item["status"]
+            process = menu_item["process"]
             if status:
                 os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
