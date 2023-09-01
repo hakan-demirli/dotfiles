@@ -210,6 +210,9 @@
         * ```nix flake new -t github:nix-community/nix-direnv <desired output path>```
         * ```direnv allow```
 
+* **Nix undefined variable on python pip package**
+    * https://stackoverflow.com/questions/76540098/how-to-create-a-nix-project-with-the-python-package-streamlit
+
 # LATER
 OpenSnitch - is a GNU/Linux interactive application firewall
 

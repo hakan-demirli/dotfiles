@@ -207,12 +207,17 @@ def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
     if isThisMonth(month_title):
         lines = raw_cal_txt.split("\n")
         month_title = lines[0]
+        month_title = "\n".join(line for line in month_title if line == "\n")
         raw_cal_txt = "\n".join(lines[1:])
         yesterday = (datetime.date.today() - datetime.timedelta(days=1)).day
         calendar_parts = raw_cal_txt.split(str(yesterday))
         # Delete all characters in the second part except newlines
-        second_part = "\n".join(line for line in calendar_parts[1] if line == "\n")
-        modified_calendar = f"{calendar_parts[0]}{yesterday}{second_part}"
+        if len(calendar_parts) > 1:
+            first_part = calendar_parts[0]
+        else:
+            first_part = ""
+            yesterday = ""
+        modified_calendar = f"{first_part}{yesterday}"
         modified_calendar = month_title + "\n" + modified_calendar
         text_color = (55, 55, 55)  # gray color
         draw.text(text_position, modified_calendar, fill=text_color, font=font)
