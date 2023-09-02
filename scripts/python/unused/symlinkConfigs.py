@@ -26,11 +26,13 @@ for entry in entries:
 
     # Remove existing entry in ~/.config (if it exists)
     target_entry = os.path.join(config_dir_path, entry)
+
     if os.path.exists(target_entry):
         if os.path.islink(target_entry):
             os.unlink(target_entry)  # Unlink the symlink
         elif os.path.isdir(target_entry):
             shutil.rmtree(target_entry)  # Remove the directory
-
+        elif os.path.isfile(target_entry):
+            os.remove(target_entry)  # Remove the file
     # Create a symbolic link to the entry
     os.symlink(entry_path, target_entry)

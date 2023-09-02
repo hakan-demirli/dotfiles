@@ -15,28 +15,6 @@ local keymaps = {
     lhs = "<C-n>",
     rhs = ":NvimTreeToggle<CR>",
   },
-  -- Fast Escape
-  {
-    mode = { "i" },
-    lhs = "KJ",
-    rhs = "<Esc>",
-  },
-  {
-    mode = { "i" },
-    lhs = "JK",
-    rhs = "<Esc>",
-  },
-  {
-    mode = { "i" },
-    lhs = "jk",
-    rhs = "<Esc>",
-  },
-  {
-    mode = { "i" },
-    lhs = "kj",
-    rhs = "<Esc>",
-  },
-
   -- Disable "s".
   {
     mode = { "n", "v" },

@@ -213,6 +213,11 @@
 * **Nix undefined variable on python pip package**
     * https://stackoverflow.com/questions/76540098/how-to-create-a-nix-project-with-the-python-package-streamlit
 
+* **Enable tor as a proxy**
+    * ```sudo pacman -S tor```
+    * ```sudo systemctl start tor.service```
+    * ```sudo systemctl stop tor.service```
+
 # LATER
 OpenSnitch - is a GNU/Linux interactive application firewall
 

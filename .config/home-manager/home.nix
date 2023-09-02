@@ -1,13 +1,7 @@
-# This is your home-manager configuration file
-# Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
+{ config, pkgs, ... }:
 
-{ inputs, lib, config, pkgs, ... }: {
-  # You can import other home-manager modules here
+{
   imports = [
-    # If you want to use home-manager modules from other flakes (such as nix-colors):
-    # inputs.nix-colors.homeManagerModule
-
-    # You can also split up your configuration and import pieces of it here:
     # ./nvim.nix
   ];
 
@@ -38,13 +32,13 @@
     homeDirectory = "/home/emre";
     packages = with pkgs; [
       git
+      kitty
+      wofi
       neovim
       firefox
       vscode
-      kitty
       drawing
       sayonara
-      wofi
       waybar
       yt-dlp-light
       ffmpeg
@@ -67,16 +61,32 @@
           # List package dependencies here
         ];
       })
+      # # You can also create simple shell scripts directly inside your
+      # # configuration. For example, this adds a command 'my-hello' to your
+      # # environment:
+      # (pkgs.writeShellScriptBin "my-hello" ''
+      #   echo "Hello, ${config.home.username}!"
+      # '')
     ];
     sessionVariables = {
-      EDITOR = "code";
+      EDITOR = "nvim";
       BROWSER = "firefox";
       TERMINAL = "kitty";
       TERM = "kitty";
     };
+    stateVersion = "23.05"; # Dont change this.
   };
 
 
+  # https://github.com/nix-community/home-manager/issues/2085
+  # home.file.".gitconfig".source = config.lib.file.mkOutOfStoreSymlink ../git/.gitconfig;
+  xdg.configFile."nvim" = {
+    recursive = true;
+    source = config.lib.file.mkOutOfStoreSymlink ../nvim;
+  };
+
+  # Nicely reload system units when changing configs
+  systemd.user.startServices = "sd-switch";
   dconf.settings = {
     # for virt-manager
     "org/virt-manager/virt-manager/connections" = {
@@ -95,11 +105,6 @@
     };
   };
 
+  # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
-
-  # Nicely reload system units when changing configs
-  systemd.user.startServices = "sd-switch";
-
-  # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  home.stateVersion = "23.05";
 }
