@@ -1,88 +1,176 @@
+@import "./colors.css";
+
 * {
-	font-size: 15px;
-	font-family: "Noto Mono", monospace;
+  background: transparent;
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 12px;
+  color: white;
+  margin: 0px 0px 0px 0px;
 }
 
-window#waybar {
-	background: #292b2e;
-	color: #fdf6e3;
+window {
+  background: transparent;
 }
 
-#custom-right-arrow-dark,
-#custom-left-arrow-dark {
-	color: #292b2e;
+#tray menu,
+tooltip {
+  background: @background;
+  color: @active;
 }
 
-#custom-right-arrow-light,
-#custom-left-arrow-light {
-	color: #292b2e;
-	background: #292b2e;
-}
-
-#workspaces,
-#clock.1,
-#clock.2,
-#clock.3,
-#pulseaudio,
-#memory,
-#cpu,
+#scroll,
+#clock,
+#hardware,
+#scripts,
+#custom-weather,
+#batteries,
 #battery,
-#disk {
-	background: #292b2e;
+#pulseaudio,
+#pulseaudio#mic,
+#workspaces,
+#custom-notification,
+#tray {
+  background: alpha(@background, 0.8);
+  border-radius: 8px;
+  padding: 2px;
+  margin-right: 4px;
 }
 
 #tray {
-	background: #43464d;
-	padding: 3px 5px;
-	margin-top: 3px;
+  padding: 0px 8px 0px 8px;
 }
 
-
 #workspaces button {
-	padding: 0 2px;
-	color: #fdf6e3;
+  padding: 0px;
+  margin: 0;
+  border-radius: 0;
+  color: shade(@background, 0.8);
+}
+
+#workspaces button.urgent {
+  text-decoration: underline;
+  font-weight: bold;
 }
 
 #workspaces button.active {
-	color: #268bd2;
+  background: shade(alpha(@foreground, 0.2), 0.8);
+  color: shade(@foreground, 0.9);
+  border-radius: 8px;
 }
 
-#workspaces button:hover {
-	box-shadow: inherit;
-	text-shadow: inherit;
+#cpu,
+#clock,
+#network,
+#custom-cputemp,
+#custom-colorpicker,
+#hyprland-submap,
+#idle_inhibitor,
+#custom-updates,
+#gamemode,
+#custom-github,
+#custom-camera,
+#custom-notifications,
+#custom-recorder,
+#custom-batterysaver,
+#bluetooth,
+#disk,
+#memory,
+#pulseaudio,
+#pulseaudio.mic,
+#backlight {
+  padding: 0px 6px 0px 6px;
 }
 
-#workspaces button:hover {
-	background: #1a1a1a;
-	border: #1a1a1a;
-	padding: 0 3px;
+#idle_inhibitor,
+#pulseaudio,
+#pulseaudio.mic {
+  color: #7aa2f7;
 }
 
-#pulseaudio {
-	color: #268bd2;
+#backlight {
+  color: #fab387;
 }
 
 #memory {
-	color: #2aa198;
+  color: shade(#cca0e4, 0.8);
+}
+
+#disk {
+  color: shade(#7aa2f7, 0.8);
 }
 
 #cpu {
-	color: #6c71c4;
+  color: shade(#a6e3a1, 0.8);
 }
 
-#battery {
-	color: #859900;
+#custom-batterysaver.powersave {
+  color: #a6e3a1;
 }
 
-#disk {
-	color: #b58900;
+#custom-batterysaver.default {
+  color: @foreground;
 }
 
-#clock,
-#pulseaudio,
-#memory,
-#cpu,
-#battery,
-#disk {
-	padding: 0 2px;
+#custom-batterysaver.performance {
+  color: #d78787;
+}
+
+#network {
+  color: #a6e3a1;
+}
+
+#network.disabled,
+#network.disconnected {
+  color: #d78787;
+}
+
+@keyframes blink {
+  to {
+    background-color: alpha(red, 0.6);
+    color: @foreground;
+  }
+}
+
+@keyframes blink-blue {
+  to {
+    background-color: alpha(#7aa2f7, 0.6);
+    color: @foreground;
+  }
+}
+
+#battery.warning:not(.charging),
+#battery.critical:not(.charging) {
+  animation-name: blink;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#bluetooth.discoverable,
+#bluetooth.discovering,
+#bluetooth.pairable {
+  animation-name: blink-blue;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#bluetooth.connected {
+  background: shade(alpha(@foreground, 0.1), 0.8);
+  border-radius: 8px;
+}
+
+/* Override */
+
+#batteries {
+  margin-right: 0px;
+  border-radius: 8px 0px 0px 8px;
+}
+
+#clock {
+  margin-left: 0px;
+  border-radius: 0px 8px 8px 0px;
+  background: alpha(@background, 0.6);
 }

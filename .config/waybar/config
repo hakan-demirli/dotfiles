@@ -16,6 +16,8 @@
     "custom/left-arrow-dark",
     "pulseaudio",
     "custom/left-arrow-dark",
+    "pulseaudio#mic",
+    "custom/left-arrow-dark",
     "battery",
     "custom/left-arrow-dark",
     "custom/notification",
@@ -59,12 +61,9 @@
     "on-click": "gnome-system-monitor"
   },
   "pulseaudio": {
-    "format": "<span> {icon}\n</span>{volume}%\n {format_source}",
-    "format-bluetooth": "{volume}% {icon} {format_source}",
-    "format-bluetooth-muted": " {icon} {format_source}",
-    "format-muted": " {format_source}",
-    "format-source": " \n{volume}%",
-    "format-source-muted": "",
+    "format": "{volume}% {icon}",
+    "format-bluetooth": "{volume}% {icon}",
+    "format-muted": "",
     "format-icons": {
       "headphone": "",
       "hands-free": "",
@@ -78,10 +77,23 @@
         ""
       ]
     },
-    "on-click": "pavucontrol"
+    "on-click": "pavucontrol",
+    "on-click-right": "pactl set-sink-mute 0 toggle",
+    "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
+    "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%",
+    "smooth-scrolling-threshold": 1
   },
-  "battery": {
-    "format": "<span font='Font Awesome 5 Free 11'>{icon}\n</span>{capacity}%\n{time}",
+  "pulseaudio#mic": {
+    "format": "{format_source}",
+    "format-source": "{volume}% ",
+    "format-source-muted": "",
+    "on-click": "pavucontrol",
+    "on-click-right": "pactl set-source-mute 0 toggle",
+    "on-scroll-down": "pactl set-source-volume 0 -1%",
+    "on-scroll-up": "pactl set-source-volume 0 +1%"
+  },
+  "battery": { // 6 space max size preoccupied
+    "format": "        \n{capacity}% {icon}\n{time}",
     "format-icons": {
       "default": [
         "",
@@ -92,8 +104,8 @@
       "plugged": " "
     },
     "format-time": "{H}h{M}m",
-    "format-charging": "<span font='Font Awesome 5 Free'> </span><span font='Font Awesome 5 Free 11'>{icon}</span>\n{capacity}% \n{time}",
-    "format-full": "<span font='Font Awesome 5 Free'></span>\n<span font='Font Awesome 5 Free 11'>{icon}</span>",
+    "format-charging": "{capacity}%   {icon}\n{time}",
+    "format-full": " {icon}",
     "interval": 5,
     "states": {
       "warning": 25,

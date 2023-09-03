@@ -8,11 +8,10 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("AppIndicator3", "0.1")
 
 from gi.repository import Gtk, AppIndicator3, Gio, GLib
-
-
+# aksdjfaskdjf 
 class IndicatorApp:
     def __init__(self):
-        self.app = "my-indicator"
+        self.app        = "my-indicator"
         self.menu = Gtk.Menu()
 
         script_dir = pathlib.Path(__file__).parent.absolute()
@@ -23,13 +22,13 @@ class IndicatorApp:
         )
         self.add_menu_item("🗣️ clipboardTTS", item_callback)
 
-        item_callback = lambda _: self.toggle_process(
-            "🗓️ updateOverlay", f"python {script_dir}/updateOverlay.py"
+        item_callback = lambda _: self.run_process(
+            f"python {script_dir}/updateOverlay.py"
         )
         self.add_menu_item("🗓️ updateOverlay", item_callback)
 
-        item_callback = lambda _: self.toggle_process(
-            "🎵 youtubeSync", f"python {script_dir}/youtubeSync.py"
+        item_callback = lambda _: self.run_process(
+            f"python {script_dir}/youtubeSync.py"
         )
         self.add_menu_item("🎵 youtubeSync", item_callback)
 
@@ -51,6 +50,9 @@ class IndicatorApp:
         item.connect("activate", callback)
         self.menu_items[label] = {"status": False, "item": item, "process": None}
         self.menu.append(item)
+
+    def run_process(self, command):
+        subprocess.Popen(command.split(" "), preexec_fn=os.setsid)
 
     def toggle_process(self, label, command):
         process_info = self.menu_items[label]

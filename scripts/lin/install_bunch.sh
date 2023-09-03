@@ -16,12 +16,12 @@ sudo pacman -S --noconfirm --needed kitty
 sudo pacman -S --noconfirm --needed drawing
 sudo pacman -S --noconfirm --needed firefox
 sudo pacman -S --noconfirm --needed discord
-sudo pacman -S --noconfirm --needed neovim
 sudo pacman -S --noconfirm --needed nemo
 sudo pacman -S --noconfirm --needed nemo-fileroller
 yay -S --noconfirm --answerdiff=None visual-studio-code-bin
 yay -S --noconfirm --answerdiff=None green-tunnel
 yay -S --noconfirm --answerdiff=None sayonara-player
+
 
 
 # Bunch of utility tools
@@ -45,6 +45,7 @@ sudo pacman -S --noconfirm --needed gtk3
 sudo pacman -S --noconfirm --needed gtk-layer-shell
 sudo pacman -S --noconfirm --needed socat
 sudo pacman -S --noconfirm --needed gnome-bluetooth-3.0
+sudo pacman -S --noconfirm --needed gnome-power-manager
 sudo pacman -S --noconfirm --needed upower
 sudo pacman -S --noconfirm --needed networkmanager
 sudo pacman -S --noconfirm --needed network-manager-applet
@@ -145,11 +146,22 @@ Extensions=dir;
 EOF
 
 sudo pacman -S --noconfirm --needed nix
-yay -S --noconfirm --answerdiff=None nixpkgs-fmt
 sudo systemctl enable --now nix-daemon.service
 sudo gpasswd -a $USER nix-users
 nix-channel --add https://nixos.org/channels/nixpkgs-unstable
 nix-channel --update
+
+
+# Editor
+sudo pacman -S --noconfirm --needed helix
+# LSPs and Formatters
+sudo pacman -S --noconfirm --needed prettier     # markdown etc.
+sudo pacman -S --noconfirm --needed pyright      # python
+sudo pacman -S --noconfirm --needed python-black # python
+sudo pacman -S --noconfirm --needed taplo        # toml file
+yay -S --noconfirm --answerdiff=None verible-git # verilog
+yay -S --noconfirm --answerdiff=None nixpkgs-fmt # nix
+nix profile install nixpkgs#nil                  # nix
 
 
 # systemctl daemon-reload && systemctl restart asusd
