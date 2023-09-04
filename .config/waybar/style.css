@@ -29,6 +29,7 @@ tooltip {
 #pulseaudio#mic,
 #workspaces,
 #custom-notification,
+#memory,
 #tray {
   background: alpha(@background, 0.8);
   border-radius: 8px;

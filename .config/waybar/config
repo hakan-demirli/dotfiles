@@ -57,11 +57,11 @@
     "tooltip": false
   },
   "memory": {
-    "format": " \n{}%\n",
+    "format": "{}% ",
     "on-click": "gnome-system-monitor"
   },
   "pulseaudio": {
-    "format": "{volume}% {icon}",
+    "format": "\n{volume}% {icon}\n",
     "format-bluetooth": "{volume}% {icon}",
     "format-muted": "",
     "format-icons": {

@@ -163,6 +163,32 @@ yay -S --noconfirm --answerdiff=None verible-git # verilog
 yay -S --noconfirm --answerdiff=None nixpkgs-fmt # nix
 nix profile install nixpkgs#nil                  # nix
 
+echo 'alias tmux='\''tmux -f ~/.config/tmux/tmux.conf'\''' >> ~/.bashrc
+echo 'alias txa='\''tmux attach-session -t'\''' >> ~/.bashrc
+echo 'alias txls='\''tmux list-sessions'\''' >> ~/.bashrc
+echo 'alias txks='\''tmux kill-session -t '\''' >> ~/.bashrc
+echo 'alias txn='\''tmux new-session -s'\''' >> ~/.bashrc
+echo 'alias txs='\''tmux switch-client -n'\''' >> ~/.bashrc
+echo 'alias txkw='\''tmux kill-window -t '\''' >> ~/.bashrc
+echo 'alias txlw='\''tmux list-windows'\''' >> ~/.bashrc
+echo 'alias hx='\''helix'\''' >> ~/.bashrc
+echo 'alias hxf='\''tmux new-session -s helix-session "helix $(find -L ~/.config /mnt/second/rep \( \
+-name node_modules -o  \
+-name conda        -o  \
+-name env          -o  \
+-name bin          -o  \
+-name .direnv      -o  \
+-name .git         -o  \
+-name .github      -o  \
+-name __pycache__  -o  \
+-name venv         -o  \
+-name .venv            \
+\) -prune -o -type d -print | fzf)"'\''' >> ~/.bashrc
+
+echo 'set -o vi' >> ~/.bashrc
+echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
+
+
 
 # systemctl daemon-reload && systemctl restart asusd
 reboot
