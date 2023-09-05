@@ -69,7 +69,7 @@ def symlink_bin():
     # Define the source and target directories
     source_dir = os.path.abspath(os.path.join(mylib.CONFIG_DIR, "../scripts/lin/bin"))
     target_home = os.path.expanduser("~")
-    target_dir = os.path.join(target_home, ".local/usr/bin")
+    target_dir = os.path.join(target_home, ".local/bin")
 
     # Ensure the target directory exists; create it if not
     if not os.path.exists(target_dir):

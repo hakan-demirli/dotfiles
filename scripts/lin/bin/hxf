@@ -18,6 +18,7 @@ function helix_project() {
 
     if [ -n "$selected_dir" ]; then
         cd "$selected_dir" || return 1
+        eval "$(direnv export bash)"
         session_name=$(basename "$selected_dir")
         tmux new-session -s "$session_name" "helix $selected_dir"
     fi

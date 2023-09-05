@@ -165,23 +165,7 @@ yay -S --noconfirm --answerdiff=None verible-git # verilog
 yay -S --noconfirm --answerdiff=None nixpkgs-fmt # nix
 nix profile install nixpkgs#nil                  # nix
 
-
-echo 'export PATH=~/.local/usr/bin:$PATH' >> ~/.bashrc
-
-echo 'alias tmux='\''tmux -f ~/.config/tmux/tmux.conf'\''' >> ~/.bashrc
-echo 'alias txa='\''tmux attach-session -t'\''' >> ~/.bashrc
-echo 'alias txls='\''tmux list-sessions'\''' >> ~/.bashrc
-echo 'alias txks='\''tmux kill-session -t '\''' >> ~/.bashrc
-echo 'alias txn='\''tmux new-session -s'\''' >> ~/.bashrc
-echo 'alias txs='\''tmux switch-client -n'\''' >> ~/.bashrc
-echo 'alias txkw='\''tmux kill-window -t '\''' >> ~/.bashrc
-echo 'alias txlw='\''tmux list-windows'\''' >> ~/.bashrc
-echo 'alias hx='\''helix'\''' >> ~/.bashrc
-
-echo 'set -o vi' >> ~/.bashrc
-echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
-
-
+echo 'if [ -f ~/.config/my_bashrc ]; then . ~/.config/my_bashrc; fi' >> ~/.bashrc
 
 # systemctl daemon-reload && systemctl restart asusd
 reboot

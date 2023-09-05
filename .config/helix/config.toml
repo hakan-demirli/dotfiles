@@ -20,7 +20,7 @@ g = ":pipe-to live-grep-in-split-tmux"
 [editor]
 line-number = "relative"
 mouse = false
-bufferline = "multiple"
+bufferline = "always"
 rulers = [80]
 
 [editor.cursor-shape]

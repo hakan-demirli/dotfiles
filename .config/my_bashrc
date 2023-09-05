@@ -1,29 +1,26 @@
 
-set_paths () {
+my_set_paths () {
+    set -o vi
+
     # local MY_TMP_DIR=/mnt/tmp
 
-    export MY_STORAGE_DIR=/mnt/second
-    export MY_APP_DIR=$MY_STORAGE_DIR/software
-    export MY_REP_DIR=$MY_STORAGE_DIR/rep
-    export MY_MUSIC_DIR=$MY_STORAGE_DIR/music
-    export MY_IMAGE_DIR=$MY_STORAGE_DIR/images
-    export MY_TTS_DIR=$MY_APP_DIR/lin/piper
-    export MY_DOTFILE_DIR=$MY_REP_DIR/dotfiles
-    export MY_SCRIPT_DIR=$MY_DOTFILE_DIR/scripts
-
-    export PATH=/usr/local/bin:$PATH
     export PATH=~/.local/bin:$PATH
-    export PATH=$MY_SCRIPT_DIR:$PATH
-    export PATH=$MY_APP_DIR/lin/quartus/nios2eds/sdk2/bin:$PATH
-    export PATH=$MY_APP_DIR/lin/quartus/quartus/bin:$PATH
-    export PATH=$MY_APP_DIR/lin/verible:$PATH
-    export PATH=$MY_APP_DIR/lin/oss-cad-suite/bin:$PATH
-    export PATH=$MY_APP_DIR/lin/quartus/questa_fse/bin:$PATH
+    export PATH=/usr/local/bin:$PATH
 
-    export QSYS_ROOTDIR=$MY_APP_DIR/lin/quartus/quartus/sopc_builder/bin
+    export DIRENV_CONFIG=$HOME/.config/direnv/direnvrc
+
+
+    alias tmux='tmux -f ~/.config/tmux/tmux.conf'
+    alias txa='tmux attach-session -t'
+    alias txls='tmux list-sessions'
+    alias txks='tmux kill-session -t '
+    alias txn='tmux new-session -s'
+    alias txs='tmux switch-client -n'
+    alias txkw='tmux kill-window -t '
+    alias txlw='tmux list-windows'
+    alias hx='helix'
+
     export LM_LICENSE_FILE=$MY_APP_DIR/lin/quartus/license.dat
-    export SWT_GTK3=0
-    export SWT_WEBKIT2=1
 
     # Path for 32 bit modelsim
     # export PATH=$MY_APP_DIR/lin/modelsim/modelsim_ase/bin:$PATH
@@ -32,16 +29,9 @@ set_paths () {
     # export RISCV=$MY_APP_DIR/lin/riscv64_gnu_toolchain
     # export PATH=$MY_APP_DIR/lin/riscv64_gnu_toolchain/bin:$PATH
 
-
-    # Run everything using prime_run
-    # export __NV_PRIME_RENDER_OFFLOAD=1
-    # export __GLX_VENDOR_LIBRARY_NAME=nvidia
-    # export __VK_LAYER_NV_optimus=NVIDIA_only
-    # export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json
-    # export XDG_RUNTIME_DIR=/home/emre/Documents/NoMachine
-    # export RUNLEVEL=3
+    eval "$(direnv hook bash)"
 }
 
-set_paths
+my_set_paths
 
-unset -f set_paths
+unset -f my_set_paths

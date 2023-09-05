@@ -14,8 +14,8 @@ s : search in selection.
 
 # Movement
 
-<ctrl,u>: move half page up
 <ctrl,d>: move half page down
+<ctrl,u>: move half page up
 <ctrl+s>: save current cursor position to jump list
 <ctrl+i>: "in" move forward in jumplist
 <crtl+o>: "out" move backwards in jumplist
@@ -76,12 +76,19 @@ g -> goto <menu will popup on the right>
 
 select then `:pipe sort`
 
-#
+m -> match select menu
+[ -> bracket menu. move between diagnostics
+] -> bracket menu. move between diagnostics
+<space+d> -> all diagnostics in current file
+<space+D> -> all diagnostics in all files
+
+how to search for keybindings?
+<space,?> list all possible commands
+you can also search for key using () like (m).
 
 ## lf file manager
 
-#
-
+############
 hjkl to move
 ctrl+u/d as pageup/down fast scroll.
 / to search and n/N to go among
