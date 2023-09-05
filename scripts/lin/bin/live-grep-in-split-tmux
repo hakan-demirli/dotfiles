@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Split the window vertically and run helix-live-grep in the new pane
+tmux split-window -v helix-live-grep
+

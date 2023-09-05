@@ -20,6 +20,10 @@ s : search in selection.
 <ctrl+i>: "in" move forward in jumplist
 <crtl+o>: "out" move backwards in jumplist
 
+:sh -> run in terminal and show output
+:pipe-to -> run in terminal
+:pipe -> run in terminal and paste return value to current file
+
 # Changes
 
 a: append right after cursor
@@ -73,7 +77,9 @@ g -> goto <menu will popup on the right>
 select then `:pipe sort`
 
 #
+
 ## lf file manager
+
 #
 
 hjkl to move

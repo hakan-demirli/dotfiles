@@ -13,6 +13,10 @@ p = "paste_clipboard_before"
   "paste_before",
 ]
 
+[keys.normal.space]
+# g = ":pipe-to tmux split-window -h helix-live-grep"
+g = ":pipe-to live-grep-in-split-tmux"
+
 [editor]
 line-number = "relative"
 mouse = false
@@ -26,3 +30,6 @@ insert = "bar"
 space = "all"
 tab = "all"
 newline = "none"
+
+[editor.file-picker]
+hidden = true

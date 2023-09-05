@@ -1,8 +1,8 @@
 [[language]]
 name = "gdscript"
 language-server = { command = "nc", args = [
-    "localhost",
-    "6005",
+  "localhost",
+  "6005",
 ], language-id = "gdscript" }
 formatter = { command = "git", args = ["stripspace"] }
 
@@ -55,14 +55,14 @@ auto-format = true
 name = "ruby"
 config = { solargraph = { diagnostics = true, formatting = false } }
 formatter = { command = "bundle", args = [
-    "exec",
-    "rubocop",
-    "--stdin",
-    "foo.rb",
-    "-a",
-    "--stderr",
-    "--fail-level",
-    "fatal",
+  "exec",
+  "rubocop",
+  "--stdin",
+  "foo.rb",
+  "-a",
+  "--stderr",
+  "--fail-level",
+  "fatal",
 ] }
 auto-format = true
 
