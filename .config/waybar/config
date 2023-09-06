@@ -2,7 +2,7 @@
   "layer": "top",
   "position": "right",
   "modules-left": [
-    "wlr/workspaces"
+    "hyprland/workspaces"
   ],
   "modules-center": [
     "clock#1",
@@ -32,24 +32,24 @@
     "format": " ",
     "tooltip": false
   },
-  "wlr/workspaces": {
-    "format": "{icon}",
+  "hyprland/workspaces": {
+    "format": "{}",
     "on-scroll-up": "hyprctl dispatch workspace -1",
     "on-scroll-down": "hyprctl dispatch workspace r+1",
     "on-click": "activate",
     "disable-scroll-wraparound": true,
-    "persistent_workspaces": {
-      "1": [],
-      "2": [],
-      "3": []
-    }
+    //"persistent_workspaces": {
+    //  "1": [],
+    //  "2": [],
+    //  "3": []
+    //}
   },
   "clock#1": {
-    "format": "{:%a}",
+    "format": "{:%H:%M}",
     "tooltip": false
   },
   "clock#2": {
-    "format": "{:%H:%M}",
+    "format": "{:%a}",
     "tooltip": false
   },
   "clock#3": {
