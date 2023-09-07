@@ -1,6 +1,7 @@
 [Default Applications]
 application/x-shellscript=helix.desktop
 text/html=firefox.desktop
+text/plain=helix.desktop
 x-scheme-handler/http=firefox.desktop
 x-scheme-handler/https=firefox.desktop
 x-scheme-handler/about=firefox.desktop

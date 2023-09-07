@@ -2,6 +2,9 @@
 my_set_paths () {
     set -o vi
 
+    if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
+    alias lf='lfcd'
+
     # local MY_TMP_DIR=/mnt/tmp
     export TERM=kitty
     export PATH=~/.local/bin:$PATH
@@ -9,6 +12,7 @@ my_set_paths () {
 
     export DIRENV_CONFIG=$HOME/.config/direnv/direnvrc
 
+    export OPENER=xdg-open
 
     alias tmux='tmux -f ~/.config/tmux/tmux.conf'
     alias txa='tmux attach-session -t'
