@@ -3,7 +3,7 @@ my_set_paths () {
     set -o vi
 
     # local MY_TMP_DIR=/mnt/tmp
-
+    export TERM=kitty
     export PATH=~/.local/bin:$PATH
     export PATH=/usr/local/bin:$PATH
 

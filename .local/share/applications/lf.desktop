@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=lf
+Comment=Launches the lf file manager
+Icon=utilities-terminal
+Terminal=false
+Exec=kitty lf
+Categories=ConsoleOnly;System;FileTools;FileManager
+MimeType=inode/directory;

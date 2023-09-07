@@ -67,9 +67,33 @@ def symlink_cargo_config():
 
 def symlink_bin():
     # Define the source and target directories
-    source_dir = os.path.abspath(os.path.join(mylib.CONFIG_DIR, "../scripts/lin/bin"))
+    source_dir = os.path.abspath(os.path.join(mylib.HOME_DIR, ".local/bin"))
     target_home = os.path.expanduser("~")
     target_dir = os.path.join(target_home, ".local/bin")
+
+    # Ensure the target directory exists; create it if not
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    # Iterate through files in the source directory
+    for filename in os.listdir(source_dir):
+        source_path = os.path.join(source_dir, filename)
+        target_path = os.path.join(target_dir, filename)
+
+        # Remove existing target if it exists
+        remove_path(target_path)
+
+        # Create a symbolic link from the source to the target
+        os.symlink(source_path, target_path)
+
+
+def symlink_desktop_files():
+    # Define the source and target directories
+    source_dir = os.path.abspath(
+        os.path.join(mylib.HOME_DIR, ".local/share/applications")
+    )
+    target_home = os.path.expanduser("~")
+    target_dir = os.path.join(target_home, ".local/share/applications")
 
     # Ensure the target directory exists; create it if not
     if not os.path.exists(target_dir):
@@ -93,6 +117,7 @@ def main():
 
     if not "nt" in os.name:
         symlink_bin()
+        symlink_desktop_files()
 
 
 if __name__ == "__main__":

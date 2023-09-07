@@ -76,3 +76,17 @@ indent = { tab-width = 4, unit = "    " }
 [[language]]
 name = "toml"
 auto-format = true
+
+[[language]]
+name = "cpp"
+# config = { "clangd.fallbackFlags" = ["-std=c++20"] }
+language-server = { command = "clangd", args = ["--compile-commands-dir=./"] }
+
+# Diagnostics:
+#   Suppress: "pp_including_mainfile_in_preamble"
+# Add above codes into the .clangd file under your project directory.
+
+# Create compile_commands.json using this: ` cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..`
+
+
+#
