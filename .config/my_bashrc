@@ -1,6 +1,9 @@
 
 my_set_paths () {
     set -o vi
+    set show-mode-in-prompt on
+    set vi-cmd-mode-string "\1\e[2 q\2"
+    set vi-ins-mode-string "\1\e[6 q\2"
 
     if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
     alias lf='lfcd'

@@ -20,6 +20,7 @@ application/x-extension-xhtml=firefox.desktop
 application/x-extension-xht=firefox.desktop
 
 [Added Associations]
+text/x-shellscript=helix.desktop;
 application/x-shellscript=helix.desktop;
 application/x-zerosize=helix.desktop;
 text/x-makefile=helix.desktop;

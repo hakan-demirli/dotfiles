@@ -1,4 +1,4 @@
-
+# https://codeberg.org/tplasdio/lf-config
 # Main options
 set icons
 set period 1
@@ -44,6 +44,11 @@ set cursorpreviewfmt "\033[7m"
 
 cmd mkdir $mkdir -p "$(echo $* | tr ' ' '\ ')"
 cmd trash %trash-put $fx
+
+
+cmd delete_for_real ${{
+	rm -rf "$fx"
+}}
 
 
 cmd delete ${{
@@ -219,7 +224,7 @@ map d cut
 map p paste
 map <esc>   :unselect; clear
 map xd delete
-
+map xk delete_for_real
 
 # Navigation
 map gl follow_link
