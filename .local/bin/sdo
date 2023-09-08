@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+
+import subprocess
+import argparse
+import os
+
+
+def get_file_type(file_path):
+    # Get the file type using xdg-mime
+    command = f"xdg-mime query filetype {file_path}"
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+
+    if process.returncode == 0:
+        return stdout.decode().strip()
+    else:
+        print(f"Error getting file type: {stderr.decode()}")
+        return None
+
+
+def set_default_app(desktop_file, file_type):
+    # Set the default application using xdg-mime
+    command = f"xdg-mime default {desktop_file} {file_type}"
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+
+    if process.returncode == 0:
+        print(f"Default application set to {desktop_file} for {file_type}.")
+    else:
+        print(f"Error setting default application: {stderr.decode()}")
+
+
+def add_to_mimeapps_list(desktop_file, file_type):
+    mimeapps_list_path = os.path.expanduser("~/.config/mimeapps.list")
+    with open(mimeapps_list_path, "a") as mimeapps_file:
+        mimeapps_file.write(f"{file_type}={desktop_file}\n")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Set the default application for a file type and update mimeapps.list."
+    )
+    parser.add_argument("file_path", help="Path to the program")
+    parser.add_argument(
+        "desktop_file", help="Desktop file name (without '.desktop')"
+    )
+
+    args = parser.parse_args()
+
+    # Convert relative file path to absolute using the current working directory
+    absolute_file_path = os.path.abspath(args.file_path)
+
+    # Append ".desktop" to desktop_file if it doesn't already contain it
+    if not args.desktop_file.endswith(".desktop"):
+        args.desktop_file += ".desktop"
+
+    # Get the file type
+    file_type = get_file_type(absolute_file_path)
+    if file_type is not None:
+        # Set the default application
+        set_default_app(args.desktop_file, file_type)
+        # Add to mimeapps.list
+        add_to_mimeapps_list(args.desktop_file, file_type)
+
+
+if __name__ == "__main__":
+    main()

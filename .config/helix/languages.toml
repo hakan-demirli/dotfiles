@@ -8,11 +8,14 @@ formatter = { command = "git", args = ["stripspace"] }
 
 [[language]]
 name = "python"
-roots = ["pyproject.toml", "setup.py", "Poetry.lock", ".git"]
+roots = ["pyproject.toml", "."]
 language-server = { command = "pyright-langserver", args = ["--stdio"] }
+config = {}
+formatter = { command = "black", args = ["--quiet", "-"] }
 auto-format = true
-formatter = { command = 'black', args = ["--quiet", "-"] }
-config = ""
+# Add this to pyproject.toml in root directory of project to add extra paths.
+# [tool.pyright]
+# extraPaths = ["./test"]
 
 [[language]]
 name = "html"
@@ -39,7 +42,7 @@ auto-format = true
 [[language]]
 name = "markdown"
 formatter = { command = 'prettier', args = ["--parser", "markdown"] }
-auto-format = true
+# auto-format = true
 
 [[language]]
 name = "hcl"
@@ -66,12 +69,12 @@ formatter = { command = "bundle", args = [
 ] }
 auto-format = true
 
-[[language]]
-name = "verilog"
-language-server = { command = "verible-verilog-ls", args = ["--stdio"] }
-formatter = { command = 'verible-verilog-format', args = ["fmt", "-"] }
-auto-format = true
-indent = { tab-width = 4, unit = "    " }
+# [[language]]
+# name = "verilog"
+# language-server = { command = "verilator", args = ["--lint-only", "-Wall"] }
+# formatter = { command = 'verible-verilog-format', args = ["-"] }
+# auto-format = true
+# indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "toml"
@@ -79,6 +82,7 @@ auto-format = true
 
 [[language]]
 name = "cpp"
+# auto-format = true
 # config = { "clangd.fallbackFlags" = ["-std=c++20"] }
 language-server = { command = "clangd", args = [
   "--compile-commands-dir=./build",

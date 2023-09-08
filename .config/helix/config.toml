@@ -12,6 +12,8 @@ p = "paste_clipboard_before"
   "move_line_up",
   "paste_before",
 ]
+j = "move_line_down"
+k = "move_line_up"
 
 [keys.normal.space]
 # g = ":pipe-to tmux split-window -h helix-live-grep"

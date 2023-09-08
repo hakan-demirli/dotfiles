@@ -21,6 +21,11 @@
     * ```yay -S downgrade```
     * ```sudo downgrade <package_name>```
 
+* **Change default application using xdg-mime**
+    * ```xdg-mime query filetype test.md```
+    * ```xdg-mime query default image/png```
+    * ```xdg-mime default helix.desktop image/png```
+
 * **Add windows to grub menu**
     * GUI tool:
         * Grub Customizer
