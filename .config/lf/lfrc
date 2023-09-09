@@ -36,6 +36,7 @@ set ifs "\n"
 set shell "bash"
 set ruler 'df:acc:progress:selection:filter:ind'
 set cursorpreviewfmt "\033[7m"
+set info size
 
 # use mimetype xdg-open for everything
 # source '~/.config/lf/opener'

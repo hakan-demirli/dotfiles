@@ -14,11 +14,12 @@ sudo sed -i 's/^MAKEFLAGS=.*/MAKEFLAGS="-j$(nproc)"/' /etc/makepkg.conf
 
 # Applications
 sudo pacman -S --noconfirm --needed kitty
-sudo pacman -S --noconfirm --needed drawing
+sudo pacman -S --noconfirm --needed kolourpaint
+sudo pacman -S --noconfirm --needed breeze
 sudo pacman -S --noconfirm --needed firefox
 sudo pacman -S --noconfirm --needed discord
-sudo pacman -S --noconfirm --needed nemo
-sudo pacman -S --noconfirm --needed nemo-fileroller
+# sudo pacman -S --noconfirm --needed nemo
+# sudo pacman -S --noconfirm --needed nemo-fileroller
 yay -S --noconfirm --answerdiff=None visual-studio-code-bin
 yay -S --noconfirm --answerdiff=None green-tunnel
 yay -S --noconfirm --answerdiff=None sayonara-player
@@ -130,23 +131,23 @@ gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
 
 # Set default apps
-xdg-mime default nemo.desktop inode/directory application/x-gnome-saved-search
-xdg-settings set default-web-browser firefox.desktop
+# xdg-mime default nemo.desktop inode/directory application/x-gnome-saved-search
+# xdg-settings set default-web-browser firefox.desktop
 
 # Create a custom context item for Nemo
-nemo_dir="$HOME/.local/share/nemo/actions"
-nemo_file="helix.nemo_action"
-nemo_file_path="$nemo_dir/$nemo_file"
-mkdir -p "$nemo_dir"
-cat <<EOF > "$nemo_file_path"
-[Nemo Action]
-Name=Open in Helix
-Comment=Open the 'helix' editor in the selected folder
-Exec=kitty tmux new-session -s "%p" "helix %F"
-Icon-Name=Helix
-Selection=any
-Extensions=dir;
-EOF
+# nemo_dir="$HOME/.local/share/nemo/actions"
+# nemo_file="helix.nemo_action"
+# nemo_file_path="$nemo_dir/$nemo_file"
+# mkdir -p "$nemo_dir"
+# cat <<EOF > "$nemo_file_path"
+# [Nemo Action]
+# Name=Open in Helix
+# Comment=Open the 'helix' editor in the selected folder
+# Exec=kitty tmux new-session -s "%p" "helix %F"
+# Icon-Name=Helix
+# Selection=any
+# Extensions=dir;
+# EOF
 
 
 sudo pacman -S --noconfirm --needed nix

@@ -375,8 +375,8 @@ Vagrantfile            " "
 *.appx     " "
 *.msi      " "
 *.app      " "
-*.pdf      " "
-*.PDF      " "
+*.pdf      " 󰈦"
+*.PDF      " 󰈦"
 *.ps       " "
 *.txt       📝
 *.TXT       📝

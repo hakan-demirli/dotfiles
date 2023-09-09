@@ -19,6 +19,7 @@ application/xhtml+xml=firefox.desktop
 application/x-extension-xhtml=firefox.desktop
 application/x-extension-xht=firefox.desktop
 text/x-script.python=helix.desktop
+text/csv=helix.desktop
 
 [Added Associations]
 text/x-shellscript=helix.desktop;
@@ -38,3 +39,4 @@ application/x-extension-xhtml=firefox.desktop;
 application/x-extension-xht=firefox.desktop;
 inode/x-empty=helix.desktop
 text/x-script.python=helix.desktop
+text/csv=helix.desktop
