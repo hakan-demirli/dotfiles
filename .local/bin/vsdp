@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import json
+import subprocess
+
+# Define the path to the JSON file
+config_dir = os.path.expanduser("~/.config/vsdp")
+config_file = os.path.join(config_dir, "container_mapping.json")
+
+# Ensure the config directory exists
+os.makedirs(config_dir, exist_ok=True)
+
+# Load container mapping from JSON file if it exists, or create an empty one
+if os.path.exists(config_file):
+    with open(config_file, "r") as f:
+        container_mapping = json.load(f)
+else:
+    container_mapping = {}
+
+
+def save_container_mapping():
+    # Save container mapping to JSON file
+    with open(config_file, "w") as f:
+        json.dump(container_mapping, f, indent=4)
+
+
+def get_container_name():
+    print("Available Docker containers:")
+    try:
+        # Run the "docker images" command to list available Docker containers
+        docker_images_output = subprocess.check_output(["docker", "images"], text=True)
+        lines = docker_images_output.split("\n")
+
+        containers = []
+        # Extract container name and image tag information and print with colored index
+        for index, line in enumerate(lines[1:], start=0):  # Skip the header
+            columns = line.split()
+            if len(columns) >= 2:
+                image_name = columns[0]
+                image_tag = columns[1]
+
+                # ANSI escape codes for colors (e.g., \033[31m for red)
+                color_code = 32  # Green
+                colored_index = f"\033[{color_code}m{index}\033[0m"  # Reset color
+                containers.append(f"{image_name}:{image_tag}")
+                print(f"{colored_index}. {image_name}:{image_tag}")
+
+        color_code = 32  # Green
+        index = input(
+            f"\033[{color_code}mEnter the index of the container to use: \033[0m"
+        )
+        index = int(index)
+        if 1 <= index <= len(container_mapping):
+            print("Invalid index. Please enter a valid index.")
+            exit(1)
+        return containers[index]
+    except subprocess.CalledProcessError:
+        print("Error: Failed to list Docker containers.")
+
+
+def is_container_running(container_name):
+    try:
+        # Run the "docker ps" command and capture its output
+        docker_ps_output = subprocess.check_output(["docker", "ps"], text=True)
+
+        # Check if the container name is in the "docker ps" output
+        return container_name in docker_ps_output
+    except subprocess.CalledProcessError:
+        return False
+
+
+def run_docker_container(project_path: str, container_name: str):
+    if is_container_running(container_name):
+        print(f"Docker container '{container_name}' is already running.")
+    else:
+        folder_name = os.path.basename(project_path)
+        docker_command = f"docker run -d --name {folder_name} --volume {project_path}:/work --rm -it {container_name}"
+
+        # Use subprocess.run() to execute the Docker command and capture the return code
+        try:
+            subprocess.run(docker_command, shell=True, check=True)
+            print(f"Started Docker container: {container_name}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error: Failed to start Docker container '{container_name}': {e}")
+            sys.exit(1)
+
+
+def launch_docker_container(project_path):
+    if project_path in container_mapping:
+        container_name = container_mapping[project_path]
+        run_docker_container(project_path, container_name)
+    else:
+        container_name = get_container_name()
+        run_docker_container(project_path, container_name)
+        container_mapping[project_path] = container_name
+
+
+if __name__ == "__main__":
+    project_path = "/mnt/second/rep/gem5_projects"  #  sys.argv[1]
+
+    # Convert the provided project path to an absolute path relative to CWD
+    project_path = os.path.abspath(project_path)
+
+    # Check if the provided project path is valid
+    if not os.path.exists(project_path):
+        print(f"Error: The project path '{project_path}' does not exist.")
+        sys.exit(1)
+
+    launch_docker_container(project_path)
+
+    # Save the container mapping to the JSON file after launching the container
+    save_container_mapping()

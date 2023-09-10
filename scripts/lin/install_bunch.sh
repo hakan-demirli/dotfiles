@@ -165,14 +165,14 @@ sudo usermod -aG docker $USER
 newgrp docker
 
 
-# Editor
-sudo pacman -S --noconfirm --needed helix
-sudo pacman -S --noconfirm --needed bat # live-grep script
+# xremap+vscode == helix
+# sudo pacman -S --noconfirm --needed helix
+# sudo pacman -S --noconfirm --needed bat # live-grep script
 # LSPs and Formatters
-sudo pacman -S --noconfirm --needed prettier     # markdown etc.
-sudo pacman -S --noconfirm --needed pyright      # python
-sudo pacman -S --noconfirm --needed python-black # python
-sudo pacman -S --noconfirm --needed taplo        # toml file
+# sudo pacman -S --noconfirm --needed prettier     # markdown etc.
+# sudo pacman -S --noconfirm --needed pyright      # python
+# sudo pacman -S --noconfirm --needed python-black # python
+# sudo pacman -S --noconfirm --needed taplo        # toml file
 # yay -S --noconfirm --answerdiff=None verible-git # verilog
 
 echo 'if [ -f ~/.config/my_bashrc ]; then . ~/.config/my_bashrc; fi' >> ~/.bashrc

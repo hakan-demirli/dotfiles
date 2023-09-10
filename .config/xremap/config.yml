@@ -74,6 +74,13 @@ keymap:
             ["python","/mnt/second/rep/dotfiles/scripts/python/changeVscodeCursor.py", "--style", "line"],
           { set_mode: insert },
         ]
+      Ctrl-c: Ctrl-c
+      a:  [
+        Right,
+        launch:
+          ["python","/mnt/second/rep/dotfiles/scripts/python/changeVscodeCursor.py", "--style", "line"],
+        { set_mode: insert },
+      ]
       o:  [
           C-enter,
           launch:
@@ -83,13 +90,14 @@ keymap:
       h: Left
       j: Down
       k: Up
+      Ctrl-k: Ctrl-k
       l: Right
       # x: [Home,Shift-end]
+      Ctrl-x: Ctrl-x
       w: [Ctrl-Shift-Right]
       Ctrl-w: Ctrl-w
       b: [Ctrl-Shift-Left]
       Ctrl-b: Ctrl-b
-      Ctrl-x: Ctrl-x
       # 0: Home
       # Shift-KEY_4: End
       u: C-z
