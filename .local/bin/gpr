@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+import argparse
+import subprocess
+import os
+
+GEM5_BINARY = "/mnt/second/rep/gem5_projects/gem5/build/X86/gem5.opt"
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Execute a Python file with a custom binary."
+    )
+    parser.add_argument(
+        "python_file", help="Relative or absolute path to the Python file to execute"
+    )
+
+    args = parser.parse_args()
+    python_file = args.python_file
+
+    # Convert the relative path to an absolute path
+    if not os.path.isabs(python_file):
+        python_file = os.path.abspath(python_file)
+
+    try:
+        subprocess.run([GEM5_BINARY, python_file], check=True)
+    except subprocess.CalledProcessError:
+        print(f"Failed to execute {python_file} with {GEM5_BINARY}")
+
+
+if __name__ == "__main__":
+    main()

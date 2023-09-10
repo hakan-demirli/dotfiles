@@ -149,12 +149,20 @@ gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
 # Extensions=dir;
 # EOF
 
-
-sudo pacman -S --noconfirm --needed nix
-sudo systemctl enable --now nix-daemon.service
-sudo gpasswd -a $USER nix-users
-nix-channel --add https://nixos.org/channels/nixpkgs-unstable
-nix-channel --update
+# Nix->Docker. How do you even link static glibc in nix.
+# sudo pacman -S --noconfirm --needed nix
+# sudo systemctl enable --now nix-daemon.service
+# sudo gpasswd -a $USER nix-users
+# nix-channel --add https://nixos.org/channels/nixpkgs-unstable
+# nix-channel --update
+# yay -S --noconfirm --answerdiff=None nixpkgs-fmt # nix
+# nix profile install nixpkgs#nil                  # nix
+sudo pacman -S --noconfirm --needed docker
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
 
 
 # Editor
@@ -165,9 +173,7 @@ sudo pacman -S --noconfirm --needed prettier     # markdown etc.
 sudo pacman -S --noconfirm --needed pyright      # python
 sudo pacman -S --noconfirm --needed python-black # python
 sudo pacman -S --noconfirm --needed taplo        # toml file
-yay -S --noconfirm --answerdiff=None verible-git # verilog
-yay -S --noconfirm --answerdiff=None nixpkgs-fmt # nix
-nix profile install nixpkgs#nil                  # nix
+# yay -S --noconfirm --answerdiff=None verible-git # verilog
 
 echo 'if [ -f ~/.config/my_bashrc ]; then . ~/.config/my_bashrc; fi' >> ~/.bashrc
 
