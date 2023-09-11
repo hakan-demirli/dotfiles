@@ -39,7 +39,7 @@ sudo pacman -S --noconfirm --needed fzf
 sudo pacman -S --noconfirm --needed wofi
 sudo pacman -S --noconfirm --needed unrar
 sudo pacman -S --noconfirm --needed p7zip
-sudo pacman -S --noconfirm --needed ranger
+sudo pacman -S --noconfirm --needed lf
 sudo pacman -S --noconfirm --needed wget
 sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
 
@@ -58,7 +58,6 @@ sudo pacman -S --noconfirm --needed gnome-keyring
 sudo pacman -S --noconfirm --needed pavucontrol
 sudo pacman -S --noconfirm --needed ffmpeg
 sudo pacman -S --noconfirm --needed tk
-sudo pacman -S --noconfirm --needed yt-dlp
 sudo pacman -S --noconfirm --needed gnome-themes-extra
 sudo pacman -S --noconfirm --needed adwaita-qt5
 sudo pacman -S --noconfirm --needed adwaita-qt6
@@ -76,7 +75,6 @@ yay -S --noconfirm --answerdiff=None rog-control-center
 yay -S --noconfirm --answerdiff=None hyprshot
 yay -S --noconfirm --answerdiff=None nwg-displays
 yay -S --noconfirm --answerdiff=None wlr-randr
-yay -S --noconfirm --answerdiff=None wlr-randr
 yay -S --noconfirm --answerdiff=None woeusb-ng
 yay -S --noconfirm --answerdiff=None swaync
 yay -S --noconfirm --answerdiff=None gtklock
@@ -88,7 +86,7 @@ echo 'KERNEL=="uinput", GROUP="input", TAG+="uaccess"' | sudo tee /etc/udev/rule
 
 # Windows Emulation/Layer
 sudo sed -i '/^#\[multilib\]/{N;s/#//g}' /etc/pacman.conf
-sudo pacman -Syu
+sudo pacman -Syu # must syu after multilib
 sudo pacman -S --noconfirm --needed wine
 sudo pacman -S --noconfirm --needed winetricks
 sudo pacman -S --noconfirm --needed zenity
@@ -115,6 +113,18 @@ sudo pacman -S --noconfirm --needed iptables-nft
 sudo systemctl enable --now libvirtd
 sudo gpasswd -a $USER libvirt
 sudo gpasswd -a $USER kvm
+
+# # install vmware
+# sudo pacman -S --noconfirm --needed fuse2
+# sudo pacman -S --noconfirm --needed libcanberra
+# sudo pacman -S --noconfirm --needed pcsclite
+# sudo pacman -S --noconfirm --needed linux-headers
+# sudo pacman -S --noconfirm --needed gtkmm
+# yay -S --noconfirm --needed ncurses5-compat-libs
+# yay -S --noconfirm --needed  vmware-workstation
+# sudo systemctl enable vmware-networks.service  vmware-usbarbitrator.service vmware-hostd.service
+# sudo systemctl start vmware-networks.service  vmware-usbarbitrator.service vmware-hostd.service
+# sudo modprobe -a vmw_vmci vmmon
 
 ######## CONFIGS #############
 # Set locale

@@ -91,13 +91,18 @@ cmd shred ${{
 
 
 cmd extract ${{
-	clear; tput cup $(($(tput lines)/3)); tput bold
-	set -f
-	printf -- "%s\n" $fx
-	printf "\t\033[1;34m¿Extraer? \033[37m[\033[32ms\033[37m/\033[31mN\033[37m]\033[m "
-	read -r REPLY
-	case "$REPLY" in
-		[yYsS]) aunpack $fx ;;
+	case $fx in
+		*.tar.bz2) tar xjf $fx     ;;
+		*.tar.gz)  tar xzf $fx     ;;
+		*.bz2)     bunzip2 $fx     ;;
+		*.rar)     rar x $fx       ;;
+		*.gz)      gunzip $fx      ;;
+		*.tar)     tar xf $fx      ;;
+		*.tbz2)    tar xjf $fx     ;;
+		*.tgz)     tar xzf $fx     ;;
+		*.zip)     unzip $fx       ;;
+		*.Z)       uncompress $fx  ;;
+		*)         echo "'$fx' cannot be extracted via extract()" ;;
 	esac
 }}
 
@@ -307,7 +312,7 @@ map bg cd /mnt/second/rep/gem5_projects
 # map D delete
 # map <a-d> trash
 # map <a-D> shred
-# map E extract
+map E extract
 # #map C copyto
 # #map M moveto
 # map P paste_link

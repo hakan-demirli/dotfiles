@@ -21,6 +21,7 @@ application/x-extension-xht=firefox.desktop
 text/x-script.python=code.desktop
 text/csv=code.desktop
 application/json=code.desktop
+text/x-shellscript=code.desktop
 
 [Added Associations]
 text/x-shellscript=code.desktop;
@@ -42,3 +43,4 @@ inode/x-empty=code.desktop
 text/x-script.python=code.desktop
 text/csv=code.desktop
 application/json=code.desktop
+text/x-shellscript=code.desktop
