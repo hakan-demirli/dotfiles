@@ -19,6 +19,7 @@ import os
 import sys
 import tempfile
 from datetime import timedelta
+import textwrap
 
 from xdg import xdg_cache_home, xdg_data_home
 
@@ -115,39 +116,38 @@ def fetch_task_lists(service: googleapi.GoogleApiService):
     task_lists = service.fetch_task_lists()
     # print(task_lists)
     OUTPUT_DIR = tempfile.gettempdir()
-    with open(OUTPUT_DIR + "/gtasks.json", "w") as f:
+    with open(OUTPUT_DIR + "/gtasks.txt", "w") as f:
         for task_list in task_lists:
             for task in task_list.tasks:
-                print(task, file=f)
+                if task.completed():
+                    continue
+                print("- " + insert_newlines(task.title, line_length=33), file=f)
+                for subtask in task.subtasks:
+                    if task.completed():
+                        continue
+                    print(
+                        "    * "
+                        + insert_newlines(subtask.title, line_length=31, offset=6),
+                        file=f,
+                    )
+                print("", file=f)
 
 
-def sanitize_task(input_string):
-    # Find the index of ':' and '('
-    colon_index = input_string.find(":")
-    parenthesis_index = input_string.find("(")
-
-    # Check if ':' and '(' exist in the string
-    if colon_index != -1 and parenthesis_index != -1:
-        # Extract the text between ':' and '('
-        result_string = input_string[colon_index + 1 : parenthesis_index]
-
-        # Remove leading and trailing spaces
-        result_string = result_string.strip()
-
-        return result_string
+def insert_newlines(text, line_length=33, offset=0):
+    lines = textwrap.wrap(text, line_length, break_long_words=False)
+    if len(lines) > 1:
+        indented_lines = [lines[0]] + [(offset * " ") + line for line in lines[1:]]
+        return "\n".join(indented_lines)
     else:
-        return None
+        return text
 
 
 def view_task_lists(service: googleapi.GoogleApiService):
     fetch_task_lists(service)
     OUTPUT_DIR = tempfile.gettempdir()
-    with open(OUTPUT_DIR + "/gtasks.json", "r") as f:
+    with open(OUTPUT_DIR + "/gtasks.txt", "r") as f:
         for line in f:
-            if "COMPLETED" in line:
-                continue
-            task = sanitize_task(line)
-            print(task)
+            print(line)
 
 
 if __name__ == "__main__":

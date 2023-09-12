@@ -4,6 +4,7 @@ import subprocess
 import os
 import signal
 import pathlib
+import sys
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("AppIndicator3", "0.1")
@@ -21,7 +22,7 @@ class IndicatorApp:
         self.menu_items = {}
 
         item_callback = lambda _: self.toggle_process(
-            "🗣️ clipboardTTS", f"python {script_dir}/clipboardTTS.py"
+            "🗣️ clipboardTTS", f"{sys.executable} {script_dir}/clipboardTTS.py"
         )
         self.add_menu_item("🗣️ clipboardTTS", item_callback)
 

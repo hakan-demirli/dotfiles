@@ -17,13 +17,14 @@ sudo pacman -S --noconfirm --needed kitty
 sudo pacman -S --noconfirm --needed kolourpaint
 sudo pacman -S --noconfirm --needed breeze
 sudo pacman -S --noconfirm --needed firefox
-sudo pacman -S --noconfirm --needed discord
+sudo pacman -S --noconfirm --needed direnv
 # sudo pacman -S --noconfirm --needed nemo
 # sudo pacman -S --noconfirm --needed nemo-fileroller
-yay -S --noconfirm --answerdiff=None visual-studio-code-bin
-yay -S --noconfirm --answerdiff=None green-tunnel
-yay -S --noconfirm --answerdiff=None sayonara-player
-yay -S --noconfirm --answerdiff=None qbittorrent
+yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
+yay -S --noconfirm --answerdiff=None --needed green-tunnel
+yay -S --noconfirm --answerdiff=None --needed sayonara-player
+yay -S --noconfirm --answerdiff=None --needed qbittorrent
+yay -S --noconfirm --answerdiff=None --needed parabolic
 
 
 
@@ -55,6 +56,7 @@ sudo pacman -S --noconfirm --needed network-manager-applet
 sudo pacman -S --noconfirm --needed brightnessctl
 sudo pacman -S --noconfirm --needed polkit-gnome
 sudo pacman -S --noconfirm --needed gnome-keyring
+sudo pacman -S --noconfirm --needed libsecret
 sudo pacman -S --noconfirm --needed pavucontrol
 sudo pacman -S --noconfirm --needed ffmpeg
 sudo pacman -S --noconfirm --needed tk
@@ -69,18 +71,19 @@ sudo systemctl enable bluetooth.service
 sudo systemctl start bluetooth.service
 
 
-yay -S --noconfirm --answerdiff=None swww
-yay -S --noconfirm --answerdiff=None asusctl
-yay -S --noconfirm --answerdiff=None rog-control-center
-yay -S --noconfirm --answerdiff=None hyprshot
-yay -S --noconfirm --answerdiff=None nwg-displays
-yay -S --noconfirm --answerdiff=None wlr-randr
-yay -S --noconfirm --answerdiff=None woeusb-ng
-yay -S --noconfirm --answerdiff=None swaync
-yay -S --noconfirm --answerdiff=None gtklock
+yay -S --noconfirm --answerdiff=None --needed swww
+yay -S --noconfirm --answerdiff=None --needed asusctl
+yay -S --noconfirm --answerdiff=None --needed rog-control-center
+yay -S --noconfirm --answerdiff=None --needed hyprshot
+yay -S --noconfirm --answerdiff=None --needed nwg-displays
+yay -S --noconfirm --answerdiff=None --needed wlr-randr
+yay -S --noconfirm --answerdiff=None --needed woeusb-ng
+yay -S --noconfirm --answerdiff=None --needed swaync
+yay -S --noconfirm --answerdiff=None --needed gtklock
 
 
-yay -S --noconfirm --answerdiff=None xremap-hypr-bin
+yay -S --noconfirm --answerdiff=None --needed xremap-hypr-bin
+echo "uinput" | sudo tee -a /etc/modules-load.d/uinput.conf
 sudo gpasswd -a $USER input
 echo 'KERNEL=="uinput", GROUP="input", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/99-input.rules
 
@@ -165,7 +168,7 @@ gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
 # sudo gpasswd -a $USER nix-users
 # nix-channel --add https://nixos.org/channels/nixpkgs-unstable
 # nix-channel --update
-# yay -S --noconfirm --answerdiff=None nixpkgs-fmt # nix
+# yay -S --noconfirm --answerdiff=None --needed nixpkgs-fmt # nix
 # nix profile install nixpkgs#nil                  # nix
 sudo pacman -S --noconfirm --needed docker
 sudo systemctl start docker
@@ -183,7 +186,7 @@ newgrp docker
 # sudo pacman -S --noconfirm --needed pyright      # python
 # sudo pacman -S --noconfirm --needed python-black # python
 # sudo pacman -S --noconfirm --needed taplo        # toml file
-# yay -S --noconfirm --answerdiff=None verible-git # verilog
+# yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
 
 echo 'if [ -f ~/.config/my_bashrc ]; then . ~/.config/my_bashrc; fi' >> ~/.bashrc
 

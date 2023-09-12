@@ -23,8 +23,8 @@ def getICS(ics_file, url):
         print("Failed to download iCalendar file.")
 
 
-def main()              :
-    script_dir                       = pathlib.Path(__file__).parent.absolute()
+def main():
+    script_dir = pathlib.Path(__file__).parent.absolute()
     getICS(mylib.ICS_FILE, mylib.ICS_URL)
     mylib.runInVenv(f"{script_dir}/ics2overlay.py")
     mylib.runInVenv(f"{script_dir}/tasks2overlay.py")
@@ -33,7 +33,7 @@ def main()              :
     mylib.changeWallpaper(mylib.OVERLAYED_FILE)
 
     image = Image.open(mylib.OVERLAYED_FILE)
-    width, height          = image.size
+    width, height = image.size
     crop_box = (137, 26, width, height)
     cropped_image = image.crop(crop_box)
     tmp_image = tempfile.gettempdir() + "/" + mylib.getRandomFileName(".png")

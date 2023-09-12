@@ -34,10 +34,8 @@ def main():
 
     command = f"{sys.executable} {script_dir}/gtasks/main.py view"
     font = ImageFont.truetype(font_file, size=font_size)
-    output = subprocess.check_output(command, shell=True, text=True)
-    print(output)
-    lines = output.split("\n")
-    tasks = "\n\n".join(lines)
+    tasks = subprocess.check_output(command, shell=True, text=True)
+
     draw.text(text_position, tasks, fill=text_color, font=font)
     image.save(overlay_file)
 
