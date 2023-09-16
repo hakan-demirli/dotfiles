@@ -1,29 +1,30 @@
 #Include %A_ScriptDir%\lib\myGui.ahk
 
-global mode := 1 ; 0 = regular mode, 1 = vim mode
-toggleMode()
+showgMenu() {
+    items =
+    (
+    Keybindings:
+    g: go to beginning of file
+    h: go to beginning of the line
+    e: go to end of the file
+    l: go to end of the line
+    p: go to previous window
+    n: go to next window
+    d: go to definition
+    r: go to reference
+    )
+    CreatePersistentGUI(items, A_ScreenWidth / 5, A_ScreenHeight / 5, A_ScreenWidth / 15, A_ScreenHeight / 1.3)
+}
 
-; vUpper := Format("{:U}", vText)
-; vTitle := Format("{:T}", vText)
-; vLower := Format("{:L}", vText)
-
-processKey(key_i, key_o) {
-    global mode
-    if (0 == mode) {
-        if ("{Capslock}" == key_i) {
-            SetCapsLockState, % !GetKeyState("Capslock", "T")
-        } else {
-            ; Check if Caps Lock is active
-            if (GetKeyState("Capslock", "T")) {
-                ; Convert key_i to uppercase before sending it as output
-                SendInput, % Format("{:U}", key_i)
-            } else {
-                SendInput, % key_i
-            }
-        }
-    } else {
-        SendInput, % key_o
-    }
+showSpaceMenu() {
+    items =
+    (
+    Keybindings:
+    t: open terminal
+    f: open file picker
+    g: open global search
+    )
+    CreatePersistentGUI(items, A_ScreenWidth / 5, A_ScreenHeight / 5, A_ScreenWidth / 15, A_ScreenHeight / 1.3)
 }
 
 ReplaceStringInFile(inputFile, searchString, replacementString) {
@@ -42,9 +43,250 @@ changeVSCodeCursor(from, to) {
     ReplaceStringInFile(InputFilePath, SearchString, ReplacementString)
 }
 
-toggleMode() {
-    global mode
-    mode := (mode == 0) ? 1 : 0
+changeMode(new_mode) {
+    global current_mode
+    current_mode := new_mode
     createIndicator((mode == 0) ? "I" : "V", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
     changeVSCodeCursor((mode == 0) ? "block" : "line",(mode == 0) ? "line" : "block")
 }
+
+mode := "normal"
+changeVSCodeCursor("line","block")
+; You cannot nest #if directives
+
+#If WinActive("ahk_exe code.exe") && (mode = "command")
+    Esc::
+        Send, {Esc}
+        mode := "normal"
+    return
+    Enter::
+        Send, {Enter}
+        mode := "normal"
+    return
+
+#If WinActive("ahk_exe code.exe") && (mode = "command_search")
+    Esc::
+        Send, {Esc}
+        mode := "normal"
+    return
+
+#If WinActive("ahk_exe code.exe") && (mode = "space")
+    Esc::
+        Send, {Esc}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    f::
+        Send ^p ; Ctrl+p
+        mode := "command"
+        KillPersistentGUI()
+    return
+    g::
+        Send ^+f ; Ctrl+Shift+f
+        mode := "command_search"
+        KillPersistentGUI()
+    return
+    t::
+        Send ^+' ; Ctrl+Shift+`
+        mode := "insert"
+        KillPersistentGUI()
+        createIndicator("I", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        changeVSCodeCursor("block","line")
+    return
+    Space::return ; Reserved
+    e::return ; Reserved
+    r::return ; Reserved
+    q::return ; Reserved
+    z::return ; Reserved
+    v::return ; Reserved
+    x::return ; Reserved
+    0::return ; Reserved
+    1::return ; Reserved
+    2::return ; Reserved
+    3::return ; Reserved
+    4::return ; Reserved
+    5::return ; Reserved
+    6::return ; Reserved
+    7::return ; Reserved
+    8::return ; Reserved
+    9::return ; Reserved
+    Enter::return ; Reserved
+    Backspace::return ; Reserved
+
+#If WinActive("ahk_exe code.exe") && (mode = "g")
+    Esc::
+        Send, {Esc}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    g::
+        Send, ^{Home}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    e::
+        Send, ^{End}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    p::
+        Send ^{PgUp}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    n::
+        Send ^{PgDn}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    d::
+        Send {F12}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    r::
+        Send +{F12} ; Shift+F12
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    h::
+        Send {Home}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    l::
+        Send {End}
+        mode := "normal"
+        KillPersistentGUI()
+    return
+    q::return ; Reserved
+    z::return ; Reserved
+    v::return ; Reserved
+    x::return ; Reserved
+    0::return ; Reserved
+    1::return ; Reserved
+    2::return ; Reserved
+    3::return ; Reserved
+    4::return ; Reserved
+    5::return ; Reserved
+    6::return ; Reserved
+    7::return ; Reserved
+    8::return ; Reserved
+    9::return ; Reserved
+    Enter::return ; Reserved
+    Backspace::return ; Reserved
+
+#If WinActive("ahk_exe code.exe") && (mode = "insert")
+    Esc::
+        Send, {Esc}
+        mode := "normal"
+        createIndicator("N", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        changeVSCodeCursor("line","block")
+    return
+
+#If WinActive("ahk_exe code.exe") && (mode = "normal")
+    i::
+        mode := "insert"
+        createIndicator("I", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        changeVSCodeCursor("block","line")
+    return
+    c::
+        Send, {Delete}
+        mode := "insert"
+        createIndicator("I", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        changeVSCodeCursor("block","line")
+    return
+    a::
+        Send, {Right}
+        mode := "insert"
+        createIndicator("I", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        changeVSCodeCursor("block","line")
+    return
+    o::
+        Send ^{Enter} ; Ctrl+Enter
+        mode := "insert"
+        createIndicator("I", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        changeVSCodeCursor("block","line")
+    return
+    h::Send , {Left}
+    +h::Send , +{Left}
+    !h::Send , !{Left}
+    ^h::Send , ^{Left}
+    ^!h::Send, ^!{Left}
+    return
+    j::Send , {Down}
+    +j::Send , +{Down}
+    !j::Send , !{Down}
+    ^j::Send , ^{Down}
+    ^!j::Send, ^!{Down}
+    return
+    k::Send , {Up}
+    +k::Send , +{Up}
+    !k::Send , !{Up}
+    ^k::Send , ^{Up}
+    ^!k::Send, ^!{Up}
+    return
+    l::Send , {Right}
+    +l::Send , +{Right}
+    !l::Send , !{Right}
+    ^l::Send , ^{Right}
+    ^!l::Send, ^!{Right}
+    return
+    u::Send, ^z ; Ctrl+z
+    +u::Send, +^z ; Ctrl+Shift+z
+    ^u::Send, ^u
+    return
+    d::Send, {Delete}
+    +d::Send, {Backspace}
+    ^d::Send, ^d
+    return
+    w::Send, ^+{Right}
+    return ; Ctrl+Shift+Right
+    b::Send, ^+{Left}
+    return ; Ctrl+Shift+Left
+    y::Send, ^c
+    return ; Ctrl+c
+    p::Send, ^v
+    return ; Ctrl+v
+    ^x::Send, ^x
+    return
+    ^w::Send, ^w
+    return ; Ctrl+w
+    ^b::Send, ^b
+    return ; Ctrl+b
+    f::Send,!m
+    return ; Alt+m
+    CapsLock::Send {Esc}
+    return
+    /::
+        Send, ^f
+        mode := "command_search"
+    return
+    ^/::Send, ^/
+    return ; Ctrl+/
+    Space::
+        mode := "space"
+        showSpaceMenu()
+    return
+    g::
+        mode := "g"
+        showgMenu()
+    return
+    e::return ; Reserved
+    r::return ; Reserved
+    q::return ; Reserved
+    z::return ; Reserved
+    v::return ; Reserved
+    x::return ; Reserved
+    0::return ; Reserved
+    1::return ; Reserved
+    2::return ; Reserved
+    3::return ; Reserved
+    4::return ; Reserved
+    5::return ; Reserved
+    6::return ; Reserved
+    7::return ; Reserved
+    8::return ; Reserved
+    9::return ; Reserved
+    Enter::return ; Reserved
+    Backspace::return ; Reserved

@@ -8,7 +8,6 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 
 #Include %A_ScriptDir%\lib\windowControl.ahk
 #Include %A_ScriptDir%\lib\desktop_switcher.ahk
-#Include %A_ScriptDir%\lib\vimmode.ahk
 #Include %A_ScriptDir%\lib\winMouseScroll.ahk
 
 ; If btw+enter then by the way is inserted.
@@ -29,6 +28,7 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 ; RunWait,komorebic.exe named-workspace-padding "I", 2
 ; RunWait,komorebic.exe complete-configuration, Detached
 ; SetWorkingDir, %A_WorkingDir%
+
 Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv\Scripts\python %A_ScriptDir%\..\..\python\windowsApplet.py,, hide
 Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv\Scripts\python %A_ScriptDir%\..\..\python\updateOverlay.py,, hide
 
@@ -70,35 +70,5 @@ LWin & 7::switchDesktopByNumber(7)
 LWin & 8::switchDesktopByNumber(8)
 LWin & 9::switchDesktopByNumber(9)
 
-;-------------------------------------------------
-; vimmode.ahk
-; $ symbol to prevent the hotkey from triggering itself
-#IfWinActive ahk_exe code.exe
-    $h::processKey("h", "{Left down}")
-    $j::processKey("j", "{Down down}")
-    $k::processKey("k", "{Up down}")
-    $l::processKey("l", "{Right down}")
-    $+h::processKey("+h", "+{Left down}")
-    $+j::processKey("+j", "+{Down down}")
-    $+k::processKey("+k", "+{Up down}")
-    $+l::processKey("+l", "+{Right down}")
-    $!h::processKey("!h", "!{Left down}")
-    $!j::processKey("!j", "!{Down down}")
-    $!k::processKey("!k", "!{Up down}")
-    $!l::processKey("!l", "!{Right down}")
-    $^h::processKey("^h", "^{Left down}")
-    $^j::processKey("^j", "^{Down down}")
-    $^k::processKey("^k", "^{Up down}")
-    $^l::processKey("^l", "^{Right down}")
-    $^!h::processKey("^!h", "^!{Left down}")
-    $^!j::processKey("^!j", "^!{Down down}")
-    $^!k::processKey("^!k", "^!{Up down}")
-    $^!l::processKey("^!l", "^!{Right down}")
-
-    $x::processKey("x", "{Delete}")
-    $0::processKey("0", "{Home}")
-    $$::processKey("$", "{End}")
-    Capslock::processKey("{Capslock}", "{Escape}")
-
-    !i::toggleMode()
-    #If
+; It has to be at the bottom
+#Include %A_ScriptDir%\lib\vimmode.ahk
