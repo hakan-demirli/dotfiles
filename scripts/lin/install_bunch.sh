@@ -41,6 +41,8 @@ sudo pacman -S --noconfirm --needed wofi
 sudo pacman -S --noconfirm --needed unrar
 sudo pacman -S --noconfirm --needed p7zip
 sudo pacman -S --noconfirm --needed lf
+sudo pacman -S --noconfirm --needed nemo
+sudo pacman -S --noconfirm --needed nemo-fileroller
 sudo pacman -S --noconfirm --needed wget
 sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
 
@@ -64,20 +66,25 @@ sudo pacman -S --noconfirm --needed gnome-themes-extra
 sudo pacman -S --noconfirm --needed adwaita-qt5
 sudo pacman -S --noconfirm --needed adwaita-qt6
 sudo pacman -S --noconfirm --needed swayidle
+sudo pacman -S --noconfirm --needed usbutils
+sudo pacman -S --noconfirm --needed wireplumber
+sudo pacman -S --noconfirm --needed grim
+sudo pacman -S --noconfirm --needed slurp
 
 sudo pacman -S --noconfirm --needed blueman
 sudo pacman -S --noconfirm --needed bluez
 sudo systemctl enable bluetooth.service
 sudo systemctl start bluetooth.service
 
-
+yay -S --noconfirm --answerdiff=None --needed k4dirstat
 yay -S --noconfirm --answerdiff=None --needed swww
 yay -S --noconfirm --answerdiff=None --needed asusctl
 yay -S --noconfirm --answerdiff=None --needed rog-control-center
 yay -S --noconfirm --answerdiff=None --needed hyprshot
 yay -S --noconfirm --answerdiff=None --needed nwg-displays
 yay -S --noconfirm --answerdiff=None --needed wlr-randr
-yay -S --noconfirm --answerdiff=None --needed woeusb-ng
+yay -S --noconfirm --answerdiff=None --needed etcher-bin
+# yay -S --noconfirm --answerdiff=None --needed woeusb-ng
 yay -S --noconfirm --answerdiff=None --needed swaync
 yay -S --noconfirm --answerdiff=None --needed gtklock
 
@@ -96,6 +103,7 @@ sudo pacman -S --noconfirm --needed zenity
 sudo pacman -S --noconfirm --needed lutris
 sudo pacman -S --noconfirm --needed lib32-nvidia-utils
 sudo pacman -S --noconfirm --needed xdg-desktop-portal-hyprland
+sudo pacman -S --noconfirm --needed xdg-desktop-portal-gtk
 sudo pacman -S --noconfirm --needed nvidia
 sudo pacman -S --noconfirm --needed nvidia-prime
 

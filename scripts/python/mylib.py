@@ -21,13 +21,8 @@ Dependencies:
         pip install Pillow
         pip install requests
         pip install gcalcli
-        pip install gtasks-md
         pip install clipboard
-        pip install pandoc
-        pip install mutagen
-    Windows:
-        # Pandoc.exe == pandoc 2.19.2
-        # gtasks-md auth ./credentials.json
+        pip install google-auth-oauthlib
 """
 
 ##########

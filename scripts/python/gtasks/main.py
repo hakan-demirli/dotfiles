@@ -21,22 +21,19 @@ import tempfile
 from datetime import timedelta
 import textwrap
 
-from xdg import xdg_cache_home, xdg_data_home
 
 import googleapi
 
 
-# python cli.py auth /mnt/second/rep/personal_repo/secrets/credentials.json
+# python main.py auth /mnt/second/rep/personal_repo/secrets/credentials.json
 def main():
     args = parse_args()
 
-    config_dir = f"{xdg_data_home()}/gtasks-md/{args.user}/"
+    config_dir = os.path.expanduser("~/.config/gtasks/")
     os.makedirs(os.path.dirname(config_dir), exist_ok=True)
-    cache_dir = f"{xdg_cache_home()}/gtasks-md/{args.user}/"
-    os.makedirs(os.path.dirname(cache_dir), exist_ok=True)
 
     logging.basicConfig(
-        filename=f"{xdg_cache_home()}/gtasks-md/log.txt",
+        filename=config_dir + "log.txt",
         format="%(asctime)s %(levelname)-8s %(message)s",
         encoding="utf-8",
         level=logging.INFO,

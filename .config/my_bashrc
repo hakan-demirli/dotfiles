@@ -8,7 +8,7 @@ my_set_paths () {
 
     if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
     alias lf='lfcd'
-
+    alias cf='cf && exit'
     # local MY_TMP_DIR=/mnt/tmp
     export TERM=kitty
     export PATH=~/.local/bin:$PATH

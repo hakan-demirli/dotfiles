@@ -30,10 +30,13 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 ; RunWait,komorebic.exe complete-configuration, Detached
 ; SetWorkingDir, %A_WorkingDir%
 Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv\Scripts\python %A_ScriptDir%\..\..\python\windowsApplet.py,, hide
+Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv\Scripts\python %A_ScriptDir%\..\..\python\updateOverlay.py,, hide
 
 ; BINDINGS BELOW
 ;-------------------------------------------------
 ; General
+; $CapsLock::Send {Esc} ; Use sharpkeys registry hack instead of this.
+ScrollLock::CapsLock
 #q::Send, !{F4}
 #+f::Send, {F11}
 #f::Run, explorer
@@ -70,34 +73,32 @@ LWin & 9::switchDesktopByNumber(9)
 ;-------------------------------------------------
 ; vimmode.ahk
 ; $ symbol to prevent the hotkey from triggering itself
-$h::processKey("h", "{Left down}")
-$j::processKey("j", "{Down down}")
-$k::processKey("k", "{Up down}")
-$l::processKey("l", "{Right down}")
-$+h::processKey("+h", "+{Left down}")
-$+j::processKey("+j", "+{Down down}")
-$+k::processKey("+k", "+{Up down}")
-$+l::processKey("+l", "+{Right down}")
-$!h::processKey("!h", "!{Left down}")
-$!j::processKey("!j", "!{Down down}")
-$!k::processKey("!k", "!{Up down}")
-$!l::processKey("!l", "!{Right down}")
-$^h::processKey("^h", "^{Left down}")
-$^j::processKey("^j", "^{Down down}")
-$^k::processKey("^k", "^{Up down}")
-$^l::processKey("^l", "^{Right down}")
-$^!h::processKey("^!h", "^!{Left down}")
-$^!j::processKey("^!j", "^!{Down down}")
-$^!k::processKey("^!k", "^!{Up down}")
-$^!l::processKey("^!l", "^!{Right down}")
+#IfWinActive ahk_exe code.exe
+    $h::processKey("h", "{Left down}")
+    $j::processKey("j", "{Down down}")
+    $k::processKey("k", "{Up down}")
+    $l::processKey("l", "{Right down}")
+    $+h::processKey("+h", "+{Left down}")
+    $+j::processKey("+j", "+{Down down}")
+    $+k::processKey("+k", "+{Up down}")
+    $+l::processKey("+l", "+{Right down}")
+    $!h::processKey("!h", "!{Left down}")
+    $!j::processKey("!j", "!{Down down}")
+    $!k::processKey("!k", "!{Up down}")
+    $!l::processKey("!l", "!{Right down}")
+    $^h::processKey("^h", "^{Left down}")
+    $^j::processKey("^j", "^{Down down}")
+    $^k::processKey("^k", "^{Up down}")
+    $^l::processKey("^l", "^{Right down}")
+    $^!h::processKey("^!h", "^!{Left down}")
+    $^!j::processKey("^!j", "^!{Down down}")
+    $^!k::processKey("^!k", "^!{Up down}")
+    $^!l::processKey("^!l", "^!{Right down}")
 
-$x::processKey("x", "{Delete}")
-$0::processKey("0", "{Home}")
-$$::processKey("$", "{End}")
-Capslock::processKey("{Capslock}", "{Escape}")
+    $x::processKey("x", "{Delete}")
+    $0::processKey("0", "{Home}")
+    $$::processKey("$", "{End}")
+    Capslock::processKey("{Capslock}", "{Escape}")
 
-!i::toggleMode()
-
-;-------------------------------------------------
-; komorebi.ahk
-
+    !i::toggleMode()
+    #If

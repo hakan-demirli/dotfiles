@@ -93,6 +93,14 @@ keymap:
       k: Up
       Ctrl-k: Ctrl-k
       l: Right
+      e: reserved
+      r: reserved
+      q: reserved
+      z: reserved
+      v: reserved
+      x: reserved
+      KEY_ENTER: reserved
+      KEY_BACKSPACE: reserved
       # x: [Home,Shift-end]
       Ctrl-x: Ctrl-x
       w: [Ctrl-Shift-Right]
@@ -106,11 +114,12 @@ keymap:
       y: C-c
       p: C-v
       d: delete
+      Shift-d: KEY_BACKSPACE
       f: Alt-m
       Ctrl-d: Ctrl-d
       CapsLock: Esc
       slash: [C-f, { set_mode: command }]
-      Ctrl-slash: Ctrl-slash
+      Ctrl-slash: Ctrl-slash # comment selected line
       Shift-slash: reserved
       Shift-dot: C-KEY_RIGHTBRACE
       Shift-comma: C-KEY_LEFTBRACE
@@ -121,6 +130,8 @@ keymap:
            t: [Ctrl-Shift-KEY_GRAVE, { set_mode: insert}]
       g:
          remap:
+           g: C-Home
+           e: C-End
            p: C-KEY_PAGEUP
            n: C-KEY_PAGEDOWN
            d: KEY_F12

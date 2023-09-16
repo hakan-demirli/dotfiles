@@ -39,8 +39,32 @@ def symlink_dotfiles():
 
         # Remove the existing target dotfile (if it exists)
         remove_path(target_dotfile_path)
+        try:
+            os.symlink(source_dotfile_path, target_dotfile_path)
+        except:
+            print(f"[FAILED] {source_dotfile_path}")
 
-        os.symlink(source_dotfile_path, target_dotfile_path)
+
+def symlink_wsl_config():
+    # Define the source and target directories
+    source_config_dir = mylib.CONFIG_DIR
+    source_config_file = ".wslconfig"
+    target_home = os.path.expanduser("~")
+    target_config_dir = target_home
+
+    # Ensure the target directory exists; create it if not
+    if not os.path.exists(target_config_dir):
+        os.makedirs(target_config_dir)
+
+    # Construct source and target paths
+    source_config_path = os.path.join(source_config_dir, source_config_file)
+    target_config_path = os.path.join(target_config_dir, source_config_file)
+
+    # Remove existing target config file if it exists
+    remove_path(target_config_path)
+
+    # Create a symbolic link from the source to the target
+    os.symlink(source_config_path, target_config_path)
 
 
 def symlink_cargo_config():
@@ -118,6 +142,8 @@ def main():
     if not "nt" in os.name:
         symlink_bin()
         symlink_desktop_files()
+    else:
+        symlink_wsl_config()
 
 
 if __name__ == "__main__":

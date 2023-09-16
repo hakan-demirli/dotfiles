@@ -1,3 +1,8 @@
+* **Hide context menu entry**
+    * Open regedit.exe and visit \HKEY_CLASSES_ROOT\PackagedCom\ClassIndex\. There should be several tens of entries (keys) under that, all named after {UUID}.
+    * Expand all entries you saw in Step 1 and look for the entry containing keyword AdvancedMicroDevicesInc (AMD). Once you find it, copy its corresponding UUID string.
+    * visit \HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\. There should be three keys under Shell Extensions: Approved, Blocked, and Cached. If there is no Blocked key on your system, manually create it by right-clicking Shell Extensions, and create a new key named Blocked.
+    * Enter Blocked key (which appears as a directory in regedit tool). Under directory Blocked, create a new String (aka type REG_SZ). Rename the String as {UUID}, in which UUID is the same UUID as we found in Step 2.
 
 
 * **/mnt/c/Windows/Explorer.exe: cannot execute binary file: Exec format error**

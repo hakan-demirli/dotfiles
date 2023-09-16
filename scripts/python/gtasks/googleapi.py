@@ -22,7 +22,6 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from xdg import xdg_cache_home, xdg_data_home
 
 from tasks import Task, TaskList, TaskStatus
 
@@ -151,16 +150,17 @@ class GoogleApiService:
         Read credentials from selected user configuration.
 
         This function will try to read existing token from
-        $XDG_CACHE_HOME/gtasks-md directory for the selected user. If file with
+        config directory for the selected user. If file with
         the token doesn't exist, it will try creating a new one after reading
-        credentials from $XDG_DATA_HOME/gtasks-md. If there are no credentials
+        credentials from config. If there are no credentials
         the process will simply fail.
         """
         creds = None
-        config_dir = f"{xdg_data_home()}/gtasks-md/{self.user}"
-        credentials_file = f"{config_dir}/{CREDENTIALS_FILE}"
-        cache_dir = f"{xdg_cache_home()}/gtasks-md/{self.user}"
-        token_file = f"{cache_dir}/token.json"
+
+        config_dir = os.path.expanduser("~/.config/gtasks/")
+        os.makedirs(os.path.dirname(config_dir), exist_ok=True)
+        credentials_file = config_dir + CREDENTIALS_FILE
+        token_file = config_dir + "token.json"
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
@@ -183,7 +183,7 @@ class GoogleApiService:
 
     def save_credentials(self, credentials: str):
         """Save credentials to selected user config directory."""
-        config_dir = f"{xdg_data_home()}/gtasks-md/{self.user}"
+        config_dir = os.path.expanduser("~/.config/gtasks/")
 
         with open(f"{config_dir}/{CREDENTIALS_FILE}", "w+") as dest_file:
             dest_file.write(credentials)

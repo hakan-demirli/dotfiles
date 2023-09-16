@@ -1,0 +1,18 @@
+# Settings apply across all Linux distros running on WSL 2
+[wsl2]
+memory=12GB
+processors=8
+swap=32GB
+nestedVirtualization=false
+localhostforwarding=true
+
+
+# Disable page reporting so WSL retains all allocated memory claimed from Windows and releases none back when free
+pageReporting=false
+# Turns on output console showing contents of dmesg when opening a WSL 2 distro for debugging
+debugConsole=true
+
+# kernel=C:\\temp\\myCustomKernel
+# kernelCommandLine = vsyscall=emulate
+# Sets swapfile path location, default is %USERPROFILE%\AppData\Local\Temp\swap.vhdx
+# swapfile=C:\\temp\\wsl-swap.vhdx
