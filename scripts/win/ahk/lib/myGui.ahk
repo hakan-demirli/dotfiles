@@ -29,7 +29,7 @@ CreatePersistentGUI(letter, windowWidth, windowHeight, windowX, windowY)
         Gui, -Caption +AlwaysOnTop
         Gui, Color, 0x1f1f1f
         Gui, +Resize +ToolWindow -Caption
-        Gui, Font, cWhite s14, Courier New ; Use "Courier New" as the monospace font
+        Gui, Font, cWhite s14, Courier New
         Gui, Add, Text, x0 y0 w%windowWidth% h%windowHeight% , %letter%
         Gui, Show, % "x" windowX " y" windowY " w" windowWidth " h" windowHeight " noactivate"
 

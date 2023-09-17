@@ -70,6 +70,20 @@ changeVSCodeCursor("line","block")
         mode := "normal"
     return
 
+#If WinActive("ahk_exe code.exe") && (mode = "command_substitute")
+    Esc::
+        Send, {Esc}
+        mode := "normal"
+    return
+    Enter::
+        Send, ^+l
+        Send, {Esc}
+        mode := "insert"
+        KillPersistentGUI()
+        createIndicator("I", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        changeVSCodeCursor("block","line")
+    return
+
 #If WinActive("ahk_exe code.exe") && (mode = "space")
     Esc::
         Send, {Esc}
@@ -87,7 +101,7 @@ changeVSCodeCursor("line","block")
         KillPersistentGUI()
     return
     t::
-        Send ^+' ; Ctrl+Shift+`
+        Send ^+` ; Ctrl+Shift+`
         mode := "insert"
         KillPersistentGUI()
         createIndicator("I", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
@@ -176,6 +190,24 @@ changeVSCodeCursor("line","block")
     Enter::return ; Reserved
     Backspace::return ; Reserved
 
+#If WinActive("ahk_exe code.exe") && (mode = "column")
+    gui_SearchEnter:
+        Gui, Submit
+        ; Close the GUI
+        Gui, Destroy
+        ; Switch case based on the content of testVar
+        switch testVar
+        {
+        case "w":
+            Send ^s
+        case "q":
+            Send ^w
+        default:
+            createIndicator("?", A_ScreenWidth / 16, A_ScreenHeight / 8, A_ScreenWidth / 2.1, A_ScreenHeight / 1.3)
+        }
+        mode := "normal"
+    return
+
 #If WinActive("ahk_exe code.exe") && (mode = "insert")
     Esc::
         Send, {Esc}
@@ -241,9 +273,8 @@ changeVSCodeCursor("line","block")
     ^d::Send, ^d
     return
     w::Send, ^+{Right}
+    +w::Send, ^+{Left}
     return ; Ctrl+Shift+Right
-    b::Send, ^+{Left}
-    return ; Ctrl+Shift+Left
     y::Send, ^c
     return ; Ctrl+c
     p::Send, ^v
@@ -272,6 +303,28 @@ changeVSCodeCursor("line","block")
         mode := "g"
         showgMenu()
     return
+    +`;::
+        Gui, -Caption +AlwaysOnTop +ToolWindow
+        Gui, 1: Color, 000000 ; Black-out blinds
+        Gui, Color, 0x1f1f1f
+        Gui, Font, cWhite s14, Courier New
+        Gui, Add, Text,,
+        Gui, Add, Edit, vtestVar BackgroundTransBlack -VScroll -E0x200
+        Gui, Add, Button, x-10 y-10 w1 h1 +default ggui_SearchEnter ; hidden button
+        Gui, Color,, 000000
+        Gui, Show, % "x" A_ScreenWidth / 16 " y" A_ScreenHeight / 16
+
+        mode := "column"
+    return
+    +,::Send, ^[
+    +.::Send, ^]
+    return
+    s::
+        Send, ^f
+        Send, !l
+        mode := "command_substitute"
+    return
+    b::return ; Reserved
     e::return ; Reserved
     r::return ; Reserved
     q::return ; Reserved

@@ -69,6 +69,3 @@ LWin & 6::switchDesktopByNumber(6)
 LWin & 7::switchDesktopByNumber(7)
 LWin & 8::switchDesktopByNumber(8)
 LWin & 9::switchDesktopByNumber(9)
-
-; It has to be at the bottom
-#Include %A_ScriptDir%\lib\vimmode.ahk
