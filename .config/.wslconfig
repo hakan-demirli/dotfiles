@@ -7,8 +7,6 @@ nestedVirtualization=false
 localhostforwarding=true
 
 
-# Disable page reporting so WSL retains all allocated memory claimed from Windows and releases none back when free
-pageReporting=false
 # Turns on output console showing contents of dmesg when opening a WSL 2 distro for debugging
 debugConsole=true
 
