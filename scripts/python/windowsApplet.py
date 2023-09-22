@@ -4,6 +4,21 @@ import pathlib
 import sys
 import subprocess
 
+import psutil
+
+
+def kill_process_and_children(pid: int, sig: int = 15):
+    try:
+        proc = psutil.Process(pid)
+    except psutil.NoSuchProcess as e:
+        # Maybe log something here
+        return
+
+    for child_process in proc.children(recursive=True):
+        child_process.send_signal(sig)
+
+    proc.send_signal(sig)
+
 
 class IndicatorApp:
     def __init__(self):
@@ -40,7 +55,7 @@ class IndicatorApp:
     def toggle_script(self, label, script_path):
         process_info = self.menu_items[label]
         if process_info["process"]:
-            process_info["process"].terminate()
+            kill_process_and_children(process_info["process"].pid)
             process_info["process"] = None
             return
         else:
