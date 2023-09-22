@@ -3,13 +3,15 @@ from pathlib import Path
 from queue import Queue
 import threading, time, sys, os, string, re, random, logging, clipboard, multiprocessing, tempfile, subprocess
 import mylib
-import shutil
+import requests
+import signal
+from gradio_client import Client
 
 # sudo apt install xclip
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-TEMPO = 1.3
+TEMPO = 1  # 1.3
 OUTPUT_DIR = tempfile.gettempdir()
 MODEL_PATH = mylib.TTS_DIR + "/models/en_GB-jenny_dioco-medium.onnx"
 GPU = True
@@ -22,7 +24,7 @@ PLAY_TIMEOUT = 20
 EXIT_TIMEOUT = 2
 MIN_SPEED = 0.6
 MAX_SPEED = 10
-PREFERRED_SPEED = 1.7
+PREFERRED_SPEED = 1  # 1.7
 DEFAULT_SPEED = 1
 CUTOFF_DEFAULT = 0.35
 CUTOFF = CUTOFF_DEFAULT / (TEMPO)
@@ -171,6 +173,7 @@ def tts_to_file(txt, file_path):
         f"echo '{txt}' | {piper_path} --output_file {file_path} --model {MODEL_PATH}"
     )
     subprocess.run(command, shell=True)
+    print(command)
 
 
 def convert_txt_to_wav(txt_queue: Queue, wav_queue: Queue):
@@ -295,18 +298,132 @@ def listen_clipboard(txt_queue: Queue, wav_queue: Queue):
         time.sleep(0.8)
 
 
+class GradioServer:
+    def __init__(self, api_url, app_command, sleep_duration=10):
+        self.api_url = api_url
+        self.app_command = app_command
+        self.sleep_duration = sleep_duration
+        self.server_process = None
+
+    def is_server_running(self):
+        try:
+            response = requests.get(self.api_url)
+            return response.status_code == 200
+        except requests.exceptions.ConnectionError:
+            return False
+
+    def launch_server(self):
+        if not self.is_server_running():
+            self.server_process = subprocess.Popen(self.app_command, shell=True)
+            time.sleep(self.sleep_duration)
+            print("Gradio app server launched.")
+        else:
+            print("Gradio app server is already running.")
+
+    def stop_server(self):
+        if self.server_process:
+            try:
+                os.killpg(os.getpgid(self.server_process.pid), signal.SIGTERM)
+                self.server_process = None
+                print("Gradio app server stopped.")
+            except ProcessLookupError:
+                print("Gradio app server process not found.")
+        else:
+            print("Gradio app server is not running.")
+
+
+class GradioClient:
+    def __init__(self, server_url):
+        self.client = Client(server_url)
+
+    def set_pth(self, config):
+        self.client.predict(
+            config[-1],  # weight
+            config[-2],  # voice_protection
+            fn_index=9,
+        )
+
+    def wav2wav(self, config):
+        output_information, output_audio = self.client.predict(
+            *config[:-1],  # Exclude the last (weight)
+            fn_index=2,
+        )
+        return output_information, output_audio
+
+
+def setup_rvc():
+    api_url = "http://127.0.0.1:7860/"  # Replace with your Gradio app's API URL
+    app_command = "D:/software/win/rvc_api/venv/Scripts/python.exe D:/software/win/rvc_api/infer.py"
+    server = GradioServer(api_url, app_command)
+    server.launch_server()
+
+
+def apply_rvc(t2wav_queue: Queue, wav2wav_queue: Queue):
+    t = threading.current_thread()
+    api_url = "http://127.0.0.1:7860/"  # Replace with your Gradio app's API URL
+    counter = 0
+    while True:
+        try:
+            client = GradioClient(api_url)
+            break
+        except:
+            print("failed to connect. Trying again.")
+            counter += 1
+            if counter == 5:
+                raise "failed to connect: tried 5 times."
+    while getattr(t, "do_run", True):
+        input_file = t2wav_queue.get()
+        config = [
+            0,  # speaker_id
+            "Upload audio",  # input_voice
+            input_file,  # input_audio_path
+            input_file,  # upload_audio_file
+            "",  # vocal_preview
+            "",  # tts_text
+            "",  # edgetts_speaker
+            4,  # transpose
+            input_file,  # f0_curve_file_optional
+            "rmvpe",  # pitch_extraction_algorithm
+            "D:/software/win/rvc_api/weights/amber.index",  # list_of_index_file
+            0.7,  # retrieval_feature_ratio
+            3,  # apply_median_filtering
+            0,  # resample_the_output_audio
+            1,  # volume_envelope
+            0.5,  # voice_protection
+            "D:/software/win/rvc_api/weights/amber.pth",  # weight
+        ]
+
+        try:
+            client.set_pth(config)
+            _, output_audio = client.wav2wav(config)
+            wav2wav_queue.put(output_audio)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        try:
+            os.remove(input_file)
+        except:
+            pass
+
+
 if __name__ == "__main__":
     threads = []
 
+    setup_rvc()
     txt_queue = Queue()
-    wav_queue = Queue()
+    t2wav_queue = Queue()
+    wav2wav_queue = Queue()
     threads.append(
-        threading.Thread(target=listen_clipboard, args=[txt_queue, wav_queue])
+        threading.Thread(target=listen_clipboard, args=[txt_queue, t2wav_queue])
     )
     threads.append(
-        threading.Thread(target=convert_txt_to_wav, args=[txt_queue, wav_queue])
+        threading.Thread(target=convert_txt_to_wav, args=[txt_queue, t2wav_queue])
     )
-    threads.append(threading.Thread(target=play_wav, args=[wav_queue]))
+    threads.append(
+        threading.Thread(target=apply_rvc, args=[t2wav_queue, wav2wav_queue])
+    )
+
+    threads.append(threading.Thread(target=play_wav, args=[wav2wav_queue]))
     for thread in threads:
         thread.start()
 
