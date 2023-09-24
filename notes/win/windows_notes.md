@@ -262,6 +262,15 @@
 * **Windhawk**
     * The customization marketplace for Windows programs
 
+* **Docker vscode instance**
+    * Open WSL and go to a folder.
+        * ```code .```
+        * Ctrl+shift+p > new container > Ubuntu
+        * follow along
+    * To reopen it just go to the same folder and `code .`
+    * Don't use docker desktop dev environments. Git ssh and login is wonky. Missing user account.
+
+
 | AHK Shortcuts  | Description                   |
 | -----------    | -----------                   |
 | `win+<1..9>`    | change virtual desktop       |
