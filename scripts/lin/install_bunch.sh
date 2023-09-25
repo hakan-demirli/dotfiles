@@ -20,7 +20,7 @@ sudo pacman -S --noconfirm --needed firefox
 sudo pacman -S --noconfirm --needed direnv
 # sudo pacman -S --noconfirm --needed nemo
 # sudo pacman -S --noconfirm --needed nemo-fileroller
-yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
+# yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
 yay -S --noconfirm --answerdiff=None --needed green-tunnel
 yay -S --noconfirm --answerdiff=None --needed sayonara-player
 yay -S --noconfirm --answerdiff=None --needed qbittorrent
@@ -187,13 +187,13 @@ newgrp docker
 
 
 # xremap+vscode == helix
-# sudo pacman -S --noconfirm --needed helix
-# sudo pacman -S --noconfirm --needed bat # live-grep script
+sudo pacman -S --noconfirm --needed helix
+sudo pacman -S --noconfirm --needed bat # live-grep script
 # LSPs and Formatters
-# sudo pacman -S --noconfirm --needed prettier     # markdown etc.
-# sudo pacman -S --noconfirm --needed pyright      # python
-# sudo pacman -S --noconfirm --needed python-black # python
-# sudo pacman -S --noconfirm --needed taplo        # toml file
+sudo pacman -S --noconfirm --needed prettier     # markdown etc.
+sudo pacman -S --noconfirm --needed pyright      # python
+sudo pacman -S --noconfirm --needed python-black # python
+sudo pacman -S --noconfirm --needed taplo        # toml file
 # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
 
 echo 'if [ -f ~/.config/my_bashrc ]; then . ~/.config/my_bashrc; fi' >> ~/.bashrc

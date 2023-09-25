@@ -1,15 +1,28 @@
 default_mode: insert
+
 keymap:
   - name: Default
-    application:
-      only: Code
     remap:
-      Alt-1: [
-          Alt-1,
-          launch:
-            ["python","/mnt/second/rep/dotfiles/scripts/python/changeVscodeCursor.py","--style",  "block"],
-          { set_mode: normal },
-        ]
+      KEY_RIGHTALT-a: KEY_1
+      KEY_RIGHTALT-s: KEY_2
+      KEY_RIGHTALT-d: KEY_3
+      KEY_RIGHTALT-f: KEY_4
+      KEY_RIGHTALT-g: KEY_5
+      KEY_LEFTALT-h: KEY_6
+      KEY_LEFTALT-j: KEY_7
+      KEY_LEFTALT-k: KEY_8
+      KEY_LEFTALT-l: KEY_9
+      KEY_LEFTALT-KEY_SEMICOLON: KEY_0
+      KEY_1: reserved
+      KEY_2: reserved
+      KEY_3: reserved
+      KEY_4: reserved
+      KEY_5: reserved
+      KEY_6: reserved
+      KEY_7: reserved
+      KEY_8: reserved
+      KEY_9: reserved
+      KEY_0: reserved
 
   - name: Xschem
     application:

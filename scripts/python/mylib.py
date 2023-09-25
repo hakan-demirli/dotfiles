@@ -9,9 +9,11 @@ import sys
 import tempfile
 import shutil
 import importlib.util
-from PIL import Image
-
-Image.MAX_IMAGE_PIXELS = 933120000
+try:
+    from PIL import Image
+    Image.MAX_IMAGE_PIXELS = 933120000
+except:
+    pass
 
 """
 Dependencies:
