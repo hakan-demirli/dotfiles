@@ -2,7 +2,7 @@
 
 # There can't be two sessions opened in two folders which has the same names.
 
-function code_project() {
+function helix_project() {
     selected_dir="$(find -L ~/.config /mnt/second/rep \( \
         -name node_modules -o  \
         -name conda        -o  \
@@ -19,8 +19,7 @@ function code_project() {
     if [ -n "$selected_dir" ]; then
         cd "$selected_dir" || return 1
         vsdp $selected_dir
-        code $selected_dir
     fi
 }
 
-code_project "$@"
+helix_project "$@"

@@ -7,34 +7,34 @@ import subprocess
 
 # Define the path to the JSON file
 config_dir = os.path.expanduser("~/.config/vsdp")
-config_file = os.path.join(config_dir, "container_mapping.json")
+config_file = os.path.join(config_dir, "image_mapping.json")
 
 # Ensure the config directory exists
 os.makedirs(config_dir, exist_ok=True)
 
-# Load container mapping from JSON file if it exists, or create an empty one
+# Load image mapping from JSON file if it exists, or create an empty one
 if os.path.exists(config_file):
     with open(config_file, "r") as f:
-        container_mapping = json.load(f)
+        image_mapping = json.load(f)
 else:
-    container_mapping = {}
+    image_mapping = {}
 
 
-def save_container_mapping():
-    # Save container mapping to JSON file
+def save_image_mapping():
+    # Save image mapping to JSON file
     with open(config_file, "w") as f:
-        json.dump(container_mapping, f, indent=4)
+        json.dump(image_mapping, f, indent=4)
 
 
-def get_container_name():
-    print("Available Docker containers:")
+def get_image_name():
+    print("Available Docker images:")
     try:
-        # Run the "docker images" command to list available Docker containers
+        # Run the "docker images" command to list available Docker images
         docker_images_output = subprocess.check_output(["docker", "images"], text=True)
         lines = docker_images_output.split("\n")
 
-        containers = []
-        # Extract container name and image tag information and print with colored index
+        images = []
+        # Extract image name and image tag information and print with colored index
         for index, line in enumerate(lines[1:], start=0):  # Skip the header
             columns = line.split()
             if len(columns) >= 2:
@@ -44,61 +44,59 @@ def get_container_name():
                 # ANSI escape codes for colors (e.g., \033[31m for red)
                 color_code = 32  # Green
                 colored_index = f"\033[{color_code}m{index}\033[0m"  # Reset color
-                containers.append(f"{image_name}:{image_tag}")
+                images.append(f"{image_name}:{image_tag}")
                 print(f"{colored_index}. {image_name}:{image_tag}")
 
         color_code = 32  # Green
-        index = input(
-            f"\033[{color_code}mEnter the index of the container to use: \033[0m"
-        )
+        index = input(f"\033[{color_code}mEnter the index of the image to use: \033[0m")
         index = int(index)
-        if 1 <= index <= len(container_mapping):
+        if 1 <= index <= len(image_mapping):
             print("Invalid index. Please enter a valid index.")
             exit(1)
-        return containers[index]
+        return images[index]
     except subprocess.CalledProcessError:
-        print("Error: Failed to list Docker containers.")
+        print("Error: Failed to list Docker images.")
 
 
-def is_container_running(container_name):
+def is_image_running(image_name):
     try:
         # Run the "docker ps" command and capture its output
         docker_ps_output = subprocess.check_output(["docker", "ps"], text=True)
 
-        # Check if the container name is in the "docker ps" output
-        return container_name in docker_ps_output
+        # Check if the image name is in the "docker ps" output
+        return image_name in docker_ps_output
     except subprocess.CalledProcessError:
         return False
 
 
-def run_docker_container(project_path: str, container_name: str):
-    if is_container_running(container_name):
-        print(f"Docker container '{container_name}' is already running.")
+def run_docker_image(project_path: str, image_name: str):
+    if is_image_running(image_name):
+        print(f"Docker image '{image_name}' is already running.")
     else:
         folder_name = os.path.basename(project_path)
-        docker_command = f"docker run -d --name {folder_name} --volume {project_path}:/work --rm -it {container_name}"
+        docker_command = f"docker run -e DEBUG_COLORS=true -e TERM=xterm-256color -e COLORTERM=truecolor  --name {folder_name} --volume {project_path}:/work --rm -it {image_name}"
 
         # Use subprocess.run() to execute the Docker command and capture the return code
         try:
             subprocess.run(docker_command, shell=True, check=True)
-            print(f"Started Docker container: {container_name}")
+            print(f"Started Docker image: {image_name}")
         except subprocess.CalledProcessError as e:
-            print(f"Error: Failed to start Docker container '{container_name}': {e}")
+            print(f"Error: Failed to start Docker image '{image_name}': {e}")
             sys.exit(1)
 
 
-def launch_docker_container(project_path):
-    if project_path in container_mapping:
-        container_name = container_mapping[project_path]
-        run_docker_container(project_path, container_name)
+def launch_docker_image(project_path):
+    if project_path in image_mapping:
+        image_name = image_mapping[project_path]
+        run_docker_image(project_path, image_name)
     else:
-        container_name = get_container_name()
-        run_docker_container(project_path, container_name)
-        container_mapping[project_path] = container_name
+        image_name = get_image_name()
+        run_docker_image(project_path, str(image_name))
+        image_mapping[project_path] = image_name
 
 
 if __name__ == "__main__":
-    project_path = "/mnt/second/rep/gem5_projects"  #  sys.argv[1]
+    project_path = sys.argv[1]
 
     # Convert the provided project path to an absolute path relative to CWD
     project_path = os.path.abspath(project_path)
@@ -108,7 +106,7 @@ if __name__ == "__main__":
         print(f"Error: The project path '{project_path}' does not exist.")
         sys.exit(1)
 
-    launch_docker_container(project_path)
+    launch_docker_image(project_path)
 
-    # Save the container mapping to the JSON file after launching the container
-    save_container_mapping()
+    # Save the image mapping to the JSON file after launching the image
+    save_image_mapping()

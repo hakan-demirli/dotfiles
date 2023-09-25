@@ -1,16 +1,21 @@
-
-my_set_paths () {
+my_set_paths() {
     PS1='\[\e[32m\][\u@\h \W]\$\[\e[0m\] '
     # set -o vi
     set show-mode-in-prompt on
     set vi-cmd-mode-string "\1\e[2 q\2"
     set vi-ins-mode-string "\1\e[6 q\2"
 
+    if [ "$(whoami)" == "emre" ]; then
+        alias hx='helix'
+        export TERM=kitty
+    else
+        alias helix='hx'
+    fi
+
     if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
     alias lf='lfcd'
     alias cf='cf && exit'
     # local MY_TMP_DIR=/mnt/tmp
-    export TERM=kitty
     export PATH=~/.local/bin:$PATH
     export PATH=/usr/local/bin:$PATH
 
@@ -26,11 +31,10 @@ my_set_paths () {
     alias txs='tmux switch-client -n'
     alias txkw='tmux kill-window -t '
     alias txlw='tmux list-windows'
-    alias hx='helix'
 
     export LM_LICENSE_FILE=$MY_APP_DIR/lin/quartus/license.dat
 
-    # Path for 32 bit modelsim
+    # Path for 32-bit modelsim
     # export PATH=$MY_APP_DIR/lin/modelsim/modelsim_ase/bin:$PATH
     # export PATH=/home/emre/miniconda3/bin:$PATH
 
