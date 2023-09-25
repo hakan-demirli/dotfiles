@@ -98,6 +98,7 @@ function i_network() {
 
 function i_core() {
     sudo pacman -S --noconfirm --needed ntfs-3g
+    sudo pacman -S --noconfirm --needed less
     sudo pacman -S --noconfirm --needed gnome-disk-utility
     sudo pacman -S --noconfirm --needed gnome-system-monitor
     sudo pacman -S --noconfirm --needed gnome-bluetooth-3.0
