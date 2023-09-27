@@ -121,11 +121,11 @@ function i_core() {
     sudo pacman -S --noconfirm --needed bluez
     sudo systemctl enable bluetooth.service
     sudo systemctl start bluetooth.service
-
 }
 
 function i_bunch() {
     sudo pacman -S --noconfirm --needed kitty
+    sudo pacman -S --noconfirm --needed starship
     sudo pacman -S --noconfirm --needed kolourpaint
     sudo pacman -S --noconfirm --needed breeze
     sudo pacman -S --noconfirm --needed firefox
@@ -242,6 +242,9 @@ function_name="$1"
 case "$function_name" in
     "i_network")
         i_network
+        ;;
+    "i_nix")
+        i_nix
         ;;
     *)
         echo "Invalid function name: $function_name"

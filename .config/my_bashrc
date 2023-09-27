@@ -1,5 +1,4 @@
 my_set_paths() {
-    PS1='\[\e[32m\][\u@\h \W]\$\[\e[0m\] '
     # set -o vi
     set show-mode-in-prompt on
     set vi-cmd-mode-string "\1\e[2 q\2"
@@ -41,9 +40,19 @@ my_set_paths() {
     # export RISCV=$MY_APP_DIR/lin/riscv64_gnu_toolchain
     # export PATH=$MY_APP_DIR/lin/riscv64_gnu_toolchain/bin:$PATH
 
+
+ #    PS1='\[\e[32m\][\u@\h \W]\$\[\e[0m\]'
+    # show_virtual_env() {
+    #   if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
+    #     echo -e "\e[36m $(basename $VIRTUAL_ENV) \e[0m"
+    #   fi
+    # }
+ #    export -f show_virtual_env
+ #    PS1='$(show_virtual_env)'$PS1
     eval "$(direnv hook bash)"
+    eval "$(starship init bash)"
 }
 
 my_set_paths
-
 unset -f my_set_paths
+
