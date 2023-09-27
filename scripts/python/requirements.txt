@@ -1,0 +1,8 @@
+pygobject; platform_system == "Linux"
+psutil; platform_system == "Windows"
+Pillow
+requests
+gcalcli
+clipboard
+google-auth-oauthlib
+gradio

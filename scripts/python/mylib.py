@@ -9,8 +9,10 @@ import sys
 import tempfile
 import shutil
 import importlib.util
+
 try:
     from PIL import Image
+
     Image.MAX_IMAGE_PIXELS = 933120000
 except:
     pass
@@ -19,7 +21,7 @@ except:
 Dependencies:
     Venv:
         python -m venv venv
-        pip install pygobject
+        pip install pygobject # for gtk
         pip install Pillow
         pip install requests
         pip install gcalcli

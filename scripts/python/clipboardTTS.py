@@ -7,6 +7,8 @@ import requests
 import signal
 from gradio_client import Client
 
+import os
+
 # sudo apt install xclip
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
@@ -14,6 +16,19 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 TEMPO = 1  # 1.3
 OUTPUT_DIR = tempfile.gettempdir()
 MODEL_PATH = mylib.TTS_DIR + "/models/en_GB-jenny_dioco-medium.onnx"
+RVC_API_URL = "http://127.0.0.1:7860/"  # Replace with your Gradio app's API URL
+if os.name == "nt":
+    RVC_COMMAND = (
+        "D:/software/rvc_api/venv_w/Scripts/python.exe D:/software/rvc_api/infer.py"
+    )
+    RVC_MODEL = "D:/software/rvc_api/weights/amber.pth"
+    RVC_INDEX = "D:/software/rvc_api/weights/amber.index"
+
+else:
+    RVC_COMMAND = "/mnt/second/software/rvc_api/venv_l/bin/python /mnt/second/software/rvc_api/infer.py"
+    RVC_MODEL = "/mnt/second/software/rvc_api/weights/amber.pth"
+    RVC_INDEX = "/mnt/second/software/rvc_api/weights/amber.index"
+
 GPU = True
 RETRY_TIMES = 5
 DELIMETERS = "[?.!]"
@@ -166,7 +181,7 @@ def retry(times):
     return decorator
 
 
-@retry(times=RETRY_TIMES)
+# @retry(times=RETRY_TIMES)
 def tts_to_file(txt, file_path):
     piper_path = os.path.abspath(f"{mylib.TTS_DIR}/piper")
     command = (
@@ -352,25 +367,23 @@ class GradioClient:
 
 
 def setup_rvc():
-    api_url = "http://127.0.0.1:7860/"  # Replace with your Gradio app's API URL
-    app_command = "D:/software/win/rvc_api/venv/Scripts/python.exe D:/software/win/rvc_api/infer.py"
-    server = GradioServer(api_url, app_command)
+    server = GradioServer(RVC_API_URL, RVC_COMMAND)
     server.launch_server()
 
 
 def apply_rvc(t2wav_queue: Queue, wav2wav_queue: Queue):
     t = threading.current_thread()
-    api_url = "http://127.0.0.1:7860/"  # Replace with your Gradio app's API URL
     counter = 0
     while True:
         try:
-            client = GradioClient(api_url)
+            client = GradioClient(RVC_API_URL)
             break
         except:
             print("failed to connect. Trying again.")
             counter += 1
             if counter == 5:
                 raise "failed to connect: tried 5 times."
+            time.sleep(0.5)
     while getattr(t, "do_run", True):
         input_file = t2wav_queue.get()
         config = [
@@ -384,13 +397,13 @@ def apply_rvc(t2wav_queue: Queue, wav2wav_queue: Queue):
             4,  # transpose
             input_file,  # f0_curve_file_optional
             "rmvpe",  # pitch_extraction_algorithm
-            "D:/software/win/rvc_api/weights/amber.index",  # list_of_index_file
+            RVC_INDEX,  # list_of_index_file
             0.7,  # retrieval_feature_ratio
             3,  # apply_median_filtering
             0,  # resample_the_output_audio
             1,  # volume_envelope
             0.5,  # voice_protection
-            "D:/software/win/rvc_api/weights/amber.pth",  # weight
+            RVC_MODEL,
         ]
 
         try:

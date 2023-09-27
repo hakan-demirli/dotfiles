@@ -29,8 +29,8 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 ; RunWait,komorebic.exe complete-configuration, Detached
 ; SetWorkingDir, %A_WorkingDir%
 
-Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv\Scripts\python %A_ScriptDir%\..\..\python\windowsApplet.py,, hide
-Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv\Scripts\python %A_ScriptDir%\..\..\python\updateOverlay.py,, hide
+Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv_w\Scripts\python %A_ScriptDir%\..\..\python\windowsApplet.py,, hide
+Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv_w\Scripts\python %A_ScriptDir%\..\..\python\updateOverlay.py,, hide
 
 ; BINDINGS BELOW
 ;-------------------------------------------------

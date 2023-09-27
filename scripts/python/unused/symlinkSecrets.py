@@ -27,3 +27,11 @@ if __name__ == "__main__":
         des = pathlib.Path(f"~/{item}").expanduser()
         remove_path(des)
         os.symlink(src, des)
+
+    des_dir = pathlib.Path(f"~/.config/gtasks").expanduser()
+    os.makedirs(des_dir, exist_ok=True)
+    gtask_cred = "credentials.json"
+    src = secrets_dir / pathlib.Path(gtask_cred)
+    des = pathlib.Path(f"~/.config/gtasks/{gtask_cred}").expanduser()
+    remove_path(des)
+    os.symlink(src, des)
