@@ -11,7 +11,7 @@ import os
 
 # sudo apt install xclip
 
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 TEMPO = 1  # 1.3
 OUTPUT_DIR = tempfile.gettempdir()
@@ -43,7 +43,7 @@ PREFERRED_SPEED = 1  # 1.7
 DEFAULT_SPEED = 1
 CUTOFF_DEFAULT = 0.35
 CUTOFF = CUTOFF_DEFAULT / (TEMPO)
-BANNED_CHARACTERS = """\/*<>|`[]()^#%&@:+=}"{'~“”—"""
+BANNED_CHARACTERS = """\/*<>|`’[]()^#%&@:+=}"{'~“”"""
 CONTRACTIONS = {
     "can't've": "cannot have",
     "'cause": "because",
@@ -286,6 +286,10 @@ def sanitizeString(in_str: str) -> str:
         in_str = in_str.replace(f, f.replace(".", " point "))
 
     logging.info(f"Value changed: {in_str}")
+    in_str = in_str.replace("-\n", "")
+    pattern = "- "
+    in_str = in_str.replace(pattern, "")
+    logging.info(f"Value changed again: {in_str}")
     return in_str
 
 
