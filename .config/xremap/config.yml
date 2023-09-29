@@ -3,16 +3,16 @@ default_mode: insert
 keymap:
   - name: Default
     remap:
-      KEY_RIGHTALT-a: KEY_1
-      KEY_RIGHTALT-s: KEY_2
-      KEY_RIGHTALT-d: KEY_3
-      KEY_RIGHTALT-f: KEY_4
-      KEY_RIGHTALT-g: KEY_5
-      KEY_LEFTALT-h: KEY_6
-      KEY_LEFTALT-j: KEY_7
-      KEY_LEFTALT-k: KEY_8
-      KEY_LEFTALT-l: KEY_9
-      KEY_LEFTALT-KEY_SEMICOLON: KEY_0
+      Alt-q: KEY_1
+      Alt-w: KEY_2
+      Alt-e: KEY_3
+      Alt-r: KEY_4
+      Alt-t: KEY_5
+      Alt-y: KEY_6
+      Alt-u: KEY_7
+      Alt-i: KEY_8
+      Alt-o: KEY_9
+      Alt-p: KEY_0
       KEY_1: reserved
       KEY_2: reserved
       KEY_3: reserved

@@ -10,6 +10,8 @@ my_set_paths() {
     else
         alias helix='hx'
     fi
+    alias gd='git diff'
+    alias gs='git status'
 
     if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
     alias lf='lfcd'

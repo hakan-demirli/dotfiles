@@ -29,9 +29,11 @@
 * **Add windows to grub menu**
     * GUI tool:
         * Grub Customizer
+            * Can't add automatically.
     * Manual way:
-        * `lsblk` find disk of windows
-        * `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of windows
+        * `sudo os-prober` Find disk name
+        * `lsblk` list all disks disks
+        * `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of efi
         * `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
             ```
             menuentry "Windows 10" {
