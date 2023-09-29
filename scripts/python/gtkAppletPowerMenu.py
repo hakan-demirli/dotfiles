@@ -44,6 +44,13 @@ class AppIndicatorExample:
             "Shutdown",
             "Are you sure you want to shut down?",
         )
+        self.add_menu_item(
+            menu,
+            "Logout",
+            self.confirm_action,
+            "Logout",
+            "Are you sure you want to logout?",
+        )
         # self.add_menu_item(menu, "Quit", self.quit)
 
         menu.show_all()
@@ -77,15 +84,20 @@ class AppIndicatorExample:
                 self.shutdown()
             elif action_name == "Reboot":
                 self.reboot()
-
-    def sleep(self):
-        subprocess.run(["systemctl", "suspend"])
+            elif action_name == "Logout":
+                self.logout()
 
     def reboot(self):
         subprocess.run(["systemctl", "reboot"])
 
     def shutdown(self):
         subprocess.run(["systemctl", "poweroff"])
+
+    def sleep(self):
+        subprocess.run(["systemctl", "suspend"])
+
+    def logout(self):
+        subprocess.run(["hyprctl", "dispatch", "exit"])
 
     def quit(self, source):
         Gtk.main_quit()

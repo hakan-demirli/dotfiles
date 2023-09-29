@@ -26,6 +26,11 @@
     * ```xdg-mime query default image/png```
     * ```xdg-mime default helix.desktop image/png```
 
+* **Grub remember last booted**
+    * Uncomment these lines in /etc/default/grub
+        * GRUB_DEFAULT=saved
+        * GRUB_SAVEDEFAULT=true
+
 * **Add windows to grub menu**
     * GUI tool:
         * Grub Customizer
@@ -37,6 +42,7 @@
         * `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
             ```
             menuentry "Windows 10" {
+                savedefault
                 insmod part_gpt
                 insmod fat
                 insmod search_fs_uuid
