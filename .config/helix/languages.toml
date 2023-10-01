@@ -83,9 +83,7 @@ auto-format = true
 [[language]]
 name = "cpp"
 # config = { "clangd.fallbackFlags" = ["-std=c++20"] }
-language-server = { command = "clangd", args = [
-  "--compile-commands-dir=./build",
-] }
+language-server = { command = "clangd", args = ['--fallback-style=Webkit'] }
 auto-format = true
 indent = { tab-width = 4, unit = "    " }
 

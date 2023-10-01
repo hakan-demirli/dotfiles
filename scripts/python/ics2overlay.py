@@ -4,6 +4,13 @@ import io
 import sys
 import datetime
 import mylib
+import logging
+import inspect
+
+logger = logging.getLogger(__name__)
+FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+logging.basicConfig(format=FORMAT)
+logger.setLevel(logging.DEBUG)
 
 
 def dateToEvent(day, month, year, parsed_events):
@@ -172,6 +179,7 @@ def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
     # Loop through all days, months, and years
     # Add annotations
     current_date = start_date
+
     while current_date <= end_date:
         day = current_date.day
         month = current_date.month
@@ -209,12 +217,20 @@ def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
         month_title = lines[0]
         month_title = "\n".join(line for line in month_title if line == "\n")
         raw_cal_txt = "\n".join(lines[1:])
-        yesterday = (datetime.date.today() - datetime.timedelta(days=1)).day
-        calendar_parts = raw_cal_txt.split(str(yesterday))
+        if datetime.date.today().day != 1:
+            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).day
+            calendar_parts = raw_cal_txt.split(str(yesterday))
+        else:
+            yesterday = ""
+            calendar_parts = ""
+            first_part = raw_cal_txt
+
         # Delete all characters in the second part except newlines
         if len(calendar_parts) > 1:
             first_part = calendar_parts[0]
+            logger.debug(f"Split first part: {first_part}")
         else:
+            logger.debug(f"No split: {raw_cal_txt}")
             first_part = ""
             yesterday = ""
         modified_calendar = f"{first_part}{yesterday}"
