@@ -1,14 +1,24 @@
 default_mode: insert
 
+# virtual_modifiers:
+#   - KEY_F19
+# modmap:
+#   - name: deflt
+#     remap:
+#       KEY_SPACE:
+#         held: KEY_F19
+#         alone: KEY_SPACE
+#         alone_timeout_millis: 1550 
+
 keymap:
   - name: Default
     remap:
-      Alt-q: KEY_1
-      Alt-w: KEY_2
-      Alt-e: KEY_3
-      Alt-r: KEY_4
-      Alt-t: KEY_5
-      Alt-y: KEY_6
+      Alt-m: KEY_1
+      Alt-comma: KEY_2
+      Alt-dot: KEY_3
+      Alt-j: KEY_4
+      Alt-k: KEY_5
+      Alt-l: KEY_6
       Alt-u: KEY_7
       Alt-i: KEY_8
       Alt-o: KEY_9
@@ -23,6 +33,11 @@ keymap:
       KEY_8: reserved
       KEY_9: reserved
       KEY_0: reserved
+  - name: helix
+    application:
+      only: helix
+    remap:
+      KEY_BACKSPACE: reserved
 
   - name: Xschem
     application:
