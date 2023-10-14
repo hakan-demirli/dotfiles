@@ -146,12 +146,11 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed wget
     sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
     sudo pacman -S --noconfirm --needed yt-dlp
+    sudo pacman -S --noconfirm --needed mpv
     sudo pacman -S --noconfirm --needed cronie
     # yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
     yay -S --noconfirm --answerdiff=None --needed green-tunnel
-    yay -S --noconfirm --answerdiff=None --needed sayonara-player
     yay -S --noconfirm --answerdiff=None --needed qbittorrent
-    yay -S --noconfirm --answerdiff=None --needed parabolic
 
     # nemo_dir="$HOME/.local/share/nemo/actions"
     # nemo_file="helix.nemo_action"
@@ -235,7 +234,7 @@ if [ $# -eq 0 ]; then
     i_xremap
     i_y_core
     i_bunch
-    i_docker
+    # i_docker
     i_helix
     s_locale
     s_theme

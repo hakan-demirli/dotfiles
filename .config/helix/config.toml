@@ -6,8 +6,8 @@ esc = ["collapse_selection", "keep_primary_selection"]
 y = "yank_main_selection_to_clipboard"
 p = "paste_clipboard_before"
 D = "delete_char_backward"
-"A-j" = ["extend_to_line_bounds", "delete_selection", "paste_after"]
-"A-k" = [
+J = ["extend_to_line_bounds", "delete_selection", "paste_after"]
+K = [
   "extend_to_line_bounds",
   "delete_selection",
   "move_line_up",

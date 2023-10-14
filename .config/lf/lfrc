@@ -9,7 +9,7 @@ set hiddenfiles ".*:*.aux:*.log:*.bbl:*.bcf:*.blg:*.run.xml"
 set previewer ~/.config/lf/lf_kitty_preview
 set cleaner ~/.config/lf/lf_kitty_clean
 set promptfmt "
-\033[48;2;35;38;39;38;2;28;220;156m 
+\033[48;2;35;38;39;38;2;28;220;156m 󰣇
 \033[38;2;35;38;39;48;2;202;31;31m
 \033[38;2;202;31;31;48;2;40;47;62m
 \033[38;2;255;255;255m %w
@@ -51,44 +51,9 @@ cmd delete_for_real ${{
 	rm -rf "$fx"
 }}
 
-
 cmd delete ${{
 	gio trash "$fx"
 }}
-
-
-
-cmd chmodx &{{
-	chmod u+x $fx
-	lf -remote "send $id reload"
-}}
-
-
-cmd shred ${{
-	# TODO:
-	# handle multiple files with shred or rshred
-	# for files or directories respectively (with array/positional parameters)
-	# Al parecer hay algunos bugs luego del primer despedazo no se puede despedazar más? revisar luego
-	clear; tput cup $(($(tput lines)/3)); tput bold
-	set -f
-	printf -- "%s\n" $fx | sed 's|'"$HOME"'||'
-	# Mejorar el prompteo, que sea más cuidadoso
-	printf "\t\033[1;34m¿Despedazar? \033[37m[\033[32ms\033[37m/\033[31mN\033[37m]\033[m "
-	read -r REPLY
-	case "$REPLY" in
-		[yYsS])
-			for f in $fx; do
-				if [ -f "$f" ]; then
-					shred -u -n 3 "$f" >/dev/null 2>&1 &
-					# TODO: Poner un máximo número de trabajos
-				elif [ -d "$f" ]; then
-					rshred -fdu "$f"
-				fi
-			done
-		;;
-	esac
-}}
-
 
 cmd extract ${{
 	case $fx in
@@ -107,232 +72,40 @@ cmd extract ${{
 }}
 
 
-cmd moveto ${{
-	clear; tput cup $(($(tput lines)/3)); tput bold
-	set -f
-	clear
-	echo "¿A dónde mover?"
-	if dest="$(sed -e 's/\s*#.*//' -e '/^$/d' -e 's/^\S*\s*//' "${XDG_CONFIG_HOME:-"$HOME/.config"}/shell/bm-dirs" \
-			| fzf \
-			| sed 's|~|$HOME|'
-		)"
-	then
-		for x in $fx; do
-			eval mv -iv \"$x\" \"$dest\"
-		done &&
-			notify-send "lf" "🚚 Fichero(s) movidos a $dest"
-	fi
-}}
-
-
-cmd copyto ${{
-	clear; tput cup $(($(tput lines)/3)); tput bold
-	set -f
-	clear
-	echo "¿A dónde copiar?"
-	dest="$(sed -e 's/\s*#.*//' -e '/^$/d' -e 's/^\S*\s*//' "${XDG_CONFIG_HOME:-"$HOME/.config"}/shell/bm-dirs" \
-		| fzf \
-		| sed 's|~|$HOME|')" &&
-	for x in $fx; do
-		eval cp -ivr \"$x\" \"$dest\"
-	done &&
-	notify-send "lf" "📋 Fichero(s) copiados a $dest"
-}}
-
-cmd broot ${{
-	# You need to manually close broot printing the
-	# selected path with :print-path or :pp. You may
-	# want to configure broot keybindings
-	selected="$(broot)"
-	if [ -d "$selected" ]; then
-		lf -remote "send ${id} cd \"${selected}\""
-	elif [ -e "$selected" ]; then
-		lf -remote "send ${id} select \"${selected}\""
-	else
-		>&2 printf "Could not select %s\n" "${selected}"
-	fi
-}}
-
-cmd paste_link %{{
-	IFS='
-'
-	# TODO: reescribir no con los marcados a copiar/pegar,
-	# sino con los seleccionados: $fs
-	set -- $(cat ~/.local/share/lf/files)
-	mode="$1"
-	shift
-	if [ $# -lt 1 ]; then
-		lf -remote "send $id echo no files to link"
-		exit 1
-	fi
-	case "$mode" in
-		# symbolically copy mode is indicating a soft link
-		copy) ln -sr -t . -- "$@";;
-		# while a move mode is indicating a hard link
-		move) ln -t . -- "$@";;
-	esac \
-		|| exit $?
-	rm ~/.local/share/lf/files
-	lf -remote "send clear"
-}}
-
 cmd follow_link %{{
 	lf -remote "send ${id} select \"$(readlink $f)\""
 }}
 
-cmd zlua %{{
-	lf -remote "send ${id} cd \"$(z.lua -e $*)\""
-}}
-
-cmd zlua_i ${{
-	dir=$(z.lua -l "$@" \
-		| fzf --nth 2.. --tac +s -e \
-			--header "Directorios frecientes" --header-first \
-			--preview "lsd --color always --icon always --tree --depth 3 --group-dirs first {+2} 2>/dev/null" \
-		| awk '{print substr($0, index($0,$2))}'
-	)
-	lf -remote "send ${id} cd \"${dir}\""
-}}
-
-cmd gsh %{{
-	lf -remote "send ${id} cd \"$(g.sh -x $*)\""
-}}
-
-cmd gsh_fuzzy %{{
-	lf -remote "send ${id} cd \"$(_GS_GREP='fzf -f' g.sh -l $* | awk 'NR==1{print $2}')\""
-}}
-
-cmd gsh_i ${{
-	selected=$(g.sh -l "$@" \
-		| fzf --nth 2.. --tac +s -e \
-		--header "Directorios marcados" --header-first \
-		--preview "lsd --color always --icon always --tree --depth 2 --group-dirs first {+2} 2>/dev/null" \
-		| awk '{print substr($0, index($0,$2))}'
-	)
-	if [ -d "$selected" ]; then
-		lf -remote "send ${id} cd \"${selected}\""
-	elif [ -e "$selected" ]; then
-		lf -remote "send ${id} select \"${selected}\""
-	else
-		>&2 printf "Could not select %s\n" "${selected}"
-	fi
-}}
-
-cmd stop ${{
-	kill -TSTP $(ps -p $$ -o 'ppid=')
+cmd music ${{
+    # multi file or current file
+    mpv $fx
 }}
 
 cmd setbg "$1"
 
 # Keymaps
 map y copy
-map d cut
+map c cut
 map p paste
+map x :toggle;down  
 map <esc>   :unselect; clear
-map xd delete
-map xk delete_for_real
+map m music
+
+map d
+map dd delete
+map dk delete_for_real
 
 # Navigation
+# Goto
 map gl follow_link
+map ge bottom
 map gd cd ~/Downloads
 map gr cd /mnt/second/rep
-
+# Bookmark
 map bd cd /mnt/second/rep/dotfiles
 map br cd /mnt/second/rep/re-ramulator2
 map bg cd /mnt/second/rep/gem5_projects
 
-# map z<space> push :zlua<space>
-# map <a-z> zlua_i
-# map <a-g> gsh_i
-# map zo zlua_i
-# map g<space> push :gsh<space>
-# map gñ push :gsh_fuzzy<space>
-# map go gsh_i
-# map gs $lf -remote "send $id cd \"$SCRIPTS\""
-# map J jumps
-# navigate the jump list with "#[", "#]"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Movement
-# map k up
-# map l down
-# map j updir
-# map ñ open
-# map Ñ openwith
-# map h read
-# map { half-up
-# map } half-down
-# map <c-n> down
-# map <c-p> up
-
-# File name search
-# Dependency: my 'ffd' script which uses:
-# - fd or find, fzf, tput; bat and lsd (for previews)
-# map f
-# map f1 $lf -remote "send $id select \"$(ffd -p --depth 1 +m)\""  # Fuzzy find 1 level deep
-# map f2 $lf -remote "send $id select \"$(ffd -p --depth 2 +m)\""  # Fuzzy find 2 levels deep
-# map f3 $lf -remote "send $id select \"$(ffd -p --depth 3 +m)\""  # Fuzzy find 3 levels deep
-# map ff broot
-# map F  $lf -remote "send $id select \"$(ffd -p +m)\""
-# map -  search
-# map _  search-back
-# map zf find
-# map zF find-back
-
-# File content search
-# Dependency: my 'rgfzf' script which uses:
-# - bash, rg or rga (which has other optional deps), fzf; bat (for previews)
-# map rg $lf -remote "send $id select \"$(rgfzf -p)\""
-# map rG $lf -remote "send $id select \"$(rgfzf -p --depth 1)\""
-# map rf $lf -remote "send $id select \"$(rgfzf -dp)\""
-# map rF $lf -remote "send $id select \"$(rgfzf -dp --depth 1)\""
-# map ra $lf -remote "send $id select \"$(rgfzf -dp --rg=rga --depth 1 -s 0.3)\""
-# map rA $lf -remote "send $id select \"$(rgfzf -dp --rg=rga -s 0.8)\""  # Can be very CPU intensive, use with care
-
-# Main maps
-# map Km maps  # List normal mode mappings
-# map Kc cmaps  # List command mode mappings
-# map d
-# map dd cut
-# map D delete
-# map <a-d> trash
-# map <a-D> shred
-map E extract
-# #map C copyto
-# #map M moveto
-# map P paste_link
-# map <a-n> push :mkdir<space>
-# map <a-t> push $touch<space>
-# map <a-r> reload
-# map <enter> shell
-# map x $$f
-# map X !$f
-# map <a-x> chmodx
-# map <a-X> $setbg $f
-# map C &compila $f  # Compile
-# map <a-c> $compila -ir $f  # Interpret/Compile and run
-# map o &mimeopen $f
-# map O $mimeopen --ask $f
-# map U glob-unselect *
-# map <a-u> glob-select *
-# Remember that 'v' toggles selections
-# TODO:
-# - recursive selection
 
 # Drag commands
 # Dependencies: dragon-drag-and-drop and my 'drag' script which uses it
@@ -347,40 +120,4 @@ map E extract
 # map dc &drag cp "$PWD"  # Drag copy into current dir
 # map dw &drag wget "$PWD"  # Drag download into current dir
 
-#map J $lf -remote "send $id cd $(sed -e 's/\s*#.*//' -e '/^$/d' -e 's/^\S*\s*//' "${XDG_CONFIG_HOME:-"$HOME/.config"}/shell/bm-dirs" | fzf)"
-
-# Command mode
-# cmap <tab> cmd-menu-complete
-# cmap <backtab> cmd-menu-complete-back
-# cmap <a-j> cmd-left
-# cmap <a-ñ> cmd-right
-# cmap <a-h> cmd-escape
-# cmap <a-I> cmd-home
-# cmap <a-A> cmd-end
-# cmap <a-,> cmd-delete
-#cmap <a-backspace> cmd-delete  # Bug: No se puede mapear alt + backspace al parecer
-
-# Renaming
-# map c
-# map r
-# map i rename  # Before extension
-# map A push i<a-A>  # At the very end
-# map cc push i<a-A><c-u>  # New rename
-# map I push i<c-a>  # At the very beginning
-# map a push i<a-A><a-b>  # After extension
-# map b $vidir   # Bulkrename in $EDITOR, 'vidir' from more-utils
-# map B $find | vidir -
-# map V push $"$EDITOR"<space>
-# map <c-z> stop
-
-# New forked terminal in current directory
-# map W &{ nohup "${TERMINAL:-alacritty}" >/dev/null 2>&1& }
-
-# Copy selected file names
-# map Y $printf "%s" "$fx" | xclip -selection clipboard
-
-# Change background image
-# map cb &fondo-awesome $f
-
-# Source Bookmarks
-#source "~/.config/lf/shortcutrc"
+map t :maps

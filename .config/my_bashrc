@@ -13,6 +13,8 @@ my_set_paths() {
     alias gd='git diff'
     alias gs='git status'
 
+    alias yt-dlp-pl="yt-dlp --embed-metadata --format 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720][ext=mp4]/best[ext=mp4]' --output '%(playlist_index)s. %(title)s.%(ext)s'"
+
     if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
     alias lf='lfcd'
     alias cf='cf && exit'
