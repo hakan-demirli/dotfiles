@@ -32,12 +32,26 @@ def main():
     image = Image.new("RGBA", (width, height), background_color)
     draw = ImageDraw.Draw(image)
 
-    command = f"{sys.executable} {script_dir}/gtasks/main.py view"
     font = ImageFont.truetype(font_file, size=font_size)
-    tasks = subprocess.check_output(command, shell=True, text=True)
 
-    draw.text(text_position, tasks, fill=text_color, font=font)
-    image.save(overlay_file)
+    try:
+        command = f"{sys.executable} {script_dir}/gtasks/main.py view"
+        tasks = subprocess.check_output(command, shell=True, text=True)
+        draw.text(text_position, tasks, fill=text_color, font=font)
+        image.save(overlay_file)
+        return
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed with exit code {e.returncode}")
+        print(f"Deleting token and trying again")
+        command = f"{sys.executable} {script_dir}/gtasks/main.py delete_token"
+        subprocess.run(command, shell=True, text=True)
+        command = f"{sys.executable} {script_dir}/gtasks/main.py auth"
+        subprocess.run(command, shell=True, text=True)
+        command = f"{sys.executable} {script_dir}/gtasks/main.py view"
+        tasks = subprocess.check_output(command, shell=True, text=True)
+        draw.text(text_position, tasks, fill=text_color, font=font)
+        image.save(overlay_file)
+        return
 
 
 if __name__ == "__main__":

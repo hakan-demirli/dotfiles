@@ -31,6 +31,7 @@ def main():
 
     config_dir = os.path.expanduser("~/.config/gtasks/")
     os.makedirs(os.path.dirname(config_dir), exist_ok=True)
+    token_file = config_dir + "token.json"
 
     logging.basicConfig(
         filename=config_dir + "log.txt",
@@ -50,8 +51,10 @@ def main():
             view_task_lists(service)
         case "fetch":
             fetch_task_lists(service)
+        case "delete_token":
+            os.remove(token_file)
         case None:
-            print("Please run one of the subcommands.")
+            print("Please run one of the subcommands: auth, view, fetch, delete_token")
 
 
 def parse_args():
@@ -100,6 +103,7 @@ def parse_args():
 
     subparsers.add_parser("fetch", help="fetch Google Tasks.")
     subparsers.add_parser("view", help="View Google Tasks.")
+    subparsers.add_parser("delete_token", help="Delete Token file.")
 
     return parser.parse_args()
 
