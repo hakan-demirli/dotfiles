@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=my_player
+Comment=Launches my music player
+Icon=utilities-terminal
+Terminal=false
+Exec=kitty lf /mnt/second/music
+Categories=AudioVideo;Audio;Player;
+MimeType=audio/opus;
