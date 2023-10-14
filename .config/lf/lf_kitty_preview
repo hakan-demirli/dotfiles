@@ -6,7 +6,7 @@ x=$4
 y=$5
 
 preview() {
-    kitty +kitten icat --silent --stdin no --transfer-mode file --place "${w}x${h}@${x}x${y}" "$1" < /dev/null > /dev/tty
+    kitty +kitten icat --silent --stdin no --transfer-mode memory --place "$((${x}*7/9))x${h}@${x}x${y}" "$1" < /dev/null > /dev/tty
 }
 
 TEMPDIR=/tmp
