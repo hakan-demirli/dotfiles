@@ -83,17 +83,37 @@ cmd music ${{
 
 cmd setbg "$1"
 
+# Drag: dragon-drop
+# cmd drag_all &ls -Ah --zero | xargs -d'\0' dragon-drag-and-drop 2>/dev/null
+cmd dragon %dragon-drop -a -x $fx
+# cmd drag_allx &ls -Ah --zero | xargs -d'\0' dragon-drag-and-drop -a -x 2>/dev/null
+# map dl drag_all  # Drag from files in current dir
+# map dL drag_allx    # Drag all files in current dir and exit
+# map ds &dragon-drag-and-drop $fx  # Drag from selected files
+# map dS &dragon-drag-and-drop -a -x $fx  # Drag all selected files and exit
+# map dm &drag mv "$PWD"  # Drag move into current dir
+# map dc &drag cp "$PWD"  # Drag copy into current dir
+# map dw &drag wget "$PWD"  # Drag download into current dir
+
+
 # Keymaps
 map y copy
 map c cut
 map p paste
 map x :toggle;down  
 map <esc>   :unselect; clear
+
 map m music
+
+map <space>
+map <space>d dragon
 
 map d
 map dd delete
 map dk delete_for_real
+
+map t :maps
+
 
 # Navigation
 # Goto
@@ -106,18 +126,3 @@ map bd cd /mnt/second/rep/dotfiles
 map br cd /mnt/second/rep/re-ramulator2
 map bg cd /mnt/second/rep/gem5_projects
 
-
-# Drag commands
-# Dependencies: dragon-drag-and-drop and my 'drag' script which uses it
-
-# cmd drag_all &ls -Ah --zero | xargs -d'\0' dragon-drag-and-drop 2>/dev/null
-# cmd drag_allx &ls -Ah --zero | xargs -d'\0' dragon-drag-and-drop -a -x 2>/dev/null
-# map dl drag_all  # Drag from files in current dir
-# map dL drag_allx    # Drag all files in current dir and exit
-# map ds &dragon-drag-and-drop $fx  # Drag from selected files
-# map dS &dragon-drag-and-drop -a -x $fx  # Drag all selected files and exit
-# map dm &drag mv "$PWD"  # Drag move into current dir
-# map dc &drag cp "$PWD"  # Drag copy into current dir
-# map dw &drag wget "$PWD"  # Drag download into current dir
-
-map t :maps

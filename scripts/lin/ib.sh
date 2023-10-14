@@ -141,8 +141,8 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed p7zip
     sudo pacman -S --noconfirm --needed lf
     sudo pacman -S --noconfirm --needed xclip
-    sudo pacman -S --noconfirm --needed nemo
-    sudo pacman -S --noconfirm --needed nemo-fileroller
+    # sudo pacman -S --noconfirm --needed nemo
+    # sudo pacman -S --noconfirm --needed nemo-fileroller
     sudo pacman -S --noconfirm --needed wget
     sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
     sudo pacman -S --noconfirm --needed yt-dlp
@@ -151,6 +151,7 @@ function i_bunch() {
     # yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
     yay -S --noconfirm --answerdiff=None --needed green-tunnel
     yay -S --noconfirm --answerdiff=None --needed qbittorrent
+    yay -S --noconfirm --answerdiff=None --needed dragon-drop
 
     # nemo_dir="$HOME/.local/share/nemo/actions"
     # nemo_file="helix.nemo_action"
