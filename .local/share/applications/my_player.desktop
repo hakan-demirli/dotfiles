@@ -5,6 +5,6 @@ Name=my_player
 Comment=Launches my music player
 Icon=utilities-terminal
 Terminal=false
-Exec=kitty lf /mnt/second/music
+Exec=kitty --title "my_player" lf /mnt/second/music
 Categories=AudioVideo;Audio;Player;
 MimeType=audio/opus;
