@@ -1,0 +1,7 @@
+session_name: 45f2eda314587b805b89963e4aed08b3449db377004ede2698af29277dfbdb37
+start_directory: /mnt/second/rep/dotfiles
+windows:
+- panes:
+  - echo hello
+  - echo hello
+  window_name: my test window

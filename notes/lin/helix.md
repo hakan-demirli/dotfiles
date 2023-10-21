@@ -100,3 +100,6 @@ paste with p
 u to unselect all wtf
 c to unselect too confusingkk
 s +<smth> to sort files
+
+Nvim but visual first like helix:
+https://github.com/00sapo/visual.nvim

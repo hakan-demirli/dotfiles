@@ -1,0 +1,10 @@
+session_name: 5514df626864eb668b768baf246e99808b371e91dcceacc8042fbfbd7b9209b0
+windows:
+- focus: 'true'
+  layout: c850,102x52,0,0[102x26,0,0,1,102x25,0,27,2]
+  options: {}
+  panes:
+  - pane
+  - bash
+  start_directory: /home/emre/.config/tmuxp
+  window_name: my test window

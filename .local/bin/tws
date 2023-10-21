@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import json
+import yaml
+import subprocess
+import pathlib
+import hashlib
+
+
+class SessionManager:
+    def __init__(self, workspace_path) -> None:
+        # Define the path to the JSON file
+        self.workspace_path = workspace_path
+        self.config_dir = os.path.expanduser("~/.config/tmuxp")
+        self.mapping = {}
+
+        # Ensure the config directory exists
+        os.makedirs(self.config_dir, exist_ok=True)
+
+        # Use rglob to find YAML files in the directory and its subdirectories
+        for yaml_file_path in pathlib.Path(self.config_dir).rglob("*.yaml"):
+            with open(yaml_file_path, "r") as yaml_file:
+                try:
+                    yaml_data = yaml.safe_load(yaml_file)
+                    if "start_directory" in yaml_data:
+                        start_directory = yaml_data["start_directory"]
+                        self.mapping[yaml_file_path.name] = start_directory
+                except yaml.YAMLError as e:
+                    print(f"Error reading {yaml_file_path}: {e}")
+                    exit(1)
+
+    def run_tmux_session(self, session_file: str):
+        tmux_command = f"tmuxp load {session_file}"
+
+        try:
+            subprocess.run(tmux_command, shell=True, check=True)
+            print(f"Started tmux session: {session_file}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error: Failed to start tmuxp session '{session_file}': {e}")
+            sys.exit(1)
+
+    def create_workspace_file(self):
+        hash_object = hashlib.sha256(self.workspace_path.encode())
+        hash_hex = hash_object.hexdigest()
+        # Define the data structure
+        default_yaml = {
+            "session_name": f"{hash_hex}",
+            "start_directory": f"{self.workspace_path}",
+            "windows": [
+                {"window_name": "my test window", "panes": ["echo hello", "echo hello"]}
+            ],
+        }
+        session_file = f"{self.config_dir}/{hash_hex}.yaml"
+
+        with open(session_file, "w") as yaml_file:
+            yaml.dump(default_yaml, yaml_file, default_flow_style=False)
+
+        return session_file
+
+    def launch_tmux_session(self):
+        if self.workspace_path in self.mapping:
+            session_file = self.mapping[self.workspace_path]
+            self.run_tmux_session(session_file)
+        else:
+            session_file = self.create_workspace_file()
+            self.run_tmux_session(session_file)
+
+
+if __name__ == "__main__":
+    try:
+        workspace_path = sys.argv[1]
+    except:
+        print("Error: Missing argument, workspace path")
+        exit(1)
+
+    workspace_path = os.path.abspath(workspace_path)
+    # Check if the provided project path is valid
+    if not os.path.exists(workspace_path):
+        print(f"Error: The project path '{workspace_path}' does not exist.")
+        sys.exit(1)
+
+    sm = SessionManager(workspace_path)
+    sm.launch_tmux_session()

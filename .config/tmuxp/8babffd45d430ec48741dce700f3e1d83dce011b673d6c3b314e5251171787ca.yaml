@@ -1,0 +1,7 @@
+session_name: 8babffd45d430ec48741dce700f3e1d83dce011b673d6c3b314e5251171787ca
+start_directory: /home/emre
+windows:
+- panes:
+  - echo hello
+  - echo hello
+  window_name: my test window

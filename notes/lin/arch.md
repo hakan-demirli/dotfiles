@@ -230,6 +230,12 @@
     * ```sudo pacman -S tor```
     * ```sudo systemctl start tor.service```
     * ```sudo systemctl stop tor.service```
+    * From now on do not use systemctl. Use `sudo tor` when you need it.
+    * Firefox:
+        * In Settings > Search network > Manual proxy configuration 
+        * Enter SOCKS host: `localhost` with port `9050` (SOCKS v5).
+        * Select Proxy DNS when using SOCKS v5.
+
 
 # LATER
 OpenSnitch - is a GNU/Linux interactive application firewall
