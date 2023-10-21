@@ -78,6 +78,7 @@ function i_xremap() {
 }
 
 function i_y_core() {
+    yay -S --noconfirm --answerdiff=None --needed swayosd-git
     yay -S --noconfirm --answerdiff=None --needed k4dirstat
     yay -S --noconfirm --answerdiff=None --needed swww
     yay -S --noconfirm --answerdiff=None --needed asusctl
