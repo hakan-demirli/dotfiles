@@ -106,7 +106,8 @@ function i_core() {
     sudo pacman -S --noconfirm --needed ntfs-3g
     sudo pacman -S --noconfirm --needed less
     sudo pacman -S --noconfirm --needed gnome-disk-utility
-    sudo pacman -S --noconfirm --needed gnome-system-monitor
+    # sudo pacman -S --noconfirm --needed gnome-system-monitor
+    sudo pacman -S --noconfirm --needed btop
     sudo pacman -S --noconfirm --needed gnome-bluetooth-3.0
     sudo pacman -S --noconfirm --needed gnome-power-manager
     sudo pacman -S --noconfirm --needed upower

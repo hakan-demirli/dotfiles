@@ -58,7 +58,7 @@
   },
   "memory": {
     "format": "{}% ",
-    "on-click": "gnome-system-monitor"
+    "on-click": "kitty btop"
   },
   "pulseaudio": {
     "format": "\n{volume}% {icon}\n",
