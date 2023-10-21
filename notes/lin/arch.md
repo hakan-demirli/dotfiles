@@ -236,6 +236,17 @@
         * Enter SOCKS host: `localhost` with port `9050` (SOCKS v5).
         * Select Proxy DNS when using SOCKS v5.
 
+* **Enable ECH on Firefox**
+    * In `about:config`
+        * true: `network.dns.use_https_rr_as_altsvc`
+        * true: `network.dns.echconfig.enabled`
+    * Enable DoH:
+        * Search 'doh' on firefox settings
+        * 'Enable Secure DNS using'
+            * 'Increased Protection' or 'Max Protection'
+    * Check if it works from here:
+        * https://www.cloudflare.com/ssl/encrypted-sni/#results
+
 
 # LATER
 OpenSnitch - is a GNU/Linux interactive application firewall

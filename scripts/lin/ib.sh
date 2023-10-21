@@ -207,6 +207,7 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed helix
     sudo pacman -S --noconfirm --needed bat # live-grep script
     sudo pacman -S --noconfirm --needed tmux
+    sudo pacman -S --noconfirm --needed tmuxp
     sudo pacman -S --noconfirm --needed fzf
     sudo pacman -S --noconfirm --needed ripgrep
     # LSPs and Formatters
