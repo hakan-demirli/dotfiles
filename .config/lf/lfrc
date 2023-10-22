@@ -76,6 +76,29 @@ cmd follow_link %{{
 	lf -remote "send ${id} select \"$(readlink $f)\""
 }}
 
+
+cmd mtp_mount %{{
+	base_dir="/tmp/mtp"
+	if [ ! -d "$base_dir" ]; then
+	    mkdir -p "$base_dir"
+	fi
+	sub_dir="$base_dir/$(date +'%Y%m%d%H%M%S%N')"
+	mkdir "$sub_dir"
+	jmtpfs "$sub_dir"
+}}
+
+cmd mtp_unmount %{{
+	parent_dir="/tmp/mtp"
+
+	if [ -d "$parent_dir" ]; then
+	    for sub_dir in "$parent_dir"/*; do
+	        if [ -d "$sub_dir" ]; then
+	            fusermount -u "$sub_dir" 2>/dev/null
+	        fi
+	    done
+	fi
+}}
+
 cmd music ${{
     # multi file or current file
     mpv $fx
@@ -107,6 +130,8 @@ map m music
 
 map <space>
 map <space>d dragon
+map <space>m mtp_mount
+map <space>u mtp_unmount
 
 map d
 map dd delete
@@ -121,6 +146,9 @@ map gl follow_link
 map ge bottom
 map gd cd ~/Downloads
 map gr cd /mnt/second/rep
+map gm cd /tmp/mtp
+# map gm cd /run/user/1000/gvfs
+
 # Bookmark
 map bd cd /mnt/second/rep/dotfiles
 map br cd /mnt/second/rep/re-ramulator2

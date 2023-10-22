@@ -143,7 +143,9 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed p7zip
     sudo pacman -S --noconfirm --needed lf
     sudo pacman -S --noconfirm --needed xclip
-    sudo pacman -S --noconfirm --needed nemo # until I add mtp support to lf
+    # Check /run/user/1000/gvfs directory for mtp devices mounted by nemo
+    # Check /tmp/mtp directory for mtp devices mounted by lf
+    sudo pacman -S --noconfirm --needed nemo # required for bugless mounting
     sudo pacman -S --noconfirm --needed nemo-fileroller
     sudo pacman -S --noconfirm --needed wget
     sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
