@@ -153,7 +153,7 @@ function i_bunch() {
     # yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
     yay -S --noconfirm --answerdiff=None --needed green-tunnel
     yay -S --noconfirm --answerdiff=None --needed qbittorrent
-    yay -S --noconfirm --answerdiff=None --needed dragon-drop
+    yay -S --noconfirm --answerdiff=None --needed dragon-drop # rip-drag alternative
 
     # nemo_dir="$HOME/.local/share/nemo/actions"
     # nemo_file="helix.nemo_action"
