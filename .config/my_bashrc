@@ -43,7 +43,31 @@ my_set_paths() {
 
     # export RISCV=$MY_APP_DIR/lin/riscv64_gnu_toolchain
     # export PATH=$MY_APP_DIR/lin/riscv64_gnu_toolchain/bin:$PATH
+	
 
+
+	# Set XDG Base Directory variables
+	export XDG_DATA_HOME="$HOME/.local/share"
+	export XDG_CONFIG_HOME="$HOME/.config"
+	export XDG_STATE_HOME="$HOME/.local/state"
+	export XDG_CACHE_HOME="$HOME/.cache"
+
+	# Add these variables to PATH if needed
+	export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
+
+	# Make sure the directories exist
+	mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+
+	export ANDROID_HOME="$XDG_DATA_HOME"/android
+	export HISTFILE="${XDG_STATE_HOME}"/bash/history
+	export CARGO_HOME="$XDG_DATA_HOME"/cargo
+	export CUDA_CACHE_PATH="$XDG_CACHE_HOME"/nv
+	export GNUPGHOME="$XDG_DATA_HOME"/gnupg
+	export RUSTUP_HOME="$XDG_DATA_HOME"/rustup
+	export NUGET_PACKAGES="$XDG_CACHE_HOME"/NuGetPackages
+	export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc 
+	export DOTNET_CLI_HOME="/tmp/DOTNET_CLI_HOME"
+	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 
  #    PS1='\[\e[32m\][\u@\h \W]\$\[\e[0m\]'
     # show_virtual_env() {

@@ -247,6 +247,11 @@
     * Check if it works from here:
         * https://www.cloudflare.com/ssl/encrypted-sni/#results
 
+* **Clean Home Directory**
+    * This shows the folders that can be moved:
+        * https://wiki.archlinux.org/title/XDG_Base_Directory
+    * This automatically scans and shows
+        * ```yay -S xdg-ninja```
 
 # LATER
 OpenSnitch - is a GNU/Linux interactive application firewall
