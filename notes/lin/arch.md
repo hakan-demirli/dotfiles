@@ -1,9 +1,56 @@
 * **Convert pip package to PKGBUILD**
     * yay -S pip2pkgbuild
 
+* **Create swap**
+    * Check if swap file exists:
+        * ```sudo swapon -s```
+    * Close all active swap files:
+        * ```sudo swapoff -a```
+    * Create a swap file bigger than the ram
+        ```
+        sudo dd if=/dev/zero of=/swapfile bs=1G count=30 status=progress
+        sudo mkswap /swapfile
+        sudo chmod 600 /swapfile
+        sudo swapon /swapfile
+        ```
+    * Make it persistent:
+        * Backup fstab file:
+            * ```sudo cp /etc/fstab /etc/fstab.backup```
+        * Edit fstab file:
+            * ```echo '/swapfile none    swap    defaults 0 0' | sudo tee -a /etc/fstab```
+        * Check for errors:
+            * ```sudo mount -a```
+        * Delete backup if there are no errors:
+            * ```sudo rm /etc/fstab.backup```
+
 * **Enable Hibernation**
-    * [tutorial](https://confluence.jaytaala.com/display/TKB/Use+a+swap+file+and+enable+hibernation+on+Arch+Linux+-+including+on+a+LUKS+root+partition#UseaswapfileandenablehibernationonArchLinuxincludingonaLUKSrootpartition-Enablehibernation)
-    * ```systemctl hibernate```
+    * May not work if Grub remember last booted is set
+    * Auto setup
+        * Create a swapfile bigger than your ram.
+        * Use hibernator script in dotfiles/scripts/lin directory
+
+    * Manual, may not work
+        * [tutorial](https://confluence.jaytaala.com/display/TKB/Use+a+swap+file+and+enable+hibernation+on+Arch+Linux+-+including+on+a+LUKS+root+partition#UseaswapfileandenablehibernationonArchLinuxincludingonaLUKSrootpartition-Enablehibernation)
+        * Create a swap file bigger than your RAM
+        * Update Grub:
+            * Backup Grub
+                * ```sudo cp /etc/default/grub /etc/default/grub.backup```
+            * Find device UUID for root partition (non-LUKS)
+                * Find what is mounted on `/`
+                    * `df`
+                * Find the uuid of the disk mounted on /
+                    * ```sudo blkid```
+            * Find physical offset of swapfile
+                * ```sudo filefrag -v /swapfile```
+                * First value of the physical offset field. Each field/column consists of two sub columns. Be careful.
+            * Edit grub file
+                * ```sudo vim /etc/default/grub```
+                * We want to find the line starting with GRUB_CMDLINE_LINUX_DEFAULT and append following following bits of information we got previously.
+                    * ```GRUB_CMDLINE_LINUX_DEFAULT="quiet resume=UUID=f68ed3c5-da10-4288-890f-b83d8763e85e resume_offset=45731840"```
+                * ```sudo grub-mkconfig -o /boot/grub/grub.cfg```
+                * ```reboot```
+
+        * ```systemctl hibernate```
 
 * **Use woeusb without gui**
     * ```sudo woeusb /mnt/second/software/isos/Win10_22H2_English_x64v1.iso --device /dev/sdb```
@@ -39,7 +86,7 @@
         * `sudo os-prober` Find disk name
         * `lsblk` list all disks disks
         * `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of efi
-        * `sudo nvim /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
+        * `sudo helix /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
             ```
             menuentry "Windows 10" {
                 savedefault
