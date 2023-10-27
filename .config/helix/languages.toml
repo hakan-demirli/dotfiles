@@ -1,22 +1,23 @@
-[[language]]
-name = "gdscript"
-language-server = { command = "nc", args = [
-  "localhost",
-  "6005",
-], language-id = "gdscript" }
-formatter = { command = "git", args = ["stripspace"] }
+[language-server]
+clangd = { command = "clangd", args = ['--fallback-style=Webkit'] }
+
 
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
-language-server = { command = "pyright-langserver", args = ["--stdio"] }
-config = {}
 formatter = { command = "black", args = ["--quiet", "-"] }
+language-servers = ["pyright"]
 auto-format = true
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
 # extraPaths = ["./test"]
 
+
+# [[language]]
+# name = "verilog"
+# formatter = { command = 'verible-verilog-format', args = ["-"] }
+# auto-format = true
+# indent = { tab-width = 4, unit = "    " }
 [[language]]
 name = "html"
 formatter = { command = 'prettier', args = ["--parser", "html"] }
@@ -45,46 +46,19 @@ formatter = { command = 'prettier', args = ["--parser", "markdown"] }
 # auto-format = true
 
 [[language]]
-name = "hcl"
-formatter = { command = 'terraform', args = ["fmt", "-"] }
-auto-format = true
-
-[[language]]
-name = "tfvars"
-formatter = { command = 'terraform', args = ["fmt", "-"] }
-auto-format = true
-
-[[language]]
-name = "ruby"
-config = { solargraph = { diagnostics = true, formatting = false } }
-formatter = { command = "bundle", args = [
-  "exec",
-  "rubocop",
-  "--stdin",
-  "foo.rb",
-  "-a",
-  "--stderr",
-  "--fail-level",
-  "fatal",
-] }
-auto-format = true
-
-# [[language]]
-# name = "verilog"
-# language-server = { command = "verilator", args = ["--lint-only", "-Wall"] }
-# formatter = { command = 'verible-verilog-format', args = ["-"] }
-# auto-format = true
-# indent = { tab-width = 4, unit = "    " }
-
-[[language]]
 name = "toml"
 auto-format = true
 
 [[language]]
 name = "cpp"
-# config = { "clangd.fallbackFlags" = ["-std=c++20"] }
-language-server = { command = "clangd", args = ['--fallback-style=Webkit'] }
 auto-format = true
+language-servers = ["clangd"]
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "c"
+auto-format = true
+language-servers = ["clangd"]
 indent = { tab-width = 4, unit = "    " }
 
 # Diagnostics:

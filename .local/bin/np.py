@@ -1,0 +1,68 @@
+import subprocess
+import shutil
+import os
+import subprocess
+import shutil
+from pathlib import Path
+
+"""copy a template project to current dir."""
+
+
+def clone_or_update_repo(repo_url, destination_path):
+    if not os.path.exists(destination_path):
+        # Clone the repository if it doesn't exist
+        subprocess.run(["git", "clone", repo_url, destination_path])
+        print(f"Repository cloned to {destination_path}")
+    else:
+        # Update the existing repository
+        try:
+            subprocess.run(["git", "fetch"], cwd=destination_path, check=True)
+            # Check if there are any changes to pull
+            result = subprocess.run(
+                ["git", "status", "-uno"],
+                capture_output=True,
+                text=True,
+                cwd=destination_path,
+                check=True,
+            )
+            if "Your branch is behind" in result.stdout:
+                subprocess.run(["git", "pull"], cwd=destination_path)
+                print(f"Repository at {destination_path} is now up to date.")
+            else:
+                print(f"Repository at {destination_path} is already up to date.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error while updating the repository: {e}")
+
+
+def run_fzf_inside_cache_and_copy(cache_dir):
+    cache_dir = Path(cache_dir)
+
+    try:
+        cmd = (
+            f"find -L {cache_dir} -maxdepth 1 -name .git -prune -o -type d -print | fzf"
+        )
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, shell=True)
+        selected_directory = result.stdout.decode().strip()
+
+        if selected_directory:
+            selected_path = Path(selected_directory)
+            print(f"Selected directory: {selected_path}")
+
+            # Copy the selected directory to the current working directory
+            destination = Path.cwd() / selected_path.name
+            shutil.copytree(selected_path, destination)
+            print(f"Directory copied to: {destination}")
+
+        else:
+            print("No directory selected.")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error while running fzf: {e}")
+
+
+if __name__ == "__main__":
+    repo_url = "https://github.com/hakan-demirli/code_templates"
+    cache_dir = "~/.cache/np"
+    destination_path = os.path.expanduser(cache_dir)
+    clone_or_update_repo(repo_url, destination_path)
+    run_fzf_inside_cache_and_copy(cache_dir)
