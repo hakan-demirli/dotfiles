@@ -151,6 +151,6 @@ map gm cd /tmp/mtp
 
 # Bookmark
 map bd cd /mnt/second/rep/dotfiles
-map br cd /mnt/second/rep/re-ramulator2
-map bg cd /mnt/second/rep/gem5_projects
+map bs cd /mnt/second/school
+map bp cd /mnt/second/rep/personal_repo
 
