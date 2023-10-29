@@ -56,18 +56,20 @@ cmd delete ${{
 }}
 
 cmd extract ${{
+	folder_name="${fx%.*}"  # Extracts the folder name without the extension
+	mkdir -p "$folder_name" # Create the folder if it doesn't exist
 	case $fx in
-		*.tar.bz2) tar xjf $fx     ;;
-		*.tar.gz)  tar xzf $fx     ;;
-		*.bz2)     bunzip2 $fx     ;;
-		*.rar)     rar x $fx       ;;
-		*.gz)      gunzip $fx      ;;
-		*.tar)     tar xf $fx      ;;
-		*.tbz2)    tar xjf $fx     ;;
-		*.tgz)     tar xzf $fx     ;;
-		*.zip)     unzip $fx       ;;
-		*.Z)       uncompress $fx  ;;
-		*)         echo "'$fx' cannot be extracted via extract()" ;;
+		*.tar.bz2) tar xjf "$fx" -C "$folder_name" ;;
+		*.tar.gz) tar xzf "$fx" -C "$folder_name" ;;
+		*.bz2) bunzip2 "$fx" -C "$folder_name" ;;
+		*.rar) rar x "$fx" "$folder_name/" ;;
+		*.gz) gunzip "$fx" -c > "$folder_name/${fx%.*}" ;;
+		*.tar) tar xf "$fx" -C "$folder_name" ;;
+		*.tbz2) tar xjf "$fx" -C "$folder_name" ;;
+		*.tgz) tar xzf "$fx" -C "$folder_name" ;;
+		*.zip) unzip "$fx" -d "$folder_name" ;;
+		*.Z) uncompress "$fx" ;;
+		*) echo "'$fx' cannot be extracted via extract()" ;;
 	esac
 }}
 
@@ -132,6 +134,7 @@ map <space>
 map <space>d dragon
 map <space>m mtp_mount
 map <space>u mtp_unmount
+map <space>x extract
 
 map d
 map dd delete

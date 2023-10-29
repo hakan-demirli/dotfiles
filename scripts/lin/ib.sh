@@ -219,6 +219,9 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed pyright      # python
     sudo pacman -S --noconfirm --needed python-black # python
     sudo pacman -S --noconfirm --needed taplo        # toml file
+    sudo pacman -S --noconfirm --needed texlab       # latex.
+    sudo pacman -S --noconfirm --needed zathura      # pdf viewer.
+    sudo pacman -S --noconfirm --needed zathura-pdf-mupdf
     # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
 }
 

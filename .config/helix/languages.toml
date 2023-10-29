@@ -1,5 +1,10 @@
 [language-server]
 clangd = { command = "clangd", args = ['--fallback-style=Webkit'] }
+texlab = { command = "texlab", config = { texlab = { build = { onSave = true, forwardSearchAfter = true }, forwardSearch = { executable = "zathura", args = [
+  "--synctex-forward",
+  "%l:1:%f",
+  "%p",
+] }, chktex = { onEdit = true } } } }
 
 
 [[language]]
@@ -67,5 +72,6 @@ indent = { tab-width = 4, unit = "    " }
 
 # Create compile_commands.json using this: ` cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..`
 
-
-#
+[[language]]
+name = "latex"
+language-servers = ["texlab"]
