@@ -69,14 +69,20 @@ my_set_paths() {
 	export DOTNET_CLI_HOME="/tmp/DOTNET_CLI_HOME"
 	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 
- #    PS1='\[\e[32m\][\u@\h \W]\$\[\e[0m\]'
+	# fzf keybindings and shortcuts for Bash
+	source /usr/share/fzf/key-bindings.bash
+	source /usr/share/fzf/completion.bash
+
+
+    # PS1='\[\e[32m\][\u@\h \W]\$\[\e[0m\]'
     # show_virtual_env() {
     #   if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
     #     echo -e "\e[36m $(basename $VIRTUAL_ENV) \e[0m"
     #   fi
     # }
- #    export -f show_virtual_env
- #    PS1='$(show_virtual_env)'$PS1
+    # export -f show_virtual_env
+    # PS1='$(show_virtual_env)'$PS1
+
     eval "$(direnv hook bash)"
     eval "$(starship init bash)"
 }
