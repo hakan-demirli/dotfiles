@@ -1,7 +1,8 @@
 *.exe
 *.wav
 *.json
-*__pycache__*
-*venv*
-.direnv/
+**/__pycache__
+**/venv_*
+**/venv
+**/.direnv
 *fuse_hidden*
