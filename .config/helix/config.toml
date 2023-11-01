@@ -19,6 +19,15 @@ k = "move_line_up"
 [keys.normal.space]
 # g = ":pipe-to tmux split-window -h helix-live-grep"
 g = ":pipe-to live-grep-in-split-tmux"
+[keys.normal.g]
+l = ["collapse_selection", "extend_to_line_end"]
+h = ["collapse_selection", "extend_to_line_start"]
+s = [
+  "collapse_selection",
+  "select_mode",
+  "goto_first_nonwhitespace",
+  "exit_select_mode",
+]
 
 [editor]
 line-number = "relative"
