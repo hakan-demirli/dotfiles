@@ -35,3 +35,8 @@ if __name__ == "__main__":
     des = pathlib.Path(f"~/.config/gtasks/{gtask_cred}").expanduser()
     remove_path(des)
     os.symlink(src, des)
+
+    des_dir = pathlib.Path(f"~/.config/yarr").expanduser()
+    src = secrets_dir / pathlib.Path("yarr")
+    remove_path(des_dir)
+    os.symlink(src, des_dir)

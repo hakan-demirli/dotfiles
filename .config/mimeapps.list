@@ -25,6 +25,7 @@ text/x-shellscript=helix.desktop
 x-scheme-handler/etcher=balena-etcher.desktop
 text/x-asm=helix.desktop
 x-scheme-handler/msteams=teams.desktop
+text/xml=helix.desktop
 
 [Added Associations]
 text/x-shellscript=helix.desktop;
@@ -48,3 +49,4 @@ text/csv=helix.desktop
 application/json=helix.desktop
 text/x-shellscript=helix.desktop
 text/x-asm=helix.desktop
+text/xml=helix.desktop
