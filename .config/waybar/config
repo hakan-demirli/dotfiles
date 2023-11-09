@@ -18,6 +18,8 @@
     "custom/left-arrow-dark",
     "pulseaudio#mic",
     "custom/left-arrow-dark",
+    "backlight",
+    "custom/left-arrow-dark",
     "battery",
     "custom/left-arrow-dark",
     "custom/notification",
@@ -81,7 +83,8 @@
     "on-click-right": "pactl set-sink-mute 0 toggle",
     "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
     "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%",
-    "smooth-scrolling-threshold": 1
+    "smooth-scrolling-threshold": 1,
+    "reverse-scrolling": 1
   },
   "pulseaudio#mic": {
     "format": "{format_source}",
@@ -89,8 +92,17 @@
     "format-source-muted": "",
     "on-click": "pavucontrol",
     "on-click-right": "pactl set-source-mute 0 toggle",
+    "on-scroll-up": "pactl set-source-volume 0 +1%",
     "on-scroll-down": "pactl set-source-volume 0 -1%",
-    "on-scroll-up": "pactl set-source-volume 0 +1%"
+    "reverse-scrolling": 1
+  },
+  "backlight": {
+    "device": "amdgpu_bl2", // cd /var/lib/systemd/backlight
+    "format": "{percent}% {icon}",
+    "format-icons": ["", ""],
+    "on-scroll-up": "exec brightnessctl s 5%+",
+    "on-scroll-down": "exec brightnessctl s 5%-",
+    "reverse-scrolling": 1
   },
   "battery": { // 6 space max size preoccupied
     "format": "        \n{capacity}% {icon}\n{time}",
@@ -113,8 +125,6 @@
     },
     "tooltip": false,
     "on-click": "gnome-power-statistics",
-    "on-scroll-up": "exec brightnessctl s 10%+",
-    "on-scroll-down": "exec brightnessctl s 10%-"
   },
   "custom/notification": {
     "tooltip": false,
