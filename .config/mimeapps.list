@@ -50,3 +50,4 @@ application/json=helix.desktop
 text/x-shellscript=helix.desktop
 text/x-asm=helix.desktop
 text/xml=helix.desktop
+text/plain=helix.desktop

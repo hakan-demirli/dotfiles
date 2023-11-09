@@ -226,6 +226,7 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed texlab       # latex.
     sudo pacman -S --noconfirm --needed zathura      # pdf viewer.
     sudo pacman -S --noconfirm --needed zathura-pdf-mupdf
+    sudo pacman -S --noconfirm --needed lldb
     # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
 }
 
