@@ -158,6 +158,9 @@ function i_bunch() {
     yay -S --noconfirm --answerdiff=None --needed dragon-drop # rip-drag alternative
     yay -S --noconfirm --answerdiff=None --needed yarr-bin 
 
+    # IDE like autocomplete. Buggy right now.
+    # yay -S --noconfirm --answerdiff=None --needed nodejs-inshellisense 
+
     # nemo_dir="$HOME/.local/share/nemo/actions"
     # nemo_file="helix.nemo_action"
     # nemo_file_path="$nemo_dir/$nemo_file"

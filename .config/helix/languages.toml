@@ -13,6 +13,7 @@ roots = ["pyproject.toml", "."]
 formatter = { command = "black", args = ["--quiet", "-"] }
 language-servers = ["pyright"]
 auto-format = true
+# ruff formatter any good?
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
 # extraPaths = ["./test"]
