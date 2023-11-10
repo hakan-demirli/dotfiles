@@ -10,6 +10,7 @@ def main():
     types = [".jpg", ".png", ".jpeg"]
 
     wallpapers = mylib.getFilesByType(wp_folder, types)
+    wallpapers = sorted(wallpapers)
 
     if len(wallpapers) <= 0:
         print(f"No wallpapers found in '{wp_folder}'. Exiting.")
