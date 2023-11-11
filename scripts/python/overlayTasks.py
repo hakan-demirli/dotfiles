@@ -17,8 +17,8 @@ def main():
     overlayed_file = mylib.OVERLAYED_FILE
 
     # Calculate the position for overlay (top right corner)
-    x_offset = 200
-    y_offset = 0
+    x_offset = mylib.SCREEN_WIDTH - 700
+    y_offset = (mylib.SCREEN_HEIGHT // 2) + 75
     mylib.overlayImages(
         overlayed_file, overlay_file, overlayed_file, x_offset, y_offset
     )

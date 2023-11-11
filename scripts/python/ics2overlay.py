@@ -240,14 +240,14 @@ def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
 
 
 def main():
-    width, height = 1100, 800
+    width, height = 700, 1080
     background_color = (0, 0, 0, 222)
     image = Image.new("RGBA", (width, height), background_color)
     draw = ImageDraw.Draw(image)
 
     months_to_display = getDisplayedMonths(1, 4)
 
-    num_rows = 2
+    num_rows = 3
     num_columns = len(months_to_display) // num_rows + (
         1 if len(months_to_display) % num_rows != 0 else 0
     )
@@ -264,11 +264,11 @@ def main():
         # Print the current column
         text_height = 0
         for year, month in month_group:
-            raw_cal_txt = getTextCalendarMonth(year, month).replace("\n", "\n\n\n")
-            text_position = (x_offset, 20 + text_height)
+            raw_cal_txt = getTextCalendarMonth(year, month).replace("\n", "\n\n")
+            text_position = (x_offset, 10 + text_height)
             smartDrawLayers(raw_cal_txt, events, text_position, draw)
 
-            text_height += len(raw_cal_txt.split("\n")) * 14
+            text_height += len(raw_cal_txt.split("\n")) * 13
 
         text_position = (x_offset, 20)
         # Update the X offset for the next column
