@@ -30,10 +30,13 @@ s = [
 ]
 
 [editor]
+true-color = true
 line-number = "relative"
 mouse = false
 bufferline = "always"
 rulers = [80]
+idle-timeout = 0
+completion-trigger-len = 1
 
 [editor.cursor-shape]
 insert = "bar"

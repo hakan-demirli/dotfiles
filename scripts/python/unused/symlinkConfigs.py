@@ -134,6 +134,28 @@ def symlink_desktop_files():
         # Create a symbolic link from the source to the target
         os.symlink(source_path, target_path)
 
+def symlink_helix_windows():
+    source_dotfiles_dir = mylib.CONFIG_DIR
+
+    target_dotfiles_dir = os.path.abspath(
+        os.path.join(os.getenv('APPDATA'), "helix")
+    )
+    if not os.path.exists(target_dotfiles_dir):
+        os.makedirs(target_dotfiles_dir)
+
+    for dotfile_entry in os.listdir(source_dotfiles_dir):
+        source_dotfile_path = os.path.join(source_dotfiles_dir, dotfile_entry)
+
+        target_dotfile_path = os.path.join(target_dotfiles_dir, dotfile_entry)
+
+        # Remove the existing target dotfile (if it exists)
+        remove_path(target_dotfile_path)
+        try:
+            os.symlink(source_dotfile_path, target_dotfile_path)
+        except:
+            print(f"[FAILED] {source_dotfile_path}")
+
+
 
 def main():
     symlink_dotfiles()

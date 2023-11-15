@@ -1,3 +1,12 @@
+function ya() {
+	tmp="$(mktemp -t "yazi-cwd.XXXXX")"
+	yazi --cwd-file="$tmp"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
 my_set_paths() {
     # set -o vi
     set show-mode-in-prompt on
@@ -85,6 +94,8 @@ my_set_paths() {
 
     eval "$(direnv hook bash)"
     eval "$(starship init bash)"
+
+    # alias ya='ya' # You do not need this. Function is already in path.
 }
 
 my_set_paths

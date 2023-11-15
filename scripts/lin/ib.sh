@@ -141,7 +141,7 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed wofi
     sudo pacman -S --noconfirm --needed unrar
     sudo pacman -S --noconfirm --needed p7zip
-    sudo pacman -S --noconfirm --needed lf
+    sudo pacman -S --noconfirm --needed lf # yazi when matured
     sudo pacman -S --noconfirm --needed xclip
     # Check /run/user/1000/gvfs directory for mtp devices mounted by nemo
     # Check /tmp/mtp directory for mtp devices mounted by lf
@@ -214,7 +214,7 @@ function i_docker() {
 function i_helix() {
     sudo pacman -S --noconfirm --needed helix
     sudo pacman -S --noconfirm --needed bat # live-grep script
-    sudo pacman -S --noconfirm --needed tmux
+    sudo pacman -S --noconfirm --needed tmux # zellij when matured
     sudo pacman -S --noconfirm --needed tmuxp
     sudo pacman -S --noconfirm --needed fzf
     sudo pacman -S --noconfirm --needed ripgrep
