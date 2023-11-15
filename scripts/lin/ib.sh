@@ -47,12 +47,7 @@ function i_vmware() {
 }
 
 function i_nf() {
-    # Install a Nerd Font
-    wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
-    mkdir -p ~/.fonts
-    unzip JetBrainsMono.zip -d ~/.fonts
-    fc-cache -fv
-    rm JetBrainsMono.zip
+    sudo pacman -S ttf-jetbrains-mono
 }
 
 function i_wine_nvidia() {
@@ -143,10 +138,12 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed p7zip
     sudo pacman -S --noconfirm --needed lf # yazi when matured
     sudo pacman -S --noconfirm --needed xclip
+    sudo pacman -S --noconfirm --needed unarchiver
+    sudo pacman -S --noconfirm --needed os-prober
     # Check /run/user/1000/gvfs directory for mtp devices mounted by nemo
     # Check /tmp/mtp directory for mtp devices mounted by lf
-    sudo pacman -S --noconfirm --needed nemo # required for bugless mounting
-    sudo pacman -S --noconfirm --needed nemo-fileroller
+    # sudo pacman -S --noconfirm --needed nemo # no need
+    # sudo pacman -S --noconfirm --needed nemo-fileroller
     sudo pacman -S --noconfirm --needed wget
     sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
     sudo pacman -S --noconfirm --needed yt-dlp
@@ -155,8 +152,11 @@ function i_bunch() {
     # yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
     yay -S --noconfirm --answerdiff=None --needed green-tunnel
     yay -S --noconfirm --answerdiff=None --needed qbittorrent
-    yay -S --noconfirm --answerdiff=None --needed dragon-drop # rip-drag alternative
+    # yay -S --noconfirm --answerdiff=None --needed dragon-drop # rip-drag is better
+    yay -S --noconfirm --answerdiff=None --needed ripdrag-git 
     yay -S --noconfirm --answerdiff=None --needed yarr-bin 
+    # yay -S --noconfirm --answerdiff=None --needed yazi-git # missing features
+    
 
     # IDE like autocomplete. Buggy right now.
     # yay -S --noconfirm --answerdiff=None --needed nodejs-inshellisense 
@@ -227,6 +227,7 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed zathura      # pdf viewer.
     sudo pacman -S --noconfirm --needed zathura-pdf-mupdf
     sudo pacman -S --noconfirm --needed lldb
+    sudo pacman -S --noconfirm --needed bash-language-server
     # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
 }
 
@@ -242,7 +243,7 @@ if [ $# -eq 0 ]; then
     i_qemu
     # i_vmware
     i_nix
-    i_mtfp
+    # i_mtfp
     i_nf
     i_wine_nvidia
     i_xremap

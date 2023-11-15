@@ -76,6 +76,8 @@ my_set_paths() {
 	export NUGET_PACKAGES="$XDG_CACHE_HOME"/NuGetPackages
 	export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc 
 	export DOTNET_CLI_HOME="/tmp/DOTNET_CLI_HOME"
+	export GNUPGHOME="$XDG_DATA_HOME"/gnupg
+	export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 
 	# fzf keybindings and shortcuts for Bash
@@ -96,6 +98,7 @@ my_set_paths() {
     eval "$(starship init bash)"
 
     # alias ya='ya' # You do not need this. Function is already in path.
+    # alias lf='ya' # Muscle memory.
 }
 
 my_set_paths

@@ -26,6 +26,7 @@ x-scheme-handler/etcher=balena-etcher.desktop
 text/x-asm=helix.desktop
 x-scheme-handler/msteams=teams.desktop
 text/xml=helix.desktop
+inode/x-empty=helix.desktop
 
 [Added Associations]
 text/x-shellscript=helix.desktop;
@@ -51,3 +52,4 @@ text/x-shellscript=helix.desktop
 text/x-asm=helix.desktop
 text/xml=helix.desktop
 text/plain=helix.desktop
+inode/x-empty=helix.desktop

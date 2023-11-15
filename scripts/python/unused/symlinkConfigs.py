@@ -71,8 +71,8 @@ def symlink_cargo_config():
     # Define the source and target directories
     source_config_dir = os.path.join(mylib.CONFIG_DIR, "cargo")
     source_config_file = "config"
-    target_home = os.path.expanduser("~")
-    target_config_dir = os.path.join(target_home, ".cargo")
+    target_home = os.path.expanduser("~/.local/share")
+    target_config_dir = os.path.join(target_home, "cargo")
 
     # Ensure the target directory exists; create it if not
     if not os.path.exists(target_config_dir):
@@ -134,12 +134,11 @@ def symlink_desktop_files():
         # Create a symbolic link from the source to the target
         os.symlink(source_path, target_path)
 
+
 def symlink_helix_windows():
     source_dotfiles_dir = mylib.CONFIG_DIR
 
-    target_dotfiles_dir = os.path.abspath(
-        os.path.join(os.getenv('APPDATA'), "helix")
-    )
+    target_dotfiles_dir = os.path.abspath(os.path.join(os.getenv("APPDATA"), "helix"))
     if not os.path.exists(target_dotfiles_dir):
         os.makedirs(target_dotfiles_dir)
 
@@ -154,7 +153,6 @@ def symlink_helix_windows():
             os.symlink(source_dotfile_path, target_dotfile_path)
         except:
             print(f"[FAILED] {source_dotfile_path}")
-
 
 
 def main():

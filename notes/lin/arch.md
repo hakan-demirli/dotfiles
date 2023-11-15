@@ -84,7 +84,7 @@
             * Can't add automatically.
     * Manual way:
         * `sudo os-prober` Find disk name
-        * `lsblk` list all disks disks
+            * `lsblk` list all disks disks if confused
         * `sudo grub-probe -t fs_uuid -d /dev/sda1` get id uuid of efi
         * `sudo helix /etc/grub.d/40_custom` add menuentry. Replace XXX with uuid.
             ```

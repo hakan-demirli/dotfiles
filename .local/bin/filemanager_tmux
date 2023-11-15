@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Generate a random session name
+session_name=$(uuidgen)
+
+# Create a new tmux session with the random name and a window named "myWindow"
+tmux new-session -d -s "$session_name" -n myWindow
+
+# Send the command "ya" to the window
+tmux send-keys -t "$session_name:myWindow" "ya" Enter
+
+# Attach to the tmux session using kitty terminal
+tmux attach -t "$session_name"

@@ -53,7 +53,7 @@ formatter = { command = 'prettier', args = ["--parser", "markdown"] }
 
 [[language]]
 name = "toml"
-auto-format = true
+auto-format = false
 
 [[language]]
 name = "cpp"

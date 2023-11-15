@@ -43,7 +43,8 @@ set info size
 
 %test $LF_LEVEL -eq 1 || >&2 printf "Warning: You're in a nested lf instance!"
 
-cmd mkdir $mkdir -p "$(echo $* | tr ' ' '\ ')"
+
+cmd touch $touch -p "$(echo $* | tr ' ' '\ ')"
 cmd trash %trash-put $fx
 
 
@@ -58,19 +59,7 @@ cmd delete ${{
 cmd extract ${{
 	folder_name="${fx%.*}"  # Extracts the folder name without the extension
 	mkdir -p "$folder_name" # Create the folder if it doesn't exist
-	case $fx in
-		*.tar.bz2) tar xjf "$fx" -C "$folder_name" ;;
-		*.tar.gz) tar xzf "$fx" -C "$folder_name" ;;
-		*.bz2) bunzip2 "$fx" -C "$folder_name" ;;
-		*.rar) rar x "$fx" "$folder_name/" ;;
-		*.gz) gunzip "$fx" -c > "$folder_name/${fx%.*}" ;;
-		*.tar) tar xf "$fx" -C "$folder_name" ;;
-		*.tbz2) tar xjf "$fx" -C "$folder_name" ;;
-		*.tgz) tar xzf "$fx" -C "$folder_name" ;;
-		*.zip) unzip "$fx" -d "$folder_name" ;;
-		*.Z) uncompress "$fx" ;;
-		*) echo "'$fx' cannot be extracted via extract()" ;;
-	esac
+	unar "$fx" -o "$folder_name"
 }}
 
 
@@ -106,19 +95,8 @@ cmd music ${{
     mpv $fx
 }}
 
-cmd setbg "$1"
+cmd ripdrag %ripdrag -a -x $fx
 
-# Drag: dragon-drop
-# cmd drag_all &ls -Ah --zero | xargs -d'\0' dragon-drag-and-drop 2>/dev/null
-cmd dragon %dragon-drop -a -x $fx
-# cmd drag_allx &ls -Ah --zero | xargs -d'\0' dragon-drag-and-drop -a -x 2>/dev/null
-# map dl drag_all  # Drag from files in current dir
-# map dL drag_allx    # Drag all files in current dir and exit
-# map ds &dragon-drag-and-drop $fx  # Drag from selected files
-# map dS &dragon-drag-and-drop -a -x $fx  # Drag all selected files and exit
-# map dm &drag mv "$PWD"  # Drag move into current dir
-# map dc &drag cp "$PWD"  # Drag copy into current dir
-# map dw &drag wget "$PWD"  # Drag download into current dir
 
 
 # Keymaps
@@ -129,12 +107,18 @@ map x :toggle;down
 map <esc>   :unselect; clear
 
 map m music
+map e
 
 map <space>
-map <space>d dragon
+map <space>d ripdrag
 map <space>m mtp_mount
 map <space>u mtp_unmount
 map <space>x extract
+
+map n
+map nd push %mkdir<space>
+map nf push %touch<space>
+
 
 map d
 map dd delete
@@ -148,6 +132,7 @@ map t :maps
 map gl follow_link
 map ge bottom
 map gd cd ~/Downloads
+map gc cd ~/.config
 map gr cd /mnt/second/rep
 map gm cd /tmp/mtp
 # map gm cd /run/user/1000/gvfs
