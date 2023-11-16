@@ -6,3 +6,6 @@ gcalcli
 clipboard
 google-auth-oauthlib
 gradio
+mutagen
+yt-dlp
+

@@ -146,7 +146,6 @@ function i_bunch() {
     # sudo pacman -S --noconfirm --needed nemo-fileroller
     sudo pacman -S --noconfirm --needed wget
     sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
-    sudo pacman -S --noconfirm --needed yt-dlp
     sudo pacman -S --noconfirm --needed mpv
     sudo pacman -S --noconfirm --needed cronie
     # yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
