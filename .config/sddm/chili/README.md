@@ -17,11 +17,15 @@ Chili for SDDM is the desktop environment *independent* adaption of my chili log
 
 [Download the tar archive from openDesktop](https://www.opendesktop.org/p/1240784) and extract the contents to the theme directory of SDDM *(change the path for the downloaded file if necessary)*:
 ```
-$ sudo tar -xzvf ~/Downloads/sddm-chili.tar.gz -C /usr/share/sddm/themes
+sudo cp -r /mnt/second/rep/dotfiles/.config/sddm/chili /usr/share/sddm/themes
 ```
+```
+sudo tar -xzvf ~/Downloads/sddm-chili.tar.gz -C /usr/share/sddm/themes
+```
+
 This will extract all the files to a folder called chili inside of the themes directory of SDDM. After that you will have to point SDDM to the new theme by editing its config file:
 ```
-$ sudo nano /usr/lib/sddm/sddm.conf.d/sddm.conf
+sudo helix /usr/lib/sddm/sddm.conf.d/default.conf
 ```
 In the `[Theme]` section set `Current=chili`. For a more detailed description please refer to the [Arch wiki on sddm](https://wiki.archlinux.org/index.php/SDDM). Note that, depending on your system setup, a duplicate configuration may exist in `/etc/sddm.conf`. Usually this takes preference so you want to set the above line in this file if you have it.
 

@@ -8,6 +8,8 @@ function ya() {
 }
 
 my_set_paths() {
+	export PROMPT_COMMAND='history -a'
+
     # set -o vi
     set show-mode-in-prompt on
     set vi-cmd-mode-string "\1\e[2 q\2"
@@ -68,7 +70,6 @@ my_set_paths() {
 	mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
 
 	export ANDROID_HOME="$XDG_DATA_HOME"/android
-	export HISTFILE="${XDG_STATE_HOME}"/bash/history
 	export CARGO_HOME="$XDG_DATA_HOME"/cargo
 	export CUDA_CACHE_PATH="$XDG_CACHE_HOME"/nv
 	export GNUPGHOME="$XDG_DATA_HOME"/gnupg
