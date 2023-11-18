@@ -40,15 +40,15 @@ fi
 
 tput civis # hide cursor
 
-# If -r is passed, use saved start time from ~/.sw
+# If -r is passed, use saved start time from ~/.config/.sw
 if [[ "$1" == "-r" || "$1" == "--resume" ]]; then
-    if [[ ! -f $HOME/.sw ]]; then
-        datef +%s > $HOME/.sw
+    if [[ ! -f $HOME/.config/.sw ]]; then
+        datef +%s > $HOME/.config/.sw
     fi
-    START_TIME=$(cat $HOME/.sw)
+    START_TIME=$(cat $HOME/.config/.sw)
 else
     START_TIME=$(datef +%s)
-    echo -n $START_TIME > $HOME/.sw
+    echo -n $START_TIME > $HOME/.config/.sw
 fi
 
 # GNU date accepts the input date differently than BSD

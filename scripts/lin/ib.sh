@@ -15,6 +15,11 @@ function i_mtfp(){
     yay -S --noconfirm --needed jmtpfs
 }
 
+function s_grub(){
+    sudo sed -i 's/GRUB_DEFAULT=0/GRUB_DEFAULT=saved/' /etc/default/grub
+    sudo sed -i 's/#GRUB_SAVEDEFAULT=true/GRUB_SAVEDEFAULT=true/' /etc/default/grub
+}
+
 function i_yay() {
     # Install yay
     sudo pacman -S --noconfirm --needed git
@@ -47,7 +52,8 @@ function i_vmware() {
 }
 
 function i_nf() {
-    sudo pacman -S ttf-jetbrains-mono
+    sudo pacman -S --noconfirm --needed ttf-jetbrains-mono
+    sudo pacman -S --noconfirm --needed ttf-nerd-fonts-symbols
 }
 
 function i_wine_nvidia() {
@@ -253,6 +259,7 @@ if [ $# -eq 0 ]; then
     s_locale
     s_theme
     s_bashrc
+    s_grub
     reboot
 fi
 
