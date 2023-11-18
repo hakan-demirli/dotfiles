@@ -28,6 +28,9 @@ s = [
   "goto_first_nonwhitespace",
   "exit_select_mode",
 ]
+a = ["save_selection"]
+j = ["jump_forward"]
+k = ["jump_backward"]
 
 [editor]
 true-color = true

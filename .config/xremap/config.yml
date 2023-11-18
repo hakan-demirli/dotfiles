@@ -33,6 +33,10 @@ keymap:
       KEY_8: reserved
       KEY_9: reserved
       KEY_0: reserved
+      # KEY_RIGHTBRACE: reserved
+      # KEY_BACKSLASH: reserved
+      # KEY_LEFTBRACE: KEY_BACKSPACE
+
   - name: helix
     application:
       only: helix

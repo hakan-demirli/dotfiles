@@ -100,6 +100,8 @@ my_set_paths() {
 
     # alias ya='ya' # You do not need this. Function is already in path.
     # alias lf='ya' # Muscle memory.
+
+    alias :q=exit
 }
 
 my_set_paths

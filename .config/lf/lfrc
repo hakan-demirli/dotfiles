@@ -114,11 +114,8 @@ map <space>d ripdrag
 map <space>m mtp_mount
 map <space>u mtp_unmount
 map <space>x extract
-
-map n
-map nd push %mkdir<space>
-map nf push %touch<space>
-
+map <space>D push %mkdir<space>
+map <space>F push %touch<space>
 
 map d
 map dd delete
