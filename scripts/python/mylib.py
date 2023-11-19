@@ -54,6 +54,7 @@ TASKS_OVERLAY_FILE = tempfile.gettempdir() + "/tasks_overlay.png"
 MTD_OVERLAY_FILE = tempfile.gettempdir() + "/mtd_overlay.png"
 TASKS_FILE = tempfile.gettempdir() + "/tasks.md"
 OVERLAYED_FILE = tempfile.gettempdir() + "/overlayed.png"
+OVERLAYED_BACKUP_FILE = tempfile.gettempdir() + "/overlayed_bckp.png"
 ANON_FONT_FILE = SECOND_ROOT_DIR + "/fonts/anonymous.ttf"
 
 FIREFOX_CSS_URL = "https://github.com/hakan-demirli/Firefox_Custom_CSS"

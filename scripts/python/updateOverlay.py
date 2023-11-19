@@ -2,6 +2,7 @@ import pathlib
 import mylib
 import tempfile
 import requests
+import shutil
 from PIL import Image
 
 
@@ -31,6 +32,7 @@ def main():
     mylib.runInVenv(f"{script_dir}/mtd2overlay.py")
     mylib.runInVenv(f"{script_dir}/overlayCalendar.py")
     mylib.runInVenv(f"{script_dir}/overlayTasks.py")
+    shutil.copy(mylib.OVERLAYED_FILE, mylib.OVERLAYED_BACKUP_FILE)
     mylib.runInVenv(f"{script_dir}/overlayMtd.py")
     mylib.changeWallpaper(mylib.OVERLAYED_FILE)
 
