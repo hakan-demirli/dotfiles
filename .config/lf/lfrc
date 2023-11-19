@@ -138,4 +138,4 @@ map gm cd /tmp/mtp
 map bd cd /mnt/second/rep/dotfiles
 map bs cd /mnt/second/school
 map bp cd /mnt/second/rep/personal_repo
-
+map bt cd /mnt/second/rep/personal_repo/notes/personal_notes/todo

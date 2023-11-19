@@ -40,3 +40,8 @@ if __name__ == "__main__":
     src = secrets_dir / pathlib.Path("yarr")
     remove_path(des_dir)
     os.symlink(src, des_dir)
+
+    des_dir = pathlib.Path(f"~/.config/mtd").expanduser()
+    src = secrets_dir / pathlib.Path("mtd")
+    remove_path(des_dir)
+    os.symlink(src, des_dir)

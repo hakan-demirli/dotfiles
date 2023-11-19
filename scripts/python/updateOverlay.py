@@ -28,8 +28,10 @@ def main():
     getICS(mylib.ICS_FILE, mylib.ICS_URL)
     mylib.runInVenv(f"{script_dir}/ics2overlay.py")
     mylib.runInVenv(f"{script_dir}/tasks2overlay.py")
+    mylib.runInVenv(f"{script_dir}/mtd2overlay.py")
     mylib.runInVenv(f"{script_dir}/overlayCalendar.py")
     mylib.runInVenv(f"{script_dir}/overlayTasks.py")
+    mylib.runInVenv(f"{script_dir}/overlayMtd.py")
     mylib.changeWallpaper(mylib.OVERLAYED_FILE)
 
     image = Image.open(mylib.OVERLAYED_FILE)
