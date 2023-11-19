@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# There can't be two sessions opened in two folders which has the same names.
+# This script opens directories in .config and rep dirs in fzf
+# then launches that dir inside vscode.
 
 function code_project() {
     selected_dir="$(find -L ~/.config /mnt/second/rep \( \

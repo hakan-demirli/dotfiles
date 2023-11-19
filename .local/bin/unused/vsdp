@@ -5,6 +5,10 @@ import sys
 import json
 import subprocess
 
+"""
+Docker image per directory. Like direnv.
+    
+"""
 # Define the path to the JSON file
 config_dir = os.path.expanduser("~/.config/vsdp")
 config_file = os.path.join(config_dir, "image_mapping.json")

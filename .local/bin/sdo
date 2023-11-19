@@ -4,6 +4,14 @@ import subprocess
 import argparse
 import os
 
+"""
+sdo: set default opener
+Usage:
+    sdo ./a_file.ext helix.desktop
+
+    sdo ./a_file.ext helix
+"""
+
 
 def get_file_type(file_path):
     # Get the file type using xdg-mime
@@ -45,9 +53,7 @@ def main():
         description="Set the default application for a file type and update mimeapps.list."
     )
     parser.add_argument("file_path", help="Path to the program")
-    parser.add_argument(
-        "desktop_file", help="Desktop file name (without '.desktop')"
-    )
+    parser.add_argument("desktop_file", help="Desktop file name (without '.desktop')")
 
     args = parser.parse_args()
 

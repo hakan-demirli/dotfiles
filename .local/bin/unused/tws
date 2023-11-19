@@ -8,6 +8,8 @@ import subprocess
 import pathlib
 import hashlib
 
+"""tmux workspaces."""
+
 
 class SessionManager:
     def __init__(self, workspace_path) -> None:
