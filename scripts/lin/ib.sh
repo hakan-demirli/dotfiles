@@ -132,6 +132,17 @@ function i_core() {
     sudo systemctl start bluetooth.service
 }
 
+function i_qb(){
+    # https://github.com/qutebrowser/qutebrowser/blob/9f8e9d96c85c85a605e382f1510bd08563afc566/misc/userscripts/README.md
+    sudo pacman -S --noconfirm --needed qutebrowser
+    sudo pacman -S --noconfirm --needed python-adblock
+    sudo pacman -S --noconfirm --needed python-tldextract
+    # Missing:
+    # Cross platform password manager: android+win+linux?
+    # cosmetic blockers
+    # ublock support
+}
+
 function i_bunch() {
     sudo pacman -S --noconfirm --needed kitty
     sudo pacman -S --noconfirm --needed starship
@@ -146,6 +157,7 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed xclip
     sudo pacman -S --noconfirm --needed unarchiver
     sudo pacman -S --noconfirm --needed os-prober
+
     # Check /run/user/1000/gvfs directory for mtp devices mounted by nemo
     # Check /tmp/mtp directory for mtp devices mounted by lf
     # sudo pacman -S --noconfirm --needed nemo # no need
