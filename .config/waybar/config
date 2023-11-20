@@ -21,6 +21,7 @@
     "backlight",
     "custom/left-arrow-dark",
     "battery",
+    "custom/weather",
     "custom/left-arrow-dark",
     "custom/notification",
     "custom/left-arrow-dark",
@@ -150,5 +151,12 @@
     "icon-size": 21,
     "spacing": 5,
     "reverse-direction": true
+  },
+  "custom/weather": {
+      "format": "{}",
+      "tooltip": true,
+      "interval": 3600,
+      "exec": "~/.local/bin/wttr",
+      "return-type": "json"
   }
 }
