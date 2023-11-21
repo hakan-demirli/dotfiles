@@ -9,10 +9,10 @@ sudo sed -i '/^#MAKEFLAGS=/s/^#//' /etc/makepkg.conf
 sudo sed -i 's/^MAKEFLAGS=.*/MAKEFLAGS="-j$(nproc)"/' /etc/makepkg.conf
 
 function i_mtfp(){
-    sudo pacman -S --noconfirm --needed libmtp
-    sudo pacman -S --noconfirm --needed gvfs-mtp
-    sudo pacman -S --noconfirm --needed gvfs-gphoto2
-    yay -S --noconfirm --needed jmtpfs
+    # sudo pacman -S --noconfirm --needed libmtp
+    # sudo pacman -S --noconfirm --needed gvfs-mtp
+    # sudo pacman -S --noconfirm --needed gvfs-gphoto2
+    yay -S --noconfirm --needed simple-mtpfs
 }
 
 function s_grub(){
@@ -274,7 +274,7 @@ if [ $# -eq 0 ]; then
     i_qemu
     # i_vmware
     i_nix
-    # i_mtfp
+    i_mtfp
     i_nf
     i_wine_nvidia
     i_xremap
