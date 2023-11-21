@@ -28,6 +28,7 @@ x-scheme-handler/msteams=teams.desktop
 text/xml=helix.desktop
 inode/x-empty=helix.desktop
 application/javascript=helix.desktop
+text/x-file=helix.desktop
 
 [Added Associations]
 text/x-shellscript=helix.desktop;
@@ -55,3 +56,4 @@ text/xml=helix.desktop
 text/plain=helix.desktop
 inode/x-empty=helix.desktop
 application/javascript=helix.desktop
+text/x-file=helix.desktop

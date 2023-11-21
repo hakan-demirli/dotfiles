@@ -9,10 +9,18 @@ sudo sed -i '/^#MAKEFLAGS=/s/^#//' /etc/makepkg.conf
 sudo sed -i 's/^MAKEFLAGS=.*/MAKEFLAGS="-j$(nproc)"/' /etc/makepkg.conf
 
 function i_mtfp(){
+    # Too complex
     # sudo pacman -S --noconfirm --needed libmtp
     # sudo pacman -S --noconfirm --needed gvfs-mtp
     # sudo pacman -S --noconfirm --needed gvfs-gphoto2
-    yay -S --noconfirm --needed simple-mtpfs
+    # yay -S --noconfirm --needed jmtpfs
+
+    # Buggy on my phone
+    # yay -S --noconfirm --needed simple-mtpfs 
+
+    # Perfect 
+    yay -S --noconfirm --needed android-file-transfer 
+
 }
 
 function s_grub(){
@@ -29,13 +37,19 @@ function i_yay() {
 
 function i_qemu() {
     # Install QEMU
-    sudo pacman -S --noconfirm --needed qemu-desktop
+    sudo pacman -S --noconfirm --needed qemu-emulators-full 
+    # sudo pacman -S --noconfirm --needed qemu-desktop
     sudo pacman -S --noconfirm --needed dnsmasq
     sudo pacman -S --noconfirm --needed virt-manager
     sudo pacman -S --noconfirm --needed iptables-nft
+    sudo pacman -S --noconfirm --needed libvirt
+
+    sudo virsh net-start default
     sudo systemctl enable --now libvirtd
     sudo gpasswd -a $USER libvirt
     sudo gpasswd -a $USER kvm
+
+    # You should reboot again after you open virt-manager first time
 }
 
 function i_vmware() {
