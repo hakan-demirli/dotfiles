@@ -22,7 +22,7 @@ config.bind(";w", "hint links spawn --detach mpv --force-window yes {hint-url}")
 config.bind(";W", "spawn --detach mpv --force-window yes {url}")
 config.bind(
     ";I",
-    'hint images spawn --output-messages wget -P "/home/nephitejnf/Downloads/Qute/" {hint-url}',
+    'hint images spawn --output-messages wget -P "/home/emre/Downloads/Qute/" {hint-url}',
 )
 config.bind("q", "nop")
 
@@ -74,11 +74,11 @@ c.tabs.background = True
 c.tabs.title.format_pinned = "{index} {audio}"
 
 c.url.open_base_url = True
-c.url.start_pages = "https://search.realnephestate.xyz/"
+c.url.start_pages = """https://duckduckgo.com/?k7=282a36&amp;k8=f8f8f2&amp;k9=50fa7b&amp;kae=t&amp;kt=p&amp;ks=m&amp;kw=n&amp;km=l&amp;ko=s&amp;kj=282a36&amp;ka=p&amp;kaa=bd93f9&amp;ku=-1&amp;kx=f1fa8c&amp;ky=44475a&amp;kaf=1&amp;kai=1&amp;kf=1/?q={}"""
 c.url.default_page = "about:blank"
 
 c.url.searchengines = {
-    "DEFAULT": "https://search.realnephestate.xyz/search?q={}",
+    "DEFAULT": """https://duckduckgo.com/?k7=282a36&amp;k8=f8f8f2&amp;k9=50fa7b&amp;kae=t&amp;kt=p&amp;ks=m&amp;kw=n&amp;km=l&amp;ko=s&amp;kj=282a36&amp;ka=p&amp;kaa=bd93f9&amp;ku=-1&amp;kx=f1fa8c&amp;ky=44475a&amp;kaf=1&amp;kai=1&amp;kf=1/?q={}""",
     "ddg": """https://duckduckgo.com/?k7=282a36&amp;k8=f8f8f2&amp;k9=50fa7b&amp;kae=t&amp;kt=p&amp;ks=m&amp;kw=n&amp;km=l&amp;ko=s&amp;kj=282a36&amp;ka=p&amp;kaa=bd93f9&amp;ku=-1&amp;kx=f1fa8c&amp;ky=44475a&amp;kaf=1&amp;kai=1&amp;kf=1/?q={}""",
     "ksl": "https://classifieds.ksl.com/search?keyword={}",
     "tw": "https://twitch.tv/{}",

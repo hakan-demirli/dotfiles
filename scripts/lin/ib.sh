@@ -138,9 +138,23 @@ function i_qb(){
     sudo pacman -S --noconfirm --needed python-adblock
     sudo pacman -S --noconfirm --needed python-tldextract
     # Missing:
-    # Cross platform password manager: android+win+linux?
-    # cosmetic blockers
-    # ublock support
+        # [ ] Dark mode
+            # https://www.reddit.com/r/qutebrowser/comments/cc5vov/dark_mode_in_qutebrowser
+            # https://github.com/qutebrowser/qutebrowser/blob/main/doc/faq.asciidoc
+        # [ ] Video speed controls
+        # [ ] Toggle video focus
+            # https://github.com/qutebrowser/qutebrowser/issues/1354#issuecomment-1132289061
+        # [ ] lf file picker
+            # https://www.youtube.com/watch?v=ce2NOmTBWfo
+        # [x] ublock capabilities
+            # [x] youtube adblock
+                # Greasemonkey script
+            # [x] cosmetic blockers
+                # https://github.com/qutebrowser/qutebrowser/issues/6480#issuecomment-1820106001
+        # [x] Cross platform password manager
+            # https://github.com/android-password-store/Android-Password-Store
+        # [x] Video speed
+            # https://www.reddit.com/r/qutebrowser/comments/os9hed/qutebrowser_video_speed_controller/
 }
 
 function i_bunch() {
@@ -170,13 +184,13 @@ function i_bunch() {
     yay -S --noconfirm --answerdiff=None --needed green-tunnel
     yay -S --noconfirm --answerdiff=None --needed qbittorrent
     # yay -S --noconfirm --answerdiff=None --needed dragon-drop # rip-drag is better
-    yay -S --noconfirm --answerdiff=None --needed ripdrag-git 
-    yay -S --noconfirm --answerdiff=None --needed yarr-bin 
+    yay -S --noconfirm --answerdiff=None --needed ripdrag-git
+    yay -S --noconfirm --answerdiff=None --needed yarr-bin
     # yay -S --noconfirm --answerdiff=None --needed yazi-git # missing features
-    
+
 
     # IDE like autocomplete. Buggy right now.
-    # yay -S --noconfirm --answerdiff=None --needed nodejs-inshellisense 
+    # yay -S --noconfirm --answerdiff=None --needed nodejs-inshellisense
 
     # nemo_dir="$HOME/.local/share/nemo/actions"
     # nemo_file="helix.nemo_action"
