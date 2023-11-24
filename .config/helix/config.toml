@@ -32,6 +32,9 @@ a = ["save_selection"]
 j = ["jump_forward"]
 k = ["jump_backward"]
 
+[keys.select]
+y = "yank_main_selection_to_clipboard"
+
 [editor]
 true-color = true
 line-number = "relative"
@@ -54,3 +57,8 @@ hidden = true
 
 [editor.soft-wrap]
 enable = true
+
+[editor.statusline]
+# left = ["mode", "spinner"]
+center = ["file-name", "primary-selection-length"]
+# right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]

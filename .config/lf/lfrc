@@ -80,6 +80,7 @@ cmd mount_mtp ${{
 	dmtpfs 
 }}
 
+cmd q quit
 
 
 # Keymaps
@@ -102,6 +103,7 @@ map <space>F push %touch<space>
 map d
 map dd delete
 map dk delete_for_real
+
 
 map t :maps
 
