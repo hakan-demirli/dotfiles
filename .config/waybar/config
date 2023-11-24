@@ -143,8 +143,9 @@
     "return-type": "json",
     "exec-if": "which swaync-client",
     "exec": "swaync-client -swb",
-    "on-click": "sh -c 'sleep 0.1s; swaync-client -t -sw; sleep 0.1s'",
+    "on-click": "sleep 0.1; swaync-client -t -sw",
     "on-click-right": "swaync-client -d -sw",
+    "on-click-released": "swaync-client -t -sw",
     "escape": true
   },
   "tray": {

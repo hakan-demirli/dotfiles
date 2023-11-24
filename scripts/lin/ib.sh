@@ -201,7 +201,15 @@ function i_bunch() {
     # yay -S --noconfirm --answerdiff=None --needed dragon-drop # rip-drag is better
     yay -S --noconfirm --answerdiff=None --needed ripdrag-git
     yay -S --noconfirm --answerdiff=None --needed yarr-bin
+
     # yay -S --noconfirm --answerdiff=None --needed yazi-git # missing features
+    # [x] Delete no confirm 
+        # https://github.com/sxyazi/yazi/issues/171
+    # [ ] Open or Enter
+        # https://github.com/sxyazi/yazi/issues/335
+    # [ ] Preview OPUS files
+        # https://github.com/sxyazi/yazi/issues/182
+
 
 
     # IDE like autocomplete. Buggy right now.

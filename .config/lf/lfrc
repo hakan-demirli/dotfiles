@@ -56,6 +56,15 @@ cmd delete ${{
 	gio trash "$fx"
 }}
 
+
+cmd zip ${{
+    set -f
+    mkdir $1
+    cp -r $fx $1
+    zip -r $1.zip $1
+    rm -rf $1
+}}
+
 cmd extract ${{
 	folder_name="${fx%.*}"  # Extracts the folder name without the extension
 	mkdir -p "$folder_name" # Create the folder if it doesn't exist
@@ -99,6 +108,7 @@ map <space>m mount_mtp
 map <space>x extract
 map <space>D push %mkdir<space>
 map <space>F push %touch<space>
+map <space>c push :zip<space>
 
 map d
 map dd delete

@@ -300,6 +300,18 @@
     * This automatically scans and shows
         * ```yay -S xdg-ninja```
 
+* **Share WIFI over Ethernet (Using GUI)**
+    * Right click on your network manager and choose "Edit Connections".
+    * Then in the "Wired" tab, you can either use your existing wired connection, or create a new one by hitting the "Add" button
+        * You should create new one. name your new connection "Shared" or smth
+    * Open its IPv4 tab and in "Method", choose "Shared to other computers".
+    * Apply everything and close the network manager windows.
+    * Connect devices with ethernet cable.
+    * Now right click network manager again and choose "Shared" entry there.
+    * You can find its ip using ```ip neigh``` command.
+
+
+
 # LATER
 OpenSnitch - is a GNU/Linux interactive application firewall
 
