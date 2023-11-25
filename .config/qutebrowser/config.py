@@ -88,3 +88,58 @@ c.url.searchengines = {
 }
 
 c.window.title_format = "{perc}{current_title}{title_sep}nephestate browser"
+
+
+# Configure the filepicker
+filepicker = [
+    "kitty",
+    "--class",
+    "filepicker",
+    "--title",
+    "filepicker",
+    "-e",
+    "lf",
+    "-command",
+    "set nohidden",
+    "-selection-path={}",
+]
+c.fileselect.handler = "external"
+c.fileselect.folder.command = filepicker
+c.fileselect.multiple_files.command = filepicker
+c.fileselect.single_file.command = filepicker
+
+
+config.bind("j", "jseval --quiet scrollHelper.scrollBy(100)")
+config.bind("k", "jseval --quiet scrollHelper.scrollBy(-100)")
+config.bind("<Ctrl-D>", "jseval --quiet scrollHelper.scrollPage(0.5)")
+config.bind("<Ctrl-U>", "jseval --quiet scrollHelper.scrollPage(-0.5)")
+config.bind("gg", "jseval --quiet scrollHelper.scrollTo(0)")
+config.bind("G", "jseval --quiet scrollHelper.scrollToPercent(100)")
+
+
+config.bind(
+    "s",
+    'jseval --quiet document.querySelector("video, audio").playbackRate = parseFloat(document.querySelector("video, audio").playbackRate - 0.1).toFixed(1)',
+)
+config.bind(
+    "d",
+    'jseval --quiet document.querySelector("video, audio").playbackRate = parseFloat(document.querySelector("video, audio").playbackRate + 0.1).toFixed(1)',
+)
+config.bind(
+    "r",
+    'jseval --quiet document.querySelector("video, audio").playbackRate = 1',
+)
+config.bind(
+    "R",
+    "reload",
+)
+
+
+# Dark mode
+c.colors.webpage.preferred_color_scheme = "dark"
+c.colors.webpage.darkmode.enabled = True
+c.colors.webpage.darkmode.algorithm = "lightness-cielab"
+c.colors.webpage.darkmode.threshold.text = 150
+c.colors.webpage.darkmode.threshold.background = 100
+# c.colors.webpage.darkmode.policy.images = "always"
+# c.colors.webpage.darkmode.grayscale.images = 0.35

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# ib: install bunch
 
 # Update and upgrade packages
 sudo pacman -Syu
@@ -152,21 +153,25 @@ function i_qb(){
     sudo pacman -S --noconfirm --needed python-adblock
     sudo pacman -S --noconfirm --needed python-tldextract
     # Missing:
-        # [ ] Dark mode
+        # [ ] Cross Platform Password Auto Fill
+            # https://github.com/android-password-store/Android-Password-Store
+        # [x] Dark mode
+            # https://www.reddit.com/r/qutebrowser/comments/zmqey6/an_update_on_the_status_of_dark_mode/
             # https://www.reddit.com/r/qutebrowser/comments/cc5vov/dark_mode_in_qutebrowser
             # https://github.com/qutebrowser/qutebrowser/blob/main/doc/faq.asciidoc
-        # [ ] Video speed controls
-        # [ ] Toggle video focus
+        # [x] Video speed controls
+            # https://www.reddit.com/r/qutebrowser/comments/os9hed/qutebrowser_video_speed_controller/
+        # [x] Toggle video focus
             # https://github.com/qutebrowser/qutebrowser/issues/1354#issuecomment-1132289061
-        # [ ] lf file picker
+                # You can just scroll with jk
+        # [x] lf file picker
+            # https://github.com/gokcehan/lf/discussions/1080
             # https://www.youtube.com/watch?v=ce2NOmTBWfo
         # [x] ublock capabilities
             # [x] youtube adblock
                 # Greasemonkey script
             # [x] cosmetic blockers
                 # https://github.com/qutebrowser/qutebrowser/issues/6480#issuecomment-1820106001
-        # [x] Cross platform password manager
-            # https://github.com/android-password-store/Android-Password-Store
         # [x] Video speed
             # https://www.reddit.com/r/qutebrowser/comments/os9hed/qutebrowser_video_speed_controller/
 }
