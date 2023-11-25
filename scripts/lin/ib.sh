@@ -191,6 +191,7 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed unarchiver
     sudo pacman -S --noconfirm --needed os-prober
     sudo pacman -S --noconfirm --needed kooha
+    sudo pacman -S --noconfirm --needed udiskie
 
     # Check /run/user/1000/gvfs directory for mtp devices mounted by nemo
     # Check /tmp/mtp directory for mtp devices mounted by lf
