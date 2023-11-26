@@ -154,7 +154,11 @@ function i_qb(){
     sudo pacman -S --noconfirm --needed python-tldextract
     sudo pacman -S --noconfirm --needed rofi
     # Missing:
-        # [ ] Cross Platform Password Auto Fill
+        # [ ] Vimium like hint accuracy
+        # [ ] Usable pinned tabs/bookmarks
+            # https://www.reddit.com/r/qutebrowser/comments/ixrvgb/struggling_alittle_with_learning_how_to_manage/
+            # https://www.reddit.com/r/qutebrowser/comments/gcqwv2/how_do_you_guys_manage_your_bookmarksquickmarks/
+        # [x] Cross Platform Password Auto Fill
             # https://github.com/unode/firefox_decrypt
             # https://github.com/qutebrowser/qutebrowser/blob/main/misc/userscripts/qute-pass
             # https://github.com/android-password-store/Android-Password-Store

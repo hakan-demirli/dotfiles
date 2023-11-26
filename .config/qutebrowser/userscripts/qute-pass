@@ -254,6 +254,7 @@ def fake_key_raw(text):
 
 def extract_password(secret, pattern):
     # match = re.match(pattern, secret)
+    print("scp ", secret)
     match = secret.strip().split("\n")[0]
     if not match:
         raise CouldNotMatchPassword("Pattern did not match target")
@@ -267,6 +268,7 @@ def extract_password(secret, pattern):
 
 def extract_username(target, pattern):
     # match = re.search(pattern, target, re.MULTILINE)
+    print("tgu: ", target)
     match = target.strip().split("\n")[1]
     if not match:
         raise CouldNotMatchUsername("Pattern did not match target")
@@ -353,7 +355,9 @@ def main(arguments):
         and not arguments.otp_only
     ):
         secret = pass_(selection)
+    print("sec: ", secret)
     username_target = selection if arguments.username_target == "path" else secret
+    print("ut: ", username_target)
     try:
         if arguments.username_only:
             fake_key_raw(extract_username(username_target, arguments.username_pattern))

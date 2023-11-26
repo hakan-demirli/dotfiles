@@ -86,10 +86,10 @@ config.bind("q", "nop")
 # BUG: ... may not contain unprintable characters. Can't use regex.
 # """--username-target "secret" --username-pattern "(?:^[^\n]*\n?){1}(.*)" --password-pattern "(.+)" """
 # Just edit the qute-ass script instead of using regex.
-
 config.bind(
     "pl",
-    """spawn --userscript qute-pass  --username-target "secret" """,
+    'spawn --userscript qute-pass --username-target secret --username-pattern "username: (.+)"',
+    # """spawn --userscript qute-pass  --username-target "secret" """,
 )
 config.bind(
     "pu",
@@ -111,6 +111,7 @@ config.bind("<Alt-q>", "tab-select 1")
 config.bind("<Alt-w>", "tab-select 2")
 config.bind("<Alt-e>", "tab-select 3")
 config.bind("<Alt-r>", "tab-select 4")
+config.bind("o", "set-cmd-text -s :open -t ")
 
 
 # Video Speed Controls
