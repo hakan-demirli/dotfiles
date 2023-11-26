@@ -83,10 +83,26 @@ config.bind("gn", "tab-next")
 config.bind("q", "nop")
 
 # password management
-config.bind("pl", "spawn --userscript qute-pass")
-config.bind("pu", "spawn --userscript qute-pass --username-only")
-config.bind("pp", "spawn --userscript qute-pass --password-only")
-config.bind("po", "spawn --userscript qute-pass --otp-only")
+# BUG: ... may not contain unprintable characters. Can't use regex.
+# """--username-target "secret" --username-pattern "(?:^[^\n]*\n?){1}(.*)" --password-pattern "(.+)" """
+# Just edit the qute-ass script instead of using regex.
+
+config.bind(
+    "pl",
+    """spawn --userscript qute-pass  --username-target "secret" """,
+)
+config.bind(
+    "pu",
+    """spawn --userscript qute-pass  --username-target "secret" --username-only""",
+)
+config.bind(
+    "pp",
+    """spawn --userscript qute-pass  --username-target "secret" --password-only""",
+)
+config.bind(
+    "po",
+    """spawn --userscript qute-pass  --username-target "secret" --otp-only""",
+)
 
 
 config.bind("<space>p", "tab-pin")

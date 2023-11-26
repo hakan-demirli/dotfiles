@@ -30,12 +30,12 @@ my_set_paths() {
     alias lf='lfcd'
     alias cf='cf && exit'
     # local MY_TMP_DIR=/mnt/tmp
-    export PATH=~/.local/bin:$PATH
-    export PATH=/usr/local/bin:$PATH
+    # export PATH=~/.local/bin:$PATH
+    # export PATH=/usr/local/bin:$PATH
 
-    export DIRENV_CONFIG=$HOME/.config/direnv/direnvrc
+    # export DIRENV_CONFIG=$HOME/.config/direnv/direnvrc
 
-    export OPENER=xdg-open
+    # export OPENER=xdg-open
 
     alias tmux='tmux -f ~/.config/tmux/tmux.conf'
     alias txa='tmux attach-session -t'
@@ -46,7 +46,7 @@ my_set_paths() {
     alias txkw='tmux kill-window -t '
     alias txlw='tmux list-windows'
 
-    export LM_LICENSE_FILE=$MY_APP_DIR/lin/quartus/license.dat
+    # export LM_LICENSE_FILE=$MY_APP_DIR/lin/quartus/license.dat
 
     # Path for 32-bit modelsim
     # export PATH=$MY_APP_DIR/lin/modelsim/modelsim_ase/bin:$PATH
@@ -58,28 +58,28 @@ my_set_paths() {
 
 
 	# Set XDG Base Directory variables
-	export XDG_DATA_HOME="$HOME/.local/share"
-	export XDG_CONFIG_HOME="$HOME/.config"
-	export XDG_STATE_HOME="$HOME/.local/state"
-	export XDG_CACHE_HOME="$HOME/.cache"
+	# export XDG_DATA_HOME="$HOME/.local/share"
+	# export XDG_CONFIG_HOME="$HOME/.config"
+	# export XDG_STATE_HOME="$HOME/.local/state"
+	# export XDG_CACHE_HOME="$HOME/.cache"
 
 	# Add these variables to PATH if needed
-	export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
+	# export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
 
 	# Make sure the directories exist
 	mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
 
-	export ANDROID_HOME="$XDG_DATA_HOME"/android
-	export CARGO_HOME="$XDG_DATA_HOME"/cargo
-	export CUDA_CACHE_PATH="$XDG_CACHE_HOME"/nv
-	export GNUPGHOME="$XDG_DATA_HOME"/gnupg
-	export PASSWORD_STORE_DIR="$XDG_DATA_HOME"/password-store
-	export RUSTUP_HOME="$XDG_DATA_HOME"/rustup
-	export NUGET_PACKAGES="$XDG_CACHE_HOME"/NuGetPackages
-	export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc 
-	export DOTNET_CLI_HOME="/tmp/DOTNET_CLI_HOME"
-	export GNUPGHOME="$XDG_DATA_HOME"/gnupg
-	export WGETRC="$XDG_CONFIG_HOME/wgetrc"
+	# export ANDROID_HOME="$XDG_DATA_HOME"/android
+	# export CARGO_HOME="$XDG_DATA_HOME"/cargo
+	# export CUDA_CACHE_PATH="$XDG_CACHE_HOME"/nv
+	# export GNUPGHOME="$XDG_DATA_HOME"/gnupg
+	# export PASSWORD_STORE_DIR="$XDG_DATA_HOME"/password-store
+	# export RUSTUP_HOME="$XDG_DATA_HOME"/rustup
+	# export NUGET_PACKAGES="$XDG_CACHE_HOME"/NuGetPackages
+	# export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc 
+	# export DOTNET_CLI_HOME="/tmp/DOTNET_CLI_HOME"
+	# export GNUPGHOME="$XDG_DATA_HOME"/gnupg
+	# export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 
 	# fzf keybindings and shortcuts for Bash

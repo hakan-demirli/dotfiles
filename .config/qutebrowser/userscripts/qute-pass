@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 """
-Insert login information using pass and a dmenu-compatible application (e.g. dmenu, wofi -dmenu, ...). A short
+Insert login information using pass and a dmenu-compatible application (e.g. dmenu, rofi -dmenu, ...). A short
 demonstration can be seen here: https://i.imgur.com/KN3XuZP.gif.
 """
 
@@ -102,7 +102,7 @@ argument_parser.add_argument(
 argument_parser.add_argument(
     "--dmenu-invocation",
     "-d",
-    default="wofi -dmenu",
+    default="rofi -dmenu",
     help="Invocation used to execute a dmenu-provider",
 )
 argument_parser.add_argument(
@@ -178,6 +178,7 @@ def qute_command(command):
 
 
 def find_pass_candidates(domain, unfiltered=False):
+    print(arguments.password_store)
     candidates = []
 
     if arguments.mode == "gopass":
@@ -252,11 +253,12 @@ def fake_key_raw(text):
 
 
 def extract_password(secret, pattern):
-    match = re.match(pattern, secret)
+    # match = re.match(pattern, secret)
+    match = secret.strip().split("\n")[0]
     if not match:
         raise CouldNotMatchPassword("Pattern did not match target")
     try:
-        return match.group(1)
+        return match
     except IndexError:
         raise CouldNotMatchPassword(
             "Pattern did not contain capture group, please use capture group. Example: (.*)"
@@ -264,11 +266,12 @@ def extract_password(secret, pattern):
 
 
 def extract_username(target, pattern):
-    match = re.search(pattern, target, re.MULTILINE)
+    # match = re.search(pattern, target, re.MULTILINE)
+    match = target.strip().split("\n")[1]
     if not match:
         raise CouldNotMatchUsername("Pattern did not match target")
     try:
-        return match.group(1)
+        return match
     except IndexError:
         raise CouldNotMatchUsername(
             "Pattern did not contain capture group, please use capture group. Example: (.*)"
@@ -284,6 +287,7 @@ def main(arguments):
         extra_suffixes=arguments.extra_url_suffixes.split(",")
     )
     extract_result = extractor(arguments.url)
+    print(extract_result)
 
     # Try to find candidates using targets in the following order: fully-qualified domain name (includes subdomains),
     # the registered domain name, the IPv4 address if that's what the URL represents and finally the private domain
@@ -311,10 +315,12 @@ def main(arguments):
             netloc,
         ],
     ):
+        print("ta: ", target)
         attempted_targets.append(target)
         target_candidates = find_pass_candidates(
             target, unfiltered=arguments.unfiltered
         )
+        print("tc: ", target_candidates)
         if not target_candidates:
             continue
 
@@ -324,7 +330,7 @@ def main(arguments):
     else:
         if not candidates:
             stderr(
-                "No pass candidates for URL {!r} found! (I tried {!r})".format(
+                "Pizza. No pass candidates for URL {!r} found! (I tried {!r})".format(
                     arguments.url, attempted_targets
                 )
             )
@@ -359,9 +365,13 @@ def main(arguments):
         else:
             # Enter username and password using fake-key and <Tab> (which seems to work almost universally), then switch
             # back into insert-mode, so the form can be directly submitted by hitting enter afterwards
-            fake_key_raw(extract_username(username_target, arguments.username_pattern))
+            uname = extract_username(username_target, "asdf")
+            passw = extract_password(secret, "asdf")
+            # print(uname)
+            # print(passw)
+            fake_key_raw(uname)
             qute_command("fake-key <Tab>")
-            fake_key_raw(extract_password(secret, arguments.password_pattern))
+            fake_key_raw(passw)
     except CouldNotMatchPassword as e:
         stderr("Failed to match password, target: secret, error: {}".format(e))
         return ExitCodes.COULD_NOT_MATCH_PASSWORD
