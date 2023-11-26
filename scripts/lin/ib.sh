@@ -152,8 +152,11 @@ function i_qb(){
     sudo pacman -S --noconfirm --needed qutebrowser
     sudo pacman -S --noconfirm --needed python-adblock
     sudo pacman -S --noconfirm --needed python-tldextract
+    sudo pacman -S --noconfirm --needed rofi
     # Missing:
         # [ ] Cross Platform Password Auto Fill
+            # https://github.com/unode/firefox_decrypt
+            # https://github.com/qutebrowser/qutebrowser/blob/main/misc/userscripts/qute-pass
             # https://github.com/android-password-store/Android-Password-Store
         # [x] Dark mode
             # https://www.reddit.com/r/qutebrowser/comments/zmqey6/an_update_on_the_status_of_dark_mode/
@@ -172,8 +175,6 @@ function i_qb(){
                 # Greasemonkey script
             # [x] cosmetic blockers
                 # https://github.com/qutebrowser/qutebrowser/issues/6480#issuecomment-1820106001
-        # [x] Video speed
-            # https://www.reddit.com/r/qutebrowser/comments/os9hed/qutebrowser_video_speed_controller/
 }
 
 function i_bunch() {

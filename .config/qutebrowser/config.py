@@ -16,25 +16,126 @@ if os.path.exists(config.configdir / "theme.py"):
     theme.setup(c, "mocha", True)
 
 
-# bindings.commands = {"normal": {";w": "hint links spawn --detach mpv --force-window yes {hint-url}", "pt": "pin-tab"}}
-config.bind("pt", "tab-pin")
-config.bind(";w", "hint links spawn --detach mpv --force-window yes {hint-url}")
-config.bind(";W", "spawn --detach mpv --force-window yes {url}")
-config.bind(
-    ";I",
-    'hint images spawn --output-messages wget -P "/home/emre/Downloads/Qute/" {hint-url}',
+c.auto_save.session = True
+c.session.lazy_restore = True
+c.tabs.position = "left"
+c.tabs.width = 141  # px
+c.tabs.wrap = False
+c.scrolling.smooth = True
+c.content.pdfjs = True
+c.content.autoplay = False
+
+# Dark mode
+c.colors.webpage.preferred_color_scheme = "dark"
+c.colors.webpage.darkmode.enabled = True
+c.colors.webpage.darkmode.algorithm = "lightness-cielab"
+c.colors.webpage.darkmode.threshold.text = 150
+c.colors.webpage.darkmode.threshold.background = 100
+# c.colors.webpage.darkmode.policy.images = "always"
+# c.colors.webpage.darkmode.grayscale.images = 0.35
+
+selected_tab_color = "#260f2e"
+c.colors.tabs.even.bg = "black"
+c.colors.tabs.odd.bg = "black"
+c.colors.tabs.pinned.even.bg = "#080d2b"
+c.colors.tabs.pinned.odd.bg = "#080d2b"
+c.colors.tabs.selected.odd.bg = selected_tab_color
+c.colors.tabs.selected.even.bg = selected_tab_color
+c.colors.tabs.pinned.selected.odd.bg = selected_tab_color
+c.colors.tabs.pinned.selected.even.bg = selected_tab_color
+# c.colors.tabs.pinned.even.fg = "black"
+# c.colors.tabs.pinned.odd.fg = "black"
+
+c.input.insert_mode.auto_load = True
+# c.spellcheck.languages = ["en-GB"]
+c.tabs.background = True
+c.url.open_base_url = True
+c.url.start_pages = """https://duckduckgo.com//?q={}"""
+c.url.default_page = "about:blank"
+c.url.searchengines = {
+    "DEFAULT": """https://duckduckgo.com/?q={}""",
+    "ddg": """https://duckduckgo.com//?q={}""",
+}
+c.tabs.title.format_pinned = "{audio}{index}: {current_title}"
+c.window.title_format = "{perc}{current_title}{title_sep}nephestate browser"
+c.editor.command = ["st", "-e", "helix", "{file}", "-c", "normal {line}G{column0}l"]
+
+# Custom aliases
+c.aliases.update(
+    {
+        "bc": "tab-close",
+        "pin": "tab-pin",
+        "tabselect": "tab-select",
+    }
 )
+
+
+config.bind("j", "jseval --quiet scrollHelper.scrollBy(100)")
+config.bind("k", "jseval --quiet scrollHelper.scrollBy(-100)")
+config.bind("<Ctrl-D>", "jseval --quiet scrollHelper.scrollPage(0.5)")
+config.bind("<Ctrl-U>", "jseval --quiet scrollHelper.scrollPage(-0.5)")
+config.bind("gg", "jseval --quiet scrollHelper.scrollTo(0)")
+config.bind("ge", "jseval --quiet scrollHelper.scrollToPercent(100)")
+config.bind("gp", "tab-prev")
+config.bind("gn", "tab-next")
+
+
 config.bind("q", "nop")
 
 # password management
-config.bind("ee", "spawn --userscript qute-pass")
-config.bind("eu", "spawn --userscript qute-pass --username-only")
-config.bind("ep", "spawn --userscript qute-pass --password-only")
-config.bind("eo", "spawn --userscript qute-pass --otp-only")
+config.bind("pl", "spawn --userscript qute-pass")
+config.bind("pu", "spawn --userscript qute-pass --username-only")
+config.bind("pp", "spawn --userscript qute-pass --password-only")
+config.bind("po", "spawn --userscript qute-pass --otp-only")
 
-c.colors.tabs.even.bg = "grey"
-c.colors.tabs.odd.bg = "darkgrey"
 
+config.bind("<space>p", "tab-pin")
+config.bind("<space>f", "set-cmd-text -s :tab-select")
+config.bind("<Alt-q>", "tab-select 1")
+config.bind("<Alt-w>", "tab-select 2")
+config.bind("<Alt-e>", "tab-select 3")
+config.bind("<Alt-r>", "tab-select 4")
+
+
+# Video Speed Controls
+config.bind(
+    "s",
+    'jseval --quiet document.querySelector("video, audio").playbackRate = parseFloat(document.querySelector("video, audio").playbackRate - 0.1).toFixed(1)',
+)
+config.bind(
+    "d",
+    'jseval --quiet document.querySelector("video, audio").playbackRate = parseFloat(document.querySelector("video, audio").playbackRate + 0.1).toFixed(1)',
+)
+config.bind(
+    "r",
+    'jseval --quiet document.querySelector("video, audio").playbackRate = 1',
+)
+config.bind(
+    "R",
+    "reload",
+)
+
+
+# Configure the filepicker
+filepicker = [
+    "kitty",
+    "--class",
+    "filepicker",
+    "--title",
+    "filepicker",
+    "-e",
+    "lf",
+    "-command",
+    "set nohidden",
+    "-selection-path={}",
+]
+c.fileselect.handler = "external"
+c.fileselect.folder.command = filepicker
+c.fileselect.multiple_files.command = filepicker
+c.fileselect.single_file.command = filepicker
+
+
+# adblock
 c.content.blocking.method = "adblock"
 c.content.blocking.adblock.lists = [
     "https://easylist.to/easylist/easylist.txt",
@@ -61,85 +162,3 @@ c.content.blocking.adblock.lists = [
     "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
     "https://github.com/uBlockOrigin/uAssets/raw/master/filters/unbreak.txt",
 ]
-
-c.content.pdfjs = True
-c.content.autoplay = False
-
-c.editor.command = ["st", "-e", "vim", "{file}", "-c", "normal {line}G{column0}l"]
-
-c.input.insert_mode.auto_load = True
-# c.spellcheck.languages = ["en-GB"]
-
-c.tabs.background = True
-c.tabs.title.format_pinned = "{index} {audio}"
-
-c.url.open_base_url = True
-c.url.start_pages = """https://duckduckgo.com/?k7=282a36&amp;k8=f8f8f2&amp;k9=50fa7b&amp;kae=t&amp;kt=p&amp;ks=m&amp;kw=n&amp;km=l&amp;ko=s&amp;kj=282a36&amp;ka=p&amp;kaa=bd93f9&amp;ku=-1&amp;kx=f1fa8c&amp;ky=44475a&amp;kaf=1&amp;kai=1&amp;kf=1/?q={}"""
-c.url.default_page = "about:blank"
-
-c.url.searchengines = {
-    "DEFAULT": """https://duckduckgo.com/?k7=282a36&amp;k8=f8f8f2&amp;k9=50fa7b&amp;kae=t&amp;kt=p&amp;ks=m&amp;kw=n&amp;km=l&amp;ko=s&amp;kj=282a36&amp;ka=p&amp;kaa=bd93f9&amp;ku=-1&amp;kx=f1fa8c&amp;ky=44475a&amp;kaf=1&amp;kai=1&amp;kf=1/?q={}""",
-    "ddg": """https://duckduckgo.com/?k7=282a36&amp;k8=f8f8f2&amp;k9=50fa7b&amp;kae=t&amp;kt=p&amp;ks=m&amp;kw=n&amp;km=l&amp;ko=s&amp;kj=282a36&amp;ka=p&amp;kaa=bd93f9&amp;ku=-1&amp;kx=f1fa8c&amp;ky=44475a&amp;kaf=1&amp;kai=1&amp;kf=1/?q={}""",
-    "ksl": "https://classifieds.ksl.com/search?keyword={}",
-    "tw": "https://twitch.tv/{}",
-    "dlive": "https://dlive.tv/{}",
-    "ig": "https://infogalactic.com/w/index.php?search={}",
-    "yt": "https://www.youtube.com/results?search_query={}",
-}
-
-c.window.title_format = "{perc}{current_title}{title_sep}nephestate browser"
-
-
-# Configure the filepicker
-filepicker = [
-    "kitty",
-    "--class",
-    "filepicker",
-    "--title",
-    "filepicker",
-    "-e",
-    "lf",
-    "-command",
-    "set nohidden",
-    "-selection-path={}",
-]
-c.fileselect.handler = "external"
-c.fileselect.folder.command = filepicker
-c.fileselect.multiple_files.command = filepicker
-c.fileselect.single_file.command = filepicker
-
-
-config.bind("j", "jseval --quiet scrollHelper.scrollBy(100)")
-config.bind("k", "jseval --quiet scrollHelper.scrollBy(-100)")
-config.bind("<Ctrl-D>", "jseval --quiet scrollHelper.scrollPage(0.5)")
-config.bind("<Ctrl-U>", "jseval --quiet scrollHelper.scrollPage(-0.5)")
-config.bind("gg", "jseval --quiet scrollHelper.scrollTo(0)")
-config.bind("G", "jseval --quiet scrollHelper.scrollToPercent(100)")
-
-
-config.bind(
-    "s",
-    'jseval --quiet document.querySelector("video, audio").playbackRate = parseFloat(document.querySelector("video, audio").playbackRate - 0.1).toFixed(1)',
-)
-config.bind(
-    "d",
-    'jseval --quiet document.querySelector("video, audio").playbackRate = parseFloat(document.querySelector("video, audio").playbackRate + 0.1).toFixed(1)',
-)
-config.bind(
-    "r",
-    'jseval --quiet document.querySelector("video, audio").playbackRate = 1',
-)
-config.bind(
-    "R",
-    "reload",
-)
-
-
-# Dark mode
-c.colors.webpage.preferred_color_scheme = "dark"
-c.colors.webpage.darkmode.enabled = True
-c.colors.webpage.darkmode.algorithm = "lightness-cielab"
-c.colors.webpage.darkmode.threshold.text = 150
-c.colors.webpage.darkmode.threshold.background = 100
-# c.colors.webpage.darkmode.policy.images = "always"
-# c.colors.webpage.darkmode.grayscale.images = 0.35
