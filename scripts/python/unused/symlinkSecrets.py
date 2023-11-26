@@ -45,3 +45,13 @@ if __name__ == "__main__":
     src = secrets_dir / pathlib.Path("mtd")
     remove_path(des_dir)
     os.symlink(src, des_dir)
+
+    des_dir = pathlib.Path(f"~/.local/share/gnupg").expanduser()
+    src = secrets_dir / pathlib.Path("gnupg")
+    remove_path(des_dir)
+    os.symlink(src, des_dir)
+
+    des_dir = pathlib.Path(f"~/.local/share/password-store").expanduser()
+    src = secrets_dir / pathlib.Path("password-store")
+    remove_path(des_dir)
+    os.symlink(src, des_dir)

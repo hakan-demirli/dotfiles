@@ -28,7 +28,7 @@ def sanitizeString(in_str):
 def syncFolder(playlist_tuple):
     playlist_folder = playlist_tuple[0]
     playlist_url = playlist_tuple[1]
-    command = f'cd {playlist_folder} && yt-dlp --remux-video opus -f bestaudio --embed-metadata --embed-thumbnail --download-archive downloaded.txt -o "./%(playlist_index)s_%(title)s.%(ext)s" -v "{playlist_url}"'
+    command = f'cd {playlist_folder} && yt-dlp --remux-video opus -f bestaudio --force-overwrites --embed-metadata --embed-thumbnail --download-archive downloaded.txt -o "./%(playlist_index)s_%(title)s.%(ext)s" -v "{playlist_url}"'
     subprocess.run(command, shell=True)
 
 
