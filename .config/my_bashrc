@@ -30,8 +30,10 @@ my_set_paths() {
     alias lf='lfcd'
     alias cf='cf && exit'
     # local MY_TMP_DIR=/mnt/tmp
-    # export PATH=~/.local/bin:$PATH
-    # export PATH=/usr/local/bin:$PATH
+
+	# Hyprland PATH is buggy
+    export PATH=~/.local/bin:$PATH
+    export PATH=/usr/local/bin:$PATH
 
     # export DIRENV_CONFIG=$HOME/.config/direnv/direnvrc
 
@@ -63,8 +65,8 @@ my_set_paths() {
 	# export XDG_STATE_HOME="$HOME/.local/state"
 	# export XDG_CACHE_HOME="$HOME/.cache"
 
-	# Add these variables to PATH if needed
-	# export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
+	# Hyprland PATH is buggy
+	export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
 
 	# Make sure the directories exist
 	mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
@@ -81,6 +83,7 @@ my_set_paths() {
 	# export GNUPGHOME="$XDG_DATA_HOME"/gnupg
 	# export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
+	alias arduino-cli='arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml'
 
 	# fzf keybindings and shortcuts for Bash
 	source /usr/share/fzf/key-bindings.bash

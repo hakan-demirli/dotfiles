@@ -147,6 +147,12 @@ function i_core() {
     sudo systemctl start bluetooth.service
 }
 
+function i_vieb(){
+    sudo pacman -S --noconfirm --needed vieb-bin
+    # [ ] lf file picker
+        # https://github.com/Jelmerro/Vieb/issues/339
+}
+
 function i_qb(){
     # https://github.com/qutebrowser/qutebrowser/blob/9f8e9d96c85c85a605e382f1510bd08563afc566/misc/userscripts/README.md
     sudo pacman -S --noconfirm --needed qutebrowser
@@ -287,6 +293,7 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed prettier     # markdown etc.
     sudo pacman -S --noconfirm --needed pyright      # python
     sudo pacman -S --noconfirm --needed python-black # python
+    sudo pacman -S --noconfirm --needed python-ruff  # python
     sudo pacman -S --noconfirm --needed taplo        # toml file
     sudo pacman -S --noconfirm --needed texlab       # latex.
     sudo pacman -S --noconfirm --needed zathura      # pdf viewer.

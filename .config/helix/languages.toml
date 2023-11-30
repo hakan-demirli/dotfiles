@@ -10,10 +10,21 @@ texlab = { command = "texlab", config = { texlab = { build = { onSave = true, fo
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
-formatter = { command = "black", args = ["--quiet", "-"] }
-language-servers = ["pyright"]
+language-servers = [ "pyright", "ruff" ]
 auto-format = true
-# ruff formatter any good?
+
+[language-server.pyright.config.python.analysis]
+typeCheckingMode = "basic"
+
+[language-server.ruff]
+command = "ruff-lsp"
+
+[language-server.ruff.config.settings]
+args = ["--ignore", "E501"]
+
+[language.formatter]
+command = "black"
+args = ["--line-length", "88", "--quiet", "-"]
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
 # extraPaths = ["./test"]
@@ -24,6 +35,7 @@ auto-format = true
 # formatter = { command = 'verible-verilog-format', args = ["-"] }
 # auto-format = true
 # indent = { tab-width = 4, unit = "    " }
+
 [[language]]
 name = "html"
 formatter = { command = 'prettier', args = ["--parser", "html"] }
