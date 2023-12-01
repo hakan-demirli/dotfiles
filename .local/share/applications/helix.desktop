@@ -1,3 +1,5 @@
+#!/usr/bin/env xdg-open
+
 [Desktop Entry]
 Name=Helix
 GenericName=Text Editor
@@ -76,7 +78,7 @@ Comment[zh_CN]=编辑文本文件
 Comment[zh_TW]=編輯文字檔
 TryExec=helix
 Exec=kitty helix %F
-Terminal=true
+Terminal=false
 Type=Application
 Keywords=Text;editor;
 Keywords[fr]=Texte;éditeur;

@@ -24,6 +24,10 @@ function i_mtfp(){
 
 }
 
+function i_qmk(){
+    sudo pacman -S --noconfirm --needed qmk
+}
+
 function s_grub(){
     sudo sed -i 's/GRUB_DEFAULT=0/GRUB_DEFAULT=saved/' /etc/default/grub
     sudo sed -i 's/#GRUB_SAVEDEFAULT=true/GRUB_SAVEDEFAULT=true/' /etc/default/grub
@@ -296,8 +300,9 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed python-ruff  # python
     sudo pacman -S --noconfirm --needed taplo        # toml file
     sudo pacman -S --noconfirm --needed texlab       # latex.
-    sudo pacman -S --noconfirm --needed zathura      # pdf viewer.
-    sudo pacman -S --noconfirm --needed zathura-pdf-mupdf
+    # sudo pacman -S --noconfirm --needed zathura     # sioyek is better.
+    # sudo pacman -S --noconfirm --needed zathura-pdf-mupdf
+    yay -S --noconfirm --answerdiff=None --needed sioyek-git
     sudo pacman -S --noconfirm --needed lldb
     sudo pacman -S --noconfirm --needed bash-language-server
     # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
