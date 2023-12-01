@@ -105,6 +105,10 @@ config.bind(
 )
 
 
+config.bind(
+    "<space>h",
+    "config-cycle tabs.show always never;; config-cycle statusbar.show always never",
+)
 config.bind("<space>p", "tab-pin")
 config.bind("<space>f", "set-cmd-text -s :tab-select")
 config.bind("<Alt-q>", "tab-select 1")
