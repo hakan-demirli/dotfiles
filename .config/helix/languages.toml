@@ -41,6 +41,11 @@ args = ["--line-length", "88", "--quiet", "-"]
 # indent = { tab-width = 4, unit = "    " }
 
 [[language]]
+name = "nix"
+formatter = { command = 'alejandra', args = [] }
+auto-format = true
+
+[[language]]
 name = "html"
 formatter = { command = 'prettier', args = ["--parser", "html"] }
 

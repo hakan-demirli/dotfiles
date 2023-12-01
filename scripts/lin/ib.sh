@@ -258,8 +258,8 @@ function i_nix() {
     sudo gpasswd -a $USER nix-users
     nix-channel --add https://nixos.org/channels/nixpkgs-unstable
     nix-channel --update
-    yay -S --noconfirm --answerdiff=None --needed nixpkgs-fmt # nix
-    nix profile install nixpkgs#nil                  # nix
+    # yay -S --noconfirm --answerdiff=None --needed nixpkgs-fmt # nix
+    # nix profile install nixpkgs#nil                  # nix
 }
 
 function s_locale() {
@@ -306,6 +306,15 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed lldb
     sudo pacman -S --noconfirm --needed bash-language-server
     # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
+
+    # Install Nix Lsp
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    cd $SCRIPT_DIR/aur_packages/nil && makepkg -scf && yay -U --noconfirm --answerdiff=None --needed ./nil-*
+
+    # Install Alejandra formatter
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    cd $SCRIPT_DIR/aur_packages/alejandra && makepkg -scf && yay -U --noconfirm --answerdiff=None --needed ./alejandra-*
+
 }
 
 function s_bashrc() {

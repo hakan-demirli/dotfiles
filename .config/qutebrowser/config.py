@@ -79,8 +79,18 @@ config.bind("ge", "jseval --quiet scrollHelper.scrollToPercent(100)")
 config.bind("gp", "tab-prev")
 config.bind("gn", "tab-next")
 
+config.unbind("q")
+config.unbind("b")
+config.bind("bh", "open https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+config.bind("bc", "open https://calendar.google.com/calendar/u/0")
+config.bind("bw", "open https://web.whatsapp.com/")
+config.bind("bd", "open https://discord.com/app")
+config.bind("bo", "open https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+config.bind("bm", "open https://mail.google.com/mail/u/1/#inbox")
+config.bind("by", "open http://127.0.0.1:7070/")
+config.bind("bk", "open https://www.keybr.com/")
+config.bind("bl", "open https://leetcode.com")
 
-config.bind("q", "nop")
 
 # password management
 # BUG: ... may not contain unprintable characters. Can't use regex.
@@ -140,11 +150,8 @@ config.bind(
 # Configure the filepicker
 filepicker = [
     "kitty",
-    "--class",
-    "filepicker",
     "--title",
     "filepicker",
-    "-e",
     "lf",
     "-command",
     "set nohidden",
