@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+
+import subprocess
+import json
+import argparse
+import os
+
+
+def get_window_list():
+    # Run 'hyprctl clients -j' command and parse the JSON output
+    result = subprocess.run(
+        ["hyprctl", "clients", "-j"], capture_output=True, text=True
+    )
+    window_list_json = result.stdout.strip()
+
+    # Parse the JSON and return the list of windows
+    return json.loads(window_list_json)
+
+
+def launch_or_focus_app(app_title, command=None):
+    window_list = get_window_list()
+
+    # Check if the app is already running
+    for window in window_list:
+        if window["title"] == app_title:
+            # If the app is running, change focus to the window
+            subprocess.run(["hyprctl", "dispatch", "focuswindow", f"title:{app_title}"])
+            return
+
+    # If the app is not running, try to launch it
+    if command:
+        # Use the provided command to launch the application
+        subprocess.Popen(
+            command, shell=True, stdin=None, stdout=None, stderr=None, close_fds=True
+        )
+        print(f"Launching {app_title} with custom command in the background.")
+        return
+
+    # Search for the .desktop file associated with the application in user's XDG_DATA_HOME
+    xdg_data_home = os.getenv("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
+    user_desktop_path = os.path.join(xdg_data_home, "applications")
+    desktop_file_path = find_desktop_file(user_desktop_path, app_title)
+
+    if desktop_file_path:
+        exec_command = get_exec_command_from_desktop(desktop_file_path)
+        if exec_command:
+            # Use Popen to launch the process in the background and detach it
+            subprocess.Popen(
+                exec_command,
+                shell=True,
+                stdin=None,
+                stdout=None,
+                stderr=None,
+                close_fds=True,
+            )
+            print(f"Launching {app_title} in the background.")
+        else:
+            print(
+                f"Error: Unable to extract Exec command from .desktop file for {app_title}"
+            )
+    else:
+        # If not found, search in the system's /usr/share/applications
+        system_desktop_path = "/usr/share/applications"
+        desktop_file_path = find_desktop_file(system_desktop_path, app_title)
+
+        if desktop_file_path:
+            exec_command = get_exec_command_from_desktop(desktop_file_path)
+            if exec_command:
+                # Use Popen to launch the process in the background and detach it
+                subprocess.Popen(
+                    exec_command,
+                    shell=True,
+                    stdin=None,
+                    stdout=None,
+                    stderr=None,
+                    close_fds=True,
+                )
+                print(f"Launching {app_title} in the background.")
+            else:
+                print(
+                    f"Error: Unable to extract Exec command from .desktop file for {app_title}"
+                )
+        else:
+            print(f"Error: Unable to find .desktop file for {app_title}")
+
+
+def find_desktop_file(desktop_path, app_title):
+    # Search for the .desktop file associated with the application in the specified path
+    desktop_files = []
+
+    if os.path.exists(desktop_path):
+        for root, dirs, files in os.walk(desktop_path):
+            for file in files:
+                if file.endswith(".desktop"):
+                    desktop_files.append(os.path.join(root, file))
+
+    # Check each .desktop file for the specified application title
+    for desktop_file in desktop_files:
+        with open(desktop_file, "r") as file:
+            content = file.read()
+            if f"Name={app_title}" in content:
+                return desktop_file
+
+    return None
+
+
+def get_exec_command_from_desktop(desktop_file_path):
+    # Extract the Exec command from the .desktop file
+    with open(desktop_file_path, "r") as file:
+        for line in file:
+            if line.startswith("Exec="):
+                return line.strip()[5:]  # Return everything after 'Exec='
+
+    return None
+
+
+if __name__ == "__main__":
+    # Use argparse to take the app_title and command as command-line arguments
+    parser = argparse.ArgumentParser(
+        description="Launch or focus on a Hyprland-managed application."
+    )
+    parser.add_argument(
+        "--title",
+        dest="app_title",
+        type=str,
+        help="Title of the application to launch or focus",
+        required=True,
+    )
+    parser.add_argument(
+        "--command", dest="command", type=str, help="Command to launch the application"
+    )
+    args = parser.parse_args()
+
+    # Call the function with the provided app_title and command
+    launch_or_focus_app(args.app_title, args.command)

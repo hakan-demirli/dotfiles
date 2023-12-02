@@ -17,6 +17,7 @@ my_set_paths() {
 
     if [ "$(whoami)" == "emre" ]; then
         alias hx='helix'
+        alias hx.="helix ."
         export TERM=kitty
     else
         alias helix='hx'
@@ -106,6 +107,7 @@ my_set_paths() {
     # alias lf='ya' # Muscle memory.
 
     alias :q=exit
+
 }
 
 my_set_paths

@@ -16,7 +16,7 @@ copy a template project to current dir.
 def clone_or_update_repo(repo_url, destination_path):
     if not os.path.exists(destination_path):
         # Clone the repository if it doesn't exist
-        subprocess.run(["git", "clone", repo_url, destination_path])
+        subprocess.run(["git", "clone", "--depth", "1", repo_url, destination_path])
         print(f"Repository cloned to {destination_path}")
     else:
         # Update the existing repository
