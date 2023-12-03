@@ -108,6 +108,11 @@ my_set_paths() {
 
     alias :q=exit
 
+    alias ascp='asusctl profile -p'
+    alias ascl='asusctl profile -l'
+    alias ascsp='asusctl profile -P Performance'
+    alias ascsb='asusctl profile -P Balanced'
+    alias ascsq='asusctl profile -P Quiet'
 }
 
 my_set_paths
