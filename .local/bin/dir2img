@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+# Function to display an error message and exit
+function die {
+  echo "Error: $1" >&2
+  exit 1
+}
+
+# Check if a directory is provided as an argument
+if [ $# -eq 0 ]; then
+  die "Usage: $0 <directory>"
+fi
+
+directory="$1"
+
+# Check if the provided path is a directory
+if [ ! -d "$directory" ]; then
+  die "Directory $directory does not exist."
+fi
+
+# Get the absolute path of the directory
+directory=$(realpath "$directory")
+
+# Use directory name as image name
+image_name="${directory##*/}.img"
+image_path="$(pwd)/$image_name"
+
+# Check if the image file already exists
+if [ -e "$image_path" ]; then
+  die "Image file $image_name already exists. Please choose a different name or remove the existing file."
+fi
+
+# Calculate directory size in MB
+dir_size=$(du -sm "$directory" | cut -f1)
+
+# Calculate extra space as 1/3 of the directory size
+extra_space=$((dir_size / 3))
+
+# Add the extra space to the directory size
+dir_size=$((dir_size + extra_space))
+
+# Create an image file with the calculated size, with progress bar
+echo "Creating image file..."
+sudo dd if=/dev/zero of="$image_path" bs=1M count=$dir_size status=progress || die "Failed to create image file."
+
+# Format the image file with the ext4 filesystem
+echo "Formatting image file..."
+sudo mkfs.ext4 "$image_path" || die "Failed to format image file."
+
+# Create a temporary mount point
+mnt_dir=$(mktemp -d)
+
+# Mount the image with sudo
+echo "Mounting image..."
+sudo mount -o loop "$image_path" "$mnt_dir" || die "Failed to mount image."
+
+# Copy the files to the mounted image with progress bar
+echo "Copying files to image..."
+sudo cp -R --no-clobber --preserve=all --sparse=always --reflink=auto "$directory"/* "$mnt_dir" || die "Failed to copy files to image."
+
+# Unmount the image with sudo
+echo "Unmounting image..."
+sudo umount "$mnt_dir" || die "Failed to unmount image."
+
+# Remove the temporary directory
+rmdir "$mnt_dir"
+
+echo "Image created successfully from the directory $directory. Image name: $image_name"

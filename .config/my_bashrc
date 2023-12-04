@@ -22,8 +22,12 @@ my_set_paths() {
     else
         alias helix='hx'
     fi
+    alias ga='git add'
     alias gd='git diff'
+    alias gp='git push'
     alias gs='git status'
+    alias gc='git commit'
+    alias gl='git log'
 
     alias yt-dlp-pl="yt-dlp --embed-metadata --format 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720][ext=mp4]/best[ext=mp4]' --output '%(playlist_index)s. %(title)s.%(ext)s'"
 
