@@ -270,20 +270,23 @@
     * To reopen it just go to the same folder and `code .`
     * Don't use docker desktop dev environments. Git ssh and login is wonky. Missing user account.
 
-
-| AHK Shortcuts  | Description                   |
-| -----------    | -----------                   |
-| `win+<1..9>`    | change virtual desktop       |
-| `alt+i`         | vim mode toggle              |
-
-| ahk  vim mode: | Description                   |
-| -----------    | -----------                   |
-| `hjkl `   | arrows       |
-| `0`        | home          |
-| `$`        | end          |
-| `capslock`        | esc          |
-| `x`        | delete          |
-
+* **AMD IGPU Code 43**
+    * When:
+        * Started after closing the lid without manually shutting down on Linux.
+           * PC didn't sleep for some reason.
+           * After using laptop for an hour and rebooting Hyprland crashed.
+           * On Windows Code 43 appeared.
+    * Solution:
+        * Plug off your laptop from AC.
+        * Reboot.
+        * Plug it back in.
+        * Remove AMD drivers using `amdcleanuputility.exe`
+        * Remove Nvidia drivers.
+        * Reboot couple of times.
+        * Plug off your laptop from AC.
+        * Reboot couple more.
+        * Install drivers couple of times and remove them.
+        * IDK somewhere along the way it should be gone.
 
 | Default Shortcuts  | Description                   |
 | -----------        | -----------                   |
