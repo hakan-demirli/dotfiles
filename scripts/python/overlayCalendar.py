@@ -1,6 +1,8 @@
 import subprocess
 import tempfile
 import mylib
+import shutil
+import os
 from PIL import Image
 
 
@@ -25,7 +27,6 @@ def main():
                 mylib.resizeImage(
                     wallpapers[idx], resized_image, monitor_width, monitor_height
                 )
-
                 background = Image.open(resized_image)
                 overlay = Image.open(overlay_file)
 
@@ -39,6 +40,10 @@ def main():
                     x_offset,
                     y_offset,
                 )
+
+            mylib.resizeImage(
+                wallpapers[idx], "/tmp/wp.png", monitor_width, monitor_height
+            )
 
         except FileNotFoundError:
             print("Input image files not found.")

@@ -107,7 +107,9 @@ function i_y_core() {
     yay -S --noconfirm --answerdiff=None --needed nwg-displays
     yay -S --noconfirm --answerdiff=None --needed wlr-randr
     yay -S --noconfirm --answerdiff=None --needed swaync
-    yay -S --noconfirm --answerdiff=None --needed gtklock
+    # BUG: https://github.com/jovanlanik/gtklock/issues/53
+    # yay -S --noconfirm --answerdiff=None --needed gtklock
+    sudo pacman -S --noconfirm --needed swaylock
     yay -S --noconfirm --answerdiff=None --needed etcher-bin
 }
 
