@@ -4,6 +4,14 @@
     * visit \HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\. There should be three keys under Shell Extensions: Approved, Blocked, and Cached. If there is no Blocked key on your system, manually create it by right-clicking Shell Extensions, and create a new key named Blocked.
     * Enter Blocked key (which appears as a directory in regedit tool). Under directory Blocked, create a new String (aka type REG_SZ). Rename the String as {UUID}, in which UUID is the same UUID as we found in Step 2.
 
+* **Stop driver update for a specific hardware**
+    * Find Hardware ID of your graphic adapter in Device Manager - Graphic Adapters - Your graphic card, and copy the 2nd line of the four shown under Details - Hardware IDs.
+    * Open Group Policy Editor (gpedit.msc)
+    * Navigate to Computer Configuration - Administrative Templates - System - Device Installation - Device Installation Restrictions
+    * Double click Prevent Installation of devices that match any of these device IDs
+    * Tick Enabled and click Show
+    * Enter the Hardware ID in a value line
+    * Confirm any open windows (most likely OK)
 
 * **/mnt/c/Windows/Explorer.exe: cannot execute binary file: Exec format error**
     * Run the following commands in order:
