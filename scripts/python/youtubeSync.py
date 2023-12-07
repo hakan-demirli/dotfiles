@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-import subprocess
+import yt_dlp
 from pathlib import Path
 import json
 from multiprocessing import Pool
 import unicodedata
+import glob
+import os
 import mylib
 
 
@@ -28,37 +30,59 @@ def sanitizeString(in_str):
 def syncFolder(playlist_tuple):
     playlist_folder = playlist_tuple[0]
     playlist_url = playlist_tuple[1]
-    command = f'cd {playlist_folder} && yt-dlp --remux-video opus -f bestaudio --force-overwrites --embed-metadata --embed-thumbnail --download-archive downloaded.txt -o "./%(playlist_index)s_%(title)s.%(ext)s" -v "{playlist_url}"'
-    subprocess.run(command, shell=True)
+    ydl_opts = {
+        "verbose": True,
+        "outtmpl": f"{playlist_folder}/%(playlist_index)s_%(title)s.%(ext)s",
+        "format": "bestaudio",
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "opus",
+                "preferredquality": "best",
+            },
+            {"key": "EmbedThumbnail"},
+        ],
+        "download_archive": f"{playlist_folder}/downloaded.txt",
+        "writethumbnail": True,
+        "writedescription": True,
+        "writeinfojson": True,
+        "embedthumbnail": True,
+        "embedmetadata": True,
+        "ignoreerrors": True,
+        "force_overwrites": True,
+        "ignore_no_formats_error": True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([playlist_url])
 
 
 def createPlaylistFolder(playlist_url):
-    new_metadata_raw = subprocess.Popen(
-        [
-            "yt-dlp",
-            "--flat-playlist",
-            "-J",
-            playlist_url,
-        ],
-        stdout=subprocess.PIPE,
-    )
-    data, err = new_metadata_raw.communicate()
-    new_metadata = json.loads(data.decode("utf-8"))
-    if new_metadata == None:
-        print(
-            f"ERROR: Can't access playlist. Be sure it is a public or unlisted playlist.URL: {playlist_url}"
-        )
-        raise SystemExit()
-
-    folder_path = mylib.MUSIC_DIR + "/" + sanitizeString(new_metadata["title"])
     try:
-        Path(folder_path).mkdir(parents=True)
+        ydl_opts = {
+            "flat_playlist": True,
+            "dump_single_json": True,
+            "skip_download": True,
+            "ignore_no_formats_error": True,
+            "playlistend": 1,
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            new_metadata = ydl.extract_info(playlist_url, download=False)
+        if new_metadata == None:
+            print(
+                f"ERROR: Can't access playlist. Be sure it is a public or unlisted playlist.URL: {playlist_url}"
+            )
+            return None
+
+        folder_name = sanitizeString(new_metadata["title"])
+        folder_path = mylib.MUSIC_DIR + "/" + folder_name
+        Path(folder_path).mkdir(parents=True, exist_ok=True)
         print(f"Generated path: {folder_path}")
-    except:
+        return folder_path
+    except Exception as e:
         print(
-            "WARNING: Folder with the same name as the playlist already exists. Updating existing playlist."
+            f"ERROR: An error occurred while processing the playlist {playlist_url}: {str(e)}"
         )
-    return folder_path
+        return None
 
 
 def syncYoutubePlaylist(playlist_file):
@@ -76,5 +100,26 @@ def syncYoutubePlaylist(playlist_file):
     print("[COMPLETED]")
 
 
+def clean_dir(directory):
+    # Define the file types to delete
+    file_types = [
+        "*.jpg",
+        "*.png",
+        "*.webp",
+        "*.json",
+        "*.part",
+        "*.description",
+    ]
+    for file_type in file_types:
+        for dirpath, dirnames, filenames in os.walk(directory):
+            for file in glob.glob(os.path.join(dirpath, file_type)):
+                try:
+                    os.remove(file)
+                    print(f"Deleted {file}")
+                except OSError as e:
+                    print(f"Error: {file} : {e.strerror}")
+
+
 if __name__ == "__main__":
     syncYoutubePlaylist(mylib.PLAYLIST_FILE)
+    clean_dir(mylib.MUSIC_DIR)
