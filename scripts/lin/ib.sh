@@ -204,6 +204,7 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed wofi
     sudo pacman -S --noconfirm --needed unrar
     sudo pacman -S --noconfirm --needed p7zip
+    sudo pacman -S --noconfirm --needed zip
     sudo pacman -S --noconfirm --needed lf # yazi when matured
     sudo pacman -S --noconfirm --needed xclip
     sudo pacman -S --noconfirm --needed unarchiver
