@@ -3,6 +3,7 @@ clangd = { command = "clangd", args = ['--fallback-style=Webkit'] }
 
 [language-server.texlab]
 command = "texlab"
+cleanArtifacts = true
 
 [language-server.texlab.config.texlab.build]
 onSave = true
