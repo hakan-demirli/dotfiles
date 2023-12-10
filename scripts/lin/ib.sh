@@ -105,6 +105,7 @@ function i_y_core() {
     yay -S --noconfirm --answerdiff=None --needed rog-control-center
     yay -S --noconfirm --answerdiff=None --needed hyprshot
     yay -S --noconfirm --answerdiff=None --needed nwg-displays
+    yay -S --noconfirm --answerdiff=None --needed wlr-randr # Dep for nwg-displays
     yay -S --noconfirm --answerdiff=None --needed wlr-randr
     yay -S --noconfirm --answerdiff=None --needed swaync
     # BUG: https://github.com/jovanlanik/gtklock/issues/53
