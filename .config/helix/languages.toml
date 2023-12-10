@@ -1,15 +1,27 @@
 [language-server]
 clangd = { command = "clangd", args = ['--fallback-style=Webkit'] }
-texlab = { command = "texlab", config = { texlab = { build = { onSave = true, forwardSearchAfter = true }, forwardSearch = { executable = "sioyek", args = [
+
+[language-server.texlab]
+command = "texlab"
+
+[language-server.texlab.config.texlab.build]
+onSave = true
+forwardSearchAfter = true
+
+[language-server.texlab.config.texlab.forwardSearch]
+executable = "sioyek"
+args = [
   "--execute-command",
   "turn_on_synctex;turn_on_presentation_mode",
-  "--reuse-window",
   "%p",
   "--forward-search-file",
   "%f",
   "--forward-search-line",
   "%l",
-] }, chktex = { onEdit = true } } } }
+]
+
+[language-server.texlab.config.texlab.chktex]
+onEdit = true
 
 [[language]]
 name = "python"

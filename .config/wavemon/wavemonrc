@@ -1,0 +1,13 @@
+interface = wlan0
+cisco_mac = off
+sort_order = chan/sig
+sort_ascending = off
+scan_filter_band = both
+scan_hidden_essids = on
+stat_updates = 100
+lhist_slot_size = 4
+meter_smoothness = 0
+info_updates = 10
+override_auto_scale = off
+transparent_bg = on
+startup_screen = info screen
