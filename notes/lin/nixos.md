@@ -85,3 +85,8 @@
     * ```internal error: virtiofsd binary '/run/current-system/sw/bin/virtiofsd' is not executable. This happened because Qemu stopped bundling virtiofsd. I added it to system config to make it appear on that path again and encountered an error operation failed: Unable to find a satisfying virtiofsd```
     * No solution.
     * try 9p drivers
+
+
+* **How to run random binaries**
+    * Use nix-ldi
+        * Here is a tutorial [link](https://github.com/mcdonc/.nixconfig/blob/master/videos/pydev/script.rst)

@@ -13,7 +13,7 @@ forwardSearchAfter = true
 executable = "sioyek"
 args = [
   "--execute-command",
-  "turn_on_synctex;turn_on_presentation_mode",
+  "turn_on_synctex",
   "%p",
   "--forward-search-file",
   "%f",
