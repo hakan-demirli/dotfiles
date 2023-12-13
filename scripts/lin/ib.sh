@@ -272,7 +272,9 @@ function s_locale() {
 }
 
 function s_theme() {
-    gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+    yay -S --noconfirm --answerdiff=None --needed dracula-gtk-theme
+    gsettings set org.gnome.desktop.interface gtk-theme "Dracula"
+    gsettings set org.gnome.desktop.wm.preferences theme "Dracula"
     gsettings set org.gnome.desktop.interface color-scheme prefer-dark
     gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
 }
