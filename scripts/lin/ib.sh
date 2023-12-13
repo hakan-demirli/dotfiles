@@ -11,13 +11,13 @@ sudo sed -i 's/^MAKEFLAGS=.*/MAKEFLAGS="-j$(nproc)"/' /etc/makepkg.conf
 
 function i_mtfp(){
     # Too complex
-    # sudo pacman -S --noconfirm --needed libmtp
-    # sudo pacman -S --noconfirm --needed gvfs-mtp
-    # sudo pacman -S --noconfirm --needed gvfs-gphoto2
-    # yay -S --noconfirm --needed jmtpfs
+    ## sudo pacman -S --noconfirm --needed libmtp
+    ## sudo pacman -S --noconfirm --needed gvfs-mtp
+    ## sudo pacman -S --noconfirm --needed gvfs-gphoto2
+    ## yay -S --noconfirm --needed jmtpfs
 
     # Buggy on my phone
-    # yay -S --noconfirm --needed simple-mtpfs 
+    ## yay -S --noconfirm --needed simple-mtpfs 
 
     # Perfect 
     yay -S --noconfirm --needed android-file-transfer 
@@ -131,7 +131,7 @@ function i_core() {
     sudo pacman -S --noconfirm --needed ntfs-3g
     sudo pacman -S --noconfirm --needed less
     sudo pacman -S --noconfirm --needed gnome-disk-utility
-    # sudo pacman -S --noconfirm --needed gnome-system-monitor
+    # sudo pacman -S --noconfirm --needed gnome-system-monitor # -> btop
     sudo pacman -S --noconfirm --needed btop
     sudo pacman -S --noconfirm --needed gnome-bluetooth-3.0
     sudo pacman -S --noconfirm --needed gnome-power-manager
@@ -166,7 +166,7 @@ function i_qb(){
     sudo pacman -S --noconfirm --needed qutebrowser
     sudo pacman -S --noconfirm --needed python-adblock
     sudo pacman -S --noconfirm --needed python-tldextract
-    sudo pacman -S --noconfirm --needed rofi
+    sudo pacman -S --noconfirm --needed rofi # qute-pass dependency
     # Missing:
         # [ ] Vimium like hint accuracy
         # [ ] Usable pinned tabs/bookmarks
@@ -206,7 +206,7 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed unrar
     sudo pacman -S --noconfirm --needed p7zip
     sudo pacman -S --noconfirm --needed zip
-    sudo pacman -S --noconfirm --needed lf # yazi when matured
+    sudo pacman -S --noconfirm --needed lf # -> yazi when matured
     sudo pacman -S --noconfirm --needed xclip
     sudo pacman -S --noconfirm --needed unarchiver
     sudo pacman -S --noconfirm --needed os-prober
@@ -215,7 +215,7 @@ function i_bunch() {
 
     # Check /run/user/1000/gvfs directory for mtp devices mounted by nemo
     # Check /tmp/mtp directory for mtp devices mounted by lf
-    # sudo pacman -S --noconfirm --needed nemo # no need
+    # sudo pacman -S --noconfirm --needed nemo # -> lf
     # sudo pacman -S --noconfirm --needed nemo-fileroller
     sudo pacman -S --noconfirm --needed wget
     sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts
@@ -224,22 +224,18 @@ function i_bunch() {
     # yay -S --noconfirm --answerdiff=None --needed visual-studio-code-bin
     yay -S --noconfirm --answerdiff=None --needed green-tunnel
     yay -S --noconfirm --answerdiff=None --needed qbittorrent
-    # yay -S --noconfirm --answerdiff=None --needed dragon-drop # rip-drag is better
+    # yay -S --noconfirm --answerdiff=None --needed dragon-drop # -> rip-drag
     yay -S --noconfirm --answerdiff=None --needed ripdrag-git
     yay -S --noconfirm --answerdiff=None --needed yarr-bin
 
     # yay -S --noconfirm --answerdiff=None --needed yazi-git # missing features
-    # [x] Delete no confirm 
-        # https://github.com/sxyazi/yazi/issues/171
-    # [ ] Open or Enter
-        # https://github.com/sxyazi/yazi/issues/335
-    # [ ] Preview OPUS files
-        # https://github.com/sxyazi/yazi/issues/182
+    ## [x] Delete no confirm 
+    #    # https://github.com/sxyazi/yazi/issues/171
+    ## [ ] Open or Enter
+    #    # https://github.com/sxyazi/yazi/issues/335
+    ## [ ] Preview OPUS files
+    #    # https://github.com/sxyazi/yazi/issues/182
 
-
-
-    # IDE like autocomplete. Buggy right now.
-    # yay -S --noconfirm --answerdiff=None --needed nodejs-inshellisense
 
     # nemo_dir="$HOME/.local/share/nemo/actions"
     # nemo_file="helix.nemo_action"
@@ -257,14 +253,13 @@ function i_bunch() {
 }
 
 function i_nix() {
-    # Nix->Docker. How do you even link static glibc in nix.
     sudo pacman -S --noconfirm --needed nix
     sudo systemctl enable --now nix-daemon.service
     sudo gpasswd -a $USER nix-users
     nix-channel --add https://nixos.org/channels/nixpkgs-unstable
     nix-channel --update
-    # yay -S --noconfirm --answerdiff=None --needed nixpkgs-fmt # nix
-    # nix profile install nixpkgs#nil                  # nix
+    # yay -S --noconfirm --answerdiff=None --needed nixpkgs-fmt # PKGBUILD+alejandra
+    # nix profile install nixpkgs#nil                           # PKGBUILD+nil 
 }
 
 function s_locale() {
@@ -293,7 +288,7 @@ function i_docker() {
 
 function i_helix() {
     sudo pacman -S --noconfirm --needed helix
-    sudo pacman -S --noconfirm --needed bat # live-grep script
+    sudo pacman -S --noconfirm --needed bat  # dependency of live-grep
     sudo pacman -S --noconfirm --needed tmux # zellij when matured
     sudo pacman -S --noconfirm --needed tmuxp
     sudo pacman -S --noconfirm --needed fzf
@@ -305,7 +300,7 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed python-ruff  # python
     sudo pacman -S --noconfirm --needed taplo        # toml file
     sudo pacman -S --noconfirm --needed texlab       # latex.
-    # sudo pacman -S --noconfirm --needed zathura     # sioyek is better.
+    # sudo pacman -S --noconfirm --needed zathura    # -> sioyek
     # sudo pacman -S --noconfirm --needed zathura-pdf-mupdf
     yay -S --noconfirm --answerdiff=None --needed sioyek-git
     sudo pacman -S --noconfirm --needed lldb
@@ -316,7 +311,7 @@ function i_helix() {
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     cd $SCRIPT_DIR/aur_packages/nil && makepkg -scf && yay -U --noconfirm --answerdiff=None --needed ./nil-*
 
-    # Install Alejandra formatter
+    # Install Alejandra Nix formatter
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     cd $SCRIPT_DIR/aur_packages/alejandra && makepkg -scf && yay -U --noconfirm --answerdiff=None --needed ./alejandra-*
 
