@@ -6,7 +6,7 @@ h=$3
 x=$4
 y=$5
 cache_width=860
-cachedir="/tmp/lf_cachedir"
+cachedir="${XDG_CACHE_HOME:-$HOME/.cache}/lf_images"
 mkdir -p "$cachedir"
 
 file="$1"; shift
@@ -23,8 +23,10 @@ generate_thumbnails() {
         img_cachekey=$(echo -n "$img $(stat -c %Y "$img")" | md5sum | cut -d ' ' -f 1)
         img_thumbnail="$cachedir/$img_cachekey.png"
         if [ ! -f "$img_thumbnail" ]; then
-		        # ffmpeg -y -i "$file" -vframes 1 -vf "scale=${w}0:-1" "$thumbnail"
+            # No thumbnails for ginormous images:
+            # BUG: https://video.stackexchange.com/questions/28408/how-to-fix-ffmpeg-picture-size-32768x16384-is-invalid
             ffmpeg -y -i "$img" -vframes 1 -vf "scale=${cache_width}:-1" "$img_thumbnail" &
+		        # ffmpeg -y -i "$file" -vframes 1 -vf "scale=${w}0:-1" "$thumbnail"
         fi
     done
     wait
