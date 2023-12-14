@@ -98,6 +98,7 @@ function i_xremap() {
 }
 
 function i_y_core() {
+    yay -S --noconfirm --answerdiff=None --needed btop-gpu-git
     yay -S --noconfirm --answerdiff=None --needed swayosd-git
     yay -S --noconfirm --answerdiff=None --needed k4dirstat
     yay -S --noconfirm --answerdiff=None --needed swww
@@ -132,7 +133,6 @@ function i_core() {
     sudo pacman -S --noconfirm --needed less
     sudo pacman -S --noconfirm --needed gnome-disk-utility
     # sudo pacman -S --noconfirm --needed gnome-system-monitor # -> btop
-    sudo pacman -S --noconfirm --needed btop
     sudo pacman -S --noconfirm --needed gnome-bluetooth-3.0
     sudo pacman -S --noconfirm --needed gnome-power-manager
     sudo pacman -S --noconfirm --needed upower
