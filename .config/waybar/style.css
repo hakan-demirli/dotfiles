@@ -10,12 +10,14 @@
 
 window {
   background: transparent;
+  border-radius: 10px;
 }
 
 #tray menu,
 tooltip {
   background: @background;
   color: @active;
+  border-radius: 10px;
 }
 
 #scroll,
