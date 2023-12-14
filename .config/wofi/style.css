@@ -2,21 +2,21 @@
   font-family: comfortaa;
   font-size: 14px;
   font-weight: 600;
+  border-radius: 5px;
 }
 
 #window {
   margin: 0px;
   border: 2px solid;
-  border-color: rgb(0, 255, 253);
+  border-color: rgb(140, 142, 154);
   border-radius: 12px;
-  background-color: rgba(37, 38, 51, 0.6);
+  background-color: rgba(40, 42, 54, 0.4);
   color: rgb(235, 255, 255);
 }
 
 #input {
   margin: 15px;
   background-color: rgba(112, 122, 137, 0.5);
-  color: rgb(37, 38, 51);
   border-radius: 25px;
   border: 2px solid rgb(52, 64, 76);
 }
@@ -30,8 +30,6 @@
 }
 
 #entry:selected {
-  background-color: rgba(0, 255, 253, 0.1);
-  border-radius: 25px;
   border: none;
   outline: none;
 }
@@ -42,13 +40,4 @@
 
 #entry image {
   padding-right: 10px;
-}
-
-#colors {
-  color: rgb(37, 38, 51);
-  color: rgb(52, 64, 76);
-  color: rgb(76, 90, 107);
-  color: rgb(112, 122, 137);
-  color: rgb(235, 77, 129);
-  color: rgb(245, 98, 36);
 }
