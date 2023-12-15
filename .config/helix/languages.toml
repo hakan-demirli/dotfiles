@@ -110,3 +110,13 @@ indent = { tab-width = 4, unit = "    " }
 [[language]]
 name = "latex"
 language-servers = ["texlab"]
+
+[[language]]
+name = "rust"
+auto-format = true
+[language.formatter]
+command = "rustfmt"
+
+[language-server.rust-analyzer.config.check]
+command = "clippy"
+
