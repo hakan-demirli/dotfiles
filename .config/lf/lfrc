@@ -86,7 +86,8 @@ cmd music ${{
 cmd ripdrag %ripdrag -a -x $fx
 
 cmd mount_mtp ${{
-	dmtpfs 
+	mkdir -p /tmp/amtp 
+	aft-mtp-mount /tmp/amtp 
 }}
 
 cmd q quit
