@@ -24,24 +24,16 @@ args = [
 [language-server.texlab.config.texlab.chktex]
 onEdit = true
 
+
+[language-server.ruff-lsp]
+command = "ruff-lsp"
+
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
-language-servers = [ "pyright", "ruff" ]
+language-servers = [ "pyright","ruff-lsp" ]
 auto-format = true
 
-[language-server.pyright.config.python.analysis]
-typeCheckingMode = "basic"
-
-[language-server.ruff]
-command = "ruff-lsp"
-
-[language-server.ruff.config.settings]
-args = ["--ignore", "E501"]
-
-[language.formatter]
-command = "black"
-args = ["--line-length", "88", "--quiet", "-"]
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
 # extraPaths = ["./test"]

@@ -299,6 +299,8 @@ function i_helix() {
     sudo pacman -S --noconfirm --needed prettier     # markdown etc.
     sudo pacman -S --noconfirm --needed pyright      # python
     sudo pacman -S --noconfirm --needed python-black # python
+    sudo pacman -S --noconfirm --needed ruff         # python
+    sudo pacman -S --noconfirm --needed ruff-lsp     # python
     sudo pacman -S --noconfirm --needed python-ruff  # python
     sudo pacman -S --noconfirm --needed rust-analyzer # rust
     sudo pacman -S --noconfirm --needed taplo        # toml file
