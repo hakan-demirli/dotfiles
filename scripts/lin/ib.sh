@@ -313,13 +313,8 @@ function i_helix() {
     # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
 
     # Install Nix Lsp
-    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-    cd $SCRIPT_DIR/aur_packages/nil && makepkg -scf && yay -U --noconfirm --answerdiff=None --needed ./nil-*
-
-    # Install Alejandra Nix formatter
-    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-    cd $SCRIPT_DIR/aur_packages/alejandra && makepkg -scf && yay -U --noconfirm --answerdiff=None --needed ./alejandra-*
-
+    yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/alejandra
+    yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/nil
 }
 
 function s_bashrc() {
