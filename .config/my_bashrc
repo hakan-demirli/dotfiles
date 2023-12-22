@@ -34,7 +34,6 @@ my_set_paths() {
     if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
     alias lf='lfcd'
     alias cf='cf && exit'
-    # local MY_TMP_DIR=/mnt/tmp
 
 	# Hyprland PATH is buggy
     export PATH=~/.local/bin:$PATH
@@ -52,6 +51,7 @@ my_set_paths() {
     alias txs='tmux switch-client -n'
     alias txkw='tmux kill-window -t '
     alias txlw='tmux list-windows'
+    alias txh='tmux new-session -s "$(basename "$(pwd)")_$(echo -n "$(pwd)" | md5sum | cut -d " " -f 1)" "helix ."'
 
     # export LM_LICENSE_FILE=$MY_APP_DIR/lin/quartus/license.dat
 
