@@ -1,0 +1,85 @@
+# Maintainer: George Rawlinson <grawlinson@archlinux.org>
+# Contributor: zimbatm <zimbatm@zimbatm.com>
+# Contributor: ShadowKyogre <shadowkyogre.public+aur@gmail.com>
+# Contributor: rmorgans <rick.morgans@gmail.com>
+
+pkgname=direnv-git
+_pkgname=direnv
+pkgver=2.33.0
+pkgrel=1
+pkgdesc='A shell extension that manages your environment'
+arch=('x86_64')
+url="https://github.com/direnv/direnv"
+license=('MIT')
+depends=('glibc')
+makedepends=('git' 'go')
+checkdepends=('zsh' 'fish' 'bash' 'tcsh' 'elvish')
+options=('!lto')
+provides=(direnv)
+conflicts=(direnv)
+source=("git+https://github.com/direnv/$_pkgname.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  git describe --tags | sed 's/^v//'
+}
+
+prepare() {
+  cd "$_pkgname"
+
+  # download dependencies
+  export GOPATH="${srcdir}"
+  go mod download
+}
+
+build() {
+  cd "$_pkgname"
+
+  # set Go flags
+  export CGO_CPPFLAGS="${CPPFLAGS}"
+  export CGO_CFLAGS="${CFLAGS}"
+  export CGO_CXXFLAGS="${CXXFLAGS}"
+  export GOPATH="${srcdir}"
+
+  go build -v \
+    -buildmode=pie \
+    -mod=readonly \
+    -modcacherw \
+    -ldflags "-compressdwarf=false \
+    -linkmode external \
+    -extldflags ${LDFLAGS}" \
+    .
+}
+
+check() {
+  cd "$_pkgname"
+
+  # run go tests
+  go test -v ./...
+
+  # run shell-specific tests
+  bash ./test/direnv-test.bash
+  #elvish ./test/direnv-test.elv # temporarily skip failing test :<
+  fish ./test/direnv-test.fish
+  tcsh -e ./test/direnv-test.tcsh
+  zsh ./test/direnv-test.zsh
+
+  # run stdlib tests
+  ./test/stdlib.bash
+}
+
+package() {
+  cd "$_pkgname"
+
+  # binary
+  install -vDm755 -t "$pkgdir/usr/bin" "$_pkgname"
+
+  # documentation
+  install -vDm644 -t "$pkgdir/usr/share/man/man1" man/*.1
+  install -vDm644 -t "$pkgdir/usr/share/doc/$_pkgname" README.md
+  install -vDm644 -t "$pkgdir/usr/share/doc/$_pkgname/docs" docs/*
+
+  # license
+  install -vDm644 -t "$pkgdir/usr/share/licenses/$_pkgname" LICENSE
+}
