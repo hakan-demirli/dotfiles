@@ -206,7 +206,8 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed unrar
     sudo pacman -S --noconfirm --needed p7zip
     sudo pacman -S --noconfirm --needed zip
-    sudo pacman -S --noconfirm --needed lf # -> yazi when matured
+    # sudo pacman -S --noconfirm --needed lf # -> yazi when matured
+    yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/lf
     sudo pacman -S --noconfirm --needed xclip
     sudo pacman -S --noconfirm --needed unarchiver
     sudo pacman -S --noconfirm --needed os-prober

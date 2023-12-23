@@ -4,7 +4,7 @@
 ln      01;36   # LINK
 or      31;01   # ORPHAN
 tw      38;5;47 # STICKY_OTHER_WRITABLE
-ow      38;5;47 # OTHER_WRITABLE
+# ow      38;5;47 # OTHER_WRITABLE # green color bug
 st      01;34   # STICKY
 di      01;34   # DIR
 pi      33      # FIFO
