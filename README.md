@@ -13,16 +13,25 @@
 
 # Install
 * Don't. Paths are hardcoded to my PC. I suggest just using my ./configs.
-1. Use archinstall on live Arch Linux ISO and install Hyprland.
+* Use archinstall on live Arch Linux ISO and install Hyprland.
   * Use `iwctl` to connect WIFI if needed.
-2. After installing arch: `git clone https://github.com/hakan-demirli/dotfiles`
-3. If you need WIFI:
+* After installing arch: `git clone https://github.com/hakan-demirli/dotfiles`
+* If you need WIFI:
   * `cd dotfiles`
   * `./scripts/lin/ib.sh i_network`
   * `python ./scripts/python/unused/symlinkConfigs.py`
   * Then reboot. Waybar will appear together with network manager applet.
   * Use applet to connect to WIFI.
-4. `./scripts/lin/ib.sh`
+* `./scripts/lin/ib.sh`
   * It will automatically reboot after the install. 
-5. Auto install my [firefoxCSS](https://github.com/hakan-demirli/Firefox_Custom_CSS).
+* Auto install my [firefoxCSS](https://github.com/hakan-demirli/Firefox_Custom_CSS).
   * `python ./scripts/python/unused/installFirefoxCSS.py`
+
+
+# TODO
+- Firefox custom file picker: lf/yazi
+  - Using xdg-desktop-portal
+- trash-cli that works on both windows and linux
+  - trash-cli: [buggy?](https://github.com/andreafrancia/trash-cli/issues/65)
+- lf delete/trash multiple selections
+

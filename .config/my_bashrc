@@ -7,6 +7,15 @@ function ya() {
 	rm -f -- "$tmp"
 }
 
+function git() {
+    if [[ $1 == "clone" && $# -eq 2 ]]
+    then
+        git_clone_cached $2
+    else
+        command git "$@"
+    fi
+}
+
 my_set_paths() {
 	export PROMPT_COMMAND='history -a'
 
