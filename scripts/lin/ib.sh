@@ -201,7 +201,7 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed kolourpaint
     sudo pacman -S --noconfirm --needed breeze
     sudo pacman -S --noconfirm --needed firefox
-    sudo pacman -S --noconfirm --needed direnv
+    # sudo pacman -S --noconfirm --needed direnv # out of date
     sudo pacman -S --noconfirm --needed wofi
     sudo pacman -S --noconfirm --needed unrar
     sudo pacman -S --noconfirm --needed p7zip
@@ -316,6 +316,7 @@ function i_helix() {
     # Install Nix Lsp
     yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/alejandra
     yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/nil
+    yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/direnv
 }
 
 function s_bashrc() {

@@ -49,6 +49,9 @@ my_set_paths() {
     export PATH=/usr/local/bin:$PATH
 
     # export DIRENV_CONFIG=$HOME/.config/direnv/direnvrc
+	export DIRENV_WARN_TIMEOUT=0
+
+
 
     # export OPENER=xdg-open
 

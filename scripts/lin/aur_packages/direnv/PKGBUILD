@@ -5,7 +5,7 @@
 
 pkgname=direnv-git
 _pkgname=direnv
-pkgver=2.33.0
+pkgver=2.33.0.r12.g7ba8c41
 pkgrel=1
 pkgdesc='A shell extension that manages your environment'
 arch=('x86_64')
@@ -22,7 +22,7 @@ sha256sums=('SKIP')
 
 pkgver() {
   cd "$_pkgname"
-  git describe --tags | sed 's/^v//'
+  git describe --long --tags --abbrev=7 | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
 }
 
 prepare() {
