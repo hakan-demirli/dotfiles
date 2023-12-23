@@ -30,6 +30,7 @@ inode/directory=lf.desktop
 application/x-gnome-saved-search=lf.desktop
 x-scheme-handler/etcher=balena-etcher.desktop
 x-scheme-handler/msteams=teams.desktop
+x-content/unix-software=lf.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -57,5 +58,4 @@ text/x-diff=helix.desktop
 text/csv=helix.desktop
 text/xml=helix.desktop
 text/plain=helix.desktop
-inode/x-empty=helix.desktop
 inode/x-empty=helix.desktop
