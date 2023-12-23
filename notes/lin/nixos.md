@@ -1,27 +1,23 @@
-* **What is configuration.nix file?**
-    * It's default location is: ```/etc/nixos/configuration.nix```
-    * It controls the OS configuration. You want to install a package you modify it.
-    * It is a bad practice to leave it in it's default location. Use flakes instead.
+* **Install a package temporarily**
+    * ```nix shell nixpkgs#<pckg_name>```
+
+* **Rebuild nixos config**
+    * ```sudo nixos-rebuild switch```
 
 * **Where to find packages**
     * https://search.nixos.org/packages
 
-* **Install git**
-    * Temporarily:
-        * ```nix shell nixpkgs#git```
-    * Via configuration.nix
-        * ```sudo nano /etc/nixos/configuration.nix```
-        ```nix
-            environment.systemPackages = with pkgs; [
-            gitMinimal  ];
-        ```
-        * ```sudo nixos-rebuild switch```
+* **What is configuration.nix file?**
+    * It's default location is: ```/etc/nixos/configuration.nix```
+    * It controls the OS configuration. You want to install a package for all users you modify it.
+    * It is a bad practice to leave it in it's default location. Use flakes instead.
+    * If you install packages using it they will only work in nixos
 
 * **Enable NTFS support**
-    * ```sudo nano /etc/nixos/configuration.nix```
+    * Modify configuration.nix file
     * Add
         * ```boot.supportedFilesystems = [ "ntfs" ];```
-    * ```sudo nixos-rebuild switch```
+    * Then rebuild nixos config
 
 * **Enable flakes**
     * Via configuration.nix

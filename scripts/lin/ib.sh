@@ -43,7 +43,9 @@ function i_yay() {
 function i_qemu() {
     # Install QEMU
     sudo pacman -S --noconfirm --needed qemu-emulators-full 
+    sudo pacman -S --noconfirm --needed qemu-img
     # sudo pacman -S --noconfirm --needed qemu-desktop
+
     sudo pacman -S --noconfirm --needed dnsmasq
     sudo pacman -S --noconfirm --needed virt-manager
     sudo pacman -S --noconfirm --needed iptables-nft

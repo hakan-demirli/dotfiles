@@ -13,17 +13,18 @@
 
 # Install
 * Don't. Paths are hardcoded to my PC. I suggest just using my ./configs.
-* Use archinstall on live Arch Linux ISO and install Hyprland.
+* Use archinstall on live Arch Linux ISO.
   * Use `iwctl` to connect WIFI if needed.
-* After installing arch: `git clone https://github.com/hakan-demirli/dotfiles`
-* If you need WIFI:
-  * `cd dotfiles`
-  * `./scripts/lin/ib.sh i_network`
-  * `python ./scripts/python/unused/symlinkConfigs.py`
-  * Then reboot. Waybar will appear together with network manager applet.
-  * Use applet to connect to WIFI.
-* `./scripts/lin/ib.sh`
-  * It will automatically reboot after the install. 
+  * Set followings:
+    * Netowork manager
+    * pipewire
+    * git
+    * Username and password
+  * ```./scripts/lin/ib.sh i_nix```
+  * ```cp ~/dotfiles/.config/nix ~/.config/nix`
+  * ```reboot```
+  * ```nix run home-manager/master -- switch --flake ~/.config/home-manager#emre -v```
+    * Change the user name accordingly
 * Auto install my [firefoxCSS](https://github.com/hakan-demirli/Firefox_Custom_CSS).
   * `python ./scripts/python/unused/installFirefoxCSS.py`
 
