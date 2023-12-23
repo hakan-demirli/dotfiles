@@ -1,0 +1,30 @@
+#!/usr/bin/env -S sh -c 'nvchecker -cnvchecker.toml --logger=json | jq -r '\''.version | sub("^v"; "") | split("-") | .[-1]'\'' | xargs -i{} sed -i "s/^\\(pkgver=\\).*/\\1{}/" $0'
+# shellcheck shell=bash disable=SC2034,SC2154
+# ex: nowrap
+pkgname=nixd-git
+_pkgname=nixd
+pkgver=0.0.0.r1.db3
+pkgrel=1
+license=(LGPL3)
+pkgdesc='nixd lsp'
+arch=(i686 x86_64 arm aarch64)
+url="https://github.com/nix-community/nixd"
+source=("${_pkgname}::git+${url}.git")
+sha256sums=('SKIP')
+provides=("nixd")
+conflicts=("nixd")
+
+build() {
+	cd "${srcdir}/${_pkgname}"
+  nix build -L .#
+}
+
+check() {
+	cd "${srcdir}/${_pkgname}"
+  meson test -C build --print-errorlogs
+}
+
+package() {
+	cd "${srcdir}/${_pkgname}"
+  meson install -C build --destdir "$pkgdir"
+}

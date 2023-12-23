@@ -314,8 +314,10 @@ function i_helix() {
     # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
 
     # Install Nix Lsp
+    yay -S --noconfirm --answerdiff=None --needed nixd
+    # yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/nil
+
     yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/alejandra
-    yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/nil
     yay -Bi --noconfirm --answerdiff=None --needed ./aur_packages/direnv
 }
 

@@ -48,7 +48,11 @@ auto-format = true
 [[language]]
 name = "nix"
 formatter = { command = 'alejandra', args = [] }
+language-servers = ["nixd"]
 auto-format = true
+
+[language-server.nixd]
+command = "nixd"
 
 [[language]]
 name = "html"
