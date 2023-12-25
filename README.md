@@ -20,7 +20,6 @@
 # TODO
 - nix: fix home-manager
 - nix: btop GPU
-- nix: lfcd
 - volume waybar/hyprland 
 - brightness waybar/hyprland 
 - Firefox custom file picker: lf/yazi
