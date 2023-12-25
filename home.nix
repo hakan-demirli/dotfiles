@@ -141,9 +141,14 @@
     };
     # TODO : chmod x all bins
     dataFile."." = {
-      source = ./.local;
+      source = ./.local/share;
       recursive = true;
     };
+  };
+  home.file.".local/bin" = {
+    source = ./.local/bin;
+    recursive = true;
+    executable = true;
   };
 
   # home.file."${config.xdg.configHome}" = {
