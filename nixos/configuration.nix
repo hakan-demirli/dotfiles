@@ -184,7 +184,7 @@
     }))
     wl-clipboard
     wl-clip-persist
-    # ntfs3g
+    pulseaudio
 
     libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
   ];

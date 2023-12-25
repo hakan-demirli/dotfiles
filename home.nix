@@ -83,8 +83,6 @@
     };
   };
 
-  services.swayosd.enable = true;
-
   home.packages = with pkgs; [
     python3
 
@@ -103,7 +101,7 @@
     kooha
     transmission
     swaynotificationcenter
-    # swayosd
+
     playerctl
     swww
     mpv
