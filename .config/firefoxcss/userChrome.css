@@ -1,0 +1,63 @@
+
+/*************************************************** One_Liner ***************************************************/
+#tabbrowser-tabs { visibility: collapse !important; }
+
+#nav-bar {
+margin-top: -30px;
+margin-right: 35vw;
+margin-bottom: 0px;
+margin-left: 0px;}
+
+/* if the screen is smaller than 1300px right margin is 30% */
+@media screen and (max-width: 1700px){
+  #urlbar-container{ min-width:unset !important }
+  #navigator-toolbox > #nav-bar{ margin-right:30vw !important}
+}
+
+/* if the screen is smaller than 950px right margin is 20% */
+@media screen and (max-width: 950px){
+  #urlbar-container{ min-width:unset !important }
+  #navigator-toolbox > #nav-bar{ margin-right:20vw !important}
+}
+/*************************************************** SIDEBERY ***************************************************/
+#sidebar-box {  min-width: 1px !important;}
+
+#sidebar-header{ display: none }
+
+/************************************************ Hover_text_color ***************************************************/
+tooltip{-moz-appearance: none !important; background:#232323 !important; color: #ededed}
+
+/******************************************* Remove_Search_with_Google ***********************************************/
+#urlbar[usertyping] .urlbarView-row:not([type]):first-child,
+#urlbar[usertyping] .urlbarView-row[type="search"]:first-child,
+.urlbarView-row[type="tabtosearch"] {
+  display: none !important;
+}
+
+/******************************************* Remove_Padding_and_button_fix *************************************************/
+#urlbar-container{ padding-block: 0px !important }
+.titlebar-buttonbox-container{ -moz-box-align: start !important; }
+
+/*************************************** Remove 1 pixel sized black line *********************************************/
+#navigator-toolbox {
+  border-bottom: none !important;
+}
+
+/*************************************** Remove Right Click Menu Top Settings ****************************************/
+#context-navigation,#context-sep-navigation{ display: none !important }
+
+/*************************************** Shrink toolbar by 1 pixel *********************************************/
+#navigator-toolbox{
+  --toolbarbutton-inner-padding: 5px;
+}
+#urlbar-container{
+  --urlbar-container-height: 25px !important;
+  padding-block: 1px !important;
+}
+toolbarbutton.bookmark-item:not(.subviewbutton){
+  margin: 0px !important;
+  padding-block: 0 !important;
+}
+
+/*************************************** Remove Bookmarks Star *******************************************************/
+#star-button-box {display: none !important;}
