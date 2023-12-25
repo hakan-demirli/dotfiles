@@ -35,5 +35,12 @@ def git_clone(url):
         shutil.copytree(repo_dir, dst_dir)
 
 
+def git_command(args):
+    if args[0] == "clone" and len(args) == 2:
+        git_clone(args[1])
+    else:
+        subprocess.run(["git"] + args)
+
+
 if __name__ == "__main__":
-    git_clone(sys.argv[1])
+    git_command(sys.argv[1:])

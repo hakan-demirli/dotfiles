@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+yt-dlp --embed-metadata --format 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720][ext=mp4]/best[ext=mp4]' --output '%(playlist_index)s. %(title)s.%(ext)s'

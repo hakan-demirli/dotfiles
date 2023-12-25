@@ -11,10 +11,29 @@
   programs.bash.enable = true;
   programs.starship.enable = true;
 
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
+  programs.fzf.enable = true;
+  programs.fzf.enableBashIntegration = true;
+
   home.username = "emre";
   home.homeDirectory = "/home/emre";
+
+  home.shellAliases = {
+    ":q" = "exit";
+    lf = "lfcd";
+    git = "git_clone_cached";
+    ga = "git add";
+    gd = "git diff";
+    gp = "git push";
+    gs = "git status";
+    gc = "git commit";
+    gl = "git log";
+
+    ascp = "asusctl profile -p";
+    ascl = "asusctl profile -l";
+    ascsp = "asusctl profile -P Performance";
+    ascsb = "asusctl profile -P Balanced";
+    ascsq = "asusctl profile -P Quiet";
+  };
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -45,8 +64,9 @@
   #  services.udisks2.enable = true;
   #  programs.gnome-disks.enable = true;
   home.packages = with pkgs; [
-    networkmanagerapplet
+    python3
 
+    networkmanagerapplet
     brightnessctl
     kooha
     transmission
@@ -59,7 +79,6 @@
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
     bat
     ripgrep
-    fzf
     tmux
 
     helix
@@ -84,6 +103,8 @@
     EDITOR = "helix";
     TERMINAL = "kitty";
     TERM = "kitty";
+
+    PROMPT_COMMAND = "history -a";
 
     # export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
     # env = PATH,$HOME/.local/bin:$PATH
