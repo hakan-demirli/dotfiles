@@ -65,6 +65,8 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
+  hardware.bluetooth.enable = true; # enables support for Bluetooth
+  services.blueman.enable = true;
 
   # Set your time zone.
   time.timeZone = "Europe/Istanbul";

@@ -78,6 +78,16 @@
   home.packages = with pkgs; [
     python3
 
+    usbutils
+    pavucontrol
+    android-file-transfer
+    yarr
+    transmission
+    libsForQt5.kolourpaint
+    libsForQt5.breeze-icons
+    # etcher # BUG electron not safe
+    nwg-displays
+    hyprshot
     networkmanagerapplet
     brightnessctl
     kooha
@@ -91,6 +101,7 @@
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
     bat
     ripgrep
+    ripdrag
     tmux
     ffmpeg
 

@@ -131,7 +131,7 @@ map gm cd /tmp/mtp
 # map gm cd /run/user/1000/gvfs
 
 # Bookmark
-map bd cd /mnt/second/rep/dotfiles
+map bd cd ~/dotfiles
 map bs cd /mnt/second/school
 map bp cd /mnt/second/rep/personal_repo
 map bt cd /mnt/second/rep/personal_repo/notes/personal_notes/todo
