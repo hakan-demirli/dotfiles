@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-tmux new-session -s "$(basename "$(pwd)")_$(echo -n "$(pwd)" | md5sum | cut -d " " -f 1)" "helix .";
-
