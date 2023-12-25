@@ -11,9 +11,9 @@
   programs.direnv.enable = true;
   programs.bash = {
     enable = true;
-    initExtra = ''
-      . "/home/emre/.local/lfcd.sh"
-    '';
+    # initExtra = ''
+    #   . "/home/emre/.local/lfcd.sh"
+    # '';
   };
 
   programs.fzf.enable = true;
@@ -25,7 +25,7 @@
   home.shellAliases = {
     ":q" = "exit";
     "hx." = "helix .";
-    lf = "lfcd";
+    # lf = "lfcd";
     git = "git_clone_cached";
     ga = "git add";
     gd = "git diff";

@@ -176,7 +176,9 @@
     kitty
     wofi
     firefox
-    lf
+    (lf.overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [] ++ [../programs/lf.patch];
+    }))
     wl-clipboard
     wl-clip-persist
     # ntfs3g
