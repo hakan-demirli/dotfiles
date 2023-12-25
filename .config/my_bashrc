@@ -1,28 +1,5 @@
-function ya() {
-	tmp="$(mktemp -t "yazi-cwd.XXXXX")"
-	yazi --cwd-file="$tmp"
-	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
-
-function git() {
-    if [[ $1 == "clone" && $# -eq 2 ]]
-    then
-        git_clone_cached $2
-    else
-        command git "$@"
-    fi
-}
-
 my_set_paths() {
 	export PROMPT_COMMAND='history -a'
-
-    # set -o vi
-    set show-mode-in-prompt on
-    set vi-cmd-mode-string "\1\e[2 q\2"
-    set vi-ins-mode-string "\1\e[6 q\2"
 
     if [ "$(whoami)" == "emre" ]; then
         alias hx='helix'
@@ -31,39 +8,9 @@ my_set_paths() {
     else
         alias helix='hx'
     fi
-    alias ga='git add'
-    alias gd='git diff'
-    alias gp='git push'
-    alias gs='git status'
-    alias gc='git commit'
-    alias gl='git log'
-
-    alias yt-dlp-pl="yt-dlp --embed-metadata --format 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720][ext=mp4]/best[ext=mp4]' --output '%(playlist_index)s. %(title)s.%(ext)s'"
 
     if [ -f ~/.config/lf/lfcd.sh ]; then . ~/.config/lf/lfcd.sh; fi
     alias lf='lfcd'
-    alias cf='cf && exit'
-
-	# Hyprland PATH is buggy
-    export PATH=~/.local/bin:$PATH
-    export PATH=/usr/local/bin:$PATH
-
-    # export DIRENV_CONFIG=$HOME/.config/direnv/direnvrc
-	export DIRENV_WARN_TIMEOUT=0
-
-
-
-    # export OPENER=xdg-open
-
-    alias tmux='tmux -f ~/.config/tmux/tmux.conf'
-    alias txa='tmux attach-session -t'
-    alias txls='tmux list-sessions'
-    alias txks='tmux kill-session -t '
-    alias txn='tmux new-session -s'
-    alias txs='tmux switch-client -n'
-    alias txkw='tmux kill-window -t '
-    alias txlw='tmux list-windows'
-    alias txh='tmux new-session -s "$(basename "$(pwd)")_$(echo -n "$(pwd)" | md5sum | cut -d " " -f 1)" "helix ."'
 
     # export LM_LICENSE_FILE=$MY_APP_DIR/lin/quartus/license.dat
 
@@ -74,62 +21,11 @@ my_set_paths() {
     # export RISCV=$MY_APP_DIR/lin/riscv64_gnu_toolchain
     # export PATH=$MY_APP_DIR/lin/riscv64_gnu_toolchain/bin:$PATH
 	
-
-
-	# Set XDG Base Directory variables
-	# export XDG_DATA_HOME="$HOME/.local/share"
-	# export XDG_CONFIG_HOME="$HOME/.config"
-	# export XDG_STATE_HOME="$HOME/.local/state"
-	# export XDG_CACHE_HOME="$HOME/.cache"
-
-	# Hyprland PATH is buggy
-	export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
-
-	# Make sure the directories exist
-	mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
-
-	# export ANDROID_HOME="$XDG_DATA_HOME"/android
-	# export CARGO_HOME="$XDG_DATA_HOME"/cargo
-	# export CUDA_CACHE_PATH="$XDG_CACHE_HOME"/nv
-	# export GNUPGHOME="$XDG_DATA_HOME"/gnupg
-	# export PASSWORD_STORE_DIR="$XDG_DATA_HOME"/password-store
-	# export RUSTUP_HOME="$XDG_DATA_HOME"/rustup
-	# export NUGET_PACKAGES="$XDG_CACHE_HOME"/NuGetPackages
-	# export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc 
-	# export DOTNET_CLI_HOME="/tmp/DOTNET_CLI_HOME"
-	# export GNUPGHOME="$XDG_DATA_HOME"/gnupg
-	# export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 	alias arduino-cli='arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml'
 
 	# fzf keybindings and shortcuts for Bash
-	source /usr/share/fzf/key-bindings.bash
-	source /usr/share/fzf/completion.bash
 	alias fd='source fzf_cd'
-
-
-    # PS1='\[\e[32m\][\u@\h \W]\$\[\e[0m\]'
-    # show_virtual_env() {
-    #   if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
-    #     echo -e "\e[36m $(basename $VIRTUAL_ENV) \e[0m"
-    #   fi
-    # }
-    # export -f show_virtual_env
-    # PS1='$(show_virtual_env)'$PS1
-
-    eval "$(direnv hook bash)"
-    eval "$(starship init bash)"
-
-    # alias ya='ya' # You do not need this. Function is already in path.
-    # alias lf='ya' # Muscle memory.
-
-    alias :q=exit
-
-    alias ascp='asusctl profile -p'
-    alias ascl='asusctl profile -l'
-    alias ascsp='asusctl profile -P Performance'
-    alias ascsb='asusctl profile -P Balanced'
-    alias ascsq='asusctl profile -P Quiet'
 }
 
 my_set_paths

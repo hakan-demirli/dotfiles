@@ -19,6 +19,7 @@
 
   home.shellAliases = {
     ":q" = "exit";
+    "hx." = "helix .";
     lf = "lfcd";
     git = "git_clone_cached";
     ga = "git add";
@@ -33,6 +34,15 @@
     ascsp = "asusctl profile -P Performance";
     ascsb = "asusctl profile -P Balanced";
     ascsq = "asusctl profile -P Quiet";
+
+    tmux = "tmux -f ~/.config/tmux/tmux.conf";
+    txa = "tmux attach-session -t";
+    txls = "tmux list-sessions";
+    txks = "tmux kill-session -t ";
+    txn = "tmux new-session -s";
+    txs = "tmux switch-client -n";
+    txkw = "tmux kill-window -t ";
+    txlw = "tmux list-windows";
   };
 
   # This value determines the Home Manager release that your configuration is
@@ -115,6 +125,8 @@
     XDG_CONFIG_HOME = "$HOME/.config";
     XDG_STATE_HOME = "$HOME/.local/state";
     XDG_CACHE_HOME = "$HOME/.cache";
+
+    DIRENV_WARN_TIMEOUT = 0;
 
     DIRENV_CONFIG = "$HOME/.config/direnv/direnvrc";
     ANDROID_HOME = "$XDG_DATA_HOME/android";
