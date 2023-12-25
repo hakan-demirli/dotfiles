@@ -89,10 +89,16 @@
   services.xserver = {
     enable = true;
     displayManager = {
-      sddm.enable = true;
-      sddm.theme = "${import ../programs/sddm-theme.nix {inherit pkgs;}}";
+      sddm = {
+        enable = true;
+        theme = "${import ../programs/sddm-theme.nix {inherit pkgs;}}";
+      };
     };
   };
+  # https://github.com/NixOS/nixpkgs/issues/97795#issuecomment-693354398
+  systemd.services.display-manager.wants = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
+  systemd.services.display-manager.after = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
+
   # Configure keymap in X11
   # services.xserver = {
   #   layout = "us";
