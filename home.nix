@@ -18,8 +18,14 @@
     '';
   };
 
-  programs.fzf.enable = true;
-  programs.fzf.enableBashIntegration = true;
+  programs.fzf = {
+    enable = true;
+    enableBashIntegration = true;
+    # Not working
+    # defaultOptions = [
+    # "--bind 'tab:toggle-up,btab:toggle-down'"
+    # ];
+  };
 
   home.username = "emre";
   home.homeDirectory = "/home/emre";
@@ -29,6 +35,8 @@
     "hx." = "helix .";
     helix = "hx";
     lf = "lfcd";
+    fzf = "fzf --bind 'tab:toggle-up,btab:toggle-down'";
+
     git = "git_clone_cached";
     ga = "git add";
     gd = "git diff";
@@ -36,6 +44,8 @@
     gs = "git status";
     gc = "git commit";
     gl = "git log";
+
+    lutris = "nvidia-offload lutris";
 
     ascp = "asusctl profile -p";
     ascl = "asusctl profile -l";
@@ -115,6 +125,8 @@
     taplo
     texlab
     sioyek
+
+    lutris
 
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"

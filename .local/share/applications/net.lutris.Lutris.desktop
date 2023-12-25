@@ -1,0 +1,14 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Name=Lutris
+StartupWMClass=Lutris
+Comment=Video Game Preservation Platform
+Categories=Game;
+Keywords=gaming;wine;emulator;
+Exec=nvidia-offload lutris %U
+Icon=lutris
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/lutris;
+X-GNOME-UsesNotifications=true

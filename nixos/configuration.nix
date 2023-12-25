@@ -19,6 +19,7 @@
     users = {
       emre = import ../home.nix;
     };
+    useGlobalPkgs = true;
   };
 
   # Bootloader.
