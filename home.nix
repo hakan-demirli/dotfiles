@@ -27,6 +27,7 @@
   home.shellAliases = {
     ":q" = "exit";
     "hx." = "helix .";
+    helix = "hx";
     lf = "lfcd";
     git = "git_clone_cached";
     ga = "git add";
@@ -50,6 +51,9 @@
     txs = "tmux switch-client -n";
     txkw = "tmux kill-window -t ";
     txlw = "tmux list-windows";
+
+    wget = ''wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'';
+    arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
   };
 
   home.stateVersion = "23.05"; # You should not change this value.
