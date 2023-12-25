@@ -80,6 +80,7 @@
     bat
     ripgrep
     tmux
+    ffmpeg
 
     helix
     nixd

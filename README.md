@@ -19,7 +19,10 @@
 
 # TODO
 - nix: fix home-manager
-- nix: copy then chmod
+- nix: btop GPU
+- nix: lfcd
+- volume waybar/hyprland 
+- brightness waybar/hyprland 
 - Firefox custom file picker: lf/yazi
   - Using xdg-desktop-portal ?
 - trash-cli that works on both windows and linux
