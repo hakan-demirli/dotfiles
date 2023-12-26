@@ -7,11 +7,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
   outputs = {
     self,
     nixpkgs,
+    nixos-hardware,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -26,7 +28,13 @@
     nixosConfigurations = {
       myNixos = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs system;};
-        modules = [./nixos/configuration.nix];
+        modules = [
+          nixos-hardware.nixosModules.common-cpu-amd
+          nixos-hardware.nixosModules.common-cpu-amd-pstate
+          nixos-hardware.nixosModules.common-pc-laptop
+          nixos-hardware.nixosModules.common-pc-ssd
+          ./nixos/configuration.nix
+        ];
       };
     };
     # TODO  nix run home-manager/master -- switch --flake .
