@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./programs/firefox.nix
+    ./programs/battery_monitor.nix
   ];
 
   programs.starship.enable = true;
