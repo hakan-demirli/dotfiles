@@ -43,11 +43,13 @@
     fzf = "fzf --bind 'tab:toggle-up,btab:toggle-down'";
 
     git = "git_clone_cached";
+    "ga." = "git add .";
     ga = "git add";
     gd = "git diff";
     gp = "git push";
     gs = "git status";
     gc = "git commit";
+    gcm = "git commit -m";
     gl = "git log";
 
     lutris = "nvidia-offload lutris";
@@ -133,6 +135,7 @@
     sioyek
 
     lutris
+    asusctl
     # pkgs.callPackage ./programs/gtasks_overlay.nix { };
   ];
 

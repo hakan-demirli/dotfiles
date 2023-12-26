@@ -64,6 +64,10 @@
   services.udisks2.enable = true;
   programs.gnome-disks.enable = true;
 
+  # For Asusctl
+  services.asusd.enable = true;
+  services.asusd.enableUserService = true;
+
   # Enable networking
   networking.networkmanager.enable = true;
   hardware.bluetooth.enable = true; # enables support for Bluetooth
@@ -188,7 +192,10 @@
 
     libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
   ];
-
+  powerManagement = {
+    enable = true;
+    cpuFreqGovernor = "ondemand";
+  };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
