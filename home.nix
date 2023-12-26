@@ -75,6 +75,7 @@
       package = pkgs.dracula-theme;
       name = "Dracula";
     };
+    gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = true;
     };
@@ -86,6 +87,7 @@
   home.packages = with pkgs; [
     python3
 
+    jq # to parse hyprctl
     usbutils
     pavucontrol
     android-file-transfer
@@ -155,7 +157,7 @@
     ANDROID_HOME = "$XDG_DATA_HOME/android";
     CARGO_HOME = "$XDG_DATA_HOME/cargo";
     CUDA_CACHE_PATH = "$XDG_CACHE_HOME/nv";
-    GNUPGHOME = "$XDG_DATA_HOME/gnupg";
+    GNUPGHOME = "$XDG_DATA_HOME/gnupg"; # handled in home manager
     PASSWORD_STORE_DIR = "$XDG_DATA_HOME/password-store";
     RUSTUP_HOME = "$XDG_DATA_HOME/rustup";
     NUGET_PACKAGES = "$XDG_CACHE_HOME/NuGetPackages";
@@ -166,8 +168,12 @@
     PYTHONPYCACHEPREFIX = "$XDG_CACHE_HOME/python";
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
     GOPATH = "$XDG_CACHE_HOME/go";
+    # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
+    GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
+    VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
   };
 
+  programs.gpg.homedir = "${config.xdg.dataHome}/gnupg";
   # xdg.configFile.foo.source =  config.lib.file.mkOutOfStoreSymlink "/absolute/path/to/bar";
 
   xdg = {
