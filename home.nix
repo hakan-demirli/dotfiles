@@ -9,7 +9,11 @@
   ];
 
   programs.starship.enable = true;
-  programs.direnv.enable = true;
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+    enableBashIntegration = true;
+  };
   programs.bash = {
     enable = true;
     initExtra = ''
@@ -124,15 +128,12 @@
     nodePackages_latest.pyright
     rust-analyzer
     taplo
+    gnumake
     texlab
     sioyek
 
     lutris
-
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-    gparted
+    # pkgs.callPackage ./programs/gtasks_overlay.nix { };
   ];
 
   home.sessionVariables = {
@@ -152,7 +153,7 @@
     XDG_STATE_HOME = "$HOME/.local/state";
     XDG_CACHE_HOME = "$HOME/.cache";
 
-    DIRENV_WARN_TIMEOUT = 0;
+    DIRENV_WARN_TIMEOUT = "8m";
 
     DIRENV_CONFIG = "$HOME/.config/direnv/direnvrc";
     ANDROID_HOME = "$XDG_DATA_HOME/android";
