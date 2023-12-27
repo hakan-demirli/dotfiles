@@ -1,4 +1,4 @@
-from dep.traymenu import TrayMenu, quitsystray
+from traymenu import TrayMenu, quitsystray
 import mylib
 import pathlib
 import sys
@@ -11,7 +11,7 @@ def kill_process_and_children(pid: int, sig: int = 15):
     try:
         proc = psutil.Process(pid)
     except psutil.NoSuchProcess as e:
-        # Maybe log something here
+        print(e)
         return
 
     for child_process in proc.children(recursive=True):
