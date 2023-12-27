@@ -195,6 +195,7 @@
     swaylock
     vim # default editor
     git
+    git-crypt
     waybar
     kitty
     wofi

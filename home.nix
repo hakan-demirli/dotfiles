@@ -148,6 +148,11 @@
     nodePackages_latest.pyright
     rust-analyzer
     taplo
+    nodePackages_latest.vscode-json-languageserver
+    nodePackages_latest.bash-language-server
+    clang-tools
+    lldb
+    cmake-language-server
     gnumake
     texlab
     sioyek
