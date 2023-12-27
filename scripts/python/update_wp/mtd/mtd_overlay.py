@@ -1,18 +1,15 @@
-import mylib
-from PIL import Image, ImageDraw, ImageFont, ImageOps
-import pathlib
-import sys
 import os
+
+from PIL import Image, ImageDraw, ImageFont
 
 
 def main():
-    script_dir = pathlib.Path(__file__).parent.absolute()
-    font_file = mylib.ANON_FONT_FILE
-    overlay_file = mylib.MTD_OVERLAY_FILE
+    font_file = os.path.expanduser("~/.local/share/fonts/anonymous.ttf")
+    overlay_file = "/tmp/mtd_overlay.png"
     width, height = 700, 800
     background_color = (0, 0, 0, 0)
     text_position = (400, 40)
-    font_size = 13
+    font_size = 12
     text_color = (255, 205, 205)
     font = ImageFont.truetype(font_file, size=font_size)
 
@@ -21,6 +18,12 @@ def main():
 
     config_dir = os.path.expanduser("~/.config/mtd")
     mtdr_file = os.path.join(config_dir, "mtd.md")
+
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
+
+    if not os.path.isfile(mtdr_file):
+        open(mtdr_file, "a").close()
 
     with open(mtdr_file, "r") as mtdr:
         mtd_contents = mtdr.readlines()

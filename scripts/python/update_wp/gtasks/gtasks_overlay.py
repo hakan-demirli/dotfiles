@@ -14,12 +14,12 @@ Gtasks to png transparent overlay image.
 
 def main():
     script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
-    font_file = os.environ["MY_FONT_FILE "]
+    font_file = os.path.expanduser("~/.local/share/fonts/anonymous.ttf")
     overlay_file = tempfile.gettempdir() + "/tasks_overlay.png"
     width, height = 700, 800
     background_color = (0, 0, 0, 0)
     text_position = (40, 40)
-    font_size = 13
+    font_size = 16
     text_color = (155, 205, 205)
 
     image = Image.new("RGBA", (width, height), background_color)
