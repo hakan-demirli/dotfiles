@@ -162,11 +162,17 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  ## xdg terminal chooser
   # xdg.portal = {
-  #   enable = true;
-  #   wlr.enable = true;
-  #   extraPortals = [pkgs.xdg-desktop-portal-gtk];
+  #   # enable = true;
+  #   extraPortals = with pkgs; [
+  #     #xdg-desktop-portal-shana
+  #     #xdg-desktop-portal-gtk
+  #     (callPackage ../programs/xdg-desktop-portal-termfilechooser.nix {})
+  #   ];
   # };
+  # # needed by termfilechooser portal
+  # environment.sessionVariables.TERMCMD = "${pkgs.kitty}/bin/kitty --class=file_chooser --override background_opacity=1";
 
   hardware = {
     # Opengl

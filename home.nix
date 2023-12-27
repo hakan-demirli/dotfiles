@@ -111,6 +111,14 @@
     };
   };
 
+  home.pointerCursor = {
+    gtk.enable = true;
+    x11.enable = true;
+    package = pkgs.bibata-cursors;
+    name = "Bibata-Modern-Classic";
+    size = 10;
+  };
+
   home.packages = with pkgs; [
     python3
 
@@ -141,6 +149,7 @@
     ffmpeg
 
     unar
+    zip
 
     helix
     nixd
@@ -163,8 +172,10 @@
 
     lutris
     asusctl
-    (pkgs.callPackage ./programs/gtasks_overlay.nix {})
-    (pkgs.callPackage ./programs/ics_overlay.nix {})
+    # (pkgs.callPackage ./programs/wp.nix {})
+    # (pkgs.callPackage ./programs/gtk_applet.nix {})
+    # (pkgs.callPackage ./programs/youtube_sync.nix {})
+    # (pkgs.callPackage ./programs/clipboard_tts.nix {})
   ];
 
   home.sessionVariables = {
