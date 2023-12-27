@@ -162,6 +162,7 @@
     lutris
     asusctl
     (pkgs.callPackage ./programs/gtasks_overlay.nix {})
+    (pkgs.callPackage ./programs/ics_overlay.nix {})
   ];
 
   home.sessionVariables = {
