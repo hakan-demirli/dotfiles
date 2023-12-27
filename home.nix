@@ -42,7 +42,7 @@
     enable = true;
     defaultCommand = "${pkgs.fd}/bin/fd --type f";
     defaultOptions = [
-      "--reverse"
+      "--bind 'tab:toggle-up,btab:toggle-down'"
       "--info=inline"
       "--border"
       "--color=fg:-1,bg:-1,hl:#bd93f9"
