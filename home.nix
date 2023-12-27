@@ -150,9 +150,11 @@
     taplo
     nodePackages_latest.vscode-json-languageserver
     nodePackages_latest.bash-language-server
+    nodePackages_latest.prettier
     clang-tools
     lldb
     cmake-language-server
+    marksman
     gnumake
     texlab
     sioyek
