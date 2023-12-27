@@ -32,41 +32,13 @@ function i_vmware() {
     sudo modprobe -a vmw_vmci vmmon
 }
 
-function i_wine_nvidia() {
-    # Windows Emulation/Layer
-    sudo sed -i '/^#\[multilib\]/{N;s/#//g}' /etc/pacman.conf
-    sudo pacman -Syu # must syu after multilib
-    sudo pacman -S --noconfirm --needed wine
-    sudo pacman -S --noconfirm --needed winetricks
-    sudo pacman -S --noconfirm --needed zenity
-    sudo pacman -S --noconfirm --needed lutris
-    sudo pacman -S --noconfirm --needed lib32-nvidia-utils
-    sudo pacman -S --noconfirm --needed xdg-desktop-portal-hyprland
-    sudo pacman -S --noconfirm --needed xdg-desktop-portal-gtk
-    sudo pacman -S --noconfirm --needed nvidia
-    sudo pacman -S --noconfirm --needed nvidia-prime
-}
-
-function i_xremap() {
-    yay -S --noconfirm --answerdiff=None --needed xremap-hypr-bin
-    echo "uinput" | sudo tee -a /etc/modules-load.d/uinput.conf
-    sudo gpasswd -a $USER input
-    echo 'KERNEL=="uinput", GROUP="input", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/99-input.rules
-}
-
 function i_y_core() {
     yay -S --noconfirm --answerdiff=None --needed btop-gpu-git
     yay -S --noconfirm --answerdiff=None --needed k4dirstat
-    yay -S --noconfirm --answerdiff=None --needed asusctl
-    yay -S --noconfirm --answerdiff=None --needed rog-control-center
-    yay -S --noconfirm --answerdiff=None --needed wlr-randr # Dep for nwg-displays
-    yay -S --noconfirm --answerdiff=None --needed wlr-randr
 }
 
 
 function i_core() {
-    sudo pacman -S --noconfirm --needed gnome-disk-utility
-    # sudo pacman -S --noconfirm --needed gnome-system-monitor # -> btop
     sudo pacman -S --noconfirm --needed gnome-bluetooth-3.0
     sudo pacman -S --noconfirm --needed gnome-power-manager
     sudo pacman -S --noconfirm --needed upower
@@ -75,14 +47,6 @@ function i_core() {
     sudo pacman -S --noconfirm --needed adwaita-qt5
     sudo pacman -S --noconfirm --needed adwaita-qt6
     sudo pacman -S --noconfirm --needed swayidle
-    sudo pacman -S --noconfirm --needed wireplumber
-    sudo pacman -S --noconfirm --needed grim
-    sudo pacman -S --noconfirm --needed slurp
-
-    sudo pacman -S --noconfirm --needed blueman
-    sudo pacman -S --noconfirm --needed bluez
-    sudo systemctl enable bluetooth.service
-    sudo systemctl start bluetooth.service
 }
 
 function i_vieb(){
@@ -131,22 +95,12 @@ function i_bunch() {
     sudo pacman -S --noconfirm --needed p7zip
     sudo pacman -S --noconfirm --needed zip
     sudo pacman -S --noconfirm --needed unarchiver
-    sudo pacman -S --noconfirm --needed udiskie
 
     # Check /run/user/1000/gvfs directory for mtp devices mounted by nemo
     # Check /tmp/mtp directory for mtp devices mounted by lf
     # sudo pacman -S --noconfirm --needed nemo # -> lf
     # sudo pacman -S --noconfirm --needed nemo-fileroller
     sudo pacman -S --noconfirm --needed wget
-    sudo pacman -S --noconfirm --needed mpv
     sudo pacman -S --noconfirm --needed cronie
 }
 
-function i_helix() {
-    sudo pacman -S --noconfirm --needed prettier     # markdown etc.
-    sudo pacman -S --noconfirm --needed python-ruff  # python
-    sudo pacman -S --noconfirm --needed rust-analyzer # rust
-    sudo pacman -S --noconfirm --needed lldb
-    sudo pacman -S --noconfirm --needed bash-language-server
-    # yay -S --noconfirm --answerdiff=None --needed verible-git # verilog
-}
