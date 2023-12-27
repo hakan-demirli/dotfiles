@@ -21,12 +21,55 @@
     # userName = "emre";
     yamlConfig = builtins.readFile ../.config/xremap/config.yml;
   };
-  boot.kernelParams = [
-    "initcall_blacklist=acpi_cpufreq_init"
-    "amd_pstate.shared_mem=1"
-    "amd_pstate=active"
-  ];
-  boot.kernelModules = ["amd-pstate"];
+
+  services.auto-epp.enable = true;
+  services.tlp = {
+    enable = true;
+    settings = {
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+
+      CPU_MIN_PERF_ON_AC = 0;
+      CPU_MAX_PERF_ON_AC = 100;
+      CPU_MIN_PERF_ON_BAT = 0;
+      CPU_MAX_PERF_ON_BAT = 20;
+    };
+  };
+
+  boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+    kernelParams = [
+      "quiet"
+      "mitigations=off"
+      "initcall_blacklist=acpi_cpufreq_init"
+      "amd_pstate.shared_mem=1"
+      "amd_pstate=active"
+    ];
+    kernelModules = ["amd-pstate"];
+
+    # kernelPatches = [
+    #   {
+    #     name = "crashdump-config";
+    #     patch = null;
+    #     # check via: zcat /proc/config.gz
+    #     extraConfig = ''
+    #       CC_OPTIMIZE_FOR_PERFORMANCE y
+    #       X86_AMD_PSTATE y
+    #     '';
+    #   }
+    # ];
+    supportedFilesystems = ["ntfs"];
+  };
+  # Bootloader.
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "nodev";
+  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.default = "saved";
+  boot.loader.efi.canTouchEfiVariables = true;
 
   home-manager = {
     extraSpecialArgs = {inherit inputs;};
@@ -36,27 +79,9 @@
     useGlobalPkgs = true;
   };
 
-  # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "nodev";
-  boot.loader.grub.useOSProber = true;
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.default = "saved";
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
   time.hardwareClockInLocalTime = true;
-  # boot.loader.systemd-boot.enable = true;
-
-  boot.supportedFilesystems = ["ntfs"];
 
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # systemctl status --user polkit-gnome-authentication-agent-1
   # systemctl restart --user polkit-gnome-authentication-agent-1
@@ -173,14 +198,6 @@
   # };
   # # needed by termfilechooser portal
   # environment.sessionVariables.TERMCMD = "${pkgs.kitty}/bin/kitty --class=file_chooser --override background_opacity=1";
-
-  hardware = {
-    # Opengl
-    opengl.enable = true;
-
-    # Most wayland compositors need this
-    nvidia.modesetting.enable = true;
-  };
 
   environment.localBinInPath = true;
   environment.sessionVariables = {
