@@ -20,8 +20,11 @@
 * ```sudo nixos-rebuild switch --flake ~/dotfiles/#myNixos```
 
 # TODO
+- nix: python scripts
 - nix: fix home-manager
 - nix: btop GPU
+- nix: test dev envs
+- Firefox: vimium jump
 - Firefox custom file picker: lf/yazi
   - Using xdg-desktop-portal ?
 - trash-cli that works on both windows and linux
