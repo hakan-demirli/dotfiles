@@ -29,6 +29,7 @@
       theme_background = false; # use terminal background
       vim_keys = true;
       proc_tree = false;
+      proc_sorting = "memory";
       update_ms = 1000;
     };
   };

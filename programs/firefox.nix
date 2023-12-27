@@ -3,6 +3,9 @@
     enable = true;
     profiles.emre = {
       # extensions = with pkgs.nur.repos.rycee.firefox-addons; []; # handled by firefox account
+
+      search.default = "Google";
+      search.force = true;
       isDefault = true;
 
       userChrome = builtins.readFile ../.config/firefoxcss/userChrome.css;
