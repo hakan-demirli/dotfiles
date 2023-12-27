@@ -20,8 +20,6 @@
 * ```sudo nixos-rebuild switch --flake ~/dotfiles/#myNixos```
 
 # TODO
-- nix: package python scripts
-- nix: secrets, git-crypt
 - nix: fix home-manager
 - nix: btop GPU
 - Firefox custom file picker: lf/yazi

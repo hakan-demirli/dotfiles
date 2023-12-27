@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-from PIL import Image, ImageDraw, ImageFont
 import calendar
-import io
-import sys
 import datetime
+import io
+import json
+import logging
 import os
 import pathlib
-import logging
-import json
+import sys
 import tempfile
-from fetch_ics_file import get_ics
 
+from fetch_ics_file import get_ics
+from PIL import Image, ImageDraw, ImageFont
 
 logger = logging.getLogger(__name__)
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"

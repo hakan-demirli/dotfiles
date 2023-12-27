@@ -100,7 +100,7 @@ map p paste
 map x :toggle;down  
 map <esc>   :unselect; clear
 
-map m music
+# map m music
 map e
 
 map <space>
