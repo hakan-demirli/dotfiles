@@ -15,6 +15,8 @@
 * Use your hardware-configuration.nix
 * Remove nvidia.nix if it is not required
 * Change user name
+* Decrypt secrets
+  * ```git-crypt unlock ../git-crypt-key```
 * ```sudo nixos-rebuild switch --flake ~/dotfiles/#myNixos```
 
 # TODO
