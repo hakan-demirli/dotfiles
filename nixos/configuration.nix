@@ -39,16 +39,18 @@
     };
   };
 
+  # test: `cpupower frequency-info`
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       "quiet"
       "mitigations=off"
-      "initcall_blacklist=acpi_cpufreq_init"
-      "amd_pstate.shared_mem=1"
-      "amd_pstate=active"
+      # "initcall_blacklist=acpi_cpufreq_init"
+      # "amd_pstate.shared_mem=1"
+      # "amd_pstate=active"
     ];
-    kernelModules = ["amd-pstate"];
+    # Pstates are not working
+    # kernelModules = ["amd-pstate"];
 
     # kernelPatches = [
     #   {
@@ -106,8 +108,8 @@
   programs.gnome-disks.enable = true;
 
   # For Asusctl
-  services.asusd.enable = true;
-  services.asusd.enableUserService = true;
+  # services.asusd.enable = true;
+  # services.asusd.enableUserService = true;
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -214,6 +216,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    cpufrequtils
     home-manager
     swaylock
     vim # default editor

@@ -80,11 +80,11 @@
 
     lutris = "nvidia-offload lutris";
 
-    ascp = "asusctl profile -p";
-    ascl = "asusctl profile -l";
-    ascsp = "asusctl profile -P Performance";
-    ascsb = "asusctl profile -P Balanced";
-    ascsq = "asusctl profile -P Quiet";
+    # ascp = "asusctl profile -p";
+    # ascl = "asusctl profile -l";
+    # ascsp = "asusctl profile -P Performance";
+    # ascsb = "asusctl profile -P Balanced";
+    # ascsq = "asusctl profile -P Quiet";
 
     tmux = "tmux -f ~/.config/tmux/tmux.conf";
     txa = "tmux attach-session -t";
