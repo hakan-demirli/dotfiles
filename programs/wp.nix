@@ -11,7 +11,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/gtasks;
+  src = ../scripts/python/wp/gtasks;
 
   installPhase = ''
     mkdir -p $out/bin

@@ -11,6 +11,7 @@
       userChrome = builtins.readFile ../.config/firefoxcss/userChrome.css;
       userContent = builtins.readFile ../.config/firefoxcss/userContent.css;
       settings = {
+        # "widget.use-xdg-desktop-portal.file-picker" = 1;
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
         "browser.compactmode.show" = true;
