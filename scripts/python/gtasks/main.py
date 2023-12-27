@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
-import asyncio
 import datetime
 import logging
 import os
-import sys
 import tempfile
 from datetime import timedelta
 import textwrap
@@ -29,9 +29,9 @@ import googleapi
 def main():
     args = parse_args()
 
-    config_dir = os.path.expanduser("~/.config/gtasks/")
+    config_dir = os.path.expanduser("~/.config/mylib/")
     os.makedirs(os.path.dirname(config_dir), exist_ok=True)
-    token_file = config_dir + "token.json"
+    token_file = config_dir + "gtoken.json"
 
     logging.basicConfig(
         filename=config_dir + "log.txt",

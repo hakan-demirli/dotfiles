@@ -11,12 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import asyncio
 import logging
 import os
 from collections import defaultdict
 from datetime import datetime
-from enum import Enum, auto
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -157,11 +155,11 @@ class GoogleApiService:
         """
         creds = None
 
-        config_dir = os.path.expanduser("~/.config/gtasks/")
+        config_dir = os.path.expanduser("~/.config/mylib/")
         os.makedirs(os.path.dirname(config_dir), exist_ok=True)
         credentials_file = config_dir + CREDENTIALS_FILE
-        token_file = config_dir + "token.json"
-        # The file token.json stores the user's access and refresh tokens, and is
+        token_file = config_dir + "gtoken.json"
+        # The file gtoken.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
         if os.path.exists(token_file):
@@ -183,7 +181,7 @@ class GoogleApiService:
 
     def save_credentials(self, credentials: str):
         """Save credentials to selected user config directory."""
-        config_dir = os.path.expanduser("~/.config/gtasks/")
+        config_dir = os.path.expanduser("~/.config/mylib/")
 
         with open(f"{config_dir}/{CREDENTIALS_FILE}", "w+") as dest_file:
             dest_file.write(credentials)
