@@ -8,6 +8,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    xremap-flake.url = "github:xremap/nix-flake";
   };
 
   outputs = {

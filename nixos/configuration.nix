@@ -12,7 +12,21 @@
     ./hardware-configuration.nix
     inputs.home-manager.nixosModules.home-manager
     ./nvidia.nix
+    inputs.xremap-flake.nixosModules.default
   ];
+
+  hardware.uinput.enable = true;
+  services.xremap = {
+    withWlroots = true;
+    # userName = "emre";
+    yamlConfig = builtins.readFile ../.config/xremap/config.yml;
+  };
+  boot.kernelParams = [
+    "initcall_blacklist=acpi_cpufreq_init"
+    "amd_pstate.shared_mem=1"
+    "amd_pstate=active"
+  ];
+  boot.kernelModules = ["amd-pstate"];
 
   home-manager = {
     extraSpecialArgs = {inherit inputs;};
@@ -141,7 +155,7 @@
   users.users.emre = {
     isNormalUser = true;
     description = "emre";
-    extraGroups = ["networkmanager" "wheel" "video"];
+    extraGroups = ["networkmanager" "wheel" "video" "uinput" "input"];
     packages = with pkgs; [];
   };
 
