@@ -1,16 +1,34 @@
+#!/usr/bin/env python3
+
 from PIL import Image, ImageDraw, ImageFont
 import calendar
 import io
 import sys
 import datetime
-import mylib
+import os
+import pathlib
 import logging
-import inspect
+import json
+import tempfile
+from fetch_ics_file import get_ics
+
 
 logger = logging.getLogger(__name__)
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
 logger.setLevel(logging.DEBUG)
+
+script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
+config_dir = os.path.expanduser("~/.config/mylib/")
+font_file = script_dir / "anonymous.ttf"
+
+ics_url_file = config_dir + "ics.json"
+calendar_overlay_file = tempfile.gettempdir() + "/calendar_overlay.png"
+ics_file = tempfile.gettempdir() + "/calendar_events.ics"
+
+with open(ics_url_file, "r") as f:
+    data = json.load(f)
+ics_url = data.get("ics_url")
 
 
 def dateToEvent(day, month, year, parsed_events):
@@ -171,7 +189,7 @@ def dateTuple(month_year_string):
 
 
 def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
-    font = ImageFont.truetype(mylib.ANON_FONT_FILE, size=10)
+    font = ImageFont.truetype(str(font_file), size=10)
     # Define the start and end dates for your loop
     start_date = datetime.date(2020, 1, 1)
     end_date = datetime.date(2030, 12, 31)
@@ -254,7 +272,7 @@ def main():
     column_width = width // num_columns
     x_offset = 10
 
-    events = parseICSFile(mylib.ICS_FILE)
+    events = parseICSFile(ics_file)
 
     # Draw in a grid.
     for i in range(0, len(months_to_display), num_rows):
@@ -275,8 +293,9 @@ def main():
         x_offset += column_width
 
     # Save the image
-    image.save(mylib.CALENDAR_OVERLAY_FILE)
+    image.save(calendar_overlay_file)
 
 
 if __name__ == "__main__":
+    get_ics()
     main()
