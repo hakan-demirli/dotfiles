@@ -177,7 +177,6 @@
     sioyek
 
     lutris
-    asusctl
     udiskie
     # (pkgs.callPackage ./programs/wp.nix {})
     # (pkgs.callPackage ./programs/gtk_applet.nix {})
