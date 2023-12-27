@@ -22,7 +22,7 @@
     yamlConfig = builtins.readFile ../.config/xremap/config.yml;
   };
 
-  services.auto-epp.enable = true;
+  # services.auto-epp.enable = true;
   services.tlp = {
     enable = true;
     settings = {

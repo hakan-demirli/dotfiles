@@ -10,8 +10,9 @@ import pathlib
 import sys
 import tempfile
 
-from fetch_ics_file import get_ics
 from PIL import Image, ImageDraw, ImageFont
+
+from .fetch_ics_file import get_ics
 
 logger = logging.getLogger(__name__)
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -20,7 +21,7 @@ logger.setLevel(logging.DEBUG)
 
 script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
 config_dir = os.path.expanduser("~/.config/mylib/")
-font_file = script_dir / "anonymous.ttf"
+font_file = os.path.expanduser("~/.local/share/fonts/anonymous.ttf")
 
 ics_url_file = config_dir + "ics.json"
 calendar_overlay_file = tempfile.gettempdir() + "/calendar_overlay.png"
@@ -189,7 +190,7 @@ def dateTuple(month_year_string):
 
 
 def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
-    font = ImageFont.truetype(str(font_file), size=10)
+    font = ImageFont.truetype(str(font_file), size=12)
     # Define the start and end dates for your loop
     start_date = datetime.date(2020, 1, 1)
     end_date = datetime.date(2030, 12, 31)
@@ -258,6 +259,8 @@ def smartDrawLayers(raw_cal_txt, ics_events, text_position, draw):
 
 
 def main():
+    get_ics()
+
     width, height = 700, 1080
     background_color = (0, 0, 0, 222)
     image = Image.new("RGBA", (width, height), background_color)
@@ -297,5 +300,4 @@ def main():
 
 
 if __name__ == "__main__":
-    get_ics()
     main()

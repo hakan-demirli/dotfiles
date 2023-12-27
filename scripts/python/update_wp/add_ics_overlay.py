@@ -101,14 +101,14 @@ def resize_image(input_image: str, output_image: str, width: int, height: int) -
 def main():
     overlayed_file = tempfile.gettempdir() + "/overlayed.png"
     calendar_overlay_file = tempfile.gettempdir() + "/calendar_overlay.png"
-    wp_folder = mylib.WALLPAPERS_PC_DIR
+    wp_dir = "/mnt/second/images/art/wallpapers_pc"
     types = [".jpg", ".png", ".jpeg"]
 
-    wallpapers = getFilesByType(wp_folder, types)
+    wallpapers = getFilesByType(wp_dir, types)
     wallpapers = sorted(wallpapers)
 
     if len(wallpapers) <= 0:
-        print(f"No wallpapers found in '{wp_folder}'. Exiting.")
+        print(f"No wallpapers found in '{wp_dir}'. Exiting.")
         exit(1)
 
     idx = ((datetime.datetime.now() - datetime.datetime(1970, 1, 1)).days) % (

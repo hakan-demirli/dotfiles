@@ -178,7 +178,7 @@
 
     lutris
     udiskie
-    # (pkgs.callPackage ./programs/wp.nix {})
+    (pkgs.callPackage ./programs/update_wp.nix {})
     # (pkgs.callPackage ./programs/gtk_applet.nix {})
     (pkgs.callPackage ./programs/youtube_sync.nix {})
     # (pkgs.callPackage ./programs/clipboard_tts.nix {})
