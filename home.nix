@@ -22,14 +22,34 @@
       }
     '';
   };
+  programs.btop = {
+    enable = true;
+    settings = {
+      color_theme = "dracula";
+      theme_background = false; # use terminal background
+      vim_keys = true;
+      proc_tree = false;
+      update_ms = 1000;
+    };
+  };
+  programs.bat = {
+    enable = true;
+    config = {theme = "Dracula";};
+  };
 
   programs.fzf = {
     enable = true;
-    enableBashIntegration = true;
-    # Not working
-    # defaultOptions = [
-    # "--bind 'tab:toggle-up,btab:toggle-down'"
-    # ];
+    defaultCommand = "${pkgs.fd}/bin/fd --type f";
+    defaultOptions = [
+      "--reverse"
+      "--info=inline"
+      "--border"
+      "--color=fg:-1,bg:-1,hl:#bd93f9"
+      "--color=fg+:#f8f8f2,bg+:#282a36,hl+:#bd93f9"
+      "--color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6"
+      "--color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4"
+      "--prompt='❯ '"
+    ];
   };
 
   home.username = "emre";
@@ -40,7 +60,6 @@
     "hx." = "helix .";
     helix = "hx";
     lf = "lfcd";
-    fzf = "fzf --bind 'tab:toggle-up,btab:toggle-down'";
 
     git = "git_clone_cached";
     "ga." = "git add .";
@@ -114,9 +133,7 @@
     playerctl
     swww
     mpv
-    btop
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
-    bat
     ripgrep
     ripdrag
     tmux
