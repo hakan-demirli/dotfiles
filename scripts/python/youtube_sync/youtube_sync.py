@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-import yt_dlp
-from pathlib import Path
-import json
-from multiprocessing import Pool
-import unicodedata
+
 import glob
 import os
-import mylib
+import unicodedata
+from multiprocessing import Pool
+from pathlib import Path
+import argparse
+import yt_dlp
 
 
 def sanitizeString(in_str):
@@ -56,7 +56,8 @@ def syncFolder(playlist_tuple):
         ydl.download([playlist_url])
 
 
-def createPlaylistFolder(playlist_url):
+def createPlaylistFolder(args):
+    music_dir, playlist_url = args
     try:
         ydl_opts = {
             "flat_playlist": True,
@@ -67,14 +68,14 @@ def createPlaylistFolder(playlist_url):
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             new_metadata = ydl.extract_info(playlist_url, download=False)
-        if new_metadata == None:
+        if new_metadata is None:
             print(
                 f"ERROR: Can't access playlist. Be sure it is a public or unlisted playlist.URL: {playlist_url}"
             )
             return None
 
         folder_name = sanitizeString(new_metadata["title"])
-        folder_path = mylib.MUSIC_DIR + "/" + folder_name
+        folder_path = music_dir + "/" + folder_name
         Path(folder_path).mkdir(parents=True, exist_ok=True)
         print(f"Generated path: {folder_path}")
         return folder_path
@@ -85,14 +86,14 @@ def createPlaylistFolder(playlist_url):
         return None
 
 
-def syncYoutubePlaylist(playlist_file):
+def syncYoutubePlaylist(music_dir, playlist_file):
     playlist_urls = []
     with open(playlist_file) as playlists_file:
         playlist_urls = [line.rstrip() for line in playlists_file]
 
     pool = Pool()
-    playlist_folders = pool.map(createPlaylistFolder, playlist_urls)
-
+    args = [(music_dir, url) for url in playlist_urls]
+    playlist_folders = pool.map(createPlaylistFolder, args)
     playlist_tuples = tuple(zip(playlist_folders, playlist_urls))
 
     pool.map(syncFolder, playlist_tuples)
@@ -121,5 +122,22 @@ def clean_dir(directory):
 
 
 if __name__ == "__main__":
-    syncYoutubePlaylist(mylib.PLAYLIST_FILE)
-    clean_dir(mylib.MUSIC_DIR)
+    parser = argparse.ArgumentParser(description="Process some music files.")
+    parser.add_argument(
+        "--playlist_file",
+        type=str,
+        default="/mnt/second/music/playlists.txt",
+        help="The playlist file.",
+    )
+    parser.add_argument(
+        "--music_dir",
+        type=str,
+        default="/mnt/second/music",
+        help="The music directory.",
+    )
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    syncYoutubePlaylist(args.music_dir, args.playlist_file)
+    clean_dir(args.music_dir)
