@@ -8,6 +8,12 @@
     ./programs/battery_monitor.nix
   ];
 
+  services.udiskie = {
+    enable = true;
+    automount = true;
+    notify = true;
+    tray = "always";
+  };
   programs.starship.enable = true;
   programs.direnv = {
     enable = true;
@@ -172,6 +178,7 @@
 
     lutris
     asusctl
+    udiskie
     # (pkgs.callPackage ./programs/wp.nix {})
     # (pkgs.callPackage ./programs/gtk_applet.nix {})
     # (pkgs.callPackage ./programs/youtube_sync.nix {})
