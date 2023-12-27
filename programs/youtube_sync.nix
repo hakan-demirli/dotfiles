@@ -1,21 +1,20 @@
 {pkgs, ...}:
 pkgs.stdenv.mkDerivation {
-  name = "ics_overlay";
+  name = "youtube_sync";
   propagatedBuildInputs = [
     (pkgs.python3.withPackages (pythonPackages:
       with pythonPackages; [
-        pillow
-        requests
+        yt-dlp
       ]))
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/ics;
+  src = ../scripts/python/youtube_sync;
 
   installPhase = ''
     mkdir -p $out/bin
     cp -r $src/* $out/
-    ln -s $out/ics_overlay.py $out/bin/ics_overlay
-    chmod +x $out/bin/ics_overlay
+    ln -s $out/youtube_sync.py $out/bin/youtube_sync
+    chmod +x $out/bin/youtube_sync
   '';
 }
