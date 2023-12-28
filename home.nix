@@ -108,6 +108,10 @@
       package = pkgs.dracula-theme;
       name = "Dracula";
     };
+    iconTheme = {
+      package = pkgs.dracula-theme;
+      name = "Dracula-cursors";
+    };
     gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = true;
@@ -118,10 +122,10 @@
   };
 
   home.pointerCursor = {
-    gtk.enable = true;
     x11.enable = true;
-    package = pkgs.bibata-cursors;
-    name = "Bibata-Modern-Classic";
+    gtk.enable = true;
+    name = "Dracula-cursors";
+    package = pkgs.dracula-theme;
     size = 10;
   };
 
@@ -179,7 +183,7 @@
     lutris
     udiskie
     (pkgs.callPackage ./programs/update_wp.nix {})
-    # (pkgs.callPackage ./programs/gtk_applet.nix {})
+    (pkgs.callPackage ./programs/gtk_applet.nix {})
     (pkgs.callPackage ./programs/youtube_sync.nix {})
     # (pkgs.callPackage ./programs/clipboard_tts.nix {})
   ];

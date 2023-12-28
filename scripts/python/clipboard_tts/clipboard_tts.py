@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
-from pathlib import Path
-from queue import Queue
-import threading, time, sys, os, string, re, random, logging, clipboard, multiprocessing, tempfile, subprocess
-import mylib
-import requests
-import signal
-from gradio_client import Client
-
+import logging
 import os
+import re
+import signal
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+import random
+import string
+import pathlib
+from queue import Queue
+
+import clipboard
+import requests
+from gradio_client import Client
 
 # sudo apt install xclip
 
@@ -15,19 +23,13 @@ logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 TEMPO = 1  # 1.3
 OUTPUT_DIR = tempfile.gettempdir()
-MODEL_PATH = mylib.TTS_DIR + "/models/en_GB-jenny_dioco-medium.onnx"
-RVC_API_URL = "http://127.0.0.1:7860/"  # Replace with your Gradio app's API URL
-if os.name == "nt":
-    RVC_COMMAND = (
-        "D:/software/rvc_api/venv_w/Scripts/python.exe D:/software/rvc_api/infer.py"
-    )
-    RVC_MODEL = "D:/software/rvc_api/weights/amber.pth"
-    RVC_INDEX = "D:/software/rvc_api/weights/amber.index"
 
-else:
-    RVC_COMMAND = "/mnt/second/software/rvc_api/venv_l/bin/python /mnt/second/software/rvc_api/infer.py"
-    RVC_MODEL = "/mnt/second/software/rvc_api/weights/amber.pth"
-    RVC_INDEX = "/mnt/second/software/rvc_api/weights/amber.index"
+script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
+MODEL_PATH = str(script_dir / "en_GB-jenny_dioco-medium.onnx")
+RVC_API_URL = "http://127.0.0.1:7860/"
+RVC_COMMAND = "/mnt/second/software/rvc_api/infer.py"
+RVC_MODEL = "/mnt/second/software/rvc_api/weights/amber.pth"
+RVC_INDEX = "/mnt/second/software/rvc_api/weights/amber.index"
 
 GPU = True
 RETRY_TIMES = 5
@@ -43,7 +45,7 @@ PREFERRED_SPEED = 1  # 1.7
 DEFAULT_SPEED = 1
 CUTOFF_DEFAULT = 0.35
 CUTOFF = CUTOFF_DEFAULT / (TEMPO)
-BANNED_CHARACTERS = """\/*<>|`’[]()^#%&@:+=}"{'~“”"""
+BANNED_CHARACTERS = """\\/*<>|`’[]()^#%&@:+=}"{'~“”"""
 CONTRACTIONS = {
     "can't've": "cannot have",
     "'cause": "because",
@@ -168,7 +170,7 @@ def retry(times):
             while attempt < times:
                 try:
                     return func(*args, **kwargs)
-                except:
+                except Exception:
                     logging.warning(
                         "Exception thrown when attempting to run %s, attempt "
                         "%d of %d" % (func, attempt, times)
@@ -183,10 +185,7 @@ def retry(times):
 
 # @retry(times=RETRY_TIMES)
 def tts_to_file(txt, file_path):
-    piper_path = os.path.abspath(f"{mylib.TTS_DIR}/piper")
-    command = (
-        f"echo '{txt}' | {piper_path} --output_file {file_path} --model {MODEL_PATH}"
-    )
+    command = f"echo '{txt}' | piper --output_file {file_path} --model {MODEL_PATH}"
     subprocess.run(command, shell=True)
     print(command)
 
@@ -196,7 +195,11 @@ def convert_txt_to_wav(txt_queue: Queue, wav_queue: Queue):
     while getattr(t, "do_run", True):
         txts = txt_queue.get()
         for txt in txts:
-            file_path = OUTPUT_DIR + f"/{mylib.getRandomFileName('.wav')}"
+            letters = string.ascii_lowercase
+            random_file_name = (
+                "".join(random.choice(letters) for _ in range(32)) + ".wav"
+            )
+            file_path = OUTPUT_DIR + random_file_name
             t0 = threading.Thread(target=tts_to_file, args=[txt, file_path])
             t0.start()
             t0.join(INFERENCE_TIMEOUT)
@@ -205,7 +208,10 @@ def convert_txt_to_wav(txt_queue: Queue, wav_queue: Queue):
 
 
 def change_wav_speed(wav_file):
-    o_path = OUTPUT_DIR + f"/{mylib.getRandomFileName('.wav')}"
+    letters = string.ascii_lowercase
+    random_file_name = "".join(random.choice(letters) for _ in range(32)) + ".wav"
+
+    o_path = OUTPUT_DIR + random_file_name
     try:
         command = ["ffmpeg", "-i", wav_file, "-filter:a", f"atempo={TEMPO}", o_path]
         print(" ".join(command))
@@ -239,17 +245,17 @@ def play_wav(wav_queue: Queue):
                     f_wav_file,
                 ]
             )
-        except:
+        except Exception:
             pass
 
         try:
             os.remove(f_wav_file)
-        except:
+        except Exception:
             pass
 
         try:
             os.remove(wav_file)
-        except:
+        except Exception:
             pass
 
 
@@ -382,11 +388,11 @@ def apply_rvc(t2wav_queue: Queue, wav2wav_queue: Queue):
         try:
             client = GradioClient(RVC_API_URL)
             break
-        except:
+        except Exception:
             print("failed to connect. Trying again.")
             counter += 1
             if counter == 5:
-                raise "failed to connect: tried 5 times."
+                raise Exception("failed to connect: tried 5 times.")
             time.sleep(0.5)
     while getattr(t, "do_run", True):
         input_file = t2wav_queue.get()
@@ -419,7 +425,7 @@ def apply_rvc(t2wav_queue: Queue, wav2wav_queue: Queue):
 
         try:
             os.remove(input_file)
-        except:
+        except Exception:
             pass
 
 

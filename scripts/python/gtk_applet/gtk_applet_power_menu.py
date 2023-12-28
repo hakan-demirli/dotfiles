@@ -1,11 +1,14 @@
+#!/usr/bin/env python3
+
 import signal
-import gi
 import subprocess
+
+import gi
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("AppIndicator3", "0.1")
 
-from gi.repository import Gtk, AppIndicator3, Gio
+from gi.repository import AppIndicator3, Gtk
 
 
 class AppIndicatorExample:
@@ -105,7 +108,7 @@ class AppIndicatorExample:
 
 def main():
     Gtk.init(None)
-    indicator = AppIndicatorExample()
+    AppIndicatorExample()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     Gtk.main()
 

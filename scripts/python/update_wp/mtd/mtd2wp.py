@@ -1,12 +1,13 @@
+import os
 import pathlib
-import mylib
 import tempfile
-import requests
+
 from PIL import Image
 
 
+# TODO
 def main():
-    script_dir = pathlib.Path(__file__).parent.absolute()
+    script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
     mylib.runInVenv(f"{script_dir}/mtd2overlay.py")
     mylib.runInVenv(f"{script_dir}/overlayMtd.py")
     mylib.changeWallpaper(mylib.OVERLAYED_FILE)
