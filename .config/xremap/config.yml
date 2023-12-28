@@ -13,16 +13,45 @@ default_mode: insert
 keymap:
   - name: Default
     remap:
-      Alt-m: KEY_1
-      Alt-comma: KEY_2
-      Alt-dot: KEY_3
-      Alt-j: KEY_4
-      Alt-k: KEY_5
-      Alt-l: KEY_6
-      Alt-u: KEY_7
-      Alt-i: KEY_8
-      Alt-o: KEY_9
-      Alt-p: KEY_0
+      Alt-h: KEY_LEFT
+      Alt-j: KEY_DOWN
+      Alt-k: KEY_UP
+      Alt-l: KEY_RIGHT
+
+      KEY_MINUS: reserved
+      KEY_EQUAL: reserved
+      KEY_RIGHTBRACE: reserved
+      KEY_BACKSLASH: reserved
+      KEY_LEFTBRACE: KEY_BACKSPACE
+      Shift-Alt-i: KEY_LEFTBRACE
+      Shift-Alt-o: KEY_RIGHTBRACE
+      Shift-Alt-k: KEY_KPLEFTPAREN
+      Shift-Alt-l: KEY_KPRIGHTPAREN
+      Shift-Alt-g: KEY_EQUAL
+      Shift-Alt-t: KEY_MINUS
+      Shift-Alt-r: Shift-KEY_EQUAL # plus
+      Shift-Alt-q: Shift-KEY_MINUS # underscore
+
+      Shift-Alt-comma: Shift-KEY_LEFTBRACE # curly
+      Shift-Alt-dot: Shift-KEY_RIGHTBRACE # curly
+      # Shift-Alt-k: KEY_LEFTMETA-KEY_UP
+      # Shift-Alt-l: KEY_LEFTMETA-KEY_RIGHT
+
+      # Alt-m: KEY_LEFTMETA-m
+      # Alt-comma: KEY_LEFTMETA-comma
+      # Alt-dot: KEY_LEFTMETA-dot
+      # Alt-slash: KEY_LEFTMETA-slash
+
+      Alt-x: KEY_1
+      Alt-c: KEY_2
+      Alt-v: KEY_3
+      Alt-s: KEY_4
+      Alt-d: KEY_5
+      Alt-f: KEY_6
+      Alt-w: KEY_7
+      Alt-e: KEY_8
+      Alt-r: KEY_9
+      Alt-t: KEY_0
       KEY_1: reserved
       KEY_2: reserved
       KEY_3: reserved
@@ -33,9 +62,6 @@ keymap:
       KEY_8: reserved
       KEY_9: reserved
       KEY_0: reserved
-      # KEY_RIGHTBRACE: reserved
-      # KEY_BACKSLASH: reserved
-      # KEY_LEFTBRACE: KEY_BACKSPACE
 
   - name: helix
     application:
