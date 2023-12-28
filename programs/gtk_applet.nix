@@ -1,21 +1,29 @@
 {pkgs, ...}:
 pkgs.stdenv.mkDerivation {
-  name = "ics_overlay";
+  name = "gtk_applet";
+
+  nativeBuildInputs = with pkgs; [
+    wrapGAppsHook
+    gobject-introspection
+    libappindicator
+  ];
   propagatedBuildInputs = [
     (pkgs.python3.withPackages (pythonPackages:
       with pythonPackages; [
-        pillow
+        pygobject3
         requests
       ]))
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/ics;
+  src = ../scripts/python/gtk_applet;
 
   installPhase = ''
     mkdir -p $out/bin
     cp -r $src/* $out/
-    ln -s $out/ics_overlay.py $out/bin/ics_overlay
-    chmod +x $out/bin/ics_overlay
+    ln -s $out/gtk_applet_power_menu.py $out/bin/gtk_applet_power_menu
+    ln -s $out/gtk_applet_script_menu.py $out/bin/gtk_applet_script_menu
+    chmod +x $out/bin/gtk_applet_script_menu
+    chmod +x $out/bin/gtk_applet_power_menu
   '';
 }
