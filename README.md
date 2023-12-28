@@ -23,6 +23,7 @@
 - nix: fix home-manager
 - nix: btop GPU
 - nix: test dev envs
+- nix: missing tray icons
 - py: fix hardcoded paths
 - Firefox custom file picker: lf/yazi
   - Using xdg-desktop-portal ?
