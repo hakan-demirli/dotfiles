@@ -136,8 +136,7 @@
     usbutils
     pavucontrol
     android-file-transfer
-    yarr
-    transmission
+    transmission-gtk
     libsForQt5.kolourpaint
     libsForQt5.breeze-icons
     # etcher # BUG electron not safe
@@ -146,7 +145,6 @@
     networkmanagerapplet
     brightnessctl
     kooha
-    transmission
     swaynotificationcenter
 
     playerctl
