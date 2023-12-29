@@ -23,6 +23,7 @@ keymap:
       KEY_RIGHTBRACE: reserved
       KEY_BACKSLASH: reserved
       KEY_LEFTBRACE: KEY_BACKSPACE
+      KEY_BACKSPACE: reserved
       Shift-Alt-i: KEY_LEFTBRACE
       Shift-Alt-o: KEY_RIGHTBRACE
       Shift-Alt-k: KEY_KPLEFTPAREN
