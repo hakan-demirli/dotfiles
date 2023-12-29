@@ -113,7 +113,22 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
-  hardware.bluetooth.enable = true; # enables support for Bluetooth
+  hardware = {
+    bluetooth.enable = true;
+    bluetooth.powerOnBoot = false;
+    bluetooth = {
+      settings = {
+        General = {
+          ControllerMode = "dual";
+          FastConnectable = "true";
+          Experimental = "true";
+        };
+        Policy = {
+          AutoEnable = "false";
+        };
+      };
+    };
+  };
   services.blueman.enable = true;
 
   # Set your time zone.
