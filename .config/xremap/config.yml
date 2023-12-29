@@ -31,6 +31,8 @@ keymap:
       Shift-Alt-t: KEY_MINUS
       Shift-Alt-r: Shift-KEY_EQUAL # plus
       Shift-Alt-q: Shift-KEY_MINUS # underscore
+      Shift-Alt-n: KEY_BACKSLASH
+      Shift-Alt-b: Shift-KEY_BACKSLASH # pipe
 
       Shift-Alt-comma: Shift-KEY_LEFTBRACE # curly
       Shift-Alt-dot: Shift-KEY_RIGHTBRACE # curly

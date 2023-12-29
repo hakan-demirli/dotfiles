@@ -141,6 +141,7 @@
     libsForQt5.breeze-icons
     # etcher # BUG electron not safe
     nwg-displays
+    wlr-randr # nwg-displays dependency
     hyprshot
     networkmanagerapplet
     brightnessctl
