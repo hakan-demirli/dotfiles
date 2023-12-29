@@ -179,6 +179,9 @@
     texlab
     sioyek
 
+    taskwarrior
+    taskwarrior-tui
+
     lutris
     udiskie
     (pkgs.callPackage ./programs/update_wp.nix {})
