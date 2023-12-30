@@ -143,6 +143,7 @@
 
     unar
     zip
+    ghostscript
 
     helix
     nixd
