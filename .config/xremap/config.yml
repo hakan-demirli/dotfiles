@@ -40,11 +40,11 @@ keymap:
       Shift-Alt-dot: reserved
       Shift-Alt-slash: reserved
 
-      # Alt-y: tmux tab 1
-      # Alt-u: tmux tab 2
-      # Alt-i: tmux tab 3
-      # Alt-o: tmux tab 4
-      Alt-p: reserved
+      Alt-y: reserved
+      # Alt-u: tmux tab 1
+      # Alt-i: tmux tab 2
+      # Alt-o: tmux tab 3
+      # Alt-p: tmux tab 4
 
       Alt-h: KEY_LEFT
       Alt-j: KEY_DOWN
