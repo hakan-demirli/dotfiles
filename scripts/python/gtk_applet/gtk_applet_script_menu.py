@@ -23,10 +23,10 @@ class IndicatorApp:
             return self.toggle_process("🗣️ clipboardTTS", "clipboard_tts")
 
         def youtube_sync(_):
-            return "youtube_sync"
+            return self.run_process("youtube_sync")
 
         def update_wp(_):
-            return "update_wp"
+            return self.run_process("update_wp")
 
         self.add_menu_item("🗣️ clipboardTTS", clipboard_tts)
 
