@@ -32,6 +32,12 @@ generate_thumbnails() {
     wait
 }
 
+function draw_clear {
+	kitty +kitten icat --transfer-mode file --clear
+}
+
+draw_clear
+
 if [ ! -f "$thumbnail" ]; then
     case "$(basename "$file" | tr '[A-Z]' '[a-z]')" in
     *.tar*) tar tf "$file" ;;
