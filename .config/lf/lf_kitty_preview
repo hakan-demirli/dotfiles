@@ -9,6 +9,12 @@ cache_width=860
 cachedir="${XDG_CACHE_HOME:-$HOME/.cache}/lf_images"
 mkdir -p "$cachedir"
 
+# Check if the file path contains the cache directory
+if [[ $file == *"$cachedir"* ]]; then
+  echo "Error: No preview allowed in the cache directory due to recursion problem."
+  exit 127
+fi
+
 file="$1"; shift
 cachekey=$(echo -n "$file $(stat -c %Y "$file")" | md5sum | cut -d ' ' -f 1)
 thumbnail="$cachedir/$cachekey.png"
@@ -33,7 +39,7 @@ generate_thumbnails() {
 }
 
 function draw_clear {
-	kitty +kitten icat --transfer-mode file --clear
+    kitty +kitten icat --clear --stdin no --silent --transfer-mode file < /dev/null > /dev/tty
 }
 
 draw_clear
