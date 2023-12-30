@@ -9,11 +9,11 @@
       Type = "oneshot";
       ExecStart =
         ""
-        + pkgs.writeScript "battery_monitor" ''
+        + pkgs.writeScriptBin "battery_monitor" ''
           #!${pkgs.stdenv.shell} --login
-          . <(udevadm info -q property -p /sys/class/power_supply/BAT0 | grep -E 'POWER_SUPPLY_(CAPACITY|STATUS)=')
-          if [[ $POWER_SUPPLY_STATUS = Discharging && $POWER_SUPPLY_CAPACITY -lt 15 ]];
-          then notify-send -u critical "Battery is low: $POWER_SUPPLY_CAPACITY";
+          . <(${pkgs.eudev}/bin/udevadm info -q property -p /sys/class/power_supply/BAT0 | ${pkgs.gnugrep}/bin/grep -E 'POWER_SUPPLY_(CAPACITY|STATUS)=')
+          if [[ $POWER_SUPPLY_STATUS = Discharging && $POWER_SUPPLY_CAPACITY -lt 25 ]];
+          then ${pkgs.libnotify}/bin/notify-send -u critical "Battery is low: $POWER_SUPPLY_CAPACITY";
           fi
         '';
       Environment = ''"DISPLAY=:0"'';

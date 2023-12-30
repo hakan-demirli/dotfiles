@@ -6,15 +6,11 @@
   imports = [
     ./programs/firefox.nix
     ./programs/battery_monitor.nix
+    ./programs/xdg.nix
   ];
 
-  services.udiskie = {
-    enable = true;
-    automount = true;
-    notify = true;
-    tray = "always";
-  };
   programs.starship.enable = true;
+  services.udiskie.enable = true;
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
@@ -27,21 +23,6 @@
           cd "$(command lf -print-last-dir "$@")"
       }
     '';
-  };
-  programs.btop = {
-    enable = true;
-    settings = {
-      color_theme = "dracula";
-      theme_background = false; # use terminal background
-      vim_keys = true;
-      proc_tree = false;
-      proc_sorting = "memory";
-      update_ms = 1000;
-    };
-  };
-  programs.bat = {
-    enable = true;
-    config = {theme = "Dracula";};
   };
 
   programs.fzf = {
@@ -156,6 +137,9 @@
     ripdrag
     tmux
     ffmpeg
+    bat
+    btop
+    libnotify
 
     unar
     zip
@@ -187,6 +171,7 @@
     (pkgs.callPackage ./programs/update_wp.nix {})
     (pkgs.callPackage ./programs/gtk_applet.nix {})
     (pkgs.callPackage ./programs/youtube_sync.nix {})
+    (pkgs.callPackage ./programs/auto_refresh.nix {})
     # (pkgs.callPackage ./programs/clipboard_tts.nix {})
   ];
 
@@ -241,24 +226,6 @@
   };
 
   programs.gpg.homedir = "${config.xdg.dataHome}/gnupg";
-  # xdg.configFile.foo.source =  config.lib.file.mkOutOfStoreSymlink "/absolute/path/to/bar";
-
-  xdg = {
-    configFile."." = {
-      source = ./.config;
-      recursive = true;
-    };
-    # TODO : chmod x all bins
-    dataFile."." = {
-      source = ./.local/share;
-      recursive = true;
-    };
-  };
-  home.file.".local/bin" = {
-    source = ./.local/bin;
-    recursive = true;
-    executable = true;
-  };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
