@@ -13,48 +13,90 @@ default_mode: insert
 keymap:
   - name: Default
     remap:
+      KEY_RIGHTBRACE: reserved
+      KEY_BACKSLASH: reserved
+      KEY_LEFTBRACE: KEY_BACKSPACE
+      Shift-KEY_LEFTBRACE: KEY_DELETE
+      KEY_BACKSPACE: reserved
+      KEY_ENTER: reserved
+      KEY_APOSTROPHE: KEY_ENTER
+
+      # Right Hand
+      Shift-Alt-y: KEY_APOSTROPHE
+      Shift-Alt-u: Shift-KEY_LEFTBRACE # curly
+      Shift-Alt-i: Shift-KEY_RIGHTBRACE # curly
+      Shift-Alt-o: reserved
+      Shift-Alt-p: reserved
+
+      Shift-Alt-h: KEY_HOME
+      Shift-Alt-j: KEY_KPLEFTPAREN
+      Shift-Alt-k: KEY_KPRIGHTPAREN
+      Shift-Alt-l: KEY_END
+      Shift-Alt-KEY_SEMICOLON: reserved
+
+      Shift-Alt-n: Shift-KEY_APOSTROPHE
+      Shift-Alt-m: KEY_LEFTBRACE
+      Shift-Alt-comma: KEY_RIGHTBRACE
+      Shift-Alt-dot: reserved
+      Shift-Alt-slash: reserved
+
+      # Alt-y: tmux tab 1
+      # Alt-u: tmux tab 2
+      # Alt-i: tmux tab 3
+      # Alt-o: tmux tab 4
+      Alt-p: reserved
+
       Alt-h: KEY_LEFT
       Alt-j: KEY_DOWN
       Alt-k: KEY_UP
       Alt-l: KEY_RIGHT
+      Alt-KEY_SEMICOLON: reserved
 
-      KEY_MINUS: reserved
-      KEY_EQUAL: reserved
-      KEY_RIGHTBRACE: reserved
-      KEY_BACKSLASH: reserved
-      KEY_LEFTBRACE: KEY_BACKSPACE
-      KEY_BACKSPACE: reserved
-      Shift-Alt-i: KEY_LEFTBRACE
-      Shift-Alt-o: KEY_RIGHTBRACE
-      Shift-Alt-k: KEY_KPLEFTPAREN
-      Shift-Alt-l: KEY_KPRIGHTPAREN
-      Shift-Alt-g: KEY_EQUAL
-      Shift-Alt-t: KEY_MINUS
-      Shift-Alt-r: Shift-KEY_EQUAL # plus
+      Alt-n: reserved
+      # Alt-m: workspace 1
+      # Alt-comma: workspace 2
+      # Alt-dot: workspace 3
+      # Alt-slash: workspace 4
+
+
+      # Left Hand
       Shift-Alt-q: Shift-KEY_MINUS # underscore
-      Shift-Alt-n: KEY_BACKSLASH
+      Shift-Alt-w: Shift-KEY_7 # ampersand 
+      Shift-Alt-e: Shift-KEY_8 # star
+      Shift-Alt-r: Shift-KEY_6 # caret
+      Shift-Alt-t: Shift-KEY_2 # at
+
+      Shift-Alt-a: Shift-KEY_1 # exclamation mark
+      Shift-Alt-s: KEY_MINUS 
+      Shift-Alt-d: Shift-KEY_EQUAL # plus
+      Shift-Alt-f: KEY_EQUAL
+      Shift-Alt-g: Shift-KEY_3 # pound
+
+      Shift-Alt-z: KEY_BACKSLASH
+      Shift-Alt-x: Shift-KEY_GRAVE # tilda
+      Shift-Alt-c: KEY_GRAVE
+      Shift-Alt-v: Shift-KEY_5 # percent
       Shift-Alt-b: Shift-KEY_BACKSLASH # pipe
 
-      Shift-Alt-comma: Shift-KEY_LEFTBRACE # curly
-      Shift-Alt-dot: Shift-KEY_RIGHTBRACE # curly
-      # Shift-Alt-k: KEY_LEFTMETA-KEY_UP
-      # Shift-Alt-l: KEY_LEFTMETA-KEY_RIGHT
-
-      # Alt-m: KEY_LEFTMETA-m
-      # Alt-comma: KEY_LEFTMETA-comma
-      # Alt-dot: KEY_LEFTMETA-dot
-      # Alt-slash: KEY_LEFTMETA-slash
-
-      Alt-x: KEY_1
-      Alt-c: KEY_2
-      Alt-v: KEY_3
-      Alt-s: KEY_4
-      Alt-d: KEY_5
-      Alt-f: KEY_6
+      # Alt-q: quit tab
       Alt-w: KEY_7
       Alt-e: KEY_8
       Alt-r: KEY_9
       Alt-t: KEY_0
+
+      # Alt-a: open terminal
+      Alt-s: KEY_4
+      Alt-d: KEY_5
+      Alt-f: KEY_6
+      Alt-g: reserved 
+
+      # Alt-z: open browser
+      Alt-x: KEY_1
+      Alt-c: KEY_2
+      Alt-v: KEY_3
+      # Alt-b: toggle waybar
+
+
       KEY_1: reserved
       KEY_2: reserved
       KEY_3: reserved
@@ -65,6 +107,8 @@ keymap:
       KEY_8: reserved
       KEY_9: reserved
       KEY_0: reserved
+      KEY_MINUS: reserved
+      KEY_EQUAL: reserved
 
   - name: helix
     application:
