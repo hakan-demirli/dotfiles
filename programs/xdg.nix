@@ -4,7 +4,8 @@
   ...
 }: {
   xdg = let
-    mutable_configs = ["hypr"];
+    mutable_configs = ["hypr" "mimeapps.list"];
+
     immutable_configs = [
       "bat"
       "gnome3-keybind-backup"
@@ -22,7 +23,6 @@
       "xremap"
       "cargo"
       "helix"
-      "mimeapps.list"
       "nvim"
       "tmux"
       "wavemon"
