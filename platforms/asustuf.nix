@@ -1,46 +1,83 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
 {
-  inputs,
-  config,
   pkgs,
+  username,
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-    inputs.home-manager.nixosModules.home-manager
-    ./nvidia.nix
-    inputs.xremap-flake.nixosModules.default
+    ./modules/asustuf.nix
+    ./modules/nvidia.nix
+    ./modules/locale.nix
   ];
 
-  hardware.uinput.enable = true;
-  services.xremap = {
-    withWlroots = true;
-    # userName = "emre";
-    yamlConfig = builtins.readFile ../.config/xremap/config.yml;
+  # nix
+  documentation.nixos.enable = false; # .desktop
+  nixpkgs.config.allowUnfree = true;
+  nix = {
+    settings = {
+      experimental-features = "nix-command flakes";
+      auto-optimise-store = true;
+    };
   };
 
-  # services.auto-epp.enable = true;
-  services.tlp = {
-    enable = true;
-    settings = {
-      CPU_SCALING_GOVERNOR_ON_AC = "performance";
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+  # virtualisation
+  programs.virt-manager.enable = true;
+  virtualisation = {
+    podman.enable = true;
+    libvirtd.enable = true;
+  };
 
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+  programs.hyprland.enable = true;
 
-      CPU_MIN_PERF_ON_AC = 0;
-      CPU_MAX_PERF_ON_AC = 100;
-      CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 20;
+  # packages
+  environment.systemPackages = with pkgs; [
+    home-manager
+    git
+    git-crypt
+    wget
+    neovim # default editor
+    libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
+  ];
+
+  # services
+  services = {
+    blueman.enable = true;
+    dbus.enable = true;
+    udisks2.enable = true;
+    printing.enable = false; # Enable CUPS to print documents.
+    # services.asusd.enable = true;
+    # services.asusd.enableUserService = true;
+    flatpak.enable = true;
+    xserver = {
+      enable = true;
+      excludePackages = [pkgs.xterm];
+
+      displayManager = {
+        sddm = {
+          enable = true;
+          theme = "${import ../programs/sddm-theme.nix {inherit pkgs;}}";
+        };
+      };
+    };
+    tlp = {
+      enable = true;
+      settings = {
+        CPU_SCALING_GOVERNOR_ON_AC = "performance";
+        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+
+        CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+        CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+
+        CPU_MIN_PERF_ON_AC = 0;
+        CPU_MAX_PERF_ON_AC = 100;
+        CPU_MIN_PERF_ON_BAT = 0;
+        CPU_MAX_PERF_ON_BAT = 20;
+      };
     };
   };
 
   # test: `cpupower frequency-info`
   boot = {
+    tmp.cleanOnBoot = true;
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       "quiet"
@@ -73,17 +110,7 @@
   boot.loader.grub.default = "saved";
   boot.loader.efi.canTouchEfiVariables = true;
 
-  home-manager = {
-    extraSpecialArgs = {inherit inputs;};
-    users = {
-      emre = import ../home.nix;
-    };
-    useGlobalPkgs = true;
-  };
-
-  time.hardwareClockInLocalTime = true;
-
-  networking.hostName = "nixos"; # Define your hostname.
+  time.hardwareClockInLocalTime = false; # messes clock on windows
 
   # systemctl status --user polkit-gnome-authentication-agent-1
   # systemctl restart --user polkit-gnome-authentication-agent-1
@@ -103,17 +130,13 @@
       };
     };
   };
-  services.dbus.enable = true;
-  services.udisks2.enable = true;
   programs.gnome-disks.enable = true;
-
-  # For Asusctl
-  # services.asusd.enable = true;
-  # services.asusd.enableUserService = true;
 
   # Enable networking
   networking.networkmanager.enable = true;
+  networking.hostName = "nixos"; # Define your hostname.
   hardware = {
+    uinput.enable = true; # xremap dep
     bluetooth.enable = true;
     bluetooth.powerOnBoot = false;
     bluetooth = {
@@ -129,49 +152,10 @@
       };
     };
   };
-  services.blueman.enable = true;
 
-  # Set your time zone.
-  time.timeZone = "Europe/Istanbul";
-
-  nix.settings.experimental-features = ["nix-command" "flakes"];
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_GB.UTF-8";
-    LC_IDENTIFICATION = "en_GB.UTF-8";
-    LC_MEASUREMENT = "en_GB.UTF-8";
-    LC_MONETARY = "en_GB.UTF-8";
-    LC_NAME = "en_GB.UTF-8";
-    LC_NUMERIC = "en_GB.UTF-8";
-    LC_PAPER = "en_GB.UTF-8";
-    LC_TELEPHONE = "en_GB.UTF-8";
-    LC_TIME = "en_GB.UTF-8";
-  };
-
-  # Enable the X11 windowing system.
-  services.xserver = {
-    enable = true;
-    displayManager = {
-      sddm = {
-        enable = true;
-        theme = "${import ../programs/sddm-theme.nix {inherit pkgs;}}";
-      };
-    };
-  };
   # https://github.com/NixOS/nixpkgs/issues/97795#issuecomment-693354398
   systemd.services.display-manager.wants = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
   systemd.services.display-manager.after = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
-
-  # Configure keymap in X11
-  # services.xserver = {
-  #   layout = "us";
-  #   xkbVariant = "";
-  # };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   # Enable sound with pipewire.
   sound.enable = true;
@@ -190,19 +174,18 @@
     #media-session.enable = true;
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.emre = {
+  users.users.${username} = {
     isNormalUser = true;
-    description = "emre";
-    extraGroups = ["networkmanager" "wheel" "video" "uinput" "input"];
-    packages = with pkgs; [];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "audio"
+      "video"
+      "uinput"
+      "input"
+      "libvirtd"
+    ];
   };
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
 
   ## xdg terminal chooser
   # xdg.portal = {
@@ -224,32 +207,10 @@
     NIXOS_OZONE_WL = "1";
   };
 
-  programs.hyprland.enable = true;
-
   security.pam.services.swaylock = {}; # without this swaylock is broken
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    cpufrequtils
-    home-manager
-    swaylock
-    vim # default editor
-    git
-    git-crypt
-    waybar
-    kitty
-    wofi
-    firefox
-    (lf.overrideAttrs (oldAttrs: {
-      patches = oldAttrs.patches or [] ++ [../programs/lf.patch];
-    }))
-    wl-clipboard
-    wl-clip-persist
-    pulseaudio
-
-    libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
-  ];
   powerManagement = {
     enable = true;
     cpuFreqGovernor = "ondemand";

@@ -13,26 +13,25 @@
   outputs = {
     self,
     nixpkgs,
+    home-manager,
     ...
   } @ inputs: let
+    username = "emre";
     system = "x86_64-linux";
-    pkgs = import nixpkgs {
-      inherit system;
-      config = {
-        allowUnfree = true;
-      };
-    };
   in {
-    # sudo nixos-rebuild switch --flake ~/new/#myNixos
-    nixosConfigurations = {
-      myNixos = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs system;};
-        modules = [
-          ./nixos/configuration.nix
-        ];
-      };
+    # sudo nix-rebuild switch --flake ~/dotfiles/#myNixos
+    nixosConfigurations."myNixos" = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs username system;};
+      modules = [./platforms/asustuf.nix];
     };
-    # TODO  nix run home-manager/master -- switch --flake .
-    # homeConfiguration
+    # home-manager switch --flake ~/dotfiles/#emre
+    homeConfigurations."${username}" = home-manager.lib.homeManagerConfiguration {
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+      extraSpecialArgs = {inherit inputs username;};
+      modules = [./platforms/home.nix];
+    };
   };
 }
