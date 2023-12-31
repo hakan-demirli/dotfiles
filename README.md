@@ -12,15 +12,12 @@
 | **WP-Manager**  | swww       |
 
 # Install
-* Use your hardware-configuration.nix
-* Remove nvidia.nix if it is not required
-* Change user name
 * Decrypt secrets
   * ```git-crypt unlock ../git-crypt-key```
 * ```sudo nixos-rebuild switch --flake ~/dotfiles/#myNixos```
+* ```home-manager switch --flake ~/dotfiles/#emre```
 
 # TODO
-- nix: fix home-manager
 - nix: btop GPU
 - nix: missing tray icons
 - py: fix hardcoded paths

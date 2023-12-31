@@ -1,7 +1,11 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  username,
+  ...
+}: {
   programs.firefox = {
     enable = true;
-    profiles.emre = {
+    profiles."${username}" = {
       # extensions = with pkgs.nur.repos.rycee.firefox-addons; []; # handled by firefox account
 
       search.default = "Google";

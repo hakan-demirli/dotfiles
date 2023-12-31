@@ -1,5 +1,6 @@
 {
   pkgs,
+  username,
   config,
   ...
 }: {
@@ -46,7 +47,7 @@
 
     makeMutable = path: file: {
       target = file;
-      source = config.lib.file.mkOutOfStoreSymlink "/home/emre/dotfiles/${path}/${file}";
+      source = config.lib.file.mkOutOfStoreSymlink "/home/${username}/dotfiles/${path}/${file}";
       recursive = true;
     };
 

@@ -1,13 +1,19 @@
 {
-  config,
   pkgs,
+  username,
+  config,
+  inputs,
   ...
 }: {
   imports = [
-    ./programs/firefox.nix
-    ./programs/battery_monitor.nix
-    ./programs/xdg.nix
+    ../programs/firefox.nix
+    ../programs/battery_monitor.nix
+    ../programs/xdg.nix
+
+    inputs.xremap-flake.homeManagerModules.default
   ];
+
+  targets.genericLinux.enable = true;
 
   programs.starship.enable = true;
   services.udiskie.enable = true;
@@ -44,8 +50,44 @@
     ];
   };
 
-  home.username = "emre";
-  home.homeDirectory = "/home/emre";
+  gtk = {
+    enable = true;
+    theme = {
+      package = pkgs.dracula-theme;
+      name = "Dracula";
+    };
+    iconTheme = {
+      package = pkgs.dracula-theme;
+      name = "Dracula-cursors";
+    };
+    gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+  };
+
+  # # requires hardware.uinput.enable = true;
+  services.xremap = {
+    withWlroots = true;
+    # userName = "emre";
+    yamlConfig = builtins.readFile ../.config/xremap/config.yml;
+  };
+
+  home = {
+    homeDirectory = "/home/${username}";
+    username = "${username}";
+    stateVersion = "23.05"; # do not change
+    pointerCursor = {
+      x11.enable = true;
+      gtk.enable = true;
+      name = "Dracula-cursors";
+      package = pkgs.dracula-theme;
+      size = 10;
+    };
+  };
 
   home.shellAliases = {
     ":q" = "exit";
@@ -85,37 +127,21 @@
     wget = ''wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'';
     arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
   };
-
-  home.stateVersion = "23.05"; # You should not change this value.
-
-  gtk = {
-    enable = true;
-    theme = {
-      package = pkgs.dracula-theme;
-      name = "Dracula";
-    };
-    iconTheme = {
-      package = pkgs.dracula-theme;
-      name = "Dracula-cursors";
-    };
-    gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
-    gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
-    gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
-  };
-
-  home.pointerCursor = {
-    x11.enable = true;
-    gtk.enable = true;
-    name = "Dracula-cursors";
-    package = pkgs.dracula-theme;
-    size = 10;
-  };
-
   home.packages = with pkgs; [
+    cpufrequtils
+    swaylock
+    vim # default editor
+    waybar
+    kitty
+    wofi
+    firefox
+    (lf.overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [] ++ [../programs/lf.patch];
+    }))
+    wl-clipboard
+    wl-clip-persist
+    pulseaudio
+
     python3
 
     jq # to parse hyprctl
@@ -177,10 +203,10 @@
 
     lutris
     udiskie
-    (pkgs.callPackage ./programs/update_wp.nix {})
-    (pkgs.callPackage ./programs/gtk_applet.nix {})
-    (pkgs.callPackage ./programs/youtube_sync.nix {})
-    (pkgs.callPackage ./programs/auto_refresh.nix {})
+    (pkgs.callPackage ../programs/update_wp.nix {})
+    (pkgs.callPackage ../programs/gtk_applet.nix {})
+    (pkgs.callPackage ../programs/youtube_sync.nix {})
+    (pkgs.callPackage ../programs/auto_refresh.nix {})
     # (pkgs.callPackage ./programs/clipboard_tts.nix {})
   ];
 
