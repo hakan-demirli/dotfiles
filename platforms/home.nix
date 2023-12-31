@@ -7,7 +7,7 @@
 }: {
   imports = [
     ../programs/firefox.nix
-    ../programs/battery_monitor.nix
+    ../programs/low_battery_notify.nix
     ../programs/xdg.nix
 
     inputs.xremap-flake.homeManagerModules.default
