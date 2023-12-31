@@ -146,6 +146,7 @@
     btop
     libnotify
 
+    trash-cli
     unar
     zip
     ghostscript
@@ -156,7 +157,9 @@
     ruff
     ruff-lsp
     nodePackages_latest.pyright
+    # rustup component add rust-analyzer
     rust-analyzer
+    clippy
     taplo
     nodePackages_latest.vscode-json-languageserver
     nodePackages_latest.bash-language-server
