@@ -13,6 +13,7 @@ default_mode: insert
 keymap:
   - name: Default
     remap:
+      KEY_GRAVE: reserved 
       KEY_RIGHTBRACE: reserved
       KEY_BACKSLASH: reserved
       KEY_LEFTBRACE: KEY_BACKSPACE
@@ -25,8 +26,8 @@ keymap:
       Shift-Alt-y: KEY_APOSTROPHE
       Shift-Alt-u: Shift-KEY_LEFTBRACE # curly
       Shift-Alt-i: Shift-KEY_RIGHTBRACE # curly
-      Shift-Alt-o: reserved
-      Shift-Alt-p: reserved
+      Shift-Alt-o: Shift-KEY_4 # dollar
+      Shift-Alt-p: KEY_PASTE
 
       Shift-Alt-h: KEY_HOME
       Shift-Alt-j: KEY_KPLEFTPAREN

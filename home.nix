@@ -18,6 +18,10 @@
   };
   programs.bash = {
     enable = true;
+    # https://github.com/nix-community/home-manager/issues/183
+    sessionVariables = {
+      EDITOR = "hx";
+    };
     initExtra = ''
       lfcd () {
           cd "$(command lf -print-last-dir "$@")"
@@ -48,6 +52,7 @@
     "hx." = "helix .";
     helix = "hx";
     lf = "lfcd";
+    tt = "taskwarrior-tui";
 
     git = "git_clone_cached";
     "ga." = "git add .";
@@ -178,7 +183,7 @@
 
   home.sessionVariables = {
     OPENER = "xdg-open";
-    EDITOR = "helix";
+    EDITOR = "hx";
     TERMINAL = "kitty";
     TERM = "kitty";
 
