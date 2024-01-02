@@ -57,8 +57,13 @@
       name = "Dracula";
     };
     iconTheme = {
-      package = pkgs.dracula-theme;
+      package = pkgs.dracula-icon-theme;
+      name = "Dracula";
+    };
+    cursorTheme = {
       name = "Dracula-cursors";
+      package = pkgs.dracula-theme;
+      size = 10;
     };
     gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
     gtk4.extraConfig = {
@@ -80,13 +85,6 @@
     homeDirectory = "/home/${username}";
     username = "${username}";
     stateVersion = "23.05"; # do not change
-    pointerCursor = {
-      x11.enable = true;
-      gtk.enable = true;
-      name = "Dracula-cursors";
-      package = pkgs.dracula-theme;
-      size = 10;
-    };
   };
 
   home.shellAliases = {
@@ -105,8 +103,6 @@
     gc = "git commit";
     gcm = "git commit -m";
     gl = "git log";
-
-    lutris = "nvidia-offload lutris";
 
     # ascp = "asusctl profile -p";
     # ascl = "asusctl profile -l";
@@ -201,7 +197,7 @@
     taskwarrior
     taskwarrior-tui
 
-    lutris
+    bottles
     udiskie
     (pkgs.callPackage ../programs/update_wp.nix {})
     (pkgs.callPackage ../programs/gtk_applet.nix {})
@@ -244,6 +240,7 @@
     PYTHONPYCACHEPREFIX = "$XDG_CACHE_HOME/python";
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
     GOPATH = "$XDG_CACHE_HOME/go";
+    WINEPREFIX = "$XDG_DATA_HOME/wineprefixes/default";
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
     VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';

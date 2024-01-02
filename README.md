@@ -19,7 +19,6 @@
 
 # TODO
 - nix: btop GPU
-- nix: missing tray icons
 - py: fix hardcoded paths
 - Firefox custom file picker: lf/yazi
   - Using xdg-desktop-portal ?
