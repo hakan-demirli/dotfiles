@@ -122,6 +122,9 @@
 
     wget = ''wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'';
     arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
+
+    llama = ''nix run git+https://github.com/nixified-ai/flake.git#textgen-nvidia'';
+    tor = ''nix run nixpkgs#tor-browser'';
   };
   home.packages = with pkgs; [
     cpufrequtils
