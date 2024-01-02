@@ -86,6 +86,10 @@
     * No solution.
     * try 9p drivers
 
+* **Run AI Models**
+    * https://github.com/nixified-ai/flake
+    * ```nix run git+https://github.com/nixified-ai/flake.git#textgen-nvidia```
+    * ```nix run git+https://github.com/nixified-ai/flake.git#invokeai-nvidia```
 
 * **How to run random binaries**
     * Use nix-ldi
