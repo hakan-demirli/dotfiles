@@ -1,7 +1,10 @@
 .config/git/config filter=git-crypt diff=git-crypt
-.config/task/taskrc filter=git-crypt diff=git-crypt
-.local/share/task/* filter=git-crypt diff=git-crypt
+.config/task/* filter=git-crypt diff=git-crypt
+.config/timewarrior/* filter=git-crypt diff=git-crypt
 .config/mylib/ics.py filter=git-crypt diff=git-crypt
 .config/mylib/ics.json filter=git-crypt diff=git-crypt
 .config/mylib/gtoken.json filter=git-crypt diff=git-crypt
 .config/mylib/credentials.json filter=git-crypt diff=git-crypt
+.local/share/task/* filter=git-crypt diff=git-crypt
+.local/share/timewarrior/* filter=git-crypt diff=git-crypt
+.local/share/timewarrior/data/* filter=git-crypt diff=git-crypt

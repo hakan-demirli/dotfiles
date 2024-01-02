@@ -43,7 +43,7 @@
     ];
 
     immutable_data = ["applications" "fonts"];
-    mutable_data = ["task"];
+    mutable_data = ["task" "timewarrior"];
 
     makeMutable = path: file: {
       target = file;

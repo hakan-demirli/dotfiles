@@ -197,6 +197,7 @@
     sioyek
 
     taskwarrior
+    timewarrior
 
     bottles
     udiskie
