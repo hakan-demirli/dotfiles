@@ -92,7 +92,6 @@
     "hx." = "helix .";
     helix = "hx";
     lf = "lfcd";
-    tt = "taskwarrior-tui";
 
     git = "git_clone_cached";
     "ga." = "git add .";
@@ -198,10 +197,10 @@
     sioyek
 
     taskwarrior
-    taskwarrior-tui
 
     bottles
     udiskie
+    (pkgs.callPackage ../programs/tt.nix {})
     (pkgs.callPackage ../programs/update_wp.nix {})
     (pkgs.callPackage ../programs/gtk_applet.nix {})
     (pkgs.callPackage ../programs/youtube_sync.nix {})
