@@ -18,6 +18,7 @@ keymap:
       KEY_BACKSLASH: reserved
       KEY_LEFTBRACE: KEY_BACKSPACE
       Shift-KEY_LEFTBRACE: KEY_DELETE
+      Alt-Shift-KEY_LEFTBRACE: Shift-KEY_MINUS # underscore
       KEY_BACKSPACE: reserved
       KEY_ENTER: reserved
       KEY_APOSTROPHE: KEY_ENTER
@@ -61,7 +62,7 @@ keymap:
 
 
       # Left Hand
-      Shift-Alt-q: Shift-KEY_MINUS # underscore
+      Shift-Alt-q: reserved
       Shift-Alt-w: Shift-KEY_7 # ampersand 
       Shift-Alt-e: Shift-KEY_8 # star
       Shift-Alt-r: Shift-KEY_6 # caret

@@ -32,7 +32,7 @@ in {
     Unit.Description = "low_battery_notify timer";
     Timer = {
       Unit = "low_battery_notify.service";
-      OnCalendar = "*:*:0/5";
+      OnCalendar = "*:0/2";
       Persistent = true;
       AccuracySec = "1s";
     };
