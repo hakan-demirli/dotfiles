@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-
+import argparse
+import copy
 import os
 import sys
 import termios
-import copy
 import tty
 from typing import Final, Tuple
 
@@ -21,12 +21,18 @@ GREEN: Final = "42;30"
 
 
 class State:
-    def __init__(self, keymaps, window_state, list_state, summary_state):
-        self.keymaps = keymaps
+    def __init__(
+        self,
+        keymap,
+        window_state="summary",
+        list_state="normal",
+        summary_state="normal",
+    ):
+        self.keymap = keymap
         self.window_state = window_state
         self.list_state = list_state
         self.summary_state = summary_state
-        self.current_list = "(none)"
+        self.current_list = ""
         self.list_index = 1
         self.summary_index = 1
         self.list_insert_state = ""
@@ -35,11 +41,15 @@ class State:
     def get_task_list_command(self):
         if self.current_list == "(none)":
             return TASK_LIST_COMMAND + ["-PROJECT"]
+        elif self.current_list == "":
+            return TASK_LIST_COMMAND
         else:
             return TASK_LIST_COMMAND + [f"project:{self.current_list}"]
 
     def get_task_add_command(self):
         if self.current_list == "(none)":
+            return TASK_LIST_ADD_COMMAND
+        elif self.current_list == "":
             return TASK_LIST_ADD_COMMAND
         else:
             return TASK_LIST_ADD_COMMAND + [f"project:{self.current_list}"]
@@ -432,34 +442,32 @@ def default(key: str, state: State) -> State:
 def handle_key(key: str, state: State) -> State:
     if state.window_state == "list":
         try:
-            return state.keymaps[state.window_state][state.list_state][key](key, state)
+            return state.keymap[state.window_state][state.list_state][key](key, state)
         except Exception:
             try:
-                return state.keymaps[state.window_state][state.list_state]["default"](
+                return state.keymap[state.window_state][state.list_state]["default"](
                     key, state
                 )
             except Exception:
-                return state.keymaps[state.window_state][state.list_state](key, state)
+                return state.keymap[state.window_state][state.list_state](key, state)
     elif state.window_state == "summary":
         try:
-            return state.keymaps[state.window_state][state.summary_state][key](
+            return state.keymap[state.window_state][state.summary_state][key](
                 key, state
             )
         except Exception:
             try:
-                return state.keymaps[state.window_state][state.summary_state][
-                    "default"
-                ]("default", state)
-            except Exception:
-                return state.keymaps[state.window_state][state.summary_state](
-                    key, state
+                return state.keymap[state.window_state][state.summary_state]["default"](
+                    "default", state
                 )
+            except Exception:
+                return state.keymap[state.window_state][state.summary_state](key, state)
     else:
         raise ValueError
 
 
 if __name__ == "__main__":
-    keymaps = {
+    keymap = {
         "list": {
             "normal": {
                 "g": task_list_move_top,
@@ -493,8 +501,31 @@ if __name__ == "__main__":
         },
     }
 
-    state = State(keymaps, "summary", "normal", "normal")
-    task_summary_move_top("g", state)  # render first screen
+    # Create the parser
+    parser = argparse.ArgumentParser(description="Taskwarrior default TUI.")
+
+    parser.add_argument(
+        "--window_state", default="summary", help="Specify window state."
+    )
+    parser.add_argument("--list_state", default="normal", help="Specify list state.")
+    parser.add_argument(
+        "--summary_state", default="normal", help="Specify summary state."
+    )
+
+    args = parser.parse_args()
+
+    state = State(
+        keymap=keymap,
+        window_state=args.window_state,
+        list_state=args.list_state,
+        summary_state=args.summary_state,
+    )
+
+    if args.window_state == "list":  # render first screen
+        task_list_move_top("g", state)
+    else:
+        task_summary_move_top("g", state)
+
     while True:
         b, key = getkey()
         state_copy = copy.deepcopy(state)

@@ -93,6 +93,7 @@
     helix = "hx";
     lf = "lfcd";
     cdf = ''cd "$(find . -type d | fzf)"'';
+    tt = ''tt --window_state=list'';
 
     git = "git_clone_cached";
     "ga." = "git add .";
