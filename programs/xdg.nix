@@ -40,6 +40,7 @@
       "qutebrowser"
       "wgetrc"
       "task"
+      "timewarrior"
     ];
 
     immutable_data = ["applications" "fonts"];
