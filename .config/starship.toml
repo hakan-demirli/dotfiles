@@ -1,0 +1,135 @@
+# "$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$username\
+$hostname\
+$localip\
+$shlvl\
+$singularity\
+$kubernetes\
+$directory\
+$vcsh\
+$fossil_branch\
+$fossil_metrics\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$hg_branch\
+$pijul_channel\
+$docker_context\
+$package\
+$c\
+$cmake\
+$cobol\
+$daml\
+$dart\
+$deno\
+$dotnet\
+$elixir\
+$elm\
+$erlang\
+$fennel\
+$golang\
+$guix_shell\
+$haskell\
+$haxe\
+$helm\
+$java\
+$julia\
+$kotlin\
+$gradle\
+$lua\
+$nim\
+$nodejs\
+$ocaml\
+$opa\
+$perl\
+$php\
+$pulumi\
+$purescript\
+$python\
+$raku\
+$rlang\
+$red\
+$ruby\
+$rust\
+$scala\
+$solidity\
+$swift\
+$terraform\
+$typst\
+$vlang\
+$vagrant\
+$zig\
+$buf\
+$nix_shell\
+$conda\
+$meson\
+$spack\
+$memory_usage\
+$aws\
+$gcloud\
+$openstack\
+$azure\
+$direnv\
+$env_var\
+$crystal\
+$custom\
+$sudo\
+$cmd_duration\
+$fill\
+$time\
+$line_break\
+${custom.taskwarrior}\
+$jobs\
+$battery\
+$status\
+$os\
+$container\
+$shell\
+$character"""
+
+[time]
+disabled = false
+
+[fill]
+symbol = ' '
+
+[custom.taskwarrior]
+command = """
+#!/usr/bin/env bash
+
+URGENT="!"
+OVERDUE="☠️"
+TODAY="😱"
+TOMORROW="📅"
+function task_indicator {
+    local out=""
+    local excluded="project.not:fun project.not:chore"
+    local cnt=0
+    if [ `task +READY +OVERDUE $excluded count` -gt "0" ]; then
+        cnt=`task +READY +OVERDUE $excluded count`
+        out="$cnt$OVERDUE"
+    elif [ `task +READY +DUETODAY $excluded count` -gt "0" ]; then
+        cnt=`task +READY +DUETODAY $excluded count`
+        out="$cnt$DUETODAY"
+    elif [ `task +READY +DUETOMORROW $excluded count` -gt "0" ]; then
+        cnt=`task +READY +DUETOMORROW $excluded count`
+        out="$cnt$DUETOMORROW"
+    elif [ `task +READY urgency \\> 15 $excluded count` -gt "0" ]; then
+        cnt=`task +READY urgency \\> 15 $excluded count`
+        out="$cnt$URGENT"
+    fi
+    echo $out
+}
+
+task_indicator
+
+"""
+when = "command -v task"
+style = "bold red"
+format = "[$output]($style) "
+shell = ["/usr/bin/env", "bash"]
+
