@@ -41,6 +41,7 @@
       "wgetrc"
       "task"
       "timewarrior"
+      "starship.toml"
     ];
 
     immutable_data = ["applications" "fonts"];
