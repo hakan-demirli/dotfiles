@@ -107,11 +107,11 @@ def getkey() -> Tuple[bytes, str]:
 
 
 def task_summary_move_up(key: str, state: State) -> State:
-    def get_below(lines, idx) -> int:
+    def get_up(lines, idx) -> int:
         return len(lines) - 1 if idx == 1 else idx - 1
 
     clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
-    idx = get_below(clines, state.summary_index)
+    idx = get_up(clines, state.summary_index)
     state.summary_index = idx
     TerminalRunner().render_screen(TerminalRunner().highlight_line(idx, clines, GREEN))
 
@@ -130,12 +130,21 @@ def task_summary_move_down(key: str, state: State) -> State:
     return state
 
 
+def task_summary_find(key: str, state: State) -> State:
+    state.summary_state = "find"
+    clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
+    TerminalRunner().render_screen(
+        TerminalRunner().highlight_line(state.summary_index, clines, GREEN)
+    )
+    return state
+
+
 def task_summary_rename(key: str, state: State) -> State:
     state.summary_state = "rename"
     clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
     clines.append(f": {state.input_string}")
     TerminalRunner().render_screen(
-        TerminalRunner().highlight_line(state.list_index, clines, GREEN)
+        TerminalRunner().highlight_line(state.summary_index, clines, GREEN)
     )
 
     return state
@@ -247,7 +256,43 @@ def task_list_modify(key: str, state: State) -> State:
 
 def task_list_to_summary(key: str, state: State) -> State:
     state.window_state = "summary"
-    return task_summary_move_top("g", state)
+    clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
+    TerminalRunner().render_screen(
+        TerminalRunner().highlight_line(state.summary_index, clines, GREEN)
+    )
+    return state
+
+
+def task_summary_find_key(key: str, state: State) -> State:
+    def get_below(lines, idx) -> int:
+        return 1 if idx == len(lines) - 1 else idx + 1
+
+    def index_to_list(idx):
+        lines = TerminalRunner().get_colorless_lines(TASK_SUMMARY_COMMAND)
+        if lines[idx + 1][0] == " ":
+            saved_word = lines[idx + 1].split()[0]
+            while lines[idx][0] == " ":
+                idx -= 1
+            parent = lines[idx].split()[0]
+            return parent + "." + saved_word
+        else:
+            return lines[idx + 1].split()[0]
+
+    lines = TerminalRunner().get_colorless_lines(TASK_SUMMARY_COMMAND)
+
+    for idx, line in enumerate(lines):
+        if not idx:
+            continue
+        saved_word = lines[idx].split()[0]
+        if saved_word[0] == key:
+            state.summary_index = idx - 1
+            break
+    clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
+    TerminalRunner().render_screen(
+        TerminalRunner().highlight_line(state.summary_index, clines, GREEN)
+    )
+    state.summary_state = "normal"
+    return state
 
 
 def task_summary_input(key: str, state: State) -> State:
@@ -439,10 +484,12 @@ if __name__ == "__main__":
                 "r": task_summary_rename,
                 "g": task_summary_move_top,
                 "G": task_summary_move_end,
+                "f": task_summary_find,
                 "q": quit,
                 "default": default,
             },
             "rename": task_summary_input,
+            "find": task_summary_find_key,
         },
     }
 
