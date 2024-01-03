@@ -79,6 +79,7 @@ class TerminalRunner:
         return lines
 
     def render_screen(self, lines: List[str], typing_line: str = "") -> None:
+        print("\033[?25l", end="")  # Hide the cursor
         print("\033[s", end="")  # Save cursor position
         print("\033[J", end="")  # clear to the end
 

@@ -92,6 +92,7 @@
     "hx." = "helix .";
     helix = "hx";
     lf = "lfcd";
+    cdf = ''cd "$(find . -type d | fzf)"'';
 
     git = "git_clone_cached";
     "ga." = "git add .";

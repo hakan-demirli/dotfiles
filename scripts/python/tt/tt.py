@@ -13,20 +13,23 @@ TASK_LIST_COMMAND: Final = ["task", "list"]
 TASK_SUMMARY_COMMAND: Final = ["task", "summary"]
 TASK_INFO_COMMAND: Final = ["task", "info"]
 TASK_LIST_DONE_COMMAND: Final = ["task", "done"]
+TASK_LIST_MODIFY_COMMAND: Final = ["task", "modify"]
 TASK_LIST_START_COMMAND: Final = ["task", "start"]
 TASK_LIST_STOP_COMMAND: Final = ["task", "stop"]
-TASK_ADD_COMMAND: Final = ["task", "add"]
+TASK_LIST_ADD_COMMAND: Final = ["task", "add"]
 GREEN: Final = "42;30"
 
 
 class State:
-    def __init__(self, keymaps, window_state, list_state):
+    def __init__(self, keymaps, window_state, list_state, summary_state):
         self.keymaps = keymaps
         self.window_state = window_state
         self.list_state = list_state
+        self.summary_state = summary_state
         self.current_list = "(none)"
         self.list_index = 1
         self.summary_index = 1
+        self.list_insert_state = ""
         self.input_string = ""
 
     def get_task_list_command(self):
@@ -34,6 +37,12 @@ class State:
             return TASK_LIST_COMMAND + ["-PROJECT"]
         else:
             return TASK_LIST_COMMAND + [f"project:{self.current_list}"]
+
+    def get_task_add_command(self):
+        if self.current_list == "(none)":
+            return TASK_LIST_ADD_COMMAND
+        else:
+            return TASK_LIST_ADD_COMMAND + [f"project:{self.current_list}"]
 
 
 def getkey() -> Tuple[bytes, str]:
@@ -99,7 +108,7 @@ def getkey() -> Tuple[bytes, str]:
 
 def task_summary_move_up(key: str, state: State) -> State:
     def get_below(lines, idx) -> int:
-        return 1 if idx == len(lines) - 1 else idx + 1
+        return len(lines) - 1 if idx == 1 else idx - 1
 
     clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
     idx = get_below(clines, state.summary_index)
@@ -121,10 +130,28 @@ def task_summary_move_down(key: str, state: State) -> State:
     return state
 
 
+def task_summary_rename(key: str, state: State) -> State:
+    state.summary_state = "rename"
+    clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
+    clines.append(f": {state.input_string}")
+    TerminalRunner().render_screen(
+        TerminalRunner().highlight_line(state.list_index, clines, GREEN)
+    )
+
+    return state
+
+
 def task_summary_to_list(key: str, state: State) -> State:
     def index_to_list(idx):
         lines = TerminalRunner().get_colorless_lines(TASK_SUMMARY_COMMAND)
-        return lines[idx + 1].split()[0]
+        if lines[idx + 1][0] == " ":
+            saved_word = lines[idx + 1].split()[0]
+            while lines[idx][0] == " ":
+                idx -= 1
+            parent = lines[idx].split()[0]
+            return parent + "." + saved_word
+        else:
+            return lines[idx + 1].split()[0]
 
     try:
         state.current_list = index_to_list(state.summary_index)
@@ -196,6 +223,19 @@ def task_list_move_up(key: str, state: State) -> State:
 
 def task_list_add(key: str, state: State) -> State:
     state.list_state = "insert"
+    state.list_insert_state = "add"
+    clines = TerminalRunner().get_colored_lines(state.get_task_list_command())
+    clines.append(f": {state.input_string}")
+    TerminalRunner().render_screen(
+        TerminalRunner().highlight_line(state.list_index, clines, GREEN)
+    )
+
+    return state
+
+
+def task_list_modify(key: str, state: State) -> State:
+    state.list_state = "insert"
+    state.list_insert_state = "modify"
     clines = TerminalRunner().get_colored_lines(state.get_task_list_command())
     clines.append(f": {state.input_string}")
     TerminalRunner().render_screen(
@@ -210,24 +250,97 @@ def task_list_to_summary(key: str, state: State) -> State:
     return task_summary_move_top("g", state)
 
 
-def task_list_insert(key: str, state: State) -> State:
-    if key == "space":
-        state.input_string += " "
-    elif key == "backspace":
-        state.input_string = state.input_string[:-1]
-    elif key == "return":
-        state.list_state = "normal"
-        _ = TerminalRunner().run(TASK_ADD_COMMAND + [state.input_string])
-    else:
-        state.input_string += key
-    clines = TerminalRunner().get_colored_lines(state.get_task_list_command())
-    clines.append(f": {state.input_string}")
-    TerminalRunner().render_screen(
-        TerminalRunner().highlight_line(state.list_index, clines, GREEN)
-    )
-    if key == "return":
+def task_summary_input(key: str, state: State) -> State:
+    def index_to_list(idx):
+        lines = TerminalRunner().get_colorless_lines(TASK_SUMMARY_COMMAND)
+        if lines[idx + 1][0] == " ":
+            saved_word = lines[idx + 1].split()[0]
+            while lines[idx][0] == " ":
+                idx -= 1
+            parent = lines[idx].split()[0]
+            return parent + "." + saved_word
+        else:
+            return lines[idx + 1].split()[0]
+
+    if key == "esc":
+        state.summary_state = "normal"
         state.input_string = ""
-    return state
+        clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
+        TerminalRunner().render_screen(
+            TerminalRunner().highlight_line(state.summary_index, clines, GREEN)
+        )
+        return state
+    else:
+        if key == "space":
+            state.input_string += " "
+        elif key == "backspace":
+            state.input_string = state.input_string[:-1]
+        elif key == "return":
+            state.summary_state = "normal"
+            # Create a copy of the original list
+            modify_cmd = TASK_LIST_MODIFY_COMMAND[:]
+            project = index_to_list(state.summary_index)
+            parent_project = (
+                project.rpartition(".")[0] + "." if project.rpartition(".")[0] else ""
+            )
+            modify_cmd.insert(1, f"project:{project}")
+            modify_cmd.append(f"project:{parent_project}{state.input_string}")
+            _ = TerminalRunner().run(modify_cmd)
+        else:
+            state.input_string += key
+
+        clines = TerminalRunner().get_colored_lines(TASK_SUMMARY_COMMAND)
+        clines.append(f": {state.input_string}")
+        TerminalRunner().render_screen(
+            TerminalRunner().highlight_line(state.summary_index, clines, GREEN)
+        )
+        if key == "return":
+            state.input_string = ""
+        return state
+
+
+def task_list_insert(key: str, state: State) -> State:
+    def index_to_id(idx: int) -> int:
+        lines = TerminalRunner().get_colorless_lines(state.get_task_list_command())
+        return int(lines[idx + 1].split()[0])
+
+    if key == "esc":
+        state.list_state = "normal"
+        state.input_string = ""
+        clines = TerminalRunner().get_colored_lines(state.get_task_list_command())
+        TerminalRunner().render_screen(
+            TerminalRunner().highlight_line(state.list_index, clines, GREEN)
+        )
+        return state
+    else:
+        if key == "space":
+            state.input_string += " "
+        elif key == "backspace":
+            state.input_string = state.input_string[:-1]
+        elif key == "return":
+            state.list_state = "normal"
+            if state.list_insert_state == "add":
+                _ = TerminalRunner().run(
+                    state.get_task_add_command() + [state.input_string]
+                )
+            elif state.list_insert_state == "modify":
+                _ = TerminalRunner().run(
+                    TASK_LIST_MODIFY_COMMAND
+                    + [str(index_to_id(state.list_index))]
+                    + [state.input_string]
+                )
+            else:
+                raise ValueError
+        else:
+            state.input_string += key
+        clines = TerminalRunner().get_colored_lines(state.get_task_list_command())
+        clines.append(f": {state.input_string}")
+        TerminalRunner().render_screen(
+            TerminalRunner().highlight_line(state.list_index, clines, GREEN)
+        )
+        if key == "return":
+            state.input_string = ""
+        return state
 
 
 def task_list_toggle_active(key: str, state: State) -> State:
@@ -256,13 +369,13 @@ def task_list_done(key: str, state: State) -> State:
         return int(lines[idx + 1].split()[0])
 
     cmd = TASK_LIST_DONE_COMMAND + [str(index_to_id(state.list_index))]
-    # print(cmd)
     _ = TerminalRunner().run(cmd)
     return task_list_move_top(key, state)
 
 
 def quit(key: str, state: State) -> State:
     print("\033[J", end="")  # clear to the end
+    print("\033[?25h", end="")  # Show the cursor
     exit()
     return state
 
@@ -282,14 +395,22 @@ def handle_key(key: str, state: State) -> State:
                 )
             except Exception:
                 return state.keymaps[state.window_state][state.list_state](key, state)
-
-    else:
+    elif state.window_state == "summary":
         try:
-            return state.keymaps[state.window_state][key](key, state)
-        except KeyError:
-            if "default" in state.keymaps[state.window_state]:
-                return state.keymaps[state.window_state]["default"]("default", state)
-            exit()
+            return state.keymaps[state.window_state][state.summary_state][key](
+                key, state
+            )
+        except Exception:
+            try:
+                return state.keymaps[state.window_state][state.summary_state][
+                    "default"
+                ]("default", state)
+            except Exception:
+                return state.keymaps[state.window_state][state.summary_state](
+                    key, state
+                )
+    else:
+        raise ValueError
 
 
 if __name__ == "__main__":
@@ -302,6 +423,7 @@ if __name__ == "__main__":
                 "k": task_list_move_up,
                 "s": task_list_toggle_active,
                 "d": task_list_done,
+                "m": task_list_modify,
                 "a": task_list_add,
                 "h": task_list_to_summary,
                 "q": quit,
@@ -310,17 +432,22 @@ if __name__ == "__main__":
             "insert": task_list_insert,
         },
         "summary": {
-            "l": task_summary_to_list,
-            "k": task_summary_move_up,
-            "j": task_summary_move_down,
-            "g": task_summary_move_top,
-            "G": task_summary_move_end,
-            "q": quit,
-            "default": default,
+            "normal": {
+                "l": task_summary_to_list,
+                "k": task_summary_move_up,
+                "j": task_summary_move_down,
+                "r": task_summary_rename,
+                "g": task_summary_move_top,
+                "G": task_summary_move_end,
+                "q": quit,
+                "default": default,
+            },
+            "rename": task_summary_input,
         },
     }
 
-    state = State(keymaps, "summary", "normal")
+    state = State(keymaps, "summary", "normal", "normal")
+    task_summary_move_top("g", state)  # render first screen
     while True:
         b, key = getkey()
         state_copy = copy.deepcopy(state)
