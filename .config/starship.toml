@@ -93,6 +93,7 @@ $character"""
 
 [time]
 disabled = false
+time_format = '%H:%M'
 
 [fill]
 symbol = ' '

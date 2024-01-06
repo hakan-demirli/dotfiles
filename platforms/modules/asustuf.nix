@@ -27,6 +27,13 @@
     fsType = "vfat";
   };
 
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 24 * 1024;
+    }
+  ];
+
   # /dev/disk/by-uuid/0D11E693467F5A53 /mnt/second ntfs nosuid,nodev,nofail 0 0
   fileSystems."/mnt/second" = {
     device = "/dev/disk/by-uuid/0D11E693467F5A53";
@@ -43,8 +50,6 @@
   #     $ mount /dev/sdn5 /mnt/windows-partition
   #     Run nixos-generate-config. It will update /etc/nixos/hardware-configuration.nix to match the new partition configuration (and configuration.nix stays untouched, unless you use the --force option).
   #     And, finally, a nixos-rebuild switch!
-
-  swapDevices = [];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
