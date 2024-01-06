@@ -136,6 +136,7 @@
   networking.networkmanager.enable = true;
   networking.hostName = "nixos"; # Define your hostname.
   hardware = {
+    keyboard.qmk.enable = true;
     uinput.enable = true; # xremap dep
     bluetooth.enable = true;
     bluetooth.powerOnBoot = false;

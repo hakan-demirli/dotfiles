@@ -73,7 +73,11 @@
       gtk-application-prefer-dark-theme = true;
     };
   };
-
+  qt = {
+    enable = true;
+    #useGtkTheme = true;
+    platformTheme = "gtk";
+  };
   # # requires hardware.uinput.enable = true;
   services.xremap = {
     withWlroots = true;
@@ -94,6 +98,7 @@
     lf = "lfcd";
     cdf = ''cd "$(find . -type d | fzf)"'';
     tt = ''tt --window_state=list'';
+    tl = ''task list'';
 
     git = "git_clone_cached";
     "ga." = "git add .";
@@ -148,7 +153,7 @@
     usbutils
     pavucontrol
     android-file-transfer
-    transmission-gtk
+    transmission-qt
     libsForQt5.kolourpaint
     libsForQt5.breeze-icons
     # etcher # BUG electron not safe
@@ -204,6 +209,7 @@
     bottles
     udiskie
     (pkgs.callPackage ../programs/tt.nix {})
+    (pkgs.callPackage ../programs/wttr.nix {})
     (pkgs.callPackage ../programs/update_wp.nix {})
     (pkgs.callPackage ../programs/gtk_applet.nix {})
     (pkgs.callPackage ../programs/youtube_sync.nix {})
@@ -246,6 +252,7 @@
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
     GOPATH = "$XDG_CACHE_HOME/go";
     WINEPREFIX = "$XDG_DATA_HOME/wineprefixes/default";
+    _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java'';
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
     VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
