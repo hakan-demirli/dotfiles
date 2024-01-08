@@ -28,6 +28,14 @@
     sessionVariables = {
       EDITOR = "hx";
     };
+
+    historySize = 10000000;
+    historyFileSize = 10000000;
+    historyControl = ["erasedups" "ignoredups" "ignorespace"];
+    enableCompletion = true;
+    bashrcExtra = ''
+      PROMPT_COMMAND="history -a; history -r"
+    '';
     initExtra = ''
       lfcd () {
           cd "$(command lf -print-last-dir "$@")"
@@ -222,8 +230,6 @@
     EDITOR = "hx";
     TERMINAL = "kitty";
     TERM = "kitty";
-
-    PROMPT_COMMAND = "history -a";
 
     # export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
     # env = PATH,$HOME/.local/bin:$PATH
