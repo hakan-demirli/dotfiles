@@ -32,6 +32,7 @@ x-scheme-handler/etcher=balena-etcher.desktop
 x-scheme-handler/msteams=teams.desktop
 x-content/unix-software=lf.desktop
 application/x-theme=helix.desktop
+application/x-wine-extension-ini=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -61,3 +62,4 @@ text/xml=helix.desktop
 text/plain=helix.desktop
 inode/x-empty=helix.desktop
 application/x-theme=helix.desktop
+application/x-wine-extension-ini=helix.desktop

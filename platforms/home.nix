@@ -108,7 +108,7 @@
     tt = ''tt --window_state=list'';
     tl = ''task list'';
 
-    git = "git_clone_cached";
+    git = "git_cached";
     "ga." = "git add .";
     ga = "git add";
     gd = "git diff";
