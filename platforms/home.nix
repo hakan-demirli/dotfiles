@@ -218,6 +218,7 @@
     udiskie
     (pkgs.callPackage ../programs/tt.nix {})
     (pkgs.callPackage ../programs/wttr.nix {})
+    (pkgs.callPackage ../programs/blender.nix {})
     (pkgs.callPackage ../programs/update_wp.nix {})
     (pkgs.callPackage ../programs/gtk_applet.nix {})
     (pkgs.callPackage ../programs/youtube_sync.nix {})
