@@ -40,6 +40,7 @@
 
   # services
   services = {
+    gvfs.enable = true; # mftp support
     blueman.enable = true;
     dbus.enable = true;
     udisks2.enable = true;
