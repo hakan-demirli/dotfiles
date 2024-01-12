@@ -39,10 +39,10 @@ auto-format = true
 # extraPaths = ["./test"]
 
 
-# [[language]]
-# name = "verilog"
+[[language]]
+name = "verilog"
 # formatter = { command = 'verible-verilog-format', args = ["-"] }
-# auto-format = true
+auto-format = true
 # indent = { tab-width = 4, unit = "    " }
 
 [[language]]

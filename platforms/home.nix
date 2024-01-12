@@ -42,7 +42,6 @@
       }
     '';
   };
-
   programs.fzf = {
     enable = true;
     defaultCommand = "${pkgs.fd}/bin/fd --type f";
@@ -210,6 +209,8 @@
     gnumake
     texlab
     sioyek
+    verible
+    verilator
 
     taskwarrior
     timewarrior
@@ -221,6 +222,7 @@
     (pkgs.callPackage ../programs/blender.nix {})
     (pkgs.callPackage ../programs/update_wp.nix {})
     (pkgs.callPackage ../programs/gtk_applet.nix {})
+    (pkgs.callPackage ../programs/svlangserver.nix {})
     (pkgs.callPackage ../programs/youtube_sync.nix {})
     (pkgs.callPackage ../programs/auto_refresh.nix {})
     # (pkgs.callPackage ./programs/clipboard_tts.nix {})
