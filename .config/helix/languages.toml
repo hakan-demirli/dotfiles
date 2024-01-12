@@ -43,7 +43,11 @@ auto-format = true
 name = "verilog"
 # formatter = { command = 'verible-verilog-format', args = ["-"] }
 auto-format = true
+language-servers = [ "svlangserver" ]
+
 # indent = { tab-width = 4, unit = "    " }
+[language-server.veridian]
+command = "veridian"
 
 [[language]]
 name = "nix"
