@@ -1,62 +1,24 @@
-[language-server]
-clangd = { command = "clangd", args = ['--fallback-style=Webkit'] }
-
-[language-server.texlab]
-command = "texlab"
-cleanArtifacts = true
-
-[language-server.texlab.config.texlab.build]
-onSave = true
-forwardSearchAfter = true
-
-[language-server.texlab.config.texlab.forwardSearch]
-executable = "sioyek"
-args = [
-  "--execute-command",
-  "turn_on_synctex",
-  "%p",
-  "--forward-search-file",
-  "%f",
-  "--forward-search-line",
-  "%l",
-]
-
-[language-server.texlab.config.texlab.chktex]
-onEdit = true
-
-
-[language-server.ruff-lsp]
-command = "ruff-lsp"
-
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
 language-servers = [ "pyright","ruff-lsp" ]
 auto-format = true
-
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
 # extraPaths = ["./test"]
 
-
 [[language]]
 name = "verilog"
-# formatter = { command = 'verible-verilog-format', args = ["-"] }
 auto-format = true
-language-servers = [ "svlangserver" ]
-
-# indent = { tab-width = 4, unit = "    " }
-[language-server.veridian]
-command = "veridian"
+formatter = { command = 'verible-verilog-format', args = ["-"] }
+language-servers = [ "dls" ]
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "nix"
 formatter = { command = 'alejandra', args = [] }
 language-servers = ["nixd"]
 auto-format = true
-
-[language-server.nixd]
-command = "nixd"
 
 [[language]]
 name = "html"
@@ -100,11 +62,9 @@ name = "c"
 auto-format = true
 language-servers = ["clangd"]
 indent = { tab-width = 4, unit = "    " }
-
 # Diagnostics:
 #   Suppress: "pp_including_mainfile_in_preamble"
 # Add above codes into the .clangd file under your project directory.
-
 # Create compile_commands.json using this: ` cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..`
 
 [[language]]
@@ -117,6 +77,80 @@ auto-format = true
 [language.formatter]
 command = "rustfmt"
 
+
+
+
+
 [language-server.rust-analyzer.config.check]
 command = "clippy"
+
+[language-server]
+clangd = { command = "clangd", args = ['--fallback-style=Webkit'] }
+
+[language-server.texlab]
+command = "texlab"
+cleanArtifacts = true
+
+[language-server.texlab.config.texlab.build]
+onSave = true
+forwardSearchAfter = true
+
+[language-server.texlab.config.texlab.forwardSearch]
+executable = "sioyek"
+args = [
+  "--execute-command",
+  "turn_on_synctex",
+  "%p",
+  "--forward-search-file",
+  "%f",
+  "--forward-search-line",
+  "%l",
+]
+
+[language-server.texlab.config.texlab.chktex]
+onEdit = true
+
+
+[language-server.veridian]
+command = "veridian"
+
+[language-server.ruff-lsp]
+command = "ruff-lsp"
+
+
+
+
+[language-server.dls]
+command = "diagnostic-languageserver"
+args = [ "--stdio", "--log-level=2" ]
+
+[language-server.dls.config.filetypes]
+verilog = "verilator"
+systemverilog =  "verilator"
+
+[language-server.dls.config.linters.verilator]
+command= "sh"
+args= [
+    "-c",
+    "verilator --lint-only -Wall $(find . -type f -name '*.v' | xargs -n1 dirname | sort -u | awk '{print \"-I\" $0}') %file 2>&1 | grep %file"
+]
+isStdout = true
+isStderr = false
+sourceName = "verilator"
+# onSaveOnly = true -- DLS never receives onDidSave event.
+#  See:
+#    https://github.com/helix-editor/helix/issues/9034
+#    https://github.com/helix-editor/helix/pull/9101
+debounce = 1000
+formatLines = 1
+formatPattern= [
+    "^(%(Warning|Error)[^:]*:)?\\s*([^:]+):(\\d+):(\\d+)?:?\\s*(\\.\\.\\.)?\\s*(.*)$",
+    {line = 4, column = 5, message= [ 7 ], security= 2}
+]
+securities= {Error = "error", Warning= "warning", undefined= "info"}
+
+
+
+[language-server.nixd]
+command = "nixd"
 

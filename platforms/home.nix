@@ -209,7 +209,9 @@
     gnumake
     texlab
     sioyek
+    yaml-language-server
     verible
+    nodePackages.diagnostic-languageserver
     verilator
 
     taskwarrior
