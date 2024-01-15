@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+import logging
+import os
+import shutil
+import subprocess
+import sys
+from urllib.parse import urlparse
+
+GIT = "git"
+
+
+def setup_logger():
+    cache_dir = create_cache_dir()
+    log_file = os.path.join(cache_dir, "git_cache.log")
+    logging.basicConfig(filename=log_file, level=logging.INFO)
+
+
+def create_cache_dir():
+    xdg_cache_dir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+    cache_dir = os.path.join(xdg_cache_dir, "git_cache")
+    os.makedirs(cache_dir, exist_ok=True)
+    return cache_dir
+
+
+def gitc_clone(url, depth=None, dst_path=None):
+    print(url)
+    print(depth)
+    print(dst_path)
+
+    cache_dir = create_cache_dir()
+
+    parsed_url = urlparse(url)
+    path_parts = parsed_url.path.strip("/").split("/")
+    if len(path_parts) < 2:
+        git(["clone", url] + (["--depth", str(depth)] if depth else []))
+
+    website_dir = os.path.join(cache_dir, parsed_url.netloc)
+    os.makedirs(website_dir, exist_ok=True)
+
+    user_dir = os.path.join(website_dir, path_parts[-2])
+    os.makedirs(user_dir, exist_ok=True)
+
+    repo_dir = os.path.join(user_dir, path_parts[-1])
+    if os.path.exists(repo_dir):
+        subprocess.run([GIT, "-C", repo_dir, "fetch", "--unshallow"])
+        subprocess.run([GIT, "-C", repo_dir, "pull"])
+        logging.info("repo exists.")
+    else:
+        if depth is not None:
+            subprocess.run([GIT, "clone", "--depth", str(depth), url, repo_dir])
+            logging.info("depth copy is performed.")
+        else:
+            subprocess.run([GIT, "clone", url, repo_dir])
+            logging.info("no depth copy is performed.")
+
+    dst_dir = (
+        os.path.join(os.getcwd(), path_parts[-1]) if dst_path is None else dst_path
+    )
+    if os.path.exists(dst_dir):
+        logging.info(
+            f"Directory {dst_dir} already exists. Please remove it before running the script."
+        )
+    else:
+        shutil.copytree(repo_dir, dst_dir)
+
+
+def git_command(args):
+    if not args or (args[0] != "clone" or len(args) < 2):
+        git(args)
+    else:
+        depth = None
+        dst_path = None
+        url = None
+        depth_next = False
+        args = args[1:]  # Remove the first argument
+        for i, arg in enumerate(args):
+            if "--depth" == arg:
+                # depth = next arg is depth number
+                # check if it is number before assigning.
+                # if not just call git(args)
+                if i + 1 < len(args) and args[i + 1].isdigit():
+                    depth = int(args[i + 1])
+                    depth_next = True
+                else:
+                    git(args)
+                    return
+            elif depth_next:
+                depth_next = False
+            elif url is None:
+                url = arg
+            elif dst_path is None:
+                dst_path = arg
+        gitc_clone(url, depth, dst_path)
+
+
+def git(args):
+    logging.info(f"Unsupported flag combination: {args}")
+    logging.info("Deferring to original git.")
+    subprocess.run([GIT] + args)
+
+
+if __name__ == "__main__":
+    setup_logger()
+    git_command(sys.argv[1:])
