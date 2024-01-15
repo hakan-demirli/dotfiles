@@ -14,6 +14,8 @@
   nixpkgs.config.allowUnfree = true;
   nix = {
     settings = {
+      max-jobs = 16;
+      cores = 16;
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
     };
