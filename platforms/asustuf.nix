@@ -18,6 +18,16 @@
       cores = 16;
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
+
+      # Prevent garbage collection from altering nix-shells managed by nix-direnv
+      # https://github.com/nix-community/nix-direnv#installation
+      keep-outputs = true;
+      keep-derivations = true;
+
+      # This option defines the maximum number of substitution jobs that Nix will try to run in
+      # parallel. The default is 16. The minimum value one can choose is 1 and lower values will be
+      # interpreted as 1.
+      max-substitution-jobs = 128;
     };
   };
 
