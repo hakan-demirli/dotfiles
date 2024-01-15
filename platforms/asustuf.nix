@@ -31,8 +31,8 @@
   # packages
   environment.systemPackages = with pkgs; [
     home-manager
-    git
-    # (pkgs.callPackage ../programs/git_cached.nix {})
+    # git
+    (pkgs.callPackage ../programs/git_cached.nix {})
 
     git-crypt
     wget
