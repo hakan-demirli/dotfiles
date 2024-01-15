@@ -30,5 +30,8 @@
     };
 
   blenderWithPySlvs = pkgs.blender.withPackages (p: [(py-slvs p)]);
+  blender = blenderWithPySlvs.overrideAttrs (oldAttrs: {
+    pname = "blender";
+  });
 in
-  blenderWithPySlvs
+  blender
