@@ -12,27 +12,20 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot.initrd.availableKernelModules = ["xhci_pci" "nvme" "ahci" "usbhid" "usb_storage" "sd_mod"];
+  boot.initrd.availableKernelModules = ["xhci_pci" "nvme" "ahci" "usb_storage" "usbhid" "sd_mod"];
   boot.initrd.kernelModules = [];
   boot.kernelModules = ["kvm-amd"];
   boot.extraModulePackages = [];
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/a76af15d-91a5-433c-9f5e-fbf65c6fefa1";
+    device = "/dev/disk/by-uuid/8b7353c8-6b67-4fc8-a54e-e0bcff099694";
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/4796-DAEB";
+    device = "/dev/disk/by-uuid/0AE0-E903";
     fsType = "vfat";
   };
-
-  swapDevices = [
-    {
-      device = "/var/lib/swapfile";
-      size = 24 * 1024;
-    }
-  ];
 
   # /dev/disk/by-uuid/0D11E693467F5A53 /mnt/second ntfs nosuid,nodev,nofail 0 0
   fileSystems."/mnt/second" = {
@@ -42,14 +35,12 @@
     options = ["rw" "uid=1000"];
   };
 
-  # https://unix.stackexchange.com/questions/213137/how-to-auto-mount-permanently-mount-external-devices-on-nixos
-  # Well, I costumarily use bashmount or udisksctl to mount USB sticks. They will be mounted in /run/media/$(user name)/$(drive label or UUID).
-  # But if you are talking about an internal harddisk or partition in a local harddrive, the simplest way is:
-  #     Create a directory of your preference, as /mnt/windows-partition
-  #     Mount the desired partition, say /dev/sdn5, in that directory:
-  #     $ mount /dev/sdn5 /mnt/windows-partition
-  #     Run nixos-generate-config. It will update /etc/nixos/hardware-configuration.nix to match the new partition configuration (and configuration.nix stays untouched, unless you use the --force option).
-  #     And, finally, a nixos-rebuild switch!
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 24 * 1024;
+    }
+  ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
