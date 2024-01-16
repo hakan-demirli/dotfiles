@@ -33,6 +33,7 @@ x-scheme-handler/msteams=teams.desktop
 x-content/unix-software=lf.desktop
 application/x-theme=helix.desktop
 application/x-wine-extension-ini=helix.desktop
+text/x-tex=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -63,3 +64,4 @@ text/plain=helix.desktop
 inode/x-empty=helix.desktop
 application/x-theme=helix.desktop
 application/x-wine-extension-ini=helix.desktop
+text/x-tex=helix.desktop
