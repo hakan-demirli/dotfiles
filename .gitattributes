@@ -3,6 +3,7 @@
 .config/task/hooks/* filter=git-crypt diff=git-crypt
 .config/task/themes/* filter=git-crypt diff=git-crypt
 .config/timewarrior/* filter=git-crypt diff=git-crypt
+.config/mylib/* filter=git-crypt diff=git-crypt
 .config/mylib/ics.py filter=git-crypt diff=git-crypt
 .config/mylib/ics.json filter=git-crypt diff=git-crypt
 .config/mylib/gtoken.json filter=git-crypt diff=git-crypt

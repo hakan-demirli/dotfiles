@@ -53,7 +53,7 @@ auto-format = false
 
 [[language]]
 name = "cpp"
-auto-format = true
+# auto-format = true
 language-servers = ["clangd"]
 indent = { tab-width = 4, unit = "    " }
 

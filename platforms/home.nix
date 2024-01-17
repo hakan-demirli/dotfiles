@@ -274,6 +274,8 @@
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
     VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
 
+    LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
+
     MY_WALLPAPERS_DIR = "/mnt/second/images/art/wallpapers_pc";
     MY_GTASKS_OVERLAY_FILE = "/tmp/tasks_overlay.png";
     MY_ICS_OVERLAY_FILE = "/tmp/calendar_overlay.png";
