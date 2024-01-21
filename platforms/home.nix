@@ -13,6 +13,13 @@
     inputs.xremap-flake.homeManagerModules.default
   ];
 
+  dconf.settings = {
+    "org/virt-manager/virt-manager/connections" = {
+      autoconnect = ["qemu:///system"];
+      uris = ["qemu:///system"];
+    };
+  };
+
   targets.genericLinux.enable = true;
 
   programs.starship.enable = true;
