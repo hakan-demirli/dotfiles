@@ -102,6 +102,12 @@ cmd mount_mtp ${{
 	aft-mtp-mount /tmp/amtp 
 }}
 
+
+cmd yank_path &{{
+	printf "%s" "${f}" | wl-copy
+}}
+
+
 cmd q quit
 
 
@@ -122,6 +128,7 @@ map <space>x extract
 map <space>D push %mkdir<space>
 map <space>F push %touch<space>
 map <space>c push :zip<space>
+map <space>y yank_path
 
 map d
 map dd trash

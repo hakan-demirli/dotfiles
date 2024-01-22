@@ -94,3 +94,7 @@
 * **How to run random binaries**
     * Use nix-ldi
         * Here is a tutorial [link](https://github.com/mcdonc/.nixconfig/blob/master/videos/pydev/script.rst)
+
+
+* **Python environments**
+    * https://ayats.org/blog/nix-workflow/
