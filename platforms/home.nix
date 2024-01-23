@@ -129,6 +129,7 @@
     # ascsp = "asusctl profile -P Performance";
     # ascsb = "asusctl profile -P Balanced";
     # ascsq = "asusctl profile -P Quiet";
+    yarn = ''yarn --use-yarnrc "$XDG_CONFIG_HOME/yarn/config"'';
 
     tmux = "tmux -f ~/.config/tmux/tmux.conf";
     txa = "tmux attach-session -t";
