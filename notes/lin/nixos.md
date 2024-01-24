@@ -98,3 +98,6 @@
 
 * **Python environments**
     * https://ayats.org/blog/nix-workflow/
+
+* **Fastest MP4 splitter**
+    * losslesscut-bin
