@@ -3,7 +3,7 @@
 Type=Application
 Name=my_player
 Comment=Launches my music player
-Icon=utilities-terminal
+Icon=multimedia-audio-player
 Terminal=false
 Exec=kitty --title "my_player" lf /mnt/second/music
 Categories=AudioVideo;Audio;Player;

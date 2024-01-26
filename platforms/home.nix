@@ -109,7 +109,7 @@
     ":q" = "exit";
     "hx." = "helix .";
     helix = "hx";
-    lf = ""; # muscle memory
+    lf = ''echo "Did you mean f?"''; # muscle memory
     f = "lfcd";
     cdf = ''cd "$(find . -type d | fzf)"'';
     # tt = ''tt --window_state=list'';
