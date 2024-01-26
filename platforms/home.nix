@@ -111,8 +111,8 @@
     helix = "hx";
     lf = "lfcd";
     cdf = ''cd "$(find . -type d | fzf)"'';
-    tt = ''tt --window_state=list'';
-    tl = ''task list'';
+    # tt = ''tt --window_state=list'';
+    # tl = ''task list'';
 
     git = "git_cached";
     "ga." = "git add .";
@@ -227,12 +227,12 @@
       supportedDevices = ["Cyclone V"];
     })
 
-    taskwarrior
-    timewarrior
+    # taskwarrior
+    # timewarrior
 
     bottles
     udiskie
-    (pkgs.callPackage ../programs/tt.nix {})
+    # (pkgs.callPackage ../programs/tt.nix {})
     (pkgs.callPackage ../programs/wttr.nix {})
     (pkgs.callPackage ../programs/blender.nix {})
     (pkgs.callPackage ../programs/veridian.nix {})
