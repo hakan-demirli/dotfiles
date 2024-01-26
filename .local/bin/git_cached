@@ -29,6 +29,10 @@ def gitc_clone(url, depth=None, dst_path=None):
 
     cache_dir = create_cache_dir()
 
+    # Remove .git from the end of the url if it exists
+    if url.endswith(".git"):
+        url = url[:-4]
+
     parsed_url = urlparse(url)
     path_parts = parsed_url.path.strip("/").split("/")
     if len(path_parts) < 2:
