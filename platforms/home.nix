@@ -109,7 +109,8 @@
     ":q" = "exit";
     "hx." = "helix .";
     helix = "hx";
-    lf = "lfcd";
+    lf = ""; # muscle memory
+    f = "lfcd";
     cdf = ''cd "$(find . -type d | fzf)"'';
     # tt = ''tt --window_state=list'';
     # tl = ''task list'';
