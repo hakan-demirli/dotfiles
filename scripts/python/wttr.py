@@ -59,7 +59,13 @@ WEATHER_CODES = {
 data = {}
 
 
-weather = requests.get("https://wttr.in/ankara?format=j1").json()
+def get_city_name():
+    response = requests.get("http://ip-api.com/json/")
+    data = response.json()
+    return data["city"]
+
+
+weather = requests.get(f"https://wttr.in/{get_city_name()}?format=j1").json()
 
 
 def format_time(time):
