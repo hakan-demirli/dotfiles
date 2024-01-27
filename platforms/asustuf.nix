@@ -13,6 +13,12 @@
   documentation.nixos.enable = false; # .desktop
   nixpkgs.config.allowUnfree = true;
   nix = {
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+    };
+
     settings = {
       max-jobs = 16;
       cores = 16;
@@ -123,7 +129,7 @@
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.default = "saved";
   boot.loader.efi.canTouchEfiVariables = true;
-
+  boot.loader.grub.configurationLimit = 30;
   time.hardwareClockInLocalTime = false; # messes clock on windows
 
   # systemctl status --user polkit-gnome-authentication-agent-1
