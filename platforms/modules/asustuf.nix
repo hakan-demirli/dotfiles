@@ -17,18 +17,17 @@
   boot.kernelModules = ["kvm-amd"];
   boot.extraModulePackages = [];
 
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/3d330da9-01ed-4bf1-baf5-0961bdf7afab";
+    fsType = "ext4";
+  };
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/3d330da9-01ed-4bf1-baf5-0961bdf7afab";
-      fsType = "ext4";
-    };
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/6054-B71B";
+    fsType = "vfat";
+  };
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/6054-B71B";
-      fsType = "vfat";
-    };
-
- # /dev/disk/by-uuid/0D11E693467F5A53 /mnt/second ntfs nosuid,nodev,nofail 0 0
+  # /dev/disk/by-uuid/0D11E693467F5A53 /mnt/second ntfs nosuid,nodev,nofail 0 0
   fileSystems."/mnt/second" = {
     device = "/dev/disk/by-uuid/0D11E693467F5A53";
     fsType = "ntfs-3g";
@@ -39,7 +38,7 @@
   swapDevices = [
     {
       device = "/var/lib/swapfile";
-      size = 24 * 1024;
+      size = 30 * 1024;
     }
   ];
 

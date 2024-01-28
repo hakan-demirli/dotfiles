@@ -223,11 +223,6 @@
     nodePackages.diagnostic-languageserver
     verilator
 
-    # I would put this in shell.nix however I cant let it get garbage collected
-    #  (quartus-prime-lite.override {
-    #   supportedDevices = ["Cyclone V"];
-    #})
-
     # taskwarrior
     # timewarrior
 
