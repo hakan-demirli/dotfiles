@@ -49,7 +49,7 @@
 
     makeMutable = path: file: {
       target = file;
-      source = config.lib.file.mkOutOfStoreSymlink "/home/${username}/dotfiles/${path}/${file}";
+      source = config.lib.file.mkOutOfStoreSymlink "/home/${username}/Desktop/dotfiles/${path}/${file}";
       recursive = true;
     };
 

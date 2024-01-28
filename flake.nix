@@ -19,12 +19,12 @@
     username = "emre";
     system = "x86_64-linux";
   in {
-    # sudo nix-rebuild switch --flake ~/dotfiles/#myNixos
+    # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#myNixos
     nixosConfigurations."myNixos" = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs username system;};
       modules = [./platforms/asustuf.nix];
     };
-    # home-manager switch --flake ~/dotfiles/#emre
+    # home-manager switch --flake ~/Desktop/dotfiles/#emre
     homeConfigurations."${username}" = home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs {
         inherit system;
