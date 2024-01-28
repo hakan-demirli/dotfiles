@@ -48,14 +48,20 @@ cmd touch $touch -p "$(echo $* | tr ' ' '\ ')"
 
 cmd trash ${{
   files=$(printf "$fx" | tr '\n' ';')
+  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles")
+  
   while [ "$files" ]; do
     file=${files%%;*}
+    
+    for forbidden_file in "${forbidden_files[@]}"; do
+      if [ "$file" = "$forbidden_file" ]; then
+        echo "You don't want this"
+        exit
+      fi
+    done
 
-    if [ "$file" = "$HOME/Desktop/np" ]; then
-      echo "You don't want this"
-    else
-      trash-put "$(basename "$file")"
-    fi
+    echo "$file"
+    trash-put "$(basename "$file")"
 
     if [ "$files" = "$file" ]; then
       files=''
@@ -66,11 +72,28 @@ cmd trash ${{
 }}
 
 cmd delete_for_real ${{
-  if [ "$fx" = "$HOME/Desktop/np" ]; then
-    echo "You don't want this"
-  else
-    rm -rf "$fx"
-  fi
+  files=$(printf "$fx" | tr '\n' ';')
+  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles")
+  
+  while [ "$files" ]; do
+    file=${files%%;*}
+    
+    for forbidden_file in "${forbidden_files[@]}"; do
+      if [ "$file" = "$forbidden_file" ]; then
+        echo "You don't want this"
+        exit
+      fi
+    done
+
+    echo "$file"
+    rm -rf  "$(basename "$file")"
+
+    if [ "$files" = "$file" ]; then
+      files=''
+    else
+      files="${files#*;}"
+    fi
+  done
 }}
 
 cmd zip ${{
