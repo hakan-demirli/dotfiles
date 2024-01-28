@@ -48,7 +48,7 @@ cmd touch $touch -p "$(echo $* | tr ' ' '\ ')"
 
 cmd trash ${{
   files=$(printf "$fx" | tr '\n' ';')
-  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles")
+  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles" "$HOME/Desktop/mibench" "$HOME/Desktop/qmk")
   
   while [ "$files" ]; do
     file=${files%%;*}
@@ -73,7 +73,7 @@ cmd trash ${{
 
 cmd delete_for_real ${{
   files=$(printf "$fx" | tr '\n' ';')
-  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles")
+  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles" "$HOME/Desktop/mibench" "$HOME/Desktop/qmk")
   
   while [ "$files" ]; do
     file=${files%%;*}
@@ -177,7 +177,7 @@ map gm cd /tmp/mtp
 # map gm cd /run/user/1000/gvfs
 
 # Bookmark
-map bd cd ~/dotfiles
+map bd cd ~/Desktop/dotfiles
 map bs cd /mnt/second/school
 map bp cd /mnt/second/rep/personal_repo
 map bt cd /mnt/second/rep/personal_repo/notes/personal_notes/todo
