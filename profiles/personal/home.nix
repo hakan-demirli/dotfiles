@@ -1,14 +1,14 @@
 {
   pkgs,
-  username,
   config,
   inputs,
+  userSettings,
   ...
 }: {
   imports = [
-    ../programs/firefox.nix
-    ../programs/low_battery_notify.nix
-    ../programs/xdg.nix
+    ../../system/app/firefox.nix
+    ../../system/app/low_battery_notify.nix
+    ../../system/app/xdg.nix
 
     inputs.xremap-flake.homeManagerModules.default
   ];
@@ -33,7 +33,7 @@
     enable = true;
     # https://github.com/nix-community/home-manager/issues/183
     sessionVariables = {
-      EDITOR = "hx";
+      EDITOR = "hx"; # BUG: Not working
     };
 
     historySize = 10000000;
@@ -95,13 +95,13 @@
   # # requires hardware.uinput.enable = true;
   services.xremap = {
     withWlroots = true;
-    # userName = "emre";
-    yamlConfig = builtins.readFile ../.config/xremap/config.yml;
+    # username = userSettings.username;
+    yamlConfig = builtins.readFile ../../.config/xremap/config.yml;
   };
 
   home = {
-    homeDirectory = "/home/${username}";
-    username = "${username}";
+    homeDirectory = "/home/${userSettings.username}";
+    username = userSettings.username;
     stateVersion = "23.05"; # do not change
   };
 
@@ -157,7 +157,7 @@
     wofi
     firefox
     (lf.overrideAttrs (oldAttrs: {
-      patches = oldAttrs.patches or [] ++ [../programs/lf.patch];
+      patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
     }))
     wl-clipboard
     wl-clip-persist
@@ -228,16 +228,16 @@
 
     bottles
     udiskie
-    # (pkgs.callPackage ../programs/tt.nix {})
-    (pkgs.callPackage ../programs/wttr.nix {})
-    (pkgs.callPackage ../programs/blender.nix {})
-    (pkgs.callPackage ../programs/veridian.nix {})
-    (pkgs.callPackage ../programs/update_wp.nix {})
-    (pkgs.callPackage ../programs/gtk_applet.nix {})
-    (pkgs.callPackage ../programs/svlangserver.nix {})
-    (pkgs.callPackage ../programs/youtube_sync.nix {})
-    (pkgs.callPackage ../programs/auto_refresh.nix {})
-    # (pkgs.callPackage ./programs/clipboard_tts.nix {})
+    # (pkgs.callPackage ../../system/app/tt.nix {})
+    (pkgs.callPackage ../../system/app/wttr.nix {})
+    (pkgs.callPackage ../../system/app/blender.nix {})
+    (pkgs.callPackage ../../system/app/veridian.nix {})
+    (pkgs.callPackage ../../system/app/update_wp.nix {})
+    (pkgs.callPackage ../../system/app/gtk_applet.nix {})
+    (pkgs.callPackage ../../system/app/svlangserver.nix {})
+    (pkgs.callPackage ../../system/app/youtube_sync.nix {})
+    (pkgs.callPackage ../../system/app/auto_refresh.nix {})
+    # (pkgs.callPackage ../../system/app/clipboard_tts.nix {})
   ];
 
   home.sessionVariables = {
@@ -280,6 +280,7 @@
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 
+    # TODO Are these in use?
     MY_WALLPAPERS_DIR = "/mnt/second/images/art/wallpapers_pc";
     MY_GTASKS_OVERLAY_FILE = "/tmp/tasks_overlay.png";
     MY_ICS_OVERLAY_FILE = "/tmp/calendar_overlay.png";

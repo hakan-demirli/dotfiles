@@ -1,7 +1,7 @@
 {
   pkgs,
-  username,
   config,
+  userSettings,
   ...
 }: {
   xdg = let
@@ -49,13 +49,13 @@
 
     makeMutable = path: file: {
       target = file;
-      source = config.lib.file.mkOutOfStoreSymlink "/home/${username}/Desktop/dotfiles/${path}/${file}";
+      source = config.lib.file.mkOutOfStoreSymlink "${userSettings.dotfilesDir}/${path}/${file}";
       recursive = true;
     };
 
     makeImmutable = path: file: {
       target = file;
-      source = ../${path}/${file};
+      source = ../../${path}/${file};
       recursive = true;
     };
 
@@ -87,7 +87,7 @@
     dataFile = mutableDataFiles // immutableDataFiles;
   };
   home.file.".local/bin" = {
-    source = ../.local/bin;
+    source = ../../.local/bin;
     recursive = true;
     executable = true;
   };
