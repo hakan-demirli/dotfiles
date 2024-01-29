@@ -12,7 +12,10 @@
 | **WP-Manager**  | swww       |
 
 # Install
-* Decrypt secrets
+* ```nix-shell -p git git-crypt home-manager helix```
+* If you don't have the key remove/rename git config.
+  * ```mv ./.config/git/config ./.config/git/config_bckp```
+* If you have the key decrypt secrets
   * ```git-crypt unlock ../git-crypt-key```
 * ```sudo nixos-rebuild switch --flake ~/dotfiles/#myNixos```
 * ```home-manager switch --flake ~/dotfiles/#emre```
