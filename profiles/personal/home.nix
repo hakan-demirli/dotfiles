@@ -280,6 +280,8 @@
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 
+    PDK_ROOT = "$HOME/.local/share/pdk";
+
     # TODO Are these in use?
     MY_WALLPAPERS_DIR = "/mnt/second/images/art/wallpapers_pc";
     MY_GTASKS_OVERLAY_FILE = "/tmp/tasks_overlay.png";

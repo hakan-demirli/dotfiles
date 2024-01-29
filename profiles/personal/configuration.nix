@@ -128,7 +128,7 @@
       "libvirtd"
     ];
     packages = with pkgs; [];
-    uid = 1000;
+    # uid = 1000;
   };
 
   environment.localBinInPath = true;
