@@ -115,4 +115,5 @@
 
     * Requires internet connection and slow and cant send big files
         * ```https://www.sharedrop.io/```
-
+* **Nix PR Tracker**
+    * https://nixpk.gs/pr-tracker.html?pr=284487
