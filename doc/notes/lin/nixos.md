@@ -82,9 +82,12 @@
     ```
 
 * **Virtiofs not working**
-    * ```internal error: virtiofsd binary '/run/current-system/sw/bin/virtiofsd' is not executable. This happened because Qemu stopped bundling virtiofsd. I added it to system config to make it appear on that path again and encountered an error operation failed: Unable to find a satisfying virtiofsd```
-    * No solution.
-    * try 9p drivers
+    * Install virtiofsd package.
+        * Try again
+    * ```internal error: virtiofsd binary '/run/current-system/sw/bin/virtiofsd' is not executable```
+        * One solution is to add `<binary path="path/to/virtiofsd"/>` to the filesystem section.
+        * The quick and dirty way is to use `/run/current-system/sw/bin/virtiofsd`.
+    * Try 9p drivers
 
 * **Run AI Models**
     * https://github.com/nixified-ai/flake
@@ -101,3 +104,15 @@
 
 * **Fastest MP4 splitter**
     * losslesscut-bin
+
+* **Share directories between devices on local network using browser**
+    * Fast as f boii but does not work in VM
+        * Install `localsend` package
+            * webpage: `https://localsend.org/#/download`
+
+    * Requires internet connection and slow
+        * ```https://pairdrop.net/```
+
+    * Requires internet connection and slow and cant send big files
+        * ```https://www.sharedrop.io/```
+
