@@ -13,6 +13,7 @@ in
     propagatedBuildInputs = [
       pkgs.ffmpeg-full # full version for ffplay
       pkgs.piper-tts
+      pkgs.wl-clipboard
       (pkgs.stdenv.lib.python3.withPackages (pythonPackages:
         with pythonPackages; [
           clipboard
