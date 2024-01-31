@@ -157,7 +157,7 @@
       "format": "{}",
       "tooltip": true,
       "interval": 60,
-      "exec": "wttr",
+      "exec": "print_weather",
       "return-type": "json"
   }
 }

@@ -5,7 +5,7 @@ import tempfile
 from PIL import Image
 
 
-# TODO
+# TODO: BROKEN, TOO OLD, IDK
 def main():
     script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
     mylib.runInVenv(f"{script_dir}/mtd2overlay.py")

@@ -20,8 +20,10 @@ logging.basicConfig(format=FORMAT)
 logger.setLevel(logging.DEBUG)
 
 script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
-config_dir = os.path.expanduser("~/.config/mylib/")
-font_file = os.path.expanduser("~/.local/share/fonts/anonymous.ttf")
+config_dir = os.path.expanduser("~/.config/mylib/")  # ABS_PATH: fix pls
+font_file = os.path.expanduser(
+    "~/.local/share/fonts/anonymous.ttf"
+)  # ABS_PATH: fix pls
 
 ics_url_file = config_dir + "ics.json"
 calendar_overlay_file = tempfile.gettempdir() + "/calendar_overlay.png"

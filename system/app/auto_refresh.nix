@@ -7,6 +7,7 @@ pkgs.stdenv.mkDerivation {
     gobject-introspection
     libgudev
     libnotify
+    gnused
   ];
   propagatedBuildInputs = [
     (pkgs.python3.withPackages (pythonPackages:

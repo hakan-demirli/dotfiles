@@ -1,22 +1,21 @@
-import os
-import shutil
 import datetime
+import os
 import time
 
 
 def create_directory_and_files():
-    config_dir = os.path.expanduser("~/.config/mtd")
+    config_dir = os.path.expanduser("~/.config/mtd")  # ABS_PATH: XDG path pls
     os.makedirs(config_dir, exist_ok=True)
 
     mtd_file = os.path.join(config_dir, "mtd.md")
     mtdr_file = os.path.join(config_dir, "mtdr.md")
 
     if not os.path.exists(mtd_file):
-        with open(mtd_file, "w") as f:
+        with open(mtd_file, "w"):
             pass  # Create an empty file if it doesn't exist
 
     if not os.path.exists(mtdr_file):
-        with open(mtdr_file, "w") as f:
+        with open(mtdr_file, "w"):
             pass  # Create an empty file if it doesn't exist
 
     return mtd_file, mtdr_file

@@ -172,7 +172,7 @@
     transmission-qt
     libsForQt5.kolourpaint
     libsForQt5.breeze-icons
-    # etcher # BUG electron not safe
+    ventoy
     nwg-displays
     wlr-randr # nwg-displays dependency
     hyprshot
@@ -188,7 +188,7 @@
     ripgrep
     ripdrag
     tmux
-    ffmpeg
+    ffmpeg-full
     bat
     btop
     libnotify
@@ -229,7 +229,7 @@
     bottles
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
-    (pkgs.callPackage ../../system/app/wttr.nix {})
+    (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
     (pkgs.callPackage ../../system/app/veridian.nix {})
     (pkgs.callPackage ../../system/app/update_wp.nix {})

@@ -24,7 +24,7 @@ def get_file(ics_file, url):
 
 
 def get_ics():
-    config_dir = os.path.expanduser("~/.config/mylib/")
+    config_dir = os.path.expanduser("~/.config/mylib/")  # ABS_PATH: XDG pls
     ics_url_file = config_dir + "ics.json"
     ics_file = tempfile.gettempdir() + "/calendar_events.ics"
 

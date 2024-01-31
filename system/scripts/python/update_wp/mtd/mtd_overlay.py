@@ -4,7 +4,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def main():
-    font_file = os.path.expanduser("~/.local/share/fonts/anonymous.ttf")
+    font_file = os.path.expanduser(
+        "~/.local/share/fonts/anonymous.ttf"
+    )  # ABS_PATH: fix pls
     overlay_file = "/tmp/mtd_overlay.png"
     width, height = 700, 800
     background_color = (0, 0, 0, 0)
@@ -16,7 +18,7 @@ def main():
     image = Image.new("RGBA", (width, height), background_color)
     draw = ImageDraw.Draw(image)
 
-    config_dir = os.path.expanduser("~/.config/mtd")
+    config_dir = os.path.expanduser("~/.config/mtd")  # ABS_PATH: XDG pls
     mtdr_file = os.path.join(config_dir, "mtd.md")
 
     if not os.path.exists(config_dir):

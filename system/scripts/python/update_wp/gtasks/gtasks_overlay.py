@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
-import subprocess
+import os
 import pathlib
+import subprocess
 import sys
 import tempfile
-import os
+
+from PIL import Image, ImageDraw, ImageFont
 
 """
 Gtasks to png transparent overlay image.
@@ -14,7 +15,9 @@ Gtasks to png transparent overlay image.
 
 def main():
     script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
-    font_file = os.path.expanduser("~/.local/share/fonts/anonymous.ttf")
+    font_file = os.path.expanduser(
+        "~/.local/share/fonts/anonymous.ttf"
+    )  # ABS_PATH: XDG pls
     overlay_file = tempfile.gettempdir() + "/tasks_overlay.png"
     width, height = 700, 800
     background_color = (0, 0, 0, 0)

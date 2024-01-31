@@ -20,7 +20,6 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-
 from tasks import Task, TaskList, TaskStatus
 
 CREDENTIALS_FILE = "credentials.json"
@@ -155,7 +154,7 @@ class GoogleApiService:
         """
         creds = None
 
-        config_dir = os.path.expanduser("~/.config/mylib/")
+        config_dir = os.path.expanduser("~/.config/mylib/")  # ABS_PATH: XDG pls
         os.makedirs(os.path.dirname(config_dir), exist_ok=True)
         credentials_file = config_dir + CREDENTIALS_FILE
         token_file = config_dir + "gtoken.json"
@@ -181,7 +180,7 @@ class GoogleApiService:
 
     def save_credentials(self, credentials: str):
         """Save credentials to selected user config directory."""
-        config_dir = os.path.expanduser("~/.config/mylib/")
+        config_dir = os.path.expanduser("~/.config/mylib/")  # ABS_PATH: XDG pls
 
         with open(f"{config_dir}/{CREDENTIALS_FILE}", "w+") as dest_file:
             dest_file.write(credentials)

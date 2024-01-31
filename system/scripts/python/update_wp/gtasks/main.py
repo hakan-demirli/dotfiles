@@ -18,9 +18,8 @@ import datetime
 import logging
 import os
 import tempfile
-from datetime import timedelta
 import textwrap
-
+from datetime import timedelta
 
 import googleapi
 
@@ -29,7 +28,7 @@ import googleapi
 def main():
     args = parse_args()
 
-    config_dir = os.path.expanduser("~/.config/mylib/")
+    config_dir = os.path.expanduser("~/.config/mylib/")  # ABS_PATH: XDG pls
     os.makedirs(os.path.dirname(config_dir), exist_ok=True)
     token_file = config_dir + "gtoken.json"
 

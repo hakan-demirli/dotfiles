@@ -11,6 +11,8 @@ in
   pkgs.stdenv.mkDerivation {
     name = "clipboard_tts";
     propagatedBuildInputs = [
+      pkgs.ffmpeg-full # full version for ffplay
+      pkgs.piper-tts
       (pkgs.stdenv.lib.python3.withPackages (pythonPackages:
         with pythonPackages; [
           clipboard
@@ -20,13 +22,11 @@ in
     ];
     dontUnpack = true;
 
-    src = ../scripts/python/clipboard_tts;
-
     installPhase = ''
       mkdir -p $out/bin
-      cp -r $src/* $out/
-      cp ${dataFile} $out/src/
-      cp ${jsonFile} $out/src/
+      cp ${../scripts/python/clipboard_tts.py} $out
+      cp ${dataFile} $out
+      cp ${jsonFile} $out
       ln -s $out/clipboard_tts.py $out/bin/clipboard_tts
       chmod +x $out/bin/clipboard_tts
     '';

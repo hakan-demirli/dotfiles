@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 import logging
 import os
+import pathlib
+import random
 import re
 import signal
+import string
 import subprocess
 import sys
 import tempfile
 import threading
 import time
-import random
-import string
-import pathlib
 from queue import Queue
 
 import clipboard
@@ -27,9 +27,9 @@ OUTPUT_DIR = tempfile.gettempdir()
 script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
 MODEL_PATH = str(script_dir / "en_GB-jenny_dioco-medium.onnx")
 RVC_API_URL = "http://127.0.0.1:7860/"
-RVC_COMMAND = "/mnt/second/software/rvc_api/infer.py"
-RVC_MODEL = "/mnt/second/software/rvc_api/weights/amber.pth"
-RVC_INDEX = "/mnt/second/software/rvc_api/weights/amber.index"
+RVC_COMMAND = "/mnt/second/software/rvc_api/infer.py"  # ABS_PATH: fix pls
+RVC_MODEL = "/mnt/second/software/rvc_api/weights/amber.pth"  # ABS_PATH: fix pls
+RVC_INDEX = "/mnt/second/software/rvc_api/weights/amber.index"  # ABS_PATH: fix pls
 
 GPU = True
 RETRY_TIMES = 5

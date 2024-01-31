@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+import argparse
 import glob
 import os
 import unicodedata
 from multiprocessing import Pool
 from pathlib import Path
-import argparse
+
 import yt_dlp
 
 
@@ -126,13 +127,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--playlist_file",
         type=str,
-        default="/mnt/second/music/playlists.txt",
+        default="/mnt/second/music/playlists.txt",  # ABS_PATH: better solution?
         help="The playlist file.",
     )
     parser.add_argument(
         "--music_dir",
         type=str,
-        default="/mnt/second/music",
+        default="/mnt/second/music",  # ABS_PATH: better solution?
         help="The music directory.",
     )
 

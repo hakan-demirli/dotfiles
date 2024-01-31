@@ -2,23 +2,23 @@
 
 import os
 import pathlib
+import random
 import shutil
+import string
 import subprocess
 import tempfile
-import string
-import random
 
-from ics.ics_overlay import main as ics_overlay
-from gtasks.gtasks_overlay import main as gtasks_overlay
-from mtd.mtd_overlay import main as mtd_overlay
+from add_gtasks_overlay import main as add_gtasks_overlay
 from add_ics_overlay import main as add_ics_overlay
 from add_mtd_overlay import main as add_mtd_overlay
-from add_gtasks_overlay import main as add_gtasks_overlay
+from gtasks.gtasks_overlay import main as gtasks_overlay
+from ics.ics_overlay import main as ics_overlay
+from mtd.mtd_overlay import main as mtd_overlay
 from PIL import Image
 
 script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
-config_dir = os.path.expanduser("~/.config/mylib/")
-font_file = "~/.local/share/fonts/anonymous.ttf"
+config_dir = os.path.expanduser("~/.config/mylib/")  # ABS_PATH: fix pls
+font_file = "~/.local/share/fonts/anonymous.ttf"  # ABS_PATH: fix pls
 
 ics_url_file = config_dir + "ics.json"
 calendar_overlay_file = tempfile.gettempdir() + "/calendar_overlay.png"

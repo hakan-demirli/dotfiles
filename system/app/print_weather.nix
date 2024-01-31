@@ -1,6 +1,6 @@
 {pkgs, ...}:
 pkgs.stdenv.mkDerivation {
-  name = "wttr";
+  name = "print_weather";
 
   propagatedBuildInputs = [
     (pkgs.python3.withPackages (pythonPackages:
@@ -10,6 +10,6 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
   installPhase = ''
-    install -Dm755 ${../scripts/python/wttr.py} $out/bin/wttr;
+    install -Dm755 ${../scripts/python/print_weather.py} $out/bin/print_weather;
   '';
 }
