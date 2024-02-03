@@ -8,7 +8,7 @@
 
 * **Install git**
     * Temporarily:
-        * ```nix shell nixpkgs#git```
+        * ```nix shell -p nixpkgs#git```
     * Via configuration.nix
         * ```sudo nano /etc/nixos/configuration.nix```
         ```nix
@@ -101,6 +101,7 @@
 
 * **Python environments**
     * https://ayats.org/blog/nix-workflow/
+    * https://www.reddit.com/r/NixOS/comments/1afex3e/setting_up_python_projects/
 
 * **Fastest MP4 splitter**
     * losslesscut-bin
