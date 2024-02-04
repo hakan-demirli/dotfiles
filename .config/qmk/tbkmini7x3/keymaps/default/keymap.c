@@ -133,9 +133,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
            XXXXXXX,    XXXXXXX,    KC_F4,       KC_F5,        KC_F6,       KC_F11,       _______,
            XXXXXXX,    XXXXXXX,    KC_F1,       KC_F2,        KC_F3,       KC_F12,       XXXXXXX,
         // Mirrored
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
+        ),
+    [FUN_RIGHT] = LAYOUT(
            XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_MS_BTN2,  KC_MS_BTN1,    XXXXXXX,      XXXXXXX,
+           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_MS_WH_UP, KC_MS_WH_DOWN, XXXXXXX,      XXXXXXX,
+        // Mirrored
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
            XXXXXXX,    XXXXXXX,    KC_MS_RIGHT,KC_MS_UP,    KC_MS_DOWN,    KC_MS_LEFT,   _______,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_MS_WH_UP, KC_MS_WH_DOWN, XXXXXXX,      XXXXXXX
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
     // clang-format on
 };

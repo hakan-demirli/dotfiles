@@ -36,7 +36,10 @@ def gitc_clone(url, depth=None, dst_path=None):
     parsed_url = urlparse(url)
     path_parts = parsed_url.path.strip("/").split("/")
     if len(path_parts) < 2:
-        git(["clone", url] + (["--depth", str(depth)] if depth else []))
+        git(
+            ["clone", "--recurse-submodules", "-j8", url]
+            + (["--depth", str(depth)] if depth else [])
+        )
 
     website_dir = os.path.join(cache_dir, parsed_url.netloc)
     os.makedirs(website_dir, exist_ok=True)
@@ -48,13 +51,25 @@ def gitc_clone(url, depth=None, dst_path=None):
     if os.path.exists(repo_dir):
         subprocess.run([GIT, "-C", repo_dir, "fetch", "--unshallow"])
         subprocess.run([GIT, "-C", repo_dir, "pull"])
+        subprocess.run([GIT, "-C", repo_dir, "submodule", "update", "--recursive"])
         logging.info("repo exists.")
     else:
         if depth is not None:
-            subprocess.run([GIT, "clone", "--depth", str(depth), url, repo_dir])
+            subprocess.run(
+                [
+                    GIT,
+                    "clone",
+                    "--recurse-submodules",
+                    "-j8",
+                    "--depth",
+                    str(depth),
+                    url,
+                    repo_dir,
+                ]
+            )
             logging.info("depth copy is performed.")
         else:
-            subprocess.run([GIT, "clone", url, repo_dir])
+            subprocess.run([GIT, "clone", "--recurse-submodules", "-j8", url, repo_dir])
             logging.info("no depth copy is performed.")
 
     dst_dir = (
