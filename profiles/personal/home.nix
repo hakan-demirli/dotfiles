@@ -35,10 +35,9 @@
     sessionVariables = {
       EDITOR = "hx"; # BUG: Not working
     };
-
-    historySize = 10000000;
-    historyFileSize = 10000000;
-    historyControl = ["erasedups" "ignoredups" "ignorespace"];
+    historyFileSize = -1;
+    historySize = -1;
+    historyControl = ["ignoredups" "erasedups"];
     enableCompletion = true;
     bashrcExtra = ''
       PROMPT_COMMAND="history -a; history -r"
