@@ -139,8 +139,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
            XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
     [FUN_RIGHT] = LAYOUT(
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_MS_BTN2,  KC_MS_BTN1,    XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_MS_BTN2,  KC_MS_BTN1,    XXXXXXX,      _______,
            XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_MS_WH_UP, KC_MS_WH_DOWN, XXXXXXX,      XXXXXXX,
         // Mirrored
            XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
