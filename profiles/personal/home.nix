@@ -192,6 +192,7 @@
     bat
     btop
     libnotify
+    yarr
 
     trash-cli
     unar

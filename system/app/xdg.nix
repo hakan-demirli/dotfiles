@@ -5,7 +5,7 @@
   ...
 }: {
   xdg = let
-    mutable_configs = ["hypr" "mimeapps.list"];
+    mutable_configs = ["hypr" "yarr" "mimeapps.list"];
 
     immutable_configs = [
       "bat"
