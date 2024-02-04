@@ -60,7 +60,8 @@ enum layers {
     NUM_RIGHT,
     SYM_LEFT,
     SYM_RIGHT,
-    FUN_LEFT
+    FUN_LEFT,
+    FUN_RIGHT
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -94,7 +95,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ),
     [NUM_LEFT] = LAYOUT(
            QK_BOOT,    XXXXXXX,    KC_7,       KC_8,        KC_9,          KC_0,         XXXXXXX,
-           XXXXXXX,    XXXXXXX,    KC_4,       KC_5,        KC_6,          XXXXXXX,      MO(FUN_LEFT),
+           XXXXXXX,    XXXXXXX,    KC_4,       KC_5,        KC_6,          XXXXXXX,      MO(FUN_RIGHT),
            XXXXXXX,    XXXXXXX,    KC_1,       KC_2,        KC_3,          XXXXXXX,      XXXXXXX,
         // Mirrored
            XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
@@ -107,13 +108,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
            XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
         // Mirrored
            KC_DEL,     KC_PASTE,   XXXXXXX,    VUP,         VDOWN,         MUTE,         XXXXXXX,
-           MMUTE,      KC_PSCR,    KC_RIGHT,   KC_UP,       KC_DOWN,       KC_LEFT,      MO(FUN_LEFT),
+           MMUTE,      KC_PSCR,    KC_RIGHT,   KC_UP,       KC_DOWN,       KC_LEFT,      MO(FUN_RIGHT),
            XXXXXXX,    XXXXXXX,    XXXXXXX,    BUP,         BDOWN,         BOFF,         XXXXXXX
         ),
     [SYM_LEFT] = LAYOUT(
            XXXXXXX,    XXXXXXX,    KC_AMPR,    KC_ASTR,     KC_CIRC,       KC_AT,        XXXXXXX,
            XXXXXXX,    KC_EXCLAIM, KC_KP_MINUS,KC_KP_PLUS,  KC_KP_EQUAL,   KC_HASH,      XXXXXXX,
-           XXXXXXX,    KC_BSLS,    KC_TILD,    KC_GRAVE,    KC_PERC,       KC_PIPE,      XXXXXXX,
+           XXXXXXX,    KC_BSLS,    KC_TILD,    KC_GRAVE,    KC_PERC,       KC_PIPE,      MO(FUN_LEFT),
         // Mirrored
            XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
            XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      XXXXXXX,
@@ -126,7 +127,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // Mirrored
            KC_UNDS,    XXXXXXX,    KC_DOLLAR,  KC_RCBR,     KC_LCBR,       KC_QUOT,      XXXXXXX,
            XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_RPRN,     KC_LPRN,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_RBRC,     KC_LBRC,       KC_DQUO,      XXXXXXX
+           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_RBRC,     KC_LBRC,       KC_DQUO,      MO(FUN_LEFT)
         ),
     [FUN_LEFT] = LAYOUT(
            XXXXXXX,    XXXXXXX,    KC_F7,       KC_F8,        KC_F9,       KC_F10,       XXXXXXX,

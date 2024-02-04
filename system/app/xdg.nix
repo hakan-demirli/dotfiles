@@ -9,6 +9,7 @@
 
     immutable_configs = [
       "bat"
+      "qmk"
       "gnome3-keybind-backup"
       "kitty"
       "nix"
