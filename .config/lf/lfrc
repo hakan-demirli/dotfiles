@@ -98,10 +98,14 @@ cmd delete_for_real ${{
 
 cmd zip ${{
     set -f
-    mkdir $1
-    cp -r $fx $1
-    zip -r $1.zip $1
-    rm -rf $1
+    mkdir "$1"
+    if [ -d "$fx" ]; then
+        cp -r "$fx"/* "$1"
+    else
+        cp "$fx" "$1"
+    fi
+    zip -r "$1.zip" "$1"
+    rm -rf "$1"
 }}
 
 cmd extract ${{

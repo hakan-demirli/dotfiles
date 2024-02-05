@@ -118,3 +118,6 @@
         * ```https://www.sharedrop.io/```
 * **Nix PR Tracker**
     * https://nixpk.gs/pr-tracker.html?pr=284487
+
+* **QEMU: Windows Guest can ping host, but host cannot ping guest on a NATed network**
+    * Disable windows firewall.
