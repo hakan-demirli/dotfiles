@@ -10,7 +10,7 @@ auto-format = true
 [[language]]
 name = "verilog"
 auto-format = true
-formatter = { command = 'verible-verilog-format', args = ["--indentation_spaces","4","-"] }
+formatter = { command = 'verible-verilog-format', args = ["--indentation_spaces","3","-"] }
 language-servers = [ "dls" , "veridian"]
 indent = { tab-width = 4, unit = "    " }
 
