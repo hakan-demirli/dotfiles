@@ -13,10 +13,10 @@ K = [
   "move_line_up",
   "paste_before",
 ]
-j = "move_line_down"
-k = "move_line_up"
-"(" = "switch_to_lowercase"
-")" = "switch_to_uppercase"
+# j = "move_line_down"
+# k = "move_line_up"
+# "(" = "switch_to_lowercase"
+# ")" = "switch_to_uppercase"
 
 [keys.normal.space]
 # g = ":pipe-to tmux split-window -h helix-live-grep"
@@ -30,9 +30,9 @@ s = [
   "goto_first_nonwhitespace",
   "exit_select_mode",
 ]
-a = ["save_selection"]
-j = ["jump_forward"]
-k = ["jump_backward"]
+# a = ["save_selection"]
+# j = ["jump_forward"]
+# k = ["jump_backward"]
 
 [keys.select]
 y = "yank_main_selection_to_clipboard"
