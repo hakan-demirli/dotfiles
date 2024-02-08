@@ -125,6 +125,7 @@ cmd music ${{
 cmd ripdrag %ripdrag -a -x $fx
 
 cmd mount_mtp ${{
+    umount /tmp/amtp
 	mkdir -p /tmp/amtp 
 	aft-mtp-mount /tmp/amtp 
 }}
