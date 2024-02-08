@@ -98,7 +98,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
            XXXXXXX,    XXXXXXX,    KC_4,       KC_5,        KC_6,          XXXXXXX,      MO(FUN_RIGHT),
            XXXXXXX,    XXXXXXX,    KC_1,       KC_2,        KC_3,          XXXXXXX,      XXXXXXX,
         // Mirrored
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           KC_BSPC,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
            XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
            XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
