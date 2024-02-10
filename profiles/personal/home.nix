@@ -189,7 +189,9 @@
     tmux
     ffmpeg-full
     bat
-    btop
+    (btop.override {
+      cudaSupport = true;
+    })
     libnotify
     yarr
 

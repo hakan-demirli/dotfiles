@@ -22,7 +22,6 @@
 * ```home-manager switch --flake ~/Desktop/dotfiles/#emre```
 
 # TODO
-- nix: btop GPU
 - py: fix hardcoded paths
 - Firefox custom file picker: lf/yazi
   - Using xdg-desktop-portal ?
