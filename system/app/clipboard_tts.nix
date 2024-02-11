@@ -36,7 +36,7 @@ in
 
     installPhase = ''
       mkdir -p $out/bin
-      cp ${../scripts/python/clipboard_tts.py} $out
+      cp ${../scripts/python/clipboard_tts/clipboard_tts.py} $out
       cp ${dataFile} $out
       cp ${rvcFile}  $out
       cp ${jsonFile} $out
