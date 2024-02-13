@@ -1,10 +1,11 @@
-from traymenu import TrayMenu, quitsystray
-import mylib
-import pathlib
-import sys
+import os
 import subprocess
+import sys
+from pathlib import Path
 
+import mylib
 import psutil
+from traymenu import TrayMenu, quitsystray
 
 
 def kill_process_and_children(pid: int, sig: int = 15):
@@ -22,7 +23,7 @@ def kill_process_and_children(pid: int, sig: int = 15):
 
 class IndicatorApp:
     def __init__(self):
-        script_dir = pathlib.Path(__file__).parent.absolute()
+        script_dir = Path(os.path.realpath(__file__)).parent.absolute()
         self.menu_items = {}
         self.tray_functions = []
 
