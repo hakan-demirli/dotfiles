@@ -84,7 +84,7 @@ def gitc_clone(url, depth=None, dst_path=None):
 
 
 def git_command(args):
-    if not args or (args[0] != "clone" or len(args) < 2):
+    if not args or (args[0] != "clone" or len(args) < 2) or "--branch" in args:
         git(args)
     else:
         depth = None
