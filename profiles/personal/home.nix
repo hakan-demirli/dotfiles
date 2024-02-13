@@ -35,6 +35,7 @@
     sessionVariables = {
       EDITOR = "hx"; # BUG: Not working
     };
+    historyFile = "/home/${userSettings.username}/.config/.bash_history";
     historyFileSize = -1;
     historySize = -1;
     historyControl = ["ignoredups" "erasedups"];
