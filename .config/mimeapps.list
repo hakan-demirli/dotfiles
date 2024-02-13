@@ -36,6 +36,7 @@ application/x-wine-extension-ini=helix.desktop
 text/x-tex=helix.desktop
 text/x-csrc=helix.desktop
 text/x-chdr=helix.desktop
+text/x-c=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -69,3 +70,4 @@ application/x-wine-extension-ini=helix.desktop
 text/x-tex=helix.desktop
 text/x-csrc=helix.desktop
 text/x-chdr=helix.desktop
+text/x-c=helix.desktop
