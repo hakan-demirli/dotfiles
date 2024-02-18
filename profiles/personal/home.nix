@@ -202,6 +202,7 @@
     ghostscript
 
     helix
+    # helix-gpt
     nixd
     alejandra
     ruff
@@ -232,6 +233,7 @@
     bottles
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
+    (pkgs.callPackage ../../system/app/helix-gpt.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
     (pkgs.callPackage ../../system/app/veridian.nix {})

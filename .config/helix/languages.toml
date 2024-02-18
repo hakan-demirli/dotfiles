@@ -1,7 +1,7 @@
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
-language-servers = [ "pyright","ruff-lsp" ]
+language-servers = [ "pyright","ruff-lsp","gpt"]
 auto-format = true
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
@@ -11,8 +11,8 @@ auto-format = true
 name = "verilog"
 auto-format = true
 formatter = { command = 'verible-verilog-format', args = ["--indentation_spaces","3","-"] }
-language-servers = [ "dls" , "veridian"]
-indent = { tab-width = 4, unit = "    " }
+language-servers = [ "dls" , "veridian", "gpt"]
+indent = { tab-width = 3, unit = "    " }
 
 [[language]]
 name = "nix"
@@ -156,3 +156,9 @@ securities= {Error = "error", Warning= "warning", undefined= "info"}
 [language-server.nixd]
 command = "nixd"
 
+
+
+
+[language-server.gpt]
+command = "helix-gpt"
+args = ["--handler","codeium","--logFile","/tmp/helix-gpt.log"]
