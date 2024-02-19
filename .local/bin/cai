@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+import re
+import sys
+
+
+def align_parentheses(processed_code):
+    lines = processed_code.split("\n")
+    max_len = max(len(line.split("(")[0]) for line in lines if "(" in line)
+    aligned_code = ""
+    for line in lines:
+        if "(" in line:
+            before, after = line.split("(", 1)
+            aligned_code += before.ljust(max_len) + "(" + after + "\n"
+        else:
+            aligned_code += line + "\n"
+    return aligned_code
+
+
+def process_verilog(verilog_code):
+    """
+    Creates verilog instantiation from module definition.
+
+    Args:
+      verilog_code: The Verilog code module definition.
+
+    Returns:
+      The instantiation of the module Verilog code.
+    """
+
+    # Remove empty lines
+    processed_code = re.sub(r"\n\s*\n", "\n", verilog_code, re.MULTILINE)
+
+    # Remove module keyword.
+    processed_code = re.sub(r"module\s+", "", processed_code)
+
+    # Remove data types and ranges.
+    processed_code = re.sub(r"output\s+", "", processed_code)
+    processed_code = re.sub(r"input\s+", "", processed_code)
+    processed_code = re.sub(r"inout\s+", "", processed_code)
+    processed_code = re.sub(r"reg\s+", "", processed_code)
+    processed_code = re.sub(r"wire\s+", "", processed_code)
+    processed_code = re.sub(r"\[[^\]]*\]\s+", "", processed_code)
+
+    # # Add dots and parentheses to ports.
+    processed_code = re.sub(r"(\w+)(,|\s*\))", r".\1(\1)\2", processed_code)
+
+    # align
+    processed_code = align_parentheses(processed_code)
+    return processed_code.rstrip(",")
+
+
+if __name__ == "__main__":
+    verilog_code = sys.stdin.read()
+    processed_code = process_verilog(verilog_code)
+    print(processed_code)
