@@ -8,7 +8,7 @@
 | **WM**          | Hyprland     |
 | **Bar**         | Waybar       |
 | **Editor**      | Helix+tmux   |
-| **FileManager** | LF           |
+| **FileManager** | lf           |
 | **WP-Manager**  | swww         |
 | **Keyboard**    | tbk_mini-QMK |
 
@@ -23,5 +23,6 @@
 
 # TODO
 - py: fix hardcoded paths
+- questa: custom home dir.
 - Firefox custom file picker: lf/yazi
   - Using xdg-desktop-portal ?

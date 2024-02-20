@@ -133,7 +133,7 @@
     yarn = ''yarn --use-yarnrc "$XDG_CONFIG_HOME/yarn/config"'';
 
     tmux = "tmux -f ~/.config/tmux/tmux.conf";
-    txa = "tmux attach-session -t";
+    txa = ''tmux attach-session -t $(tmux list-sessions -F "#{session_name}" | head -n 1)'';
     txls = "tmux list-sessions";
     txks = "tmux kill-session -t ";
     txn = "tmux new-session -s";
