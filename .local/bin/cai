@@ -53,3 +53,36 @@ if __name__ == "__main__":
     verilog_code = sys.stdin.read()
     processed_code = process_verilog(verilog_code)
     print(processed_code)
+
+
+"""
+TODO:
+    Add module name with _dut postfix.
+FIX:
+    module ls_unit (
+        input  wire                 clk_i,    // differential clock inputs
+        input  wire                 clk_n_i,  // differential clock inputs
+        input  wire                 rst_i,
+        output wire                 busy_o,
+        // ex
+        input  wire                 we_i,
+        input  wire                 re_i,
+        input  wire [         31:0] adr_i,
+        input  wire [         31:0] data_i,
+        output reg  [         31:0] data_o,
+        // dram
+        output wire                 cke,      // clock enable
+        output wire                 cs_n,     // chip select
+        output wire                 ras_n,    // row address strobe
+        output wire                 cas_n,    // column address strobe
+        output wire                 we_n,     // write enable
+        output wire [  DM_BITS-1:0] dm_tdqs,  // 
+        output wire [  BA_BITS-1:0] ba,       // bank address 
+        output wire [ADDR_BITS-1:0] addr,     // address
+        inout  wire [  DQ_BITS-1:0] dq,       // data inout
+        inout  wire [ DQS_BITS-1:0] dqs,      // data strobe differential
+        inout  wire [ DQS_BITS-1:0] dqs_n,    // data strobe differential
+        input  wire [ DQS_BITS-1:0] tdqs_n,   // Termination data strobe
+        output                      odt       // 
+    );
+"""
