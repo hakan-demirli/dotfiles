@@ -10,9 +10,9 @@ auto-format = true
 [[language]]
 name = "verilog"
 auto-format = true
-formatter = { command = 'verible-verilog-format', args = ["--indentation_spaces","3","-"] }
+formatter = { command = 'verible-verilog-format', args = ["--wrap_spaces","3","--indentation_spaces","3","-"] }
 language-servers = [ "dls" , "veridian", "gpt"]
-indent = { tab-width = 3, unit = "    " }
+indent = { tab-width = 3, unit = "   " }
 
 [[language]]
 name = "nix"
