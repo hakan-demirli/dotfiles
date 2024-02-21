@@ -142,7 +142,7 @@ systemverilog =  "verilator"
 command= "sh"
 args= [
     "-c",
-    "verilator --lint-only -Wall $(find . -type f -name '*.v' | xargs -n1 dirname | sort -u | awk '{print \"-I\" $0}') %file 2>&1 | grep %file"
+    "verilator --lint-only -Wall $(find ./ -type f -regex '.*\\.\\(v\\|sv\\|vh\\|svh\\)$' | xargs -n1 dirname | sort -u | awk '{print \"-I\" $0}') %file 2>&1 | grep %file"
 ]
 isStdout = true
 isStderr = false
