@@ -203,6 +203,7 @@
 
     helix
     # helix-gpt
+    asm-lsp
     nixd
     alejandra
     ruff

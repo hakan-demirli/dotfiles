@@ -72,13 +72,21 @@ name = "latex"
 language-servers = ["texlab"]
 auto-format = true
 
-
 [[language]]
 name = "rust"
 auto-format = true
 [language.formatter]
 command = "rustfmt"
 
+[[language]]
+name = "gas"
+scope = "source.llvm"
+roots = ["Makefile"]
+file-types = ["S", "s"]
+comment-token = "#"
+indent = { tab-width = 4, unit = "    " }
+language-servers = ["asm-lsp"]
+auto-format = true
 
 
 
@@ -162,3 +170,4 @@ command = "nixd"
 [language-server.gpt]
 command = "helix-gpt"
 args = ["--handler","codeium","--logFile","/tmp/helix-gpt.log"]
+
