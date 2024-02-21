@@ -85,4 +85,29 @@ FIX:
         input  wire [ DQS_BITS-1:0] tdqs_n,   // Termination data strobe
         output                      odt       // 
     );
+
+FIX:
+    module rf_p_2r2w #(
+       parameter WLEN  = 32,
+       parameter DEPTH = 32
+    ) (
+
+       `RP(0)
+       `RP(1)
+
+       `WP(0)
+
+       //
+       input wire clk_i,
+       input wire rst_i
+    );
+
+FIX:
+    module alu (
+       input wire [31:0] data1_i,
+       input wire [31:0] data2_i,
+       output wire [31:0] output_o,
+       alu_t control_i
+    );
+
 """
