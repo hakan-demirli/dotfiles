@@ -5,6 +5,8 @@ import datetime
 
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = 933120000
+
 
 def getFilesByType(dir: str, types: list) -> list:
     """
