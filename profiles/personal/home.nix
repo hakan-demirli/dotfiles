@@ -154,7 +154,8 @@
     vim # default editor
     waybar
     kitty
-    wofi
+    # wofi
+    j4-dmenu-desktop
     firefox
     (lf.overrideAttrs (oldAttrs: {
       patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
