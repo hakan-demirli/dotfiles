@@ -2,90 +2,151 @@
 import re
 import sys
 
+"""
+CAI: Copy as Instance
+
+Create verilog instantiation from module definition.
+Args:
+  verilog_code: Verilog module definition.
+Returns:
+  The instantiation of the module in Verilog .
+"""
+
 
 def align_parentheses(processed_code):
     lines = processed_code.split("\n")
-    max_len = max(len(line.split("(")[0]) for line in lines if "(" in line)
+    max_len_left = max(
+        len(line.split("(")[0]) for line in lines if "(" in line and "_dut" not in line
+    )
+    max_len_right = max(
+        len(line.split("(")[1].split(")")[0])
+        for line in lines
+        if "(" in line and ")" in line
+    )
     aligned_code = ""
     for line in lines:
-        if "(" in line:
-            before, after = line.split("(", 1)
-            aligned_code += before.ljust(max_len) + "(" + after + "\n"
+        if "(" in line and ")" in line and "_dut" not in line:
+            before_left, after_left = line.split("(", 1)
+            before_right, after_right = after_left.split(")", 1)
+            aligned_code += (
+                before_left.ljust(max_len_left)
+                + "("
+                + before_right.ljust(max_len_right)
+                + ")"
+                + after_right
+                + "\n"
+            )
         else:
             aligned_code += line + "\n"
     return aligned_code
 
 
 def process_verilog(verilog_code):
-    """
-    Creates verilog instantiation from module definition.
+    verilog_keywords = [
+        "module",
+        "endmodule",
+        "input",
+        "inout",
+        "output",
+        "reg",
+        "wire",
+        "always",
+        "parameter",
+    ]
+    # remove keywords
+    for keyword in verilog_keywords:
+        verilog_code = re.sub(rf"{keyword}\s+", "", verilog_code)
+    # Extract parameters
+    parameters = re.search(r"#\((.*?)\)", verilog_code, flags=re.DOTALL)
+    # Add dots and parenthesis to parameters
+    parameters_str = parameters.group(1) if parameters else ""
+    # Remove ` = <constant>` from parameters
+    parameters_str = re.sub(r"\s*=\s*\w+", "", parameters_str)
+    if parameters_str:
+        parameters_str = ", ".join(
+            [
+                f".{param.strip()}({param.strip()})"
+                for param in parameters_str.split(",")
+            ]
+        )
 
-    Args:
-      verilog_code: The Verilog code module definition.
+    # Remove parameters from the original code
+    verilog_code = re.sub(r"#\(.*?\)", "", verilog_code, flags=re.DOTALL)
 
-    Returns:
-      The instantiation of the module Verilog code.
-    """
+    # remove empty lines
+    verilog_code = re.sub(r"\n\s*\n", "\n", verilog_code, re.MULTILINE)
+    # remove multiline comments
+    verilog_code = re.sub(r"/\*.*?\*/", "", verilog_code, flags=re.DOTALL)
+    # remove single line comments
+    verilog_code = re.sub(r"//.*", "", verilog_code)
+    # remove square brackets
+    verilog_code = re.sub(r"\[[^\]]*\]\s+", "", verilog_code)
+    # Add dots and parentheses to ports.
+    verilog_code = re.sub(r"(\w+)(,|\s*\))", r".\1(\1)\2", verilog_code)
+    # align ports
+    verilog_code = align_parentheses(verilog_code)
+    # Add params and _dut before the first parenthesis
+    if parameters_str:
+        verilog_code = re.sub(
+            r"(\w+)\s*\(",
+            r"\1 \1_dut #(" + parameters_str + ") (",
+            verilog_code,
+            count=1,
+        )
+    else:
+        verilog_code = re.sub(r"(\w+)\s*\(", r"\1 \1_dut (", verilog_code, count=1)
 
-    # Remove empty lines
-    processed_code = re.sub(r"\n\s*\n", "\n", verilog_code, re.MULTILINE)
-
-    # Remove module keyword.
-    processed_code = re.sub(r"module\s+", "", processed_code)
-
-    # Remove data types and ranges.
-    processed_code = re.sub(r"output\s+", "", processed_code)
-    processed_code = re.sub(r"input\s+", "", processed_code)
-    processed_code = re.sub(r"inout\s+", "", processed_code)
-    processed_code = re.sub(r"reg\s+", "", processed_code)
-    processed_code = re.sub(r"wire\s+", "", processed_code)
-    processed_code = re.sub(r"\[[^\]]*\]\s+", "", processed_code)
-
-    # # Add dots and parentheses to ports.
-    processed_code = re.sub(r"(\w+)(,|\s*\))", r".\1(\1)\2", processed_code)
-
-    # align
-    processed_code = align_parentheses(processed_code)
-    return processed_code.rstrip(",")
-
-
-if __name__ == "__main__":
-    verilog_code = sys.stdin.read()
-    processed_code = process_verilog(verilog_code)
-    print(processed_code)
+    return verilog_code.rstrip(",")
 
 
-"""
-TODO:
-    Add module name with _dut postfix.
-FIX:
+def test_process_verilog():
+    verilog_code = """
     module ls_unit (
         input  wire                 clk_i,    // differential clock inputs
-        input  wire                 clk_n_i,  // differential clock inputs
-        input  wire                 rst_i,
         output wire                 busy_o,
         // ex
         input  wire                 we_i,
-        input  wire                 re_i,
-        input  wire [         31:0] adr_i,
-        input  wire [         31:0] data_i,
-        output reg  [         31:0] data_o,
+        output reg  [         31:0] data_o, /* // */
         // dram
-        output wire                 cke,      // clock enable
-        output wire                 cs_n,     // chip select
-        output wire                 ras_n,    // row address strobe
-        output wire                 cas_n,    // column address strobe
-        output wire                 we_n,     // write enable
-        output wire [  DM_BITS-1:0] dm_tdqs,  // 
-        output wire [  BA_BITS-1:0] ba,       // bank address 
-        output wire [ADDR_BITS-1:0] addr,     // address
-        inout  wire [  DQ_BITS-1:0] dq,       // data inout
-        inout  wire [ DQS_BITS-1:0] dqs,      // data strobe differential
-        inout  wire [ DQS_BITS-1:0] dqs_n,    // data strobe differential
-        input  wire [ DQS_BITS-1:0] tdqs_n,   // Termination data strobe
+        output wire                 cke,      // c
+        output wire                 we_n,     // wrim,.//,,,
+        output wire [  BA_BITS-1:0] ba,       // bank wire
+        output wire [ADDR_BITS-1:0] addr,     // address(fuzz) input
+        inout  wire [  DQ_BITS-1:0] dq,       // 
+        input  wire [ DQS_BITS-1:0] tdqs_n,   // Termination
         output                      odt       // 
     );
+    """
+    verilog_code_param = """
+    module ls_unit #(
+       parameter PC_WIDTH   = 32,
+       parameter DATA_WIDTH = 32
+    ) (
+        input  wire                 clk_i,    // differential clock inputs
+        input  wire                 we_i,
+        output reg  [         31:0] data_o, /* // */
+        output                      odt       // 
+    );
+    """
 
+    processed_code = process_verilog(verilog_code)
+    print(processed_code)
+    processed_code = process_verilog(verilog_code_param)
+    print(processed_code)
+
+
+if __name__ == "__main__":
+    debug = False
+    # debug = True
+    if debug:
+        test_process_verilog()
+    else:
+        verilog_code = sys.stdin.read()
+        processed_code = process_verilog(verilog_code)
+        print(processed_code)
+
+
+"""
 FIX:
     module rf_p_2r2w #(
        parameter WLEN  = 32,
