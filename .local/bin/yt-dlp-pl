@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 
+# Define the number of threads for parallel downloads
+THREADS=4
+
 # Check if the argument is provided
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <video_link>"
+    echo "Usage: $0 <playlist_link>"
     exit 1
 fi
 
-# Get the video link from the argument
-video_link=$1
+# Get the playlist link from the argument
+playlist_link=$1
 
-# Run the yt-dlp command with the video link
-nix run nixpkgs#yt-dlp -- --embed-metadata --format 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720][ext=mp4]/best[ext=mp4]' --output '%(playlist_index)s. %(title)s.%(ext)s' "$video_link"
+# Get all video links in the playlist
+nix run nixpkgs#yt-dlp -- --flat-playlist --get-id "$playlist_link" | while read -r video_id; do
+    echo "https://www.youtube.com/watch?v=$video_id"
+done | xargs -P "$THREADS" -I {} nix run nixpkgs#yt-dlp -- --embed-metadata --format 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720][ext=mp4]/best[ext=mp4]' --output '%(playlist_index)s. %(title)s.%(ext)s' {}
