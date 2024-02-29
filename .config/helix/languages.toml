@@ -1,7 +1,7 @@
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
-language-servers = [ "pyright","ruff-lsp","gpt"]
+language-servers = [ "pyright","ruff-lsp"]
 auto-format = true
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
