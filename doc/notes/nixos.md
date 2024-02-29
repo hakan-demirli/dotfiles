@@ -122,3 +122,6 @@
 
 * **QEMU: Windows Guest can ping host, but host cannot ping guest on a NATed network**
     * Disable windows firewall.
+
+* **Build in another distro**
+    * https://scottworley.com/blog/2023-10-11-Linux-distros-packaging-each-other.html

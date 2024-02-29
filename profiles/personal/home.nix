@@ -232,6 +232,7 @@
     # taskwarrior
     # timewarrior
 
+    adb-sync
     bottles
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
