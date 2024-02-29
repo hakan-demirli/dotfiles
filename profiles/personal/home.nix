@@ -150,7 +150,7 @@
   };
   home.packages = with pkgs; [
     cpufrequtils
-    swaylock
+    hyprlock
     vim # default editor
     waybar
     kitty
