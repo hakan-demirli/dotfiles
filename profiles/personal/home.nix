@@ -151,6 +151,7 @@
   home.packages = with pkgs; [
     cpufrequtils
     hyprlock
+    hypridle
     vim # default editor
     waybar
     kitty
