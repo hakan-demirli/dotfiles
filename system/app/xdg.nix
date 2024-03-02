@@ -87,7 +87,18 @@
   in {
     configFile = mutableConfigFiles // immutableConfigFiles;
     dataFile = mutableDataFiles // immutableDataFiles;
+    portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      extraPortals = [pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk];
+      configPackages = [pkgs.hyprland];
+    };
+    desktopEntries."helix" = {
+      name = "helix";
+      noDisplay = true;
+    };
   };
+
   home.file.".local/bin" = {
     source = ../../.local/bin;
     recursive = true;

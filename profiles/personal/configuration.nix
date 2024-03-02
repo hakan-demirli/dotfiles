@@ -99,6 +99,9 @@
   # systemctl restart --user polkit-gnome-authentication-agent-1
   security.polkit.enable = true;
   systemd = {
+    user.extraConfig = ''
+      DefaultEnvironment="PATH=/run/current-system/sw/bin"
+    '';
     user.services.polkit-gnome-authentication-agent-1 = {
       description = "polkit-gnome-authentication-agent-1";
       wantedBy = ["graphical-session.target"];
