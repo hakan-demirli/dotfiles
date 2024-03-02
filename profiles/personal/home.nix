@@ -156,7 +156,7 @@
     waybar
     kitty
     # wofi
-    j4-dmenu-desktop
+    # j4-dmenu-desktop
     firefox
     (lf.overrideAttrs (oldAttrs: {
       patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
@@ -239,6 +239,7 @@
     # (pkgs.callPackage ../../system/app/tt.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
+    (pkgs.callPackage ../../system/app/anyrun.nix {})
     (pkgs.callPackage ../../system/app/veridian.nix {})
     (pkgs.callPackage ../../system/app/update_wp.nix {})
     (pkgs.callPackage ../../system/app/gtk_applet.nix {})

@@ -9,6 +9,7 @@
 
     immutable_configs = [
       "bat"
+      "anyrun"
       "qmk"
       "gnome3-keybind-backup"
       "kitty"
