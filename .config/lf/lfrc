@@ -136,6 +136,18 @@ cmd yank_path &{{
 }}
 
 
+cmd fzf_jump ${{
+    res="$(find ~/Desktop /mnt/second/rep -maxdepth 1 | fzf --reverse --header='Jump to location' | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    if [ -d "$res" ] ; then
+        cmd="cd"
+    elif [ -f "$res" ] ; then
+        cmd="select"
+    else
+        exit 0
+    fi
+    lf -remote "send $id $cmd \"$res\""
+}}
+
 cmd q quit
 
 
@@ -157,6 +169,7 @@ map <space>D push %mkdir<space>
 map <space>F push %touch<space>
 map <space>c push :zip<space>
 map <space>y yank_path
+map <space>f fzf_jump 
 
 map d
 map dd trash
