@@ -234,7 +234,8 @@
     # timewarrior
 
     adb-sync
-    bottles
+    wineWowPackages.waylandFull
+    winetricks
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
@@ -249,7 +250,7 @@
     # (pkgs.callPackage ../../system/app/clipboard_tts.nix {})
   ];
 
-  home.sessionVariables = {
+  home.sessionVariables = rec {
     OPENER = "xdg-open";
     EDITOR = "hx";
     TERMINAL = "kitty";
@@ -266,6 +267,7 @@
 
     DIRENV_WARN_TIMEOUT = "8m";
 
+    WINEPREFIX = "${XDG_DATA_HOME}/wine"; # special case
     DIRENV_CONFIG = "$HOME/.config/direnv/direnvrc";
     ANDROID_HOME = "$XDG_DATA_HOME/android";
     CARGO_HOME = "$XDG_DATA_HOME/cargo";
@@ -281,8 +283,7 @@
     PYTHONPYCACHEPREFIX = "$XDG_CACHE_HOME/python";
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
     GOPATH = "$XDG_CACHE_HOME/go";
-    WINEPREFIX = "$XDG_DATA_HOME/wineprefixes/default";
-    _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java'';
+    _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot=\"$XDG_CONFIG_HOME\"/java'';
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
     VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
