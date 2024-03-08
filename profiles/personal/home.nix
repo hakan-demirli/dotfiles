@@ -150,7 +150,6 @@
   };
   home.packages = with pkgs; [
     cpufrequtils
-    hyprlock
     hypridle
     vim # default editor
     waybar
@@ -238,6 +237,7 @@
     winetricks
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
+    (pkgs.callPackage ../../system/app/hyprlock.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
     (pkgs.callPackage ../../system/app/anyrun.nix {})
