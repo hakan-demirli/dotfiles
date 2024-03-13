@@ -205,7 +205,7 @@
     helix
     helix-gpt
     asm-lsp
-    nixd
+    # nixd
     alejandra
     ruff
     ruff-lsp
