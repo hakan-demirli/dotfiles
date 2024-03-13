@@ -20,9 +20,3 @@
   * ```git-crypt unlock ../git-crypt-key```
 * ```sudo nixos-rebuild switch --flake ~/Desktop/dotfiles/#myNixos```
 * ```home-manager switch --flake ~/Desktop/dotfiles/#emre```
-
-# TODO
-- py: fix hardcoded paths
-- questa: custom home dir.
-- Firefox custom file picker: lf/yazi
-  - Using xdg-desktop-portal ?
