@@ -6,8 +6,8 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
   src = pkgs.fetchFromGitHub {
     owner = "hyprwm";
     repo = "hyprlock";
-    rev = "160fe3553fae1c2fb5f3480bada708bff9405e0b";
-    hash = "sha256-njx7ZjsIaOo+l9vF2FNtF1nvckHK/8gcqpN3EYitIoY=";
+    rev = "f3a41161eca06074de40c60991f569f1db77182a";
+    hash = "sha256-x1FWQbRxXHZwTVSNq649Qj1JmkHppiKq+X+cjPyt2Wg=";
   };
 
   strictDeps = true;
