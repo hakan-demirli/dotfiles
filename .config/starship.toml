@@ -133,3 +133,6 @@ symbol = ' '
 # format = "[$output]($style) "
 # shell = ["/usr/bin/env", "bash"]
 
+
+[scala]
+format = 'via [🇸 $version](bold red) '
