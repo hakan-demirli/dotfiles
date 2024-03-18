@@ -4,13 +4,27 @@
 
 |   |   |
 |---|---|
-| **Distro**      | Nixos        |
+| **Distro**      | NixOS        |
 | **WM**          | Hyprland     |
 | **Bar**         | Waybar       |
 | **Editor**      | Helix+tmux   |
 | **FileManager** | lf           |
 | **WP-Manager**  | swww         |
-| **Keyboard**    | tbk_mini-QMK |
+| **Keyboard**    | [tbk_mini](https://github.com/Bastardkb/TBK-Mini)-[QMK](https://github.com/hakan-demirli/dotfiles/tree/main/.local/share/qmk) |
+
+```
+.
+├── doc
+│   ├── assets: Stores static files like images for documentation.
+│   └── notes: Contains markdown notes.
+├── profiles
+│   └── personal: Contains personal nix profile.
+└── system
+    ├── app: Contains nix applications and patches.
+    ├── hardware: Contains hardware-specific nix configurations.
+    └── scripts: Contains various scripts.
+  
+```
 
 # Install
 * ```nix-shell -p git git-crypt home-manager helix```
