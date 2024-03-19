@@ -114,7 +114,7 @@
         * Hyprv
         * Windows sandbox
 
-* **How to assign a key to another key/key combination**
+* **How to assign a key to another key/key combination (remap,bind,keymap,shorcut)**
     * Permanent:
         * [SharpKeys](https://www.randyrants.com/category/sharpkeys/)
     * Temp:
