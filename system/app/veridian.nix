@@ -14,11 +14,11 @@ rustPlatform.buildRustPackage (rec {
     src = fetchFromGitHub {
       owner = "vivekmalneedi";
       repo = pname;
-      rev = "de0f90f10a444a0bf9e28ff2f512d61788754d39";
-      hash = "sha256-+VKrY0JjiVvdNyAFOZWntdS4rc9e8oSKUgR39nwteL8=";
+      rev = "aca8ee110002bab42435830823db8d569221985e";
+      hash = "sha256-dw3I4MDnjG90XSlyZZFwg7LdZfxK1T5H87oBVvqeqzM=";
     };
 
-    cargoHash = "sha256-FcxcJU9UlksCBER8RZ4lwYy2/IsxouYkfTYSMtWiOtY=";
+    cargoHash = "sha256-pWjGuLiJxM0drtLHoo381z7VSawjFKuvOTJ0qxhQtxE=";
 
     doCheck = false;
 
