@@ -31,9 +31,8 @@
   };
   programs.bash = {
     enable = true;
-    # https://github.com/nix-community/home-manager/issues/183
     sessionVariables = {
-      EDITOR = "hx"; # BUG: Not working
+      EDITOR = "hx";
     };
     historyFile = "/home/${userSettings.username}/.config/.bash_history";
     historyFileSize = -1;
@@ -205,7 +204,7 @@
     helix
     helix-gpt
     asm-lsp
-    # nixd
+    nixd
     alejandra
     ruff
     ruff-lsp
