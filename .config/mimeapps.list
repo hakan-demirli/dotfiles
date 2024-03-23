@@ -50,6 +50,7 @@ application/yaml=helix.desktop
 text/x-rst=helix.desktop
 application/xml=helix.desktop
 text/x-log=helix.desktop
+text/x-patch=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -97,3 +98,4 @@ application/yaml=helix.desktop
 text/x-rst=helix.desktop
 application/xml=helix.desktop
 text/x-log=helix.desktop
+text/x-patch=helix.desktop
