@@ -48,6 +48,7 @@ text/x-opml+xml=helix.desktop
 text/x-scala=helix.desktop
 application/yaml=helix.desktop
 text/x-rst=helix.desktop
+application/xml=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -93,3 +94,4 @@ text/x-opml+xml=helix.desktop
 text/x-scala=helix.desktop
 application/yaml=helix.desktop
 text/x-rst=helix.desktop
+application/xml=helix.desktop
