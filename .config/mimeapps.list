@@ -47,6 +47,7 @@ application/x-powershell=helix.desktop
 text/x-opml+xml=helix.desktop
 text/x-scala=helix.desktop
 application/yaml=helix.desktop
+text/x-rst=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -91,3 +92,4 @@ application/x-powershell=helix.desktop
 text/x-opml+xml=helix.desktop
 text/x-scala=helix.desktop
 application/yaml=helix.desktop
+text/x-rst=helix.desktop
