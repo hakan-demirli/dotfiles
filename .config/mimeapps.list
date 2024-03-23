@@ -41,6 +41,7 @@ application/octet-stream=helix.desktop
 text/x-python=helix.desktop
 application/toml=helix.desktop
 audio/x-opus+ogg=mpv.desktop
+text/x-lua=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -79,3 +80,4 @@ application/octet-stream=helix.desktop
 text/x-python=helix.desktop
 application/toml=helix.desktop
 audio/x-opus+ogg=mpv.desktop
+text/x-lua=helix.desktop
