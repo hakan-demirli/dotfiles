@@ -38,6 +38,7 @@ text/x-csrc=helix.desktop
 text/x-chdr=helix.desktop
 text/x-c=helix.desktop
 application/octet-stream=helix.desktop
+text/x-python=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -73,3 +74,4 @@ text/x-csrc=helix.desktop
 text/x-chdr=helix.desktop
 text/x-c=helix.desktop
 application/octet-stream=helix.desktop
+text/x-python=helix.desktop
