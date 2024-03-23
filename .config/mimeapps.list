@@ -39,6 +39,8 @@ text/x-chdr=helix.desktop
 text/x-c=helix.desktop
 application/octet-stream=helix.desktop
 text/x-python=helix.desktop
+application/toml=helix.desktop
+audio/x-opus+ogg=mpv.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -75,3 +77,5 @@ text/x-chdr=helix.desktop
 text/x-c=helix.desktop
 application/octet-stream=helix.desktop
 text/x-python=helix.desktop
+application/toml=helix.desktop
+audio/x-opus+ogg=mpv.desktop
