@@ -44,6 +44,7 @@ audio/x-opus+ogg=mpv.desktop
 text/x-lua=helix.desktop
 text/markdown=helix.desktop
 application/x-powershell=helix.desktop
+text/x-opml+xml=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -85,3 +86,4 @@ audio/x-opus+ogg=mpv.desktop
 text/x-lua=helix.desktop
 text/markdown=helix.desktop
 application/x-powershell=helix.desktop
+text/x-opml+xml=helix.desktop
