@@ -63,6 +63,14 @@
     ];
   };
 
+  # https://github.com/hyprwm/hyprpicker/issues/51#issuecomment-2016368757
+  home.pointerCursor = {
+    gtk.enable = true;
+    name = "Dracula-cursors";
+    package = pkgs.dracula-theme;
+    size = 10;
+  };
+
   gtk = {
     enable = true;
     theme = {
