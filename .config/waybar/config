@@ -21,6 +21,8 @@
     "backlight",
     "custom/left-arrow-dark",
     "battery",
+    "custom/left-arrow-dark",
+    "custom/timer",
     "custom/weather",
     "custom/left-arrow-dark",
     "custom/notification",
@@ -159,5 +161,13 @@
       "interval": 60,
       "exec": "print_weather",
       "return-type": "json"
+  },
+  "custom/timer": {
+    "tooltip": true,
+    "return-type": "json",
+    "exec": "waybar_timer -r",
+    "on-click": "waybar_timer -t",
+    "on-click-right": "waybar_timer -m",
+    "interval": 1
   }
 }
