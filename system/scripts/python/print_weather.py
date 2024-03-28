@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import argparse
 import json
 from datetime import datetime
 
@@ -90,7 +90,7 @@ def format_chances(hour):
     return ", ".join(conditions)
 
 
-def main():
+def get_weather():
     data = {}
     weather = requests.get(f"https://wttr.in/{get_city_name()}?format=j1").json()
 
@@ -101,9 +101,9 @@ def main():
         + "°"
     )
 
-    data[
-        "tooltip"
-    ] = f"<b>{weather['current_condition'][0]['weatherDesc'][0]['value']} {weather['current_condition'][0]['temp_C']}°</b>\n"
+    data["tooltip"] = (
+        f"<b>{weather['current_condition'][0]['weatherDesc'][0]['value']} {weather['current_condition'][0]['temp_C']}°</b>\n"
+    )
     data["tooltip"] += f"Feels like: {weather['current_condition'][0]['FeelsLikeC']}°\n"
     data["tooltip"] += f"Wind: {weather['current_condition'][0]['windspeedKmph']}Km/h\n"
     data["tooltip"] += f"Humidity: {weather['current_condition'][0]['humidity']}%\n"
@@ -115,18 +115,18 @@ def main():
             data["tooltip"] += "Tomorrow, "
         data["tooltip"] += f"{day['date']}</b>\n"
         data["tooltip"] += f"⬆️ {day['maxtempC']}° ⬇️ {day['mintempC']}° "
-        data[
-            "tooltip"
-        ] += f"🌅 {day['astronomy'][0]['sunrise']} 🌇 {day['astronomy'][0]['sunset']}\n"
+        data["tooltip"] += (
+            f"🌅 {day['astronomy'][0]['sunrise']} 🌇 {day['astronomy'][0]['sunset']}\n"
+        )
         for hour in day["hourly"]:
             if i == 0:
                 if int(format_time(hour["time"])) < datetime.now().hour - 2:
                     continue
-            data[
-                "tooltip"
-            ] += f"{format_time(hour['time'])} {WEATHER_CODES[hour['weatherCode']]} {format_temp(hour['FeelsLikeC'])} {hour['weatherDesc'][0]['value']}, {format_chances(hour)}\n"
+            data["tooltip"] += (
+                f"{format_time(hour['time'])} {WEATHER_CODES[hour['weatherCode']]} {format_temp(hour['FeelsLikeC'])} {hour['weatherDesc'][0]['value']}, {format_chances(hour)}\n"
+            )
 
-    print(json.dumps(data))
+    return json.dumps(data)
 
 
 if __name__ == "__main__":
@@ -134,4 +134,18 @@ if __name__ == "__main__":
     Prints weather of the city in html/css.
         City is based on your IP.
     """
-    main()
+
+    parser = argparse.ArgumentParser(description="Print Weather Status")
+    parser.add_argument(
+        "-w", "--weather", action="store_true", help="Get Weather Status"
+    )
+    parser.add_argument("-c", "--city", action="store_true", help="Get current city")
+
+    args = parser.parse_args()
+
+    if args.weather:
+        print(get_weather())
+    elif args.city:
+        print(get_city_name())
+    else:
+        print(":(")

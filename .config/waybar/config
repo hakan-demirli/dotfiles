@@ -159,7 +159,7 @@
       "format": "{}",
       "tooltip": true,
       "interval": 60,
-      "exec": "print_weather",
+      "exec": "print_weather -w",
       "return-type": "json"
   },
   "custom/timer": {
