@@ -128,9 +128,10 @@
     gd = "git diff";
     gp = "git push";
     gs = "git status";
+    gb = "fzf_git_branches";
     gc = "git commit";
     gcm = "git commit -m";
-    gl = "git log";
+    gl = "fzf_git_commits";
 
     # ascp = "asusctl profile -p";
     # ascl = "asusctl profile -l";
