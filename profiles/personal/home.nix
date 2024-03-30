@@ -32,7 +32,7 @@
   programs.bash = {
     enable = true;
     sessionVariables = {
-      EDITOR = "hx";
+      EDITOR = "nvim";
     };
     historyFile = "/home/${userSettings.username}/.config/.bash_history";
     historyFileSize = -1;
@@ -115,6 +115,7 @@
   home.shellAliases = {
     ":q" = "exit";
     "hx." = "helix .";
+    "nvim." = "nvim .";
     ".." = "cd ..";
     "cd.." = "cd ..";
     helix = "hx";
@@ -212,8 +213,8 @@
     zip
     ghostscript
 
-    helix
-    helix-gpt
+    # helix
+    # helix-gpt
     asm-lsp
     nixd
     alejandra
@@ -239,6 +240,8 @@
     nodePackages.diagnostic-languageserver
     verilator
 
+    lua-language-server
+
     # taskwarrior
     # timewarrior
 
@@ -263,7 +266,8 @@
 
   home.sessionVariables = rec {
     OPENER = "xdg-open";
-    EDITOR = "hx";
+    # EDITOR = "hx";
+    EDITOR = "nvim";
     TERMINAL = "kitty";
     TERM = "kitty";
 
@@ -297,7 +301,8 @@
     _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot=\"$XDG_CONFIG_HOME\"/java'';
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
-    VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
+    # Breaks neovim
+    # VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 

@@ -7,7 +7,7 @@
 | **Distro**      | NixOS        |
 | **WM**          | Hyprland     |
 | **Bar**         | Waybar       |
-| **Editor**      | Helix+tmux   |
+| **Editor**      | Neovim+tmux  |
 | **FileManager** | lf           |
 | **WP-Manager**  | swww         |
 | **Keyboard**    | [tbk_mini](https://github.com/Bastardkb/TBK-Mini)-[QMK](https://github.com/hakan-demirli/dotfiles/tree/main/.local/share/qmk) |
