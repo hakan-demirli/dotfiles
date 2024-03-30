@@ -1,8 +1,5 @@
 -- taken from https://github.com/noib3/dotfiles
 
--- For nvimtree
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
 -- Delete trailing whitespace on save
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   pattern = { "*" },

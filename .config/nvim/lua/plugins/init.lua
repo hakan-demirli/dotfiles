@@ -13,33 +13,6 @@ return {
     end,
   },
 
-  -- Nvimtree
-  {
-    "https://github.com/kyazdani42/nvim-tree.lua",
-    requires = { "kyazdani42/nvim-web-devicons" },
-    config = function()
-    require("nvim-tree").setup {
-  ---
-  on_attach = function(bufnr)
-    local api = require "nvim-tree.api"
-
-    local function opts(desc)
-      return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-    end
-
-    -- default mappings
-    api.config.mappings.default_on_attach(bufnr)
-
-    -- custom mappings
-    vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent,        opts('Up'))
-    vim.keymap.set('n', '?',     api.tree.toggle_help,                  opts('Help'))
-  end,
-  ---
-}
-
-    end,
-  },
-
   -- Bufferline
   {
     "noib3/nvim-cokeline",
@@ -128,17 +101,16 @@ return {
 
       ts.load_extension("fzf")
 
-      vim.keymap.set(
-        "n",
-        "<C-x><C-e>",
-        function() builtin.find_files({ cwd = project_dir() }) end
-      )
-
-      vim.keymap.set(
-        "n",
-        "<Tab>",
-        function() builtin.buffers() end
-      )
+      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+      vim.keymap.set('n', '<leader>f', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
     end,
   },
 
@@ -155,7 +127,7 @@ return {
         plugins = {
           ["nvim-treesitter"] = true,
           ["nvim-lspconfig"] = true,
-          ["nvim-tree.lua"] = true,
+          -- ["nvim-tree.lua"] = true,
           ["lazy.nvim"] = true,
           ["telescope.nvim"] = true,
         },
