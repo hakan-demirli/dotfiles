@@ -115,6 +115,8 @@
   home.shellAliases = {
     ":q" = "exit";
     "hx." = "helix .";
+    ".." = "cd ..";
+    "cd.." = "cd ..";
     helix = "hx";
     lf = ''echo "Did you mean f?"''; # muscle memory
     f = "lfcd";
