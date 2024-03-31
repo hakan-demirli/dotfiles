@@ -13,3 +13,4 @@
 .local/share/task/* filter=git-crypt diff=git-crypt
 .local/share/timewarrior/* filter=git-crypt diff=git-crypt
 .local/share/timewarrior/data/* filter=git-crypt diff=git-crypt
+.local/share/sounds/* filter=git-crypt diff=git-crypt
