@@ -151,7 +151,7 @@
     txs = "tmux switch-client -n";
     txkw = "tmux kill-window -t ";
     txlw = "tmux list-windows";
-    txh = ''tmux new-session -s "$(basename "$(pwd)")_$(echo -n "$(pwd)" | md5sum | cut -d " " -f 1)" "hx ."'';
+    txh = ''tmux new-session -s "$(basename "$(pwd)")_$(echo -n "$(pwd)" | md5sum | cut -d " " -f 1)" "nvim ."'';
 
     wget = ''wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'';
     arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
