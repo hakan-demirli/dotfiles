@@ -53,6 +53,7 @@ text/x-log=nvim.desktop
 text/x-patch=nvim.desktop
 text/css=nvim.desktop
 text/javascript=nvim.desktop
+text/x-todo-txt=nvim.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -103,3 +104,4 @@ text/x-log=nvim.desktop
 text/x-patch=nvim.desktop
 text/css=nvim.desktop
 text/javascript=nvim.desktop
+text/x-todo-txt=nvim.desktop
