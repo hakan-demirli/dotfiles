@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import logging
 import subprocess
 from datetime import datetime, timedelta
 from enum import Enum
@@ -11,6 +12,11 @@ DEFAULT_MINUTE = 40
 FONT_SIZE = 14
 ZENITY = "zenity"
 
+xdg_cache_dir = os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache'))
+log_file_path = os.path.join(xdg_cache_dir, 'waybar_timer.log')
+logging.basicConfig(filename=log_file_path, level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
+
 
 class TimerState(Enum):
     READY = "ready"
@@ -18,6 +24,13 @@ class TimerState(Enum):
     STOPPED = "stopped"
     TIMEOUT = "timeout"
 
+
+def play_sound(file: str):
+    try:
+        subprocess.Popen(f"ffplay -nodisp -autoexit $XDG_DATA_HOME/sounds/{file}",shell=True)
+    except Exception as e:
+        # print(e)
+        pass
 
 class Timer:
     def __init__(self, state_file: str) -> None:
@@ -54,7 +67,10 @@ class Timer:
         self.state = TimerState.COUNTING
         self.end_time = datetime.now() + timedelta(minutes=minutes)
         self.stopped_time = datetime.min
+        if minutes:
+            play_sound("nier_enter.mp3")
         self.save_state()
+        logging.info(f'Set timer for {minutes} minutes')
 
     def read(self) -> timedelta:
         if self.state == TimerState.COUNTING:
@@ -62,6 +78,8 @@ class Timer:
             if remaining.total_seconds() <= 0:
                 self.state = TimerState.TIMEOUT
                 self.save_state()
+                play_sound("nier_back.mp3")
+                logging.info("Timeout")
                 return timedelta(0)
             return remaining
         elif self.state == TimerState.STOPPED:
@@ -75,13 +93,16 @@ class Timer:
                 "tooltip": "Timer is not active",
             }
         elif self.state == TimerState.TIMEOUT:
-            return {"text": f"<span font='{FONT_SIZE}' rise='-2000'>󰔛</span>"}
+            return {"text": f"<span font='{FONT_SIZE}' rise='-2000'>󰔛</span>",
+                    "tooltip": "Timeout",
+            }
         elif self.state == TimerState.COUNTING or self.state == TimerState.STOPPED:
             remaining_time = self.read()
             minutes, seconds = divmod(int(remaining_time.total_seconds()), 60)
             return {
                 "text": f"<span font='{FONT_SIZE}' rise='-2000'>󰔟</span> {minutes}:{str(seconds).zfill(2)} ",
                 "class": "active",
+                "tooltip": "Timer is active",
             }
         else:
             return {
@@ -93,9 +114,11 @@ class Timer:
         if self.state == TimerState.COUNTING:
             self.state = TimerState.STOPPED
             self.stopped_time = datetime.now()
+            logging.info('Stopped timer')
         elif self.state == TimerState.STOPPED:
             self.state = TimerState.COUNTING
             self.end_time = datetime.now() + (self.end_time - self.stopped_time)
+            logging.info('Started timer')
         else:
             return
         self.save_state()
@@ -105,6 +128,7 @@ class Timer:
         self.end_time = datetime.min
         self.stopped_time = datetime.min
         self.save_state()
+        logging.info('Cleared timer')
 
 
 def run_cmd(cmd: str) -> str:
@@ -114,7 +138,6 @@ def run_cmd(cmd: str) -> str:
 def main():
     parser = argparse.ArgumentParser(description="CLI Timer")
     parser.add_argument("-r", "--read", action="store_true", help="Read remaining time")
-    parser.add_argument("-s", "--set", type=int, help="Set the timer")
     parser.add_argument(
         "-m",
         "--minute",
@@ -133,8 +156,6 @@ def main():
 
     if args.read:
         print(json.dumps(timer.print_time()))
-    elif args.set is not None:
-        timer.set(args.set)
     elif args.minute is not False:
         # minute is not set via cli. Ask the user via gui
         if args.minute is None:

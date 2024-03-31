@@ -8,6 +8,7 @@ pkgs.stdenv.mkDerivation {
 
   propagatedBuildInputs = [
     pkgs.python3
+    pkgs.ffmpeg-full # full version for ffplay
   ];
 
   dontUnpack = true;

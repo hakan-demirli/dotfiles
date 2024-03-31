@@ -26,7 +26,6 @@
       "xremap"
       "cargo"
       "helix"
-      "nvim"
       "tmux"
       "wavemon"
       "yazi"
@@ -46,7 +45,7 @@
       "starship.toml"
     ];
 
-    immutable_data = ["applications" "fonts"];
+    immutable_data = ["applications" "fonts" "sounds"];
     mutable_data = ["task" "timewarrior"];
 
     makeMutable = path: file: {
