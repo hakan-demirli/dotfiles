@@ -8,13 +8,18 @@ import string
 import subprocess
 import tempfile
 
+from PIL import Image
+
 from add_gtasks_overlay import main as add_gtasks_overlay
 from add_ics_overlay import main as add_ics_overlay
-from add_mtd_overlay import main as add_mtd_overlay
+
+# from add_mtd_overlay import main as add_mtd_overlay
+from add_left_overlay import main as add_left_overlay
 from gtasks.gtasks_overlay import main as gtasks_overlay
 from ics.ics_overlay import main as ics_overlay
-from mtd.mtd_overlay import main as mtd_overlay
-from PIL import Image
+
+# from mtd.mtd_overlay import main as mtd_overlay
+from left.left_overlay import main as left_overlay
 
 script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
 config_dir = os.path.expanduser("~/.config/mylib/")  # ABS_PATH: fix pls
@@ -85,11 +90,13 @@ def setFirefoxWallpaper(wallpaper_path: str) -> None:
 def main():
     ics_overlay()
     gtasks_overlay()
-    mtd_overlay()
+    # mtd_overlay()
+    left_overlay()
     add_ics_overlay()
     add_gtasks_overlay()
     shutil.copy(overlayed_file, overlayed_backup_file)
-    add_mtd_overlay()
+    add_left_overlay()
+    # add_mtd_overlay()
     subprocess.run(
         [
             "swww",
