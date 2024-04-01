@@ -12,7 +12,7 @@ local lsp = vim.lsp
 
 local lsp_augroup_id = api.nvim_create_augroup("Lsp", {})
 
-local on_attach = function(_ --[[ client ]] , bufnr)
+local on_attach = function(_ --[[ client ]], bufnr)
   local opts = { buffer = bufnr }
 
   -- All keymaps are set in keymaps.lua
@@ -79,6 +79,10 @@ lspconfig.nixd.setup({
 lspconfig.pyright.setup({
   on_attach = on_attach,
 })
+-- Python -> https://github.com/astral-sh/ruff-lsp
+lspconfig.ruff_lsp.setup({
+  on_attach = on_attach,
+})
 
 -- Rust -> https://github.com/rust-lang/rust-analyzer
 lspconfig.rust_analyzer.setup({
@@ -95,10 +99,3 @@ lspconfig.rust_analyzer.setup({
 lspconfig.metals.setup({
   on_attach = on_attach
 })
-
-
-
-
-
-
-
