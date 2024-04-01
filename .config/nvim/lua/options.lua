@@ -1,6 +1,7 @@
 return {
   -- Automatically set the cwd to the one containing the currently focused
   -- buffer.
+  signcolumn = "yes",
   autochdir = true,
   background = "dark",
   -- Use the system clipboard.
