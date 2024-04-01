@@ -142,6 +142,10 @@ return {
 
       dracula.setup({
         transparent = true,
+        colors = {
+          selection = "#363848",
+          visual = "#363848",
+        },
         plugins = {
           ["nvim-treesitter"] = true,
           ["nvim-lspconfig"] = true,

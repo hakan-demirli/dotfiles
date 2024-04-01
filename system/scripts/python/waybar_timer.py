@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import os
 import logging
+import os
 import subprocess
 from datetime import datetime, timedelta
 from enum import Enum
@@ -12,10 +12,13 @@ DEFAULT_MINUTE = 40
 FONT_SIZE = 14
 ZENITY = "zenity"
 
-xdg_cache_dir = os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache'))
-log_file_path = os.path.join(xdg_cache_dir, 'waybar_timer.log')
-logging.basicConfig(filename=log_file_path, level=logging.INFO,
-                    format='%(asctime)s:%(levelname)s:%(message)s')
+xdg_cache_dir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+log_file_path = os.path.join(xdg_cache_dir, "waybar_timer.log")
+logging.basicConfig(
+    filename=log_file_path,
+    level=logging.INFO,
+    format="%(asctime)s:%(levelname)s:%(message)s",
+)
 
 
 class TimerState(Enum):
@@ -27,10 +30,13 @@ class TimerState(Enum):
 
 def play_sound(file: str):
     try:
-        subprocess.Popen(f"ffplay -nodisp -autoexit $XDG_DATA_HOME/sounds/{file}",shell=True)
-    except Exception as e:
+        subprocess.Popen(
+            f"ffplay -nodisp -autoexit $XDG_DATA_HOME/sounds/{file}", shell=True
+        )
+    except Exception:
         # print(e)
         pass
+
 
 class Timer:
     def __init__(self, state_file: str) -> None:
@@ -70,7 +76,7 @@ class Timer:
         if minutes:
             play_sound("nier_enter.mp3")
         self.save_state()
-        logging.info(f'Set timer for {minutes} minutes')
+        logging.info(f"Set timer for {minutes} minutes")
 
     def read(self) -> timedelta:
         if self.state == TimerState.COUNTING:
@@ -93,8 +99,9 @@ class Timer:
                 "tooltip": "Timer is not active",
             }
         elif self.state == TimerState.TIMEOUT:
-            return {"text": f"<span font='{FONT_SIZE}' rise='-2000'>󰔛</span>",
-                    "tooltip": "Timeout",
+            return {
+                "text": f"<span font='{FONT_SIZE}' rise='-2000'>󰔛</span>",
+                "tooltip": "Timeout",
             }
         elif self.state == TimerState.COUNTING or self.state == TimerState.STOPPED:
             remaining_time = self.read()
@@ -114,11 +121,11 @@ class Timer:
         if self.state == TimerState.COUNTING:
             self.state = TimerState.STOPPED
             self.stopped_time = datetime.now()
-            logging.info('Stopped timer')
+            logging.info("Stopped timer")
         elif self.state == TimerState.STOPPED:
             self.state = TimerState.COUNTING
             self.end_time = datetime.now() + (self.end_time - self.stopped_time)
-            logging.info('Started timer')
+            logging.info("Started timer")
         else:
             return
         self.save_state()
@@ -128,7 +135,7 @@ class Timer:
         self.end_time = datetime.min
         self.stopped_time = datetime.min
         self.save_state()
-        logging.info('Cleared timer')
+        logging.info("Cleared timer")
 
 
 def run_cmd(cmd: str) -> str:

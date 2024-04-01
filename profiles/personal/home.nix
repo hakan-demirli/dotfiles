@@ -157,7 +157,7 @@
     arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
 
     llama = ''nix run git+https://github.com/nixified-ai/flake.git#textgen-nvidia'';
-    tor = ''nix run nixpkgs#tor-browser'';
+    # tor = ''nix run nixpkgs#tor-browser'';
   };
   home.packages = with pkgs; [
     cpufrequtils
@@ -168,6 +168,7 @@
     # wofi
     # j4-dmenu-desktop
     firefox
+    tor-browser
     (lf.overrideAttrs (oldAttrs: {
       patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
     }))
