@@ -116,6 +116,7 @@
     ":q" = "exit";
     "hx." = "helix .";
     ".." = "cd ..";
+    "c" = "clear";
     "cd.." = "cd ..";
     helix = "hx";
     lf = ''echo "Did you mean f?"''; # muscle memory
