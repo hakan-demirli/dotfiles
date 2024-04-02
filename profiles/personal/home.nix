@@ -32,7 +32,7 @@
   programs.bash = {
     enable = true;
     sessionVariables = {
-      EDITOR = "nvim";
+      EDITOR = "hx";
     };
     historyFile = "/home/${userSettings.username}/.config/.bash_history";
     historyFileSize = -1;
@@ -115,7 +115,6 @@
   home.shellAliases = {
     ":q" = "exit";
     "hx." = "helix .";
-    "nvim." = "nvim .";
     ".." = "cd ..";
     "cd.." = "cd ..";
     helix = "hx";
@@ -151,7 +150,7 @@
     txs = "tmux switch-client -n";
     txkw = "tmux kill-window -t ";
     txlw = "tmux list-windows";
-    txh = ''tmux new-session -s "$(basename "$(pwd)")_$(echo -n "$(pwd)" | md5sum | cut -d " " -f 1)" "nvim ."'';
+    txh = ''tmux new-session -s "$(basename "$(pwd)")_$(echo -n "$(pwd)" | md5sum | cut -d " " -f 1)" "hx ."'';
 
     wget = ''wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'';
     arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
@@ -252,6 +251,7 @@
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
     (pkgs.callPackage ../../system/app/waybar_timer.nix {})
+    (pkgs.callPackage ../../system/app/helix.nix {})
     (pkgs.callPackage ../../system/app/hyprlock.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
@@ -268,7 +268,7 @@
   home.sessionVariables = rec {
     OPENER = "xdg-open";
     # EDITOR = "hx";
-    EDITOR = "nvim";
+    EDITOR = "hx";
     TERMINAL = "kitty";
     TERM = "kitty";
 
