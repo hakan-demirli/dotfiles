@@ -4,6 +4,7 @@ import os
 import subprocess
 
 import gi
+import time
 
 gi.require_version("GUdev", "1.0")
 
@@ -57,15 +58,16 @@ def ac_event_handler(client, action, device, user_data):
 def main():
     # Create a GUdev client to monitor power supply events
     client = GUdev.Client(subsystems=["power_supply"])
-    client.connect("uevent", ac_event_handler, None)
 
     # Check the initial power status
     try:
         check_initial_power_status(client)
+        time.sleep(2)  # fix file write race condition
     except Exception:
         print("initial check failed")
 
     # Create a GLib MainLoop to listen for events
+    client.connect("uevent", ac_event_handler, None)
     loop = GLib.MainLoop()
     loop.run()
 
