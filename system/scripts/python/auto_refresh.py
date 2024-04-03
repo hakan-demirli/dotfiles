@@ -17,8 +17,11 @@ def sed(regex: str, path: str):
 def check_initial_power_status(client):
     devices = client.query_by_subsystem("power_supply")
     for device in devices:
-        if device.get_property("POWER_SUPPLY_ONLINE") == "1":
+        if device.get_property("SUBSYSTEM") == "power_supply":
             ac_event_handler(client, "change", device, None)
+            print("Updated boot refresh rate.")
+            return
+    print("Cant find power_supply device")
 
 
 def ac_event_handler(client, action, device, user_data):
@@ -32,12 +35,14 @@ def ac_event_handler(client, action, device, user_data):
     if action == "change":
         if device.get_property("SUBSYSTEM") == "power_supply":
             online = device.get_property("POWER_SUPPLY_ONLINE")
+            print(f"Power supply status changed. online: {online}")
+
             if online == "1":
                 with open(CONFIG_FILE_PATH, "r") as file:
                     file_contents = file.read()
                 if f"@{MAX_REFRESH_RATE}" not in file_contents:
                     sed(TO_MAX_REGEX, CONFIG_FILE_PATH)
-            elif online == "0":
+            elif online == "0" or (online is None):
                 sed(TO_MIN_REGEX, CONFIG_FILE_PATH)
         if device.get_property("POWER_SUPPLY_CAPACITY_LEVEL") == "critical":
             subprocess.run(
@@ -55,7 +60,10 @@ def main():
     client.connect("uevent", ac_event_handler, None)
 
     # Check the initial power status
-    check_initial_power_status(client)
+    try:
+        check_initial_power_status(client)
+    except Exception:
+        print("initial check failed")
 
     # Create a GLib MainLoop to listen for events
     loop = GLib.MainLoop()
