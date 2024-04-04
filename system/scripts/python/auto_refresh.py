@@ -4,47 +4,68 @@ import os
 import subprocess
 
 import gi
-import time
 
 gi.require_version("GUdev", "1.0")
 
 from gi.repository import GLib, GUdev  # noqa: E402
+
+CONFIG_FILE_PATH = "~/.config/hypr/monitors.conf"  # ABS_PATH: fix pls
+CONFIG_FILE_PATH = os.path.expanduser(CONFIG_FILE_PATH)
+MAX_REFRESH_RATE = 144
+MIN_REFRESH_RATE = 60
+TO_MAX_REGEX = f"/eDP-1/s/@{MIN_REFRESH_RATE}/@{MAX_REFRESH_RATE}/g"
+TO_MIN_REGEX = f"/eDP-1/s/@{MAX_REFRESH_RATE}/@{MIN_REFRESH_RATE}/g"
+AC_STATUS_FILE = "/sys/class/power_supply/ACAD/online"
 
 
 def sed(regex: str, path: str):
     subprocess.run(["sed", "-i", regex, path])
 
 
-def check_initial_power_status(client):
-    devices = client.query_by_subsystem("power_supply")
-    for device in devices:
-        if device.get_property("SUBSYSTEM") == "power_supply":
-            ac_event_handler(client, "change", device, None)
-            print("Updated boot refresh rate.")
-            return
-    print("Cant find power_supply device")
+def set_min_refresh_rate():
+    file_contents = ""
+    with open(CONFIG_FILE_PATH, "r") as file:
+        file_contents = file.read()
+    if f"@{MIN_REFRESH_RATE}" in file_contents:
+        sed(TO_MIN_REGEX, CONFIG_FILE_PATH)
+    else:
+        print("Refresh rate is alread at min.")
+
+
+def set_max_refresh_rate():
+    file_contents = ""
+    with open(CONFIG_FILE_PATH, "r") as file:
+        file_contents = file.read()
+    if f"@{MAX_REFRESH_RATE}" in file_contents:
+        sed(TO_MAX_REGEX, CONFIG_FILE_PATH)
+    else:
+        print("Refresh rate is alread at max.")
+
+
+def check_initial_power_status():
+    with open(AC_STATUS_FILE, "r") as file:
+        online = file.read()
+        print(f"Initial power status is {online}")
+        try:
+            if 0 == int(online):
+                set_min_refresh_rate()
+            else:
+                set_max_refresh_rate()
+        except Exception:
+            print("Which is not an integer.")
 
 
 def ac_event_handler(client, action, device, user_data):
-    CONFIG_FILE_PATH = "~/.config/hypr/monitors.conf"  # ABS_PATH: fix pls
-    CONFIG_FILE_PATH = os.path.expanduser(CONFIG_FILE_PATH)
-    MAX_REFRESH_RATE = 144
-    MIN_REFRESH_RATE = 60
-    TO_MAX_REGEX = f"/eDP-1/s/@{MIN_REFRESH_RATE}/@{MAX_REFRESH_RATE}/g"
-    TO_MIN_REGEX = f"/eDP-1/s/@{MAX_REFRESH_RATE}/@{MIN_REFRESH_RATE}/g"
-
     if action == "change":
         if device.get_property("SUBSYSTEM") == "power_supply":
             online = device.get_property("POWER_SUPPLY_ONLINE")
             print(f"Power supply status changed. online: {online}")
 
             if online == "1":
-                with open(CONFIG_FILE_PATH, "r") as file:
-                    file_contents = file.read()
-                if f"@{MAX_REFRESH_RATE}" not in file_contents:
-                    sed(TO_MAX_REGEX, CONFIG_FILE_PATH)
-            elif online == "0" or (online is None):
-                sed(TO_MIN_REGEX, CONFIG_FILE_PATH)
+                set_min_refresh_rate()
+            else:
+                set_max_refresh_rate()
+
         if device.get_property("POWER_SUPPLY_CAPACITY_LEVEL") == "critical":
             subprocess.run(
                 [
@@ -61,8 +82,7 @@ def main():
 
     # Check the initial power status
     try:
-        check_initial_power_status(client)
-        time.sleep(2)  # fix file write race condition
+        check_initial_power_status()
     except Exception:
         print("initial check failed")
 
