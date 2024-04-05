@@ -54,6 +54,8 @@ text/x-patch=helix.desktop
 text/css=helix.desktop
 text/javascript=helix.desktop
 text/x-todo-txt=helix.desktop
+text/x-svsrc=helix.desktop
+text/x-verilog=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -105,3 +107,5 @@ text/x-patch=helix.desktop
 text/css=helix.desktop
 text/javascript=helix.desktop
 text/x-todo-txt=helix.desktop
+text/x-svsrc=helix.desktop
+text/x-verilog=helix.desktop
