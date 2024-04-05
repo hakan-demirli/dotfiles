@@ -19,6 +19,7 @@
         # https://connect.mozilla.org/t5/discussions/how-to-remove-the-3-dot-menu-on-firefox-suggest-drop-down-items/td-p/28339
         "browser.urlbar.resultMenu.keyboardAccessible" = false;
         # "widget.use-xdg-desktop-portal.file-picker" = 1;
+        "browser.tabs.tabmanager.enabled" = false;
         "network.trr.mode" = 2; # DOH
         # enable extensions in mozilla sites
         "extensions.webextensions.restrictedDomains" = "";
