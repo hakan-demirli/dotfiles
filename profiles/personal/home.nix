@@ -129,11 +129,16 @@
     "ga." = "git add .";
     ga = "git add";
     gd = "git diff";
+    gdc = "git diff --cached";
     gp = "git push";
+    gpf = "git push --force";
+    gr = "git restore";
+    grs = "git restore --staged";
     gs = "git status";
     gb = "fzf_git_branches";
     gc = "git commit";
     gcm = "git commit -m";
+    gca = "git commit --amend";
     gl = "fzf_git_commits";
 
     # ascp = "asusctl profile -p";
