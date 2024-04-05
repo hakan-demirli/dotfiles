@@ -133,6 +133,7 @@
     gp = "git push";
     gpf = "git push --force";
     gr = "git restore";
+    "gr." = "git restore .";
     grs = "git restore --staged";
     gs = "git status";
     gb = "fzf_git_branches";

@@ -25,7 +25,11 @@ logging.basicConfig(filename=(LOG_FILE_PATH), level=logging.INFO)
 
 # Replace all print statements with logging.info
 def sed(regex: str, path: str):
-    subprocess.run(["sed", "-i", regex, path])
+    command = ["sed", "-i", regex, path]
+    try:
+        subprocess.run(command)
+    except Exception as e:
+        print(f"[sed] command {command} failed: {e}")
 
 
 def set_min_refresh_rate():
@@ -57,17 +61,14 @@ def check_initial_power_status():
         with open(AC_STATUS_FILE_PATH, "r") as file:
             online = file.read()
             logging.info(f"[Initial check] power status is {online}")
-            try:
-                if 0 == int(online):
-                    set_min_refresh_rate()
-                    break
-                elif 1 == int(online):
-                    set_max_refresh_rate()
-                    break
-                else:
-                    logging.error(f"[Initial check] online status status is: {online}")
-            except Exception:
-                logging.error(f"[Initial check] {online} is not an integer.")
+            if 0 == int(online):
+                set_min_refresh_rate()
+                break
+            elif 1 == int(online):
+                set_max_refresh_rate()
+                break
+            else:
+                logging.error(f"[Initial check] online status status is: {online}")
         time.sleep(1)
 
 
