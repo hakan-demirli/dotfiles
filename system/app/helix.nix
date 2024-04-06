@@ -1,5 +1,12 @@
-{ lib, rustPlatform, git, installShellFiles, makeWrapper, fetchFromGitHub , callPackage}:
-
+{
+  lib,
+  rustPlatform,
+  git,
+  installShellFiles,
+  makeWrapper,
+  fetchFromGitHub,
+  callPackage,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "helix";
   version = "24.03-dev";
@@ -7,8 +14,8 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "helix-editor";
     repo = "helix";
-    rev = "190fbf66d462748e42e67b6bfe36f1ef28635c23";
-    sha256 = "sha256-JVWsv/pV91S7N2ZWlAHIzDa5YfGwGPDlnPw7H9nIH3Y=";
+    rev = "97afd67fca0b505600e5fbba7ca59f06a4eec3ff";
+    sha256 = "sha256-VQI36VVt6d5U0QHW3ZjFmlkyxsomrgqlF7Q1X26ElsY=";
   };
 
   cargoHash = "sha256-tM8qw+cPVrLpViFcb3LBXX5t+wGqOqsYTzaSdYYgykE=";
@@ -16,10 +23,10 @@ rustPlatform.buildRustPackage rec {
   # disable fetching and building of tree-sitter grammars in favor of the custom build process in grammars.nix
   env.HELIX_DISABLE_AUTO_GRAMMAR_BUILD = "1";
 
-  nativeBuildInputs = [ git installShellFiles makeWrapper ];
+  nativeBuildInputs = [git installShellFiles makeWrapper];
 
-  postInstall = let 
-    grammarPath = callPackage "${src}/grammars.nix" { };
+  postInstall = let
+    grammarPath = callPackage "${src}/grammars.nix" {};
   in ''
     # We self build the grammar files
     rm -r runtime/grammars
@@ -43,7 +50,6 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://helix-editor.com";
     license = licenses.mpl20;
     mainProgram = "hx";
-    maintainers = with maintainers; [ danth yusdacra zowoq ];
+    maintainers = with maintainers; [danth yusdacra zowoq];
   };
 }
-
