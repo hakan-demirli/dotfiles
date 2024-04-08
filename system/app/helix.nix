@@ -14,8 +14,8 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "helix-editor";
     repo = "helix";
-    rev = "97afd67fca0b505600e5fbba7ca59f06a4eec3ff";
-    sha256 = "sha256-VQI36VVt6d5U0QHW3ZjFmlkyxsomrgqlF7Q1X26ElsY=";
+    rev = "ea2a4858b7130d4c833eab00bd62b9b83d57d64c";
+    sha256 = "sha256-L+5JBEJ05Ea4on76+Jdh7xqXqhaCgQyt9deqcV4ynPE=";
   };
 
   cargoHash = "sha256-tM8qw+cPVrLpViFcb3LBXX5t+wGqOqsYTzaSdYYgykE=";
