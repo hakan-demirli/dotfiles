@@ -89,6 +89,14 @@
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
+      "amd_iommu=off"
+      "idle=nomwait"
+      "amdgpu.gpu_recovery=1"
+
+      "amd_pstate=active"
+
+      ''acpi_osi="Windows 2020"''
+
       "quiet"
       "mitigations=off"
     ];

@@ -213,7 +213,6 @@
       cudaSupport = true;
     })
     libnotify
-    yarr
 
     trash-cli
     unar

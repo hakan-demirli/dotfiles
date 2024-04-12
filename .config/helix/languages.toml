@@ -21,6 +21,10 @@ language-servers = ["nixd"]
 auto-format = true
 
 [[language]]
+name = "scala"
+auto-format = true
+
+[[language]]
 name = "html"
 formatter = { command = 'prettier', args = ["--parser", "html"] }
 
