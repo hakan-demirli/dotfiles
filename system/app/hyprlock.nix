@@ -1,21 +1,14 @@
 {pkgs}:
 pkgs.stdenv.mkDerivation (finalAttrs: {
   pname = "hyprlock";
-  version = "0.1.0-e9a57f0";
+  version = "0.3.0-6fa65e1";
 
   src = pkgs.fetchFromGitHub {
     owner = "hyprwm";
     repo = "hyprlock";
-    rev = "bc87adf9ec997090f15d9b662d6ca2f86e25f264";
-    hash = "sha256-rbzVe2WNdHynJrnyJsKOOrV8yuuJ7QIuah3ZHWERSnA=";
+    rev = "6fa65e1172d633e61ed957a49e7cf96010432623";
+    hash = "sha256-7ISUD6Z8FivTw/Db8tGJdiJeqpvJs7CSCwadopb1oro=";
   };
-
-  strictDeps = true;
-
-  patches = [
-    # remove PAM file install check
-    ./hyprlock_cmake.patch
-  ];
 
   nativeBuildInputs = [
     pkgs.cmake
@@ -34,8 +27,6 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
     pkgs.wayland
     pkgs.wayland-protocols
   ];
-
-  passthru.updateScript = pkgs.nix-update-script {};
 
   meta = {
     description = "Hyprland's GPU-accelerated screen locking utility";
