@@ -72,16 +72,15 @@
     dbus.enable = true;
     # services.asusd.enable = true;
     # services.asusd.enableUserService = true;
+    displayManager = {
+      sddm = {
+        enable = true;
+        theme = "${import ../../system/app/sddm-theme.nix {inherit pkgs;}}";
+      };
+    };
     xserver = {
       enable = true;
       excludePackages = [pkgs.xterm];
-
-      displayManager = {
-        sddm = {
-          enable = true;
-          theme = "${import ../../system/app/sddm-theme.nix {inherit pkgs;}}";
-        };
-      };
     };
   };
 
