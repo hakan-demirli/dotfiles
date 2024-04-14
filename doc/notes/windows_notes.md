@@ -270,6 +270,12 @@
 * **Windhawk**
     * The customization marketplace for Windows programs
 
+* **Tiling Manager**
+    * Komerabi
+      * Buggy
+    * GlazeWM
+      * Havent tried.
+
 * **Docker vscode instance**
     * Open WSL and go to a folder.
         * ```code .```

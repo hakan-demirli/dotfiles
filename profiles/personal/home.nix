@@ -171,8 +171,7 @@
     vim # default editor
     waybar
     kitty
-    # wofi
-    # j4-dmenu-desktop
+    anyrun
     firefox
     tor-browser
     (lf.overrideAttrs (oldAttrs: {
@@ -261,7 +260,6 @@
     (pkgs.callPackage ../../system/app/hyprlock.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
-    (pkgs.callPackage ../../system/app/anyrun.nix {})
     (pkgs.callPackage ../../system/app/veridian.nix {})
     (pkgs.callPackage ../../system/app/update_wp.nix {})
     (pkgs.callPackage ../../system/app/gtk_applet.nix {})
