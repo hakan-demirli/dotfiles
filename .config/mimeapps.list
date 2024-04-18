@@ -56,6 +56,7 @@ text/javascript=helix.desktop
 text/x-todo-txt=helix.desktop
 text/x-svsrc=helix.desktop
 text/x-verilog=helix.desktop
+text/rust=helix.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -109,3 +110,4 @@ text/javascript=helix.desktop
 text/x-todo-txt=helix.desktop
 text/x-svsrc=helix.desktop
 text/x-verilog=helix.desktop
+text/rust=helix.desktop
