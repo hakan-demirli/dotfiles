@@ -31,9 +31,6 @@
   };
   programs.bash = {
     enable = true;
-    sessionVariables = {
-      EDITOR = "hx";
-    };
     historyFile = "/home/${userSettings.username}/.config/.bash_history";
     historyFileSize = -1;
     historySize = -1;
@@ -114,6 +111,11 @@
 
   home.shellAliases = {
     ":q" = "exit";
+    ";q" = "exit";
+    "q;" = "exit";
+    "q:" = "exit";
+    ":wq" = "exit";
+    ";wq" = "exit";
     "hx." = "helix .";
     ".." = "cd ..";
     "c" = "clear";
@@ -272,7 +274,6 @@
 
   home.sessionVariables = rec {
     OPENER = "xdg-open";
-    # EDITOR = "hx";
     EDITOR = "hx";
     TERMINAL = "kitty";
     TERM = "kitty";
