@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+bash $(home-manager generations | fzf | awk -F '-> ' '{print $2 "/activate"}')
+
