@@ -111,11 +111,8 @@
 
   home.shellAliases = {
     ":q" = "exit";
-    ";q" = "exit";
-    "q;" = "exit";
     "q:" = "exit";
     ":wq" = "exit";
-    ";wq" = "exit";
     "hx." = "helix .";
     ".." = "cd ..";
     "c" = "clear";
