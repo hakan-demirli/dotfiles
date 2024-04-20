@@ -16,7 +16,7 @@ if [[ $file == *"$cachedir"* ]]; then
 fi
 
 file="$1"; shift
-cachekey=$(echo -n "$file $(stat -c %Y "$file")" | md5sum | cut -d ' ' -f 1)
+cachekey=$(echo -n "$file $(stat -c %Y "$file") $cache_width" | md5sum | cut -d ' ' -f 1)
 thumbnail="$cachedir/$cachekey.png"
 
 preview() {
@@ -26,7 +26,7 @@ preview() {
 generate_thumbnails() {
     folder=$(dirname "$1")
     for img in "$folder"/*.{avi,mp4,mkv,opus,jpg,jpeg,png,bmp}; do
-        img_cachekey=$(echo -n "$img $(stat -c %Y "$img")" | md5sum | cut -d ' ' -f 1)
+        img_cachekey=$(echo -n "$img $(stat -c %Y "$img") $cache_width" | md5sum | cut -d ' ' -f 1)
         img_thumbnail="$cachedir/$img_cachekey.png"
         if [ ! -f "$img_thumbnail" ]; then
             # No thumbnails for ginormous images:
@@ -45,7 +45,7 @@ function draw_clear {
 draw_clear
 
 if [ ! -f "$thumbnail" ]; then
-    case "$(basename "$file" | tr '[A-Z]' '[a-z]')" in
+    case "$(basename "$file" | tr '[:upper:]' '[:lower:]')" in
     *.tar*) tar tf "$file" ;;
     *.zip) unzip -l "$file" ;;
     *.rar) unrar l "$file" ;;
