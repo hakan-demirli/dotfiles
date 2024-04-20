@@ -6,8 +6,7 @@
 }: {
   imports = [
     ../../system/hardware/asustuf/hardware-configuration.nix
-    # ../../system/hardware/asustuf/nvidia.nix
-    ../../system/hardware/asustuf/nvidia-disable.nix
+    ../../system/hardware/asustuf/nvidia.nix
     ../../system/hardware/battery.nix
     ../../system/hardware/virtualisation.nix
     ../../system/hardware/locale.nix
