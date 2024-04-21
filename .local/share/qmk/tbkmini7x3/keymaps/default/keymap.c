@@ -67,85 +67,94 @@ enum layers {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // clang-format off
     [QWERTY] = LAYOUT(
-           KC_TAB,     KC_Q,       KC_W,       KC_E,        KC_R,          KC_T,         XXXXXXX,
-           KC_ESC,     GUI_A,      ALT_S,      SFT_D,       CTL_F,         KC_G,         LT(NUM_RIGHT, KC_SPC),
-           XXXXXXX,    KC_Z,       KC_X,       KC_C,        KC_V,          KC_B,         MO(SYM_RIGHT),
-        // Mirrored
-           KC_BSPC,    KC_P,       KC_O,       KC_I,        KC_U,          KC_Y,         XXXXXXX,
-           KC_ENT,     GUI_SCLN,   ALT_L,      SFT_K,       CTL_J ,        KC_H,         MO(NUM_LEFT),
-           XXXXXXX,    KC_SLSH,    KC_DOT,     KC_COMM,     KC_M,          KC_N,         MO(SYM_LEFT)
+        // Left
+           KC_TAB,        KC_Q,       KC_W,       KC_E,        KC_R,          KC_T,         XXXXXXX,
+           KC_ESC,        GUI_A,      ALT_S,      SFT_D,       CTL_F,         KC_G,         LT(NUM_RIGHT, KC_SPC),
+           XXXXXXX,       KC_Z,       KC_X,       KC_C,        KC_V,          KC_B,         MO(SYM_RIGHT),
+        // Right
+           XXXXXXX,       KC_Y,       KC_U,       KC_I,        KC_O,          KC_P,         KC_BSPC,
+           MO(NUM_LEFT),  KC_H,       CTL_J,      SFT_K,       ALT_L,         GUI_SCLN,     KC_ENT,
+           MO(SYM_LEFT),  KC_N,       KC_M,       KC_COMM,     KC_DOT,        KC_SLSH,      XXXXXXX
         ),
     [QWERTY_LEFT] = LAYOUT(
-           KC_TAB,     KC_Q,       KC_W,       KC_E,        KC_R,          KC_T,         XXXXXXX,
-           KC_ESC,     KC_A,       KC_S,       KC_D,        KC_F,          KC_G,         LT(NUM_RIGHT, KC_SPC),
-           XXXXXXX,    KC_Z,       KC_X,       KC_C,        KC_V,          KC_B,         MO(SYM_RIGHT),
-        // Mirrored
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      MO(NUM_LEFT),
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      MO(SYM_LEFT)
+        // Left
+           KC_TAB,        KC_Q,       KC_W,       KC_E,        KC_R,          KC_T,         XXXXXXX,
+           KC_ESC,        KC_A,       KC_S,       KC_D,        KC_F,          KC_G,         LT(NUM_RIGHT, KC_SPC),
+           XXXXXXX,       KC_Z,       KC_X,       KC_C,        KC_V,          KC_B,         MO(SYM_RIGHT),
+        // Right
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,        XXXXXXX,      XXXXXXX,
+           MO(NUM_LEFT),  XXXXXXX,    KC_LCTL,    KC_LSFT,    KC_LALT,        KC_LGUI,      XXXXXXX,
+           MO(SYM_LEFT),  XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,        XXXXXXX,      XXXXXXX
         ),
     [QWERTY_RIGHT] = LAYOUT(
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      LT(NUM_RIGHT, KC_SPC),
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      MO(SYM_RIGHT),
-        // Mirrored
-           KC_BSPC,    KC_P,       KC_O,       KC_I,        KC_U,          KC_Y,         XXXXXXX,
-           KC_ENT,     KC_SCLN,    KC_L,       KC_K,        KC_J,          KC_H,         MO(NUM_LEFT),
-           XXXXXXX,    KC_SLSH,    KC_DOT,     KC_COMM,     KC_M,          KC_N,         MO(SYM_LEFT)
+        // Left
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,       KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      LT(NUM_RIGHT, KC_SPC),
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      MO(SYM_RIGHT),
+        // Right
+           XXXXXXX,       KC_Y,       KC_U,       KC_I,        KC_O,          KC_P,         KC_BSPC,
+           MO(NUM_LEFT),  KC_H,       KC_J,       KC_K,        KC_L,          KC_SCLN,      KC_ENT,
+           MO(SYM_LEFT),  KC_N,       KC_M,       KC_COMM,     KC_DOT,        KC_SLSH,      XXXXXXX
         ),
     [NUM_LEFT] = LAYOUT(
-           QK_BOOT,    XXXXXXX,    KC_7,       KC_8,        KC_9,          KC_0,         XXXXXXX,
-           XXXXXXX,    XXXXXXX,    KC_4,       KC_5,        KC_6,          XXXXXXX,      MO(FUN_RIGHT),
-           XXXXXXX,    XXXXXXX,    KC_1,       KC_2,        KC_3,          XXXXXXX,      XXXXXXX,
-        // Mirrored
-           KC_BSPC,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
+        // Left
+           QK_BOOT,       XXXXXXX,    KC_7,       KC_8,        KC_9,          KC_0,         XXXXXXX,
+           XXXXXXX,       XXXXXXX,    KC_4,       KC_5,        KC_6,          XXXXXXX,      LT(FUN_RIGHT, KC_SPC),
+           XXXXXXX,       XXXXXXX,    KC_1,       KC_2,        KC_3,          XXXXXXX,      XXXXXXX,
+        // Right
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      KC_BSPC,
+           _______,       XXXXXXX,    KC_LCTL,    KC_LSFT,     KC_LALT,       KC_LGUI,      XXXXXXX,
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
     [NUM_RIGHT] = LAYOUT(
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-        // Mirrored
-           KC_DEL,     KC_PASTE,   XXXXXXX,    VUP,         VDOWN,         MUTE,         XXXXXXX,
-           MMUTE,      KC_PSCR,    KC_RIGHT,   KC_UP,       KC_DOWN,       KC_LEFT,      MO(FUN_RIGHT),
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    BUP,         BDOWN,         BOFF,         XXXXXXX
+        // Left
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,       KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+        // Right
+           XXXXXXX,       MUTE,       VDOWN,      VUP,         XXXXXXX,       KC_PASTE,     KC_DEL,
+           MO(FUN_RIGHT), KC_LEFT,    KC_DOWN,    KC_UP,       KC_RIGHT,      KC_PSCR,      XXXXXXX,
+           XXXXXXX,       MMUTE,      BDOWN,      BUP,         BOFF,          XXXXXXX,      XXXXXXX
         ),
     [SYM_LEFT] = LAYOUT(
-           XXXXXXX,    XXXXXXX,    KC_AMPR,    KC_ASTR,     KC_CIRC,       KC_AT,        XXXXXXX,
-           XXXXXXX,    KC_EXCLAIM, KC_KP_MINUS,KC_KP_PLUS,  KC_KP_EQUAL,   KC_HASH,      XXXXXXX,
-           XXXXXXX,    KC_BSLS,    KC_TILD,    KC_GRAVE,    KC_PERC,       KC_PIPE,      MO(FUN_LEFT),
-        // Mirrored
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      _______
+        // Left
+           XXXXXXX,       XXXXXXX,    KC_AMPR,    KC_ASTR,     KC_CIRC,       KC_AT,        XXXXXXX,
+           XXXXXXX,       KC_EXCLAIM, KC_KP_MINUS,KC_KP_PLUS,  KC_KP_EQUAL,   KC_HASH,      XXXXXXX,
+           XXXXXXX,       KC_BSLS,    KC_TILD,    KC_GRAVE,    KC_PERC,       KC_PIPE,      MO(FUN_LEFT),
+        // Right
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,       XXXXXXX,    KC_LCTL,    KC_LSFT,     KC_LALT,       KC_LGUI,      XXXXXXX,
+           _______,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
     [SYM_RIGHT] = LAYOUT(
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      _______,
-        // Mirrored
-           KC_UNDS,    XXXXXXX,    KC_DOLLAR,  KC_RCBR,     KC_LCBR,       KC_QUOT,      XXXXXXX,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_RPRN,     KC_LPRN,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_RBRC,     KC_LBRC,       KC_DQUO,      MO(FUN_LEFT)
+        // Left
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,       KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      _______,
+        // Right
+           XXXXXXX,       KC_QUOT,    KC_LCBR,    KC_RCBR,     KC_DOLLAR,     XXXXXXX,      KC_UNDS,
+           XXXXXXX,       XXXXXXX,    KC_LPRN,    KC_RPRN,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           MO(FUN_LEFT),  KC_DQUO,    KC_LBRC,    KC_RBRC,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
     [FUN_LEFT] = LAYOUT(
-           XXXXXXX,    XXXXXXX,    KC_F7,       KC_F8,        KC_F9,       KC_F10,       XXXXXXX,
-           XXXXXXX,    XXXXXXX,    KC_F4,       KC_F5,        KC_F6,       KC_F11,       _______,
-           XXXXXXX,    XXXXXXX,    KC_F1,       KC_F2,        KC_F3,       KC_F12,       XXXXXXX,
-        // Mirrored
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    KC_LALT,    KC_LSFT,     KC_LCTL,       XXXXXXX,      _______,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
+        // Left
+           XXXXXXX,       XXXXXXX,    KC_F7,       KC_F8,        KC_F9,       KC_F10,       XXXXXXX,
+           XXXXXXX,       XXXXXXX,    KC_F4,       KC_F5,        KC_F6,       KC_F11,       _______,
+           XXXXXXX,       XXXXXXX,    KC_F1,       KC_F2,        KC_F3,       KC_F12,       XXXXXXX,
+        // Right
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           _______,       XXXXXXX,    KC_LCTL,    KC_LSFT,     KC_LALT,       KC_LGUI,      XXXXXXX,
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
     [FUN_RIGHT] = LAYOUT(
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    KC_LGUI,    XXXXXXX,    KC_MS_BTN2,  KC_MS_BTN1,    XXXXXXX,      _______,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_MS_WH_UP, KC_MS_WH_DOWN, XXXXXXX,      XXXXXXX,
-        // Mirrored
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
-           XXXXXXX,    XXXXXXX,    KC_MS_RIGHT,KC_MS_UP,    KC_MS_DOWN,    KC_MS_LEFT,   _______,
-           XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
+        // Left
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           XXXXXXX,       KC_LGUI,    XXXXXXX,    KC_MS_BTN2,  KC_MS_BTN1,    XXXXXXX,      _______,
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    KC_MS_WH_UP, KC_MS_WH_DOWN, XXXXXXX,      XXXXXXX,
+        // Right
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX,
+           _______,       KC_MS_LEFT, KC_MS_DOWN, KC_MS_UP,    KC_MS_RIGHT,   XXXXXXX,      XXXXXXX,
+           XXXXXXX,       XXXXXXX,    XXXXXXX,    XXXXXXX,     XXXXXXX,       XXXXXXX,      XXXXXXX
         ),
     // clang-format on
 };

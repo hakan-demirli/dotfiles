@@ -1,2 +1,3 @@
 **qmk_firmware/
 **.direnv/
+!*/info.json
