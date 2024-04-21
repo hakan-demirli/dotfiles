@@ -301,28 +301,17 @@
     KIVY_HOME = "$XDG_CONFIG_HOME/kivy";
     PYTHONPYCACHEPREFIX = "$XDG_CACHE_HOME/python";
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
+    PYTHON_HISTORY = "$XDG_STATE_HOME/python/history";
     GOPATH = "$XDG_CACHE_HOME/go";
     _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot=\"$XDG_CONFIG_HOME\"/java'';
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
     # Breaks neovim
-    # VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
+    VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 
     PDK_ROOT = "$HOME/.local/share/pdk";
-
-    # TODO Are these in use?
-    MY_WALLPAPERS_DIR = "/mnt/second/images/art/wallpapers_pc";
-    MY_GTASKS_OVERLAY_FILE = "/tmp/tasks_overlay.png";
-    MY_ICS_OVERLAY_FILE = "/tmp/calendar_overlay.png";
-    MY_FONT_FILE = "/mnt/second/fonts/anonymous.ttf";
-    MY_PLAYLIST_FILE = "/mnt/second/playlists.txt";
-    MY_MTD_OVERLAY_FILE = "/tmp/mtd_overlay.png";
-    MY_OVERLAYED_FILE = "/tmp/overlayed.png";
-    MY_ICS_FILE = "/tmp/calendar_events.ics";
-    MY_MUSIC_DIR = "/mnt/second/music";
-    MY_GTASKS_FILE = "/tmp/tasks.md";
   };
 
   programs.gpg.homedir = "${config.xdg.dataHome}/gnupg";
