@@ -108,7 +108,7 @@
     "reverse-scrolling": 1
   },
   "battery": { // 6 space max size preoccupied
-    "format": "        \n{capacity}% {icon}\n{time}",
+    "format": "\n{capacity}% {icon}\n{time}",
     "format-icons": {
       "default": [
         "",
