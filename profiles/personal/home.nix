@@ -94,7 +94,7 @@
   qt = {
     enable = true;
     #useGtkTheme = true;
-    platformTheme = "gtk";
+    platformTheme.name = "gtk";
   };
   # # requires hardware.uinput.enable = true;
   services.xremap = {
@@ -199,7 +199,7 @@
     swaynotificationcenter
 
     playerctl
-    # swww
+    swww
     mpv
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
     ripgrep
@@ -256,7 +256,6 @@
     # (pkgs.callPackage ../../system/app/tt.nix {})
     (pkgs.callPackage ../../system/app/waybar_timer.nix {})
     (pkgs.callPackage ../../system/app/helix.nix {})
-    (pkgs.callPackage ../../system/app/swww.nix {})
     (pkgs.callPackage ../../system/app/hyprlock.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
