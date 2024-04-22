@@ -90,7 +90,7 @@ keymap:
       Alt-s: KEY_4
       Alt-d: KEY_5
       Alt-f: KEY_6
-      Alt-g: reserved 
+      # Alt-g: reserved # tmux prefix
 
       # Alt-z: open browser
       Alt-x: KEY_1

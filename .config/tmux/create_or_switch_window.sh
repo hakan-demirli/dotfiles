@@ -2,12 +2,9 @@
 
 WINDOW_NUM="$1"
 
-# Check if the window exists
-if ! tmux list-windows -F '#I' | grep -q "^$WINDOW_NUM$"; then
-    # If it doesn't exist, create a new window
-    tmux new-window -n "Alt-$WINDOW_NUM"
-fi
+# Ignore errors by redirecting stderr to /dev/null
+tmux select-window -t "$WINDOW_NUM" 2>/dev/null
+tmux new-window -t "$WINDOW_NUM" 2>/dev/null
 
-# Switch to the specified window
-tmux select-window -t "$WINDOW_NUM"
-tmux select-pane -t 0
+# Ensure the script always returns a success status
+exit 0
