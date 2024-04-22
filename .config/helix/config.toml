@@ -13,6 +13,12 @@ K = [
   "move_line_up",
   "paste_before",
 ]
+L = "join_selections"
+C-u = ["page_cursor_half_up", "align_view_center"]
+C-d = ["page_cursor_half_down","align_view_center"]
+"A-n" = "expand_selection"
+"A-b" = "shrink_selection"
+
 # j = "move_line_down"
 # k = "move_line_up"
 # "(" = "switch_to_lowercase"

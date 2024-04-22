@@ -11,8 +11,8 @@ mkdir -p "$cachedir"
 
 # Check if the file path contains the cache directory
 if [[ $file == *"$cachedir"* ]]; then
-  echo "Error: No preview allowed in the cache directory due to recursion problem."
-  exit 127
+    echo "Error: No preview allowed in the cache directory due to recursion problem."
+    exit 127
 fi
 
 file="$1"; shift
@@ -32,7 +32,7 @@ generate_thumbnails() {
             # No thumbnails for ginormous images:
             # BUG: https://video.stackexchange.com/questions/28408/how-to-fix-ffmpeg-picture-size-32768x16384-is-invalid
             ffmpeg -y -i "$img" -vframes 1 -vf "scale=${cache_width}:-1" "$img_thumbnail" &
-		        # ffmpeg -y -i "$file" -vframes 1 -vf "scale=${w}0:-1" "$thumbnail"
+            # ffmpeg -y -i "$file" -vframes 1 -vf "scale=${w}0:-1" "$thumbnail"
         fi
     done
     wait

@@ -105,14 +105,14 @@ cmd zip ${{
 }}
 
 cmd extract ${{
-	folder_name="${fx%.*}"  # Extracts the folder name without the extension
-	mkdir -p "$folder_name" # Create the folder if it doesn't exist
-	unar "$fx" -o "$folder_name"
+  folder_name="${fx%.*}"  # Extracts the folder name without the extension
+  mkdir -p "$folder_name" # Create the folder if it doesn't exist
+  unar "$fx" -o "$folder_name"
 }}
 
 
 cmd follow_link %{{
-	lf -remote "send ${id} select \"$(readlink $f)\""
+  lf -remote "send ${id} select \"$(readlink $f)\""
 }}
 
 
@@ -125,14 +125,14 @@ cmd music ${{
 cmd ripdrag %ripdrag -a -x $fx
 
 cmd mount_mtp ${{
-    umount /tmp/amtp
-	mkdir -p /tmp/amtp 
-	aft-mtp-mount /tmp/amtp 
+  umount /tmp/amtp
+  mkdir -p /tmp/amtp
+  aft-mtp-mount /tmp/amtp
 }}
 
 
 cmd yank_path &{{
-	printf "%s" "${f}" | wl-copy
+  printf "%s" "${f}" | wl-copy
 }}
 
 
@@ -155,7 +155,7 @@ cmd q quit
 map y copy
 map c cut
 map p paste
-map x :toggle;down  
+map x :toggle;down
 map <esc>   :unselect; clear
 
 # map m music
