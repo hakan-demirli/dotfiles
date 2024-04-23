@@ -19,14 +19,28 @@ C-d = ["page_cursor_half_down","align_view_center"]
 "A-n" = "expand_selection"
 "A-b" = "shrink_selection"
 
+# Harpoon
+"C-h" = ":pipe-to helix_harpoon_add"
+"C-n" = ":pipe-to helix_harpoon_edit"
+"C-j" = ":pipe-to helix_harpoon_switch 1"
+"C-k" = ":pipe-to helix_harpoon_switch 2"
+"C-l" = ":pipe-to helix_harpoon_switch 3"
+"C-;" = ":pipe-to helix_harpoon_switch 4"
+
+
 # j = "move_line_down"
 # k = "move_line_up"
 # "(" = "switch_to_lowercase"
 # ")" = "switch_to_uppercase"
 
 [keys.normal.space]
-# g = ":pipe-to tmux split-window -h helix-live-grep"
-"/" = ":pipe-to live-grep-in-split-tmux"
+"/" = [":pipe-to helix_harpoon_update",":pipe-to live-grep-in-split-tmux"]
+"f" = [":pipe-to helix_harpoon_update","file_picker"]
+"F" = [":pipe-to helix_harpoon_update","file_picker_in_current_directory"]
+"b" = [":pipe-to helix_harpoon_update","buffer_picker"]
+
+"l" = ":pipe-to helix-harpoon"
+
 [keys.normal.g]
 l = ["collapse_selection", "extend_to_line_end"]
 h = ["collapse_selection", "extend_to_line_start"]
@@ -39,6 +53,13 @@ s = [
 # a = ["save_selection"]
 # j = ["jump_forward"]
 # k = ["jump_backward"]
+
+# Harpoon
+"n" = [":pipe-to helix_harpoon_update","goto_next_buffer"]
+"p" = [":pipe-to helix_harpoon_update","goto_previous_buffer"]
+"d" = [":pipe-to helix_harpoon_update","goto_definition"]
+"y" = [":pipe-to helix_harpoon_update","goto_type_definition"]
+"r" = [":pipe-to helix_harpoon_update","goto_reference"]
 
 [keys.select]
 y = "yank_main_selection_to_clipboard"

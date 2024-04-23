@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+source helix_harpoon_parse
+
+tmux display-popup -w 80% -E "hx $data_file"
+

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+source helix_harpoon_parse
+
+idx=$1
+
+buffer_to_switch=$(sed -n "${idx}p" "$data_file")
+
+# shorten the path. tmux send-keys is slow
+relative_path=$(realpath --relative-to="$pwd" "$buffer_to_switch")
+
+tmux send-keys -t 0 ":o $relative_path" C-m
