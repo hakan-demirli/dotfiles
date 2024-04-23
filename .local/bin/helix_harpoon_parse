@@ -24,30 +24,3 @@ touch "$data_file"
 # echo "Cursor Column: $cursor_col" >> output.txt
 # echo "Cursor Row: $cursor_row" >> output.txt
 
-
-: '
-gn/p:
-  update current cursor position with path
-  helix_harpoon_update_buffer.sh
-
-spacef:
-  update current cursor position with path
-  helix_harpoon_update_buffer.sh
-
-ctrl+h:
-  save current buffer to harpoon
-  helix_harpoon_add_buffer.sh
-
-ctrl+jkl;:
-  switch to specific buffer, first arg is index
-  helix_harpoon_switch_buffer.sh <idx>
-
-
-prefix+h:
-  harpoon editor in floating helix
-  helix_harpoon_edit.sh
-
-harpoon list is saved based on pwd.
-Each list is stored at:
-~/.cache/helix_harpoon/<pwd_hash>.txt
-'
