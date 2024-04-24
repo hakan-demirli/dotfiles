@@ -1,33 +1,36 @@
 #!/usr/bin/env bash
 
+# Get tmux information
+read -r tmux_session tmux_window tmux_pane tmux_command <<< "$(tmux display-message -p '#{session_name} #{window_id} #{pane_id} #{pane_current_command}')"
 
+# Get helix information
 status_line=$(tmux capture-pane -pS -  | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)\s+[\x{2800}-\x{28FF}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
-buffer_path=$(echo "$status_line" | awk '{ print $1}')
+read -r buffer_path cursor_row cursor_col <<< "$status_line"
+
+# Convert ~ to $HOME
 if [[ "$buffer_path" == ~* ]]; then
   buffer_path="${buffer_path/#\~/$HOME}"
 fi
+
 buffer_path=$(realpath "$buffer_path")  # Convert filename to absolute path
-cursor_col=$(echo "$status_line" | awk '{ print $3}')
-cursor_row=$(echo "$status_line" | awk '{ print $2}')
 
 pwd=$(pwd)
-pwd_hash=$(echo -n "$PWD" | md5sum | awk '{ print $1 }')
-basedir=$(dirname "$buffer_path")
-basename=$(basename "$buffer_path")
-basename_without_extension="${basename%.*}"
-extension="${buffer_path##*.}"
+pwd_hash=$(echo -n "$pwd" | md5sum | awk '{ print $1 }')
+# basedir=$(dirname "$buffer_path")
+# basename=$(basename "$buffer_path")
+# basename_without_extension="${basename%.*}"
+# extension="${buffer_path##*.}"
 
 cache_dir="$HOME/.cache/helix_harpoon"
-data_file="$HOME/.cache/helix_harpoon/$pwd_hash.txt"
-log_file="$HOME/.cache/helix_harpoon/$pwd_hash.log"
+data_file="$cache_dir/$pwd_hash.json"
+log_file="$cache_dir/$pwd_hash.log"
 
 mkdir -p "$cache_dir"
-touch "$data_file"
 
 # Remove empty lines from the data_file
 sed -i '/^$/d' "$data_file"
 
-# # debug
+# debug
 # {
 #   echo "status_line: $status_line";
 #   echo "buffer_path: $buffer_path";

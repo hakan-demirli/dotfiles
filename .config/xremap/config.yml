@@ -42,7 +42,7 @@ keymap:
       Shift-Alt-dot: reserved
       Shift-Alt-slash: reserved
 
-      Alt-y: reserved
+      # Alt-y: reserved # tmux prefix
       # Alt-u: tmux tab 1
       # Alt-i: tmux tab 2
       # Alt-o: tmux tab 3
@@ -90,7 +90,7 @@ keymap:
       Alt-s: KEY_4
       Alt-d: KEY_5
       Alt-f: KEY_6
-      # Alt-g: reserved # tmux prefix
+      # Alt-g: reserved # tmux harpoon add key
 
       # Alt-z: open browser
       Alt-x: KEY_1

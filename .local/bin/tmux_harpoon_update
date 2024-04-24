@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+source tmux_harpoon_parse
+
+# Check if the buffer_path already exists in the data_file
+if grep -q "^$buffer_path:" "$data_file"; then
+  # Update the cursor position of the existing specific file
+  sed -i "s|^\($buffer_path\):\([^:]*\):\([^,]*\)|\1:$cursor_row:$cursor_col|" "$data_file"
+fi

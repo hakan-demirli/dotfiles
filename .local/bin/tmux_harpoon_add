@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+source tmux_harpoon_parse
+
+# Check if the buffer_path already exists in the data_file
+if grep -q "^$buffer_path:" "$data_file"; then
+  tmux_harpoon_update
+else
+  echo "$buffer_path:$cursor_row:$cursor_col,$tmux_pane,$tmux_window,$tmux_session,$tmux_command" >> "$data_file"
+fi

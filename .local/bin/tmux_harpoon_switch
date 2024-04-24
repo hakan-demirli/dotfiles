@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+source tmux_harpoon_parse
+tmux_harpoon_update
+
+idx=$1
+editor_command="hx"
+
+hook_to_switch=$(sed -n "${idx}p" "$data_file")
+
+# Parse the hook_to_switch to get path, col, row, tmux_session, tmux_window, and tmux_pane
+IFS=':, ' read -r path col row tmux_pane tmux_window tmux_session tmux_command <<< "$hook_to_switch"
+
+# shorten the path. tmux send-keys is slow
+relative_path=$(realpath --relative-to="$pwd" "$path")
+
+# # debug
+# {
+#   echo "path: $path";
+#   echo "col: $col";
+#   echo "row: $row";
+#   echo "pane: $tmux_pane";
+#   echo "win: $tmux_window";
+#   echo "ses: $tmux_session";
+#   echo "com: $tmux_command";
+# } > "$log_file"
+
+# Check if editor_command is in tmux_command and tmux_window is not empty
+if [[ "$tmux_command" == *"$editor_command"* ]] && [[ -n "$tmux_window" ]]; then
+  tmux select-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+
+  tmux send-keys -t "$tmux_session:$tmux_window.$tmux_pane" ":o $relative_path:$col:$row" C-m
+elif [[ -n "$tmux_window" ]]; then
+  tmux select-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+  tmux new-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+fi
+
+exit 0

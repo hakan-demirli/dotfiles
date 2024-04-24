@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-source helix_harpoon_parse
-
-# Check if the file exists in the cache
-if grep -q "$buffer_path" "$data_file"; then
-  # Update the cursor position of the existing specific file
-  sed -i "s|^\($buffer_path\):.*|\1:$cursor_row:$cursor_col|" "$data_file"
-fi
