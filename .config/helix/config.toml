@@ -78,5 +78,5 @@ enable = true
 
 [editor.statusline]
 # left = ["mode", "spinner"]
-center = ["file-name", "primary-selection-length"]
+center = ["primary-selection-length"]
 # right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
