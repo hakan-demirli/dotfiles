@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
-source tmux_harpoon_parse
 tmux_harpoon_update
 
 idx=$1
 editor_command="hx"
 
+tmux_cwd=$(pwd)
+tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
+cache_dir="$HOME/.cache/tmux_harpoon"
+data_file="$cache_dir/$tmux_cwd_hash.json"
+
 hook_to_switch=$(sed -n "${idx}p" "$data_file")
+if [[ -z "$hook_to_switch" ]]; then
+  exit 0
+fi
 
 # Parse the hook_to_switch to get path, col, row, tmux_session, tmux_window, and tmux_pane
-IFS=':, ' read -r path col row tmux_pane tmux_window tmux_session tmux_command <<< "$hook_to_switch"
+IFS=':, ' read -r path col row tmux_pane tmux_window tmux_session tmux_command tmux_pane_path <<< "$hook_to_switch"
 
 # shorten the path. tmux send-keys is slow
-relative_path=$(realpath --relative-to="$pwd" "$path")
+relative_path=$(realpath --relative-to="$tmux_pane_path" "$path")
 
 # # debug
+# log_file="$cache_dir/$tmux_cwd_hash.log"
 # {
 #   echo "path: $path";
 #   echo "col: $col";
@@ -22,16 +30,21 @@ relative_path=$(realpath --relative-to="$pwd" "$path")
 #   echo "win: $tmux_window";
 #   echo "ses: $tmux_session";
 #   echo "com: $tmux_command";
+#   echo "ppath: $tmux_pane_path";
+#   echo "rpath: $relative_path";
+#   echo "tpath: $relative_patht";
 # } > "$log_file"
 
 # Check if editor_command is in tmux_command and tmux_window is not empty
 if [[ "$tmux_command" == *"$editor_command"* ]] && [[ -n "$tmux_window" ]]; then
+  # tmux new-window -a -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
   tmux select-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
 
   tmux send-keys -t "$tmux_session:$tmux_window.$tmux_pane" ":o $relative_path:$col:$row" C-m
 elif [[ -n "$tmux_window" ]]; then
   tmux select-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
   tmux new-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+  # tmux new-window -a -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
 fi
 
 exit 0

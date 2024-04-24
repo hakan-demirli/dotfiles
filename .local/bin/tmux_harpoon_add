@@ -1,9 +1,38 @@
 #!/usr/bin/env bash
-source tmux_harpoon_parse
+
+tmux_cwd=$(pwd)
+tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
+cache_dir="$HOME/.cache/tmux_harpoon"
+data_file="$cache_dir/$tmux_cwd_hash.json"
+
+# Get helix information
+status_line=$(tmux capture-pane -pS -  | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)\s+[\x{2800}-\x{28FF}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
+read -r buffer_path cursor_row cursor_col <<< "$status_line"
+
+# Get tmux information
+read -r tmux_session tmux_window tmux_pane tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name} #{window_id} #{pane_id} #{pane_current_command} #{pane_current_path}')"
+
+# Assign default values if buffer_path, cursor_row, and cursor_col are empty
+: "${buffer_path:="default_path"}"
+: "${cursor_row:="0"}"
+: "${cursor_col:="0"}"
+
+if [[ "$buffer_path" == ~* ]]; then
+  buffer_path="${buffer_path/#\~/$HOME}"
+fi
+
+# If buffer_path is just a filename, prepend tmux_pane_path
+if [[ "$buffer_path" != /* ]]; then
+  buffer_path="$tmux_pane_path/$buffer_path"
+else
+  buffer_path=$(realpath "$buffer_path")
+fi
+
+
 
 # Check if the buffer_path already exists in the data_file
 if grep -q "^$buffer_path:" "$data_file"; then
   tmux_harpoon_update
 else
-  echo "$buffer_path:$cursor_row:$cursor_col,$tmux_pane,$tmux_window,$tmux_session,$tmux_command" >> "$data_file"
+  echo "$buffer_path:$cursor_row:$cursor_col,$tmux_pane,$tmux_window,$tmux_session,$tmux_command,$tmux_pane_path" >> "$data_file"
 fi

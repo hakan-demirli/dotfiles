@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
-source tmux_harpoon_parse
+
+tmux_cwd=$(pwd)
+tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
+cache_dir="$HOME/.cache/tmux_harpoon"
+data_file="$cache_dir/$tmux_cwd_hash.json"
+
+# Get helix information
+status_line=$(tmux capture-pane -pS -  | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)\s+[\x{2800}-\x{28FF}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
+read -r buffer_path cursor_row cursor_col <<< "$status_line"
 
 # Check if the buffer_path already exists in the data_file
 if grep -q "^$buffer_path:" "$data_file"; then
