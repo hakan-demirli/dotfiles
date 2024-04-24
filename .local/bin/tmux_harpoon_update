@@ -9,6 +9,20 @@ data_file="$cache_dir/$tmux_cwd_hash.json"
 status_line=$(tmux capture-pane -pS -  | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)\s+[\x{2800}-\x{28FF}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
 read -r buffer_path cursor_row cursor_col <<< "$status_line"
 
+# Get tmux information
+read -r tmux_pane_path <<< "$(tmux display-message -p '#{pane_current_path}')"
+
+if [[ "$buffer_path" == ~* ]]; then
+  buffer_path="${buffer_path/#\~/$HOME}"
+fi
+
+# If buffer_path is just a filename, prepend tmux_pane_path
+if [[ "$buffer_path" != /* ]]; then
+  buffer_path="$tmux_pane_path/$buffer_path"
+else
+  buffer_path=$(realpath "$buffer_path")
+fi
+
 # Check if the buffer_path already exists in the data_file
 if grep -q "^$buffer_path:" "$data_file"; then
   # Update the cursor position of the existing specific file
