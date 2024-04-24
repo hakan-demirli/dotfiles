@@ -20,14 +20,13 @@ C-d = ["page_cursor_half_down","align_view_center"]
 "A-b" = "shrink_selection"
 
 # Harpoon
-# These bindings only make sense if you consider the xremap config.
 "C-h" = ":pipe-to helix_harpoon_add"
 "C-n" = ":pipe-to helix_harpoon_edit"
 "C-j" = [":pipe-to helix_harpoon_update",":pipe-to helix_harpoon_switch 1"]
 "C-k" = [":pipe-to helix_harpoon_update",":pipe-to helix_harpoon_switch 2"]
 "C-l" = [":pipe-to helix_harpoon_update",":pipe-to helix_harpoon_switch 3"]
-# https://stackoverflow.com/questions/30680362/how-to-use-ctrl-semicolon-for-prefix-in-tmux
-"S-A-;" = [":pipe-to helix_harpoon_update",":pipe-to helix_harpoon_switch 4"]
+"C-;" = [":pipe-to helix_harpoon_update",":pipe-to helix_harpoon_switch 4"]
+
 
 # j = "move_line_down"
 # k = "move_line_up"

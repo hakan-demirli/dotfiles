@@ -1,6 +1,4 @@
 default_mode: insert
-# To Test/See key presses:
-#    nix run nixpkgs#wev
 
 # virtual_modifiers:
 #   - KEY_F19
@@ -36,7 +34,7 @@ keymap:
       Shift-Alt-j: KEY_KPLEFTPAREN
       Shift-Alt-k: KEY_KPRIGHTPAREN
       Shift-Alt-l: KEY_END
-      # Shift-Alt-KEY_SEMICOLON: reserved # harpoon tmux
+      Shift-Alt-KEY_SEMICOLON: reserved
 
       Shift-Alt-n: Shift-KEY_APOSTROPHE
       Shift-Alt-m: KEY_LEFTBRACE
@@ -50,22 +48,13 @@ keymap:
       # Alt-o: tmux tab 3
       # Alt-p: tmux tab 4
 
-      KEY_LEFTALT-h: KEY_LEFT
-      KEY_LEFTALT-j: KEY_DOWN
-      KEY_LEFTALT-k: KEY_UP
-      KEY_LEFTALT-l: KEY_RIGHT
-      # Alt-KEY_SEMICOLON: reserved # workspace 4
+      Alt-h: KEY_LEFT
+      Alt-j: KEY_DOWN
+      Alt-k: KEY_UP
+      Alt-l: KEY_RIGHT
+      Alt-KEY_SEMICOLON: reserved
 
-      # Harpoon bindings for helix using ALT_R
-      KEY_RIGHTALT-h: Ctrl-h
-      KEY_RIGHTALT-n: Ctrl-n
-      KEY_RIGHTALT-j: Ctrl-j
-      KEY_RIGHTALT-k: Ctrl-k
-      KEY_RIGHTALT-l: Ctrl-l
-      KEY_RIGHTALT-KEY_SEMICOLON: Shift-Alt-KEY_SEMICOLON
-      # https://stackoverflow.com/questions/30680362/how-to-use-ctrl-semicolon-for-prefix-in-tmux
-
-      # Alt-n: reserved # Helix expand selection
+      Alt-n: reserved
       # Alt-m: workspace 1
       # Alt-comma: workspace 2
       # Alt-dot: workspace 3
@@ -107,7 +96,7 @@ keymap:
       Alt-x: KEY_1
       Alt-c: KEY_2
       Alt-v: KEY_3
-      # Alt-b: reserved # helix shrink selection
+      # Alt-b: toggle waybar
 
 
       KEY_1: reserved
