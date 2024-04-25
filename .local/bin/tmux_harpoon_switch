@@ -37,10 +37,13 @@ relative_path=$(realpath --relative-to="$tmux_pane_path" "$path")
 
 # Check if editor_command is in tmux_command and tmux_window is not empty
 if [[ "$tmux_command" == *"$editor_command"* ]] && [[ -n "$tmux_window" ]]; then
-  tmux new-window -a -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+  tmux select-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+  tmux new-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+
   tmux send-keys -t "$tmux_session:$tmux_window.$tmux_pane" ":o $relative_path:$col:$row" C-m
 elif [[ -n "$tmux_window" ]]; then
-  tmux new-window -a -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+  tmux select-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
+  tmux new-window -t "$tmux_session:$tmux_window.$tmux_pane" 2>/dev/null
 fi
 
 exit 0
