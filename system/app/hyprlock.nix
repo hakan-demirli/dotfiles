@@ -6,8 +6,8 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
   src = pkgs.fetchFromGitHub {
     owner = "hyprwm";
     repo = "hyprlock";
-    rev = "6fa65e1172d633e61ed957a49e7cf96010432623";
-    hash = "sha256-7ISUD6Z8FivTw/Db8tGJdiJeqpvJs7CSCwadopb1oro=";
+    rev = "415262065fff0a04b229cd00165f346a86a0a73a";
+    hash = "sha256-jla5Wo0Qt3NEnD0OjNj85BGw0pR4Zlz5uy8AqHH7tuE=";
   };
 
   nativeBuildInputs = [
@@ -26,6 +26,10 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
     pkgs.pango
     pkgs.wayland
     pkgs.wayland-protocols
+
+    pkgs.libjpeg
+    pkgs.libwebp
+    pkgs.file
   ];
 
   meta = {
