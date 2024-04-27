@@ -2,7 +2,7 @@
 tmux_harpoon_update &
 
 idx=$1
-editor_command="hx"
+editor_command=${EDITOR:-hx}
 
 tmux_cwd=$(pwd)
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
