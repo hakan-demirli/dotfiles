@@ -121,14 +121,19 @@
     };
   };
 
+  # https://github.com/NixOS/nixpkgs/issues/97795#issuecomment-693354398
+  systemd.services.display-manager.wants = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
+  systemd.services.display-manager.after = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
+
+  # https://github.com/NixOS/nixpkgs/issues/189851
+  systemd.user.extraConfig = ''
+    DefaultEnvironment="PATH=/run/current-system/sw/bin"
+  '';
+
   hardware = {
     keyboard.qmk.enable = true;
     uinput.enable = true; # xremap dep
   };
-
-  # https://github.com/NixOS/nixpkgs/issues/97795#issuecomment-693354398
-  systemd.services.display-manager.wants = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
-  systemd.services.display-manager.after = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
 
   # User account
   users.users.${userSettings.username} = {

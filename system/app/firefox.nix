@@ -18,7 +18,7 @@
         # Prevent tabbing on the "3 dot menu" on Firefox Suggest drop down items
         # https://connect.mozilla.org/t5/discussions/how-to-remove-the-3-dot-menu-on-firefox-suggest-drop-down-items/td-p/28339
         "browser.urlbar.resultMenu.keyboardAccessible" = false;
-        # "widget.use-xdg-desktop-portal.file-picker" = 1;
+        "widget.use-xdg-desktop-portal.file-picker" = 1;
         "browser.tabs.tabmanager.enabled" = true; # BUG: if false, screen jumps 1px up/down everytime a tab is closed
         "network.trr.mode" = 2; # DOH
         # enable extensions in mozilla sites
