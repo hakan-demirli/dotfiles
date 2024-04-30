@@ -47,6 +47,7 @@ keymap:
       # Alt-i: tmux tab 2
       # Alt-o: tmux tab 3
       # Alt-p: tmux tab 4
+      Alt-KEY_SPACE: KEY_SPACE
 
       Alt-h: KEY_LEFT
       Alt-j: KEY_DOWN
