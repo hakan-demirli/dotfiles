@@ -256,6 +256,7 @@
     # (pkgs.callPackage ../../system/app/tt.nix {})
     (pkgs.callPackage ../../system/app/waybar_timer.nix {})
     (pkgs.callPackage ../../system/app/helix.nix {})
+    (pkgs.callPackage ../../system/app/mitype.nix {})
     (pkgs.callPackage ../../system/app/hyprlock.nix {})
     (pkgs.callPackage ../../system/app/print_weather.nix {})
     (pkgs.callPackage ../../system/app/blender.nix {})
