@@ -115,3 +115,4 @@ text/x-verilog=helix.desktop
 text/rust=helix.desktop
 text/x-python3=helix.desktop
 video/mp4=mpv.desktop
+text/x-makefile=helix.desktop
