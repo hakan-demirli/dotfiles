@@ -276,6 +276,8 @@
     TERMINAL = "kitty";
     TERM = "kitty";
 
+    GTK_THEME = "Dracula"; # config.gtk.theme.name;
+
     # export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
     # env = PATH,$HOME/.local/bin:$PATH
     # env = PATH,/usr/local/bin:$PATH

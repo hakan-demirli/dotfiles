@@ -92,7 +92,7 @@
       xdgOpenUsePortal = true;
       config = {
         common = {
-          default = ["gtk"];
+          default = ["hyprland" "gtk"];
           "org.freedesktop.impl.portal.ScreenCast" = [
             "hyprland"
           ];
@@ -103,7 +103,7 @@
             "hyprland"
           ];
         };
-        hyprland.default = ["gtk" "hyprland"];
+        hyprland.default = ["hyprland" "gtk"];
       };
 
       extraPortals = [
