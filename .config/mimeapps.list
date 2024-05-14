@@ -59,6 +59,8 @@ text/x-verilog=helix.desktop
 text/rust=helix.desktop
 text/x-python3=helix.desktop
 video/mp4=mpv.desktop
+video/webm=mpv.desktop
+image/gif=mpv.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -115,4 +117,6 @@ text/x-verilog=helix.desktop
 text/rust=helix.desktop
 text/x-python3=helix.desktop
 video/mp4=mpv.desktop
+video/webm=mpv.desktop
 text/x-makefile=helix.desktop
+image/gif=mpv.desktop
