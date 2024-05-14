@@ -231,6 +231,7 @@
     taplo
     nodePackages_latest.vscode-json-languageserver
     nodePackages_latest.bash-language-server
+    shfmt
     nodePackages_latest.prettier
     clang-tools
     lldb
