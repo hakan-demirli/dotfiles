@@ -64,6 +64,7 @@
     wget
     neovim # default editor
     libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
+    (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix {})
   ];
 
   # services
@@ -74,7 +75,9 @@
     displayManager = {
       sddm = {
         enable = true;
-        theme = "${import ../../system/app/sddm-theme.nix {inherit pkgs;}}";
+        theme = "astronaut";
+        # theme = "${import ../../system/app/sddm-astronaut.nix {inherit pkgs;}}";
+        # theme = "${import ../../system/app/sddm-sugar-dark.nix {inherit pkgs;}}";
       };
     };
     xserver = {

@@ -7,7 +7,7 @@
 #   };
 # in
 pkgs.stdenv.mkDerivation {
-  name = "sddm-theme";
+  name = "sddm-sugar-dark";
   src = pkgs.fetchFromGitHub {
     owner = "MarianArlt";
     repo = "sddm-sugar-dark";
