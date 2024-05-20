@@ -11,7 +11,7 @@ function fgb() {
 	)
 	local -r header=$(cat <<-EOF
 	> ALT-M to merge with current * branch | ALT-R to rebase with current * branch
-	> ALT-C to checkout the branch
+	> CTRL-G to checkout the branch
 	> ALT-D to delete the merged local branch | ALT-X to force delete the local branch
 	> ENTER to open the diff with less
 	EOF
@@ -26,8 +26,8 @@ function fgb() {
 		--preview "$git_log" \
 		--header-first \
 		--header="$header" \
-		--bind="alt-c:execute(git checkout \$($get_selected_branch))" \
-		--bind="alt-c:+reload($git_branches)" \
+		--bind="ctrl-g:execute(git checkout \$($get_selected_branch))" \
+		--bind="ctrl-g:+reload($git_branches)" \
 		--bind="alt-m:execute(git merge \$($get_selected_branch))" \
 		--bind="alt-r:execute(git rebase \$($get_selected_branch))" \
 		--bind="alt-d:execute(git branch --delete \$($get_selected_branch))" \

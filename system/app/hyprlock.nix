@@ -6,8 +6,8 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
   src = pkgs.fetchFromGitHub {
     owner = "hyprwm";
     repo = "hyprlock";
-    rev = "415262065fff0a04b229cd00165f346a86a0a73a";
-    hash = "sha256-jla5Wo0Qt3NEnD0OjNj85BGw0pR4Zlz5uy8AqHH7tuE=";
+    rev = "997f222b0fec6ac74ec718b53600e77c2b26860a";
+    hash = "sha256-WD6Iyb9DV1R5a2A0UIVT8GyzRhs9ntOPGKDubEUUVNs=";
   };
 
   nativeBuildInputs = [

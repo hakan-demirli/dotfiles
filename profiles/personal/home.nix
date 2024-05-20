@@ -307,7 +307,8 @@
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
     PYTHON_HISTORY = "$XDG_STATE_HOME/python/history";
     GOPATH = "$XDG_CACHE_HOME/go";
-    _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot=\"$XDG_CONFIG_HOME\"/java'';
+    _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${XDG_CONFIG_HOME}/java";
+    KERAS_HOME = "$XDG_STATE_HOME/keras";
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
     # Breaks neovim

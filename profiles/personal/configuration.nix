@@ -42,6 +42,7 @@
       cores = systemSettings.threads;
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
+      use-xdg-base-directories = true;
 
       # Prevent garbage collection from altering nix-shells managed by nix-direnv
       # https://github.com/nix-community/nix-direnv#installation
