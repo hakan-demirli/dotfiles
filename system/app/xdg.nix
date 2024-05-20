@@ -102,11 +102,16 @@
           "org.freedesktop.impl.portal.GlobalShortcuts" = [
             "hyprland"
           ];
+          # "org.freedesktop.impl.portal.FileChooser" = [
+          #   "termfilechooser"
+          # ]; # not working
         };
         hyprland.default = ["hyprland" "gtk"];
+        # hyprland.default = ["hyprland" "termfilechooser" "gtk"]; # not working
       };
 
       extraPortals = [
+        # (pkgs.callPackage ../../system/app/xdg-desktop-portal-termfilechooser.nix {}) # not working
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-wlr
         pkgs.xdg-desktop-portal-hyprland

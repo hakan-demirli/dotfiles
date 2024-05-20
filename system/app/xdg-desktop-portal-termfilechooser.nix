@@ -10,34 +10,67 @@ pkgs.stdenv.mkDerivation {
     repo = "xdg-desktop-portal-termfilechooser";
     # ref = "fix-for-lf";
     rev = "6acc64bbc8f309f92a527006203e2a484b6a109e";
-    sha256 = "LUO5ej0c/bdSxZU4RIw3nzPqQmWCGWhmOTQC5RVz5n4=";
+    sha256 = "sha256-oKd128CC1NVP3TTe3S0gPzFdQ+f12dGNpBxvOAuC4Hs=";
   };
+
+  strictDeps = true;
+
+  depsBuildBuild = [pkgs.pkg-config];
 
   nativeBuildInputs = with pkgs; [
     meson
     ninja
+    pkg-config
     scdoc
-    pkgconf
+    wayland-scanner
+    makeWrapper
   ];
 
   buildInputs = with pkgs; [
     xdg-desktop-portal
     inih
+    libdrm
+    mesa
     systemd
+    wayland
+    wayland-protocols
   ];
 
-  # Add hyprland support
+  patches = [./termfilechooser.patch];
+
   patchPhase = ''
-    sed -i '/pantheon/ s/$/;Hyprland/' termfilechooser.portal
+    # sed -i '/pantheon/ s/$/;Hyprland/' termfilechooser.portal
 
     substituteInPlace contrib/lf-wrapper.sh \
-      --replace /usr/bin/ranger ${pkgs.lf}/bin/lf \
+      --replace "#!/bin/sh" "#!/usr/bin/env bash" \
+      --replace /usr/bin/lf ${pkgs.lf}/bin/lf \
       --replace /usr/bin/kitty ${pkgs.kitty}/bin/kitty \
-      --replace '"$termcmd"' '$termcmd' \
-      --replace 'rm "' '${pkgs.coreutils}/bin/rm "'
+      --replace /usr/bin/rm ${pkgs.coreutils}/bin/rm
+
+    substituteInPlace contrib/config \
+      --replace /home/boydaihungst/.config/xdg-desktop-portal-termfilechooser/vifm-wrapper.sh ${placeholder "out"}/share/xdg-desktop-portal-termfilechooser/lf-wrapper.sh \
+      --replace /home/boydaihungst/Downloads /tmp
+
+
+    echo "
+      install_data(
+          'contrib/lf-wrapper.sh',
+          install_dir: join_paths(get_option('datadir'), 'xdg-desktop-portal-termfilechooser'),
+      )
+      install_data(
+          'contrib/fzf-wrapper.sh',
+          install_dir: join_paths(get_option('datadir'), 'xdg-desktop-portal-termfilechooser'),
+      )" >> meson.build
+  '';
+
+  postPatch = ''
+    # Allow using lf out of the box without any configuration.
+    substituteInPlace src/core/config.c \
+      --replace-fail '"/usr/share/xdg-desktop-portal-termfilechooser/ranger-wrapper.sh"' '"${placeholder "out"}/share/xdg-desktop-portal-termfilechooser/lf-wrapper.sh"'
   '';
 
   mesonFlags = [
+    (lib.mesonOption "sysconfdir" "/etc")
     (lib.mesonEnable "systemd" true)
     (lib.mesonEnable "man-pages" true)
     (lib.mesonOption "sd-bus-provider" "libsystemd")

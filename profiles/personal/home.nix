@@ -317,6 +317,9 @@
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 
     PDK_ROOT = "$HOME/.local/share/pdk";
+
+    # needed by termfilechooser portal, # not working
+    # TERMCMD = "${pkgs.kitty}/bin/kitty --class=file_chooser --override background_opacity=1";
   };
 
   programs.gpg.homedir = "${config.xdg.dataHome}/gnupg";
