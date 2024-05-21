@@ -179,6 +179,7 @@
     wl-clipboard
     wl-clip-persist
     pulseaudio
+    tree
 
     python3
 
