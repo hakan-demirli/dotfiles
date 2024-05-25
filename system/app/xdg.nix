@@ -12,6 +12,7 @@
       "anyrun"
       "qmk"
       "gnome3-keybind-backup"
+      "gtk_indicator"
       "kitty"
       "nix"
       "sioyek"

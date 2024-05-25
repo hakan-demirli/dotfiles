@@ -266,6 +266,7 @@
     (pkgs.callPackage ../../system/app/veridian.nix {})
     (pkgs.callPackage ../../system/app/update_wp.nix {})
     (pkgs.callPackage ../../system/app/gtk_applet.nix {})
+    (pkgs.callPackage ../../system/app/gtk_indicator.nix {})
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
     (pkgs.callPackage ../../system/app/youtube_sync.nix {})
     (pkgs.callPackage ../../system/app/auto_refresh.nix {})
