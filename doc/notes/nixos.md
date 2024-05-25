@@ -1,6 +1,6 @@
 * **What is configuration.nix file?**
     * It's default location is: ```/etc/nixos/configuration.nix```
-    * It controls the OS configuration. You want to install a package you modify it.
+    * It controls the OS configuration. You want to install a package, modify it.
     * It is a bad practice to leave it in it's default location. Use flakes instead.
 
 * **Where to find packages**
@@ -98,7 +98,6 @@
     * Use nix-ldi
         * Here is a tutorial [link](https://github.com/mcdonc/.nixconfig/blob/master/videos/pydev/script.rst)
 
-
 * **Python environments**
     * https://ayats.org/blog/nix-workflow/
     * https://www.reddit.com/r/NixOS/comments/1afex3e/setting_up_python_projects/
@@ -118,7 +117,7 @@
         * ```https://www.sharedrop.io/```
 
 * **Nix PR Tracker**
-    * https://nixpk.gs/pr-tracker.html?pr=284487
+    * https://nixpk.gs/pr-tracker.html
 
 * **QEMU: Windows Guest can ping host, but host cannot ping guest on a NATed network**
     * Disable windows firewall.
