@@ -13,10 +13,11 @@ default_mode: insert
 keymap:
   - name: Default
     remap:
-      KEY_GRAVE: reserved 
+      KEY_GRAVE: reserved
       KEY_RIGHTBRACE: reserved
       KEY_BACKSLASH: reserved
       KEY_LEFTBRACE: KEY_BACKSPACE
+      Alt-KEY_LEFTBRACE: KEY_BACKSPACE
       Shift-KEY_LEFTBRACE: KEY_DELETE
       Alt-Shift-KEY_LEFTBRACE: Shift-KEY_MINUS # underscore
       KEY_BACKSPACE: reserved
