@@ -1,3 +1,7 @@
+* **List neighbor IPs**
+    * `ip neigh` linux command equivalent:
+        * `arp -a`
+
 * **Hide context menu entry**
     * Open regedit.exe and visit \HKEY_CLASSES_ROOT\PackagedCom\ClassIndex\. There should be several tens of entries (keys) under that, all named after {UUID}.
     * Expand all entries you saw in Step 1 and look for the entry containing keyword AdvancedMicroDevicesInc (AMD). Once you find it, copy its corresponding UUID string.

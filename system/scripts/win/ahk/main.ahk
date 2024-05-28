@@ -121,7 +121,7 @@ Run, %ComSpec% /k %A_ScriptDir%\..\..\python\venv_w\Scripts\python %A_ScriptDir%
 ; Shift-Alt-d: Shift-KEY_EQUAL # plus
 !+d::Send {Shift Down}={Shift Up}
 ; Shift-Alt-f: KEY_EQUAL
-!+f::Send =
+!+f::Send `=
 ; Shift-Alt-g: Shift-KEY_3 # pound
 !+g::Send {Shift Down}3{Shift Up}
 
