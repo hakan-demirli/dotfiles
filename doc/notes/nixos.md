@@ -1,3 +1,11 @@
+* **Restart touchpad driver**
+    * Find kernel module responsible for the touchpad:
+        * `lsmod`
+    * Kill it:
+        * `sudo modprobe -r hid_multitouch`
+    * Restart it:
+        * `sudo modprobe hid_multitouch`
+
 * **What is configuration.nix file?**
     * It's default location is: ```/etc/nixos/configuration.nix```
     * It controls the OS configuration. You want to install a package, modify it.
