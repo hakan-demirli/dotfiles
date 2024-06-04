@@ -218,6 +218,7 @@
     zip
     ghostscript
 
+    citrix_workspace
     # helix
     # helix-gpt
     asm-lsp
