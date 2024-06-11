@@ -5,7 +5,7 @@
   ...
 }: {
   xdg = let
-    mutable_configs = ["hypr" "yarr" "mimeapps.list" ".bash_history"];
+    mutable_configs = ["hypr" "mimeapps.list" ".bash_history"];
 
     immutable_configs = [
       "bat"

@@ -121,6 +121,7 @@
     lf = ''echo "Did you mean f?"''; # muscle memory
     f = "lfcd";
     cdf = ''cd "$(find . -type d | fzf)"'';
+    da = "direnv allow";
     # tt = ''tt --window_state=list'';
     # tl = ''task list'';
 
@@ -226,7 +227,7 @@
     alejandra
     ruff
     ruff-lsp
-    nodePackages_latest.pyright
+    pyright
     # rustup component add rust-analyzer
     rust-analyzer
     clippy
