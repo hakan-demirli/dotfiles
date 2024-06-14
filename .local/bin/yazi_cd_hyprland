@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 tmp="$(mktemp)"
-lf -last-dir-path="$tmp" "$@"
+yazi --cwd-file="$tmp" "$@"
 if [ -f "$tmp" ]; then
 	dir="$(command cat "$tmp")"
 	rm -f "$tmp"
@@ -12,4 +12,3 @@ if [ -f "$tmp" ]; then
 		fi
 	fi
 fi
-

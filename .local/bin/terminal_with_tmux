@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+terminal_title="the_terminal"
+
+tmux_cwd=$(pwd)
+if [ -z "$tmux_cwd" ]; then
+  tmux_cwd=$(realpath "~")
+fi
+
+tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
+cache_dir="$HOME/.cache/tmux_harpoon"
+data_file="$cache_dir/$tmux_cwd_hash.json"
+session_name=$(basename "$(pwd)")_$tmux_cwd_hash
+
+session_exist=$(tmux has-session -t "$session_name" 2>/dev/null)
+echo "$session_exist"
+
+window_list=$(hyprctl clients -j)
+terminal_open=$(echo "$window_list" | grep -o "$terminal_title")
+
+# if [ -n "$session_exist" ] && [ -n "$terminal_open" ]; then
+#     hyprctl dispatch focuswindow title:the_terminal
+# fi
+# if [ -z "$session_exist" ] && [ -n "$terminal_open" ]; then
+#     hyprctl dispatch focuswindow title:the_terminal
+# fi
+
+# if [ -n "$session_exist" ] && [ -z "$terminal_open" ]; then
+#     kitty --hold --title $terminal_title tmux attach -t "$session_name"
+# fi
+# if [ -z "$session_exist" ] && [ -z "$terminal_open" ]; then
+kitty --hold --title $terminal_title tmux new-session -s "$session_name" "yazi_cd_hyprland"
+
+# fi

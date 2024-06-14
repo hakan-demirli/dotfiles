@@ -40,8 +40,16 @@
       PROMPT_COMMAND="history -a; history -r"
     '';
     initExtra = ''
-      lfcd () {
+      lf_cd () {
           cd "$(command lf -print-last-dir "$@")"
+      }
+      yazi_cd() {
+        tmp="$(mktemp -t "yazi-cwd.XXXXX")"
+        yazi --cwd-file="$tmp"
+        if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+          cd -- "$cwd"
+        fi
+        rm -f -- "$tmp"
       }
     '';
   };
@@ -119,7 +127,8 @@
     "cd.." = "cd ..";
     helix = "hx";
     lf = ''echo "Did you mean f?"''; # muscle memory
-    f = "lfcd";
+    # f = "lf_cd";
+    f = "yazi_cd";
     cdf = ''cd "$(find . -type d | fzf)"'';
     da = "direnv allow";
     # tt = ''tt --window_state=list'';
@@ -174,9 +183,10 @@
     anyrun
     firefox
     tor-browser
-    (lf.overrideAttrs (oldAttrs: {
-      patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
-    }))
+    # (lf.overrideAttrs (oldAttrs: {
+    #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
+    # }))
+    yazi
     wl-clipboard
     wl-clip-persist
     pulseaudio

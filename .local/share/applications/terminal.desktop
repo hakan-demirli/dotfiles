@@ -1,10 +1,10 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Type=Application
-Name=lf
-Comment=Launches the lf file manager
+Name=terminal
+Comment=Launches the terminal with tmux
 Icon=utilities-terminal
 Terminal=false
-Exec=kitty --hold lf
+Exec=terminal_with_tmux
 Categories=ConsoleOnly;System;FileTools;FileManager
 MimeType=inode/directory;

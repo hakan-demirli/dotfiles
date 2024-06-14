@@ -1,10 +1,10 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Type=Application
-Name=lf
-Comment=Launches the lf file manager
+Name=yazi
+Comment=Launches the yazi file manager
 Icon=utilities-terminal
 Terminal=false
-Exec=kitty --hold lf
+Exec=kitty --hold yazi
 Categories=ConsoleOnly;System;FileTools;FileManager
 MimeType=inode/directory;

@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-
-helix ~/.config/mtd/mtd.md
-/mnt/second/rep/dotfiles/scripts/python/venv_l/bin/python3 /mnt/second/rep/dotfiles/scripts/python/mtd2wp.py
-
