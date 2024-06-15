@@ -1,3 +1,6 @@
+* **List exported binaries**
+    * ls -al $(nix-build --no-out-link '<nixpkgs>' -A gcc)/bin/` 
+
 * **Restart touchpad driver**
     * Find kernel module responsible for the touchpad:
         * `lsmod`
