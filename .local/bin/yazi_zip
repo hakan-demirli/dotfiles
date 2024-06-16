@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+function yazi_zip() {
+  tput reset
+  set -f
+  echo "Please enter a name for the new directory:"
+  read -r dir_name
+  mkdir "$dir_name"
+  
+  for file in "$@"; do
+    cp -r "$file" "$dir_name"
+  done
+  
+  (cd "$dir_name" && zip -r "../$dir_name.zip" .)
+  rm -rf "$dir_name"
+}
+
+yazi_zip "$@"
