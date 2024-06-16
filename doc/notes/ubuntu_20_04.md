@@ -657,8 +657,8 @@
             * Possible error:
                 * ```ImportError: cannot import name 'html5lib' from 'pip._vendor' (/usr/lib/python3/dist-packages/pip/_vendor/__init__.py) [duplicate]```
                 * Solution([source](https://stackoverflow.com/questions/70431655/importerror-cannot-import-name-html5lib-from-pip-vendor-usr-lib-python3)): `curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10`
-1
-l
+
+
 * **Enter Shell on Login Screen**
     * CTRL+ALT+F3
 
@@ -1206,7 +1206,6 @@ sudo mkfontscale && sudo mkfontdir && sudo fc-cache -fv
           sudo apt-get install -y boot-repair
           ```
 
-
 * **Include file to bashrc if exists**
     * s
     ```
@@ -1215,61 +1214,3 @@ sudo mkfontscale && sudo mkfontdir && sudo fc-cache -fv
         . /mnt/second/rep/personal_repo/code_snippets/my_bashrc
     fi
     ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-----------------------------------
-## CUSTOMIZATIONS
-* **Nice terminal app**
-    * Install it
-        * ```sudo apt install zsh```
-    * Make your default shell
-        * ```chsh -s $(which zsh)```
-
-
-# Define the "editor" for text files as first action "gpedit" is selected
-```
-mime ^text,  label editor = gedit -- "$@"
-mime ^text,  label pager  = $PAGER -- "$@"
-!mime ^text, label editor, ext xml|json|csv|tex|py|pl|rb|rs|js|sh|php|dart, flag f = gedit -- "$@"
-!mime ^text, label pager,  ext xml|json|csv|tex|py|pl|rb|rs|js|sh|php|dart = $PAGER -- "$@"
-```
-* IDK:
-```
-    Open the console with the content "shell %s", placing the cursor before the " %s" so you can quickly run commands with the current selection as the argument.
-    So, highlight the files you want to work on with Space type @ to get to a command prompt which will be :shell  %s with the cursor positioned before %s
-
-    type the name of your command and press Enter
-
-    the command you specified will be executed with selected filenames as parameters
-```
-* Press 'y' to see the shortcuts
-    * yd - copy directory name only
-    * yn - copy file name only
-    * yp - copy full path
-    * zh - toggle hidden file visibility
-
-* List app installation folder:
-    * dpkg -L gedit // list installation folders
-
-* https://github.com/trapd00r/LS_COLORS
-

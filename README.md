@@ -23,14 +23,13 @@
     ├── app: Contains nix applications and patches.
     ├── hardware: Contains hardware-specific nix configurations.
     └── scripts: Contains various scripts.
-  
 ```
 
 # Install
 * ```nix-shell -p git git-crypt home-manager helix```
-* If you don't have the key remove/rename git config.
+* If you don't have the git-crypt key remove/rename git config.
   * ```mv ./.config/git/config ./.config/git/config_bckp```
-* If you have the key decrypt secrets
+* If you have the key decrypt gitconfig
   * ```git-crypt unlock ../git-crypt-key```
 * ```sudo nixos-rebuild switch --flake ~/Desktop/dotfiles/#myNixos```
 * ```home-manager switch --flake ~/Desktop/dotfiles/#emre```

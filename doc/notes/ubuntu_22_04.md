@@ -165,8 +165,6 @@
     * ```sudo snap install rustup --classic```
     * ```cargo build --release --no-default-features --features=wayland```
 
-
-
 * **How to edit gnome default shortcuts**
     * sudo apt install dconf-editor
 
@@ -174,49 +172,22 @@
     * ```sudo apt install build-essential git m4 scons zlib1g zlib1g-dev libprotobuf-dev protobuf-compiler libprotoc-dev libgoogle-perftools-dev python3-dev libboost-all-dev pkg-config```
     * ```python3 -m pip install -r requirements.txt```
 
+* **Tiling manager for gnome**
+    * https://github.com/forge-ext/forge
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Tiling manager for gnome = https://github.com/forge-ext/forge
-
-
-
-
-
-
-    WINE error "001e:err:ntoskrnl:ZwLoadDriver failed to create driver L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\wineusb": c0000142", been trying to fix for hours
+* **WINE error "001e:err:ntoskrnl:ZwLoadDriver failed to create driver L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\wineusb": c0000142"**
     * ERROR: :err:ntoskrnl:ZwLoadDriver failed to create driver L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\wineusb": c0000142
         * Ensure lutris can see your nvidia gpu
         * If yes
             * delete .wine folder
 
+* **Enable Gnome focus follows mouse**
+    * ```sudo apt install gnome-tweaks```
+    * Launch Tweaks and go to the Windows section.
+        *  Select "Sloppy" or "Secondary-Click" under Window Focus.
 
-
-    How do I set focus follows mouse in Ubuntu 17.10 and later with GNOME 3?
-
-You may use (GNOME) Tweaks to achieve your goal. If it's not installed, first install it by running
-
-sudo apt install gnome-tweaks
-
-Launch Tweaks and go to the Windows section. Select "Sloppy" or "Secondary-Click" under Window Focus.
-
-
-
-    wine: Could not find Wine Gecko. HTML rendering will be disabled.
-    https://wiki.winehq.org/Gecko    msi file
-    Then put them into the ~/.cache/wine/
-    delete .wine
+* **wine: Could not find Wine Gecko. HTML rendering will be disabled.**
+    * Download https://wiki.winehq.org/Gecko msi file
+        * Then put them into the ~/.cache/wine/
+    * Maybe delete .wine if fails
 
