@@ -26,11 +26,11 @@ text/plain=helix.desktop
 text/csv=helix.desktop
 text/xml=helix.desktop
 inode/x-empty=helix.desktop
-inode/directory=lf.desktop
-application/x-gnome-saved-search=lf.desktop
+inode/directory=yazi.desktop
+application/x-gnome-saved-search=yazi.desktop
 x-scheme-handler/etcher=balena-etcher.desktop
 x-scheme-handler/msteams=teams.desktop
-x-content/unix-software=lf.desktop
+x-content/unix-software=yazi.desktop
 application/x-theme=helix.desktop
 application/x-wine-extension-ini=helix.desktop
 text/x-tex=helix.desktop
@@ -61,6 +61,7 @@ text/x-python3=helix.desktop
 video/mp4=mpv.desktop
 video/webm=mpv.desktop
 image/gif=mpv.desktop
+application/vnd.gtkwave-vcd=surfer.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -120,3 +121,4 @@ video/mp4=mpv.desktop
 video/webm=mpv.desktop
 text/x-makefile=helix.desktop
 image/gif=mpv.desktop
+application/vnd.gtkwave-vcd=surfer.desktop
