@@ -10,7 +10,7 @@ status_line=$(tmux capture-pane -pS -3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|S
 read -r buffer_path cursor_row cursor_col <<< "$status_line"
 
 # Get tmux information
-read -r tmux_session tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name} #{window_id} #{pane_current_command} #{pane_current_path}')"
+read -r tmux_session tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name} #{window_index} #{pane_current_command} #{pane_current_path}')"
 tmux_window=${tmux_window//@/}
 
 # # debug
