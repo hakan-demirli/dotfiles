@@ -62,6 +62,7 @@ video/mp4=mpv.desktop
 video/webm=mpv.desktop
 image/gif=mpv.desktop
 application/vnd.gtkwave-vcd=surfer.desktop
+application/pdf=sioyek.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -122,3 +123,4 @@ video/webm=mpv.desktop
 text/x-makefile=helix.desktop
 image/gif=mpv.desktop
 application/vnd.gtkwave-vcd=surfer.desktop
+application/pdf=sioyek.desktop

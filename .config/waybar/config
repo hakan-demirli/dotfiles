@@ -71,8 +71,8 @@
     "format-muted": "",
     "format-icons": {
       "headphone": "",
-      "hands-free": "",
-      "headset": "",
+      "hands-free": "ᛒ",
+      "headset": "ᛒ",
       "phone": "",
       "portable": "",
       "car": "",
