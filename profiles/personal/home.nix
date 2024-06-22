@@ -267,6 +267,7 @@
     adb-sync
     wineWowPackages.waylandFull
     winetricks
+    steam-run # quick runner for fsh compliant binaries
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
     (pkgs.callPackage ../../system/app/waybar_timer.nix {})
