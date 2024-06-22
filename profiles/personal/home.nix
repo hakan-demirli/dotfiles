@@ -129,6 +129,7 @@
     lf = ''echo "Did you mean f?"''; # muscle memory
     # f = "lf_cd";
     f = "yazi_cd";
+    ff = "yazi_cd";
     cdf = ''cd "$(find . -type d | fzf)"'';
     da = "direnv allow";
     # tt = ''tt --window_state=list'';
