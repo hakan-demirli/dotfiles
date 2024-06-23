@@ -261,6 +261,7 @@
 
     lua-language-server
 
+    neovim
     # taskwarrior
     # timewarrior
 
@@ -328,7 +329,7 @@
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
     GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
     # Breaks neovim
-    VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
+    # VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 
