@@ -76,6 +76,9 @@ image_bound = [ 0, 0 ]
 [plugins]
 preload = []
 
+[plugin]
+prepend_previewers = [{ name = "*.opus", run = "video" }]
+
 [input]
 # cd
 cd_title  = "Change directory:"
