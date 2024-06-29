@@ -199,7 +199,7 @@
     usbutils
     pavucontrol
     android-file-transfer
-    transmission-qt
+    transmission_4-qt
     libsForQt5.kolourpaint
     libsForQt5.breeze-icons
     ventoy
