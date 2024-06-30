@@ -181,9 +181,11 @@
     vim # default editor
     waybar
     kitty
-    anyrun
+    j4-dmenu-desktop
+    # anyrun
     firefox
     tor-browser
+    qalculate-qt
     # (lf.overrideAttrs (oldAttrs: {
     #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
     # }))

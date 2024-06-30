@@ -1,3 +1,6 @@
+* **Using nixGL to fix OpenGL applications on non-NixOS distributions**
+    * https://pmiddend.github.io/posts/nixgl-on-ubuntu/
+
 * **Get home-manager generated files/outputs without activating**
     * `home-manager build --flake ~/Desktop/dotfiles/#emre`
 

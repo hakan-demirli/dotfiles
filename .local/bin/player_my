@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+is_running=$(pgrep -f "my_player")
+echo "$is_running"
+
+if [ -n "$is_running" ]; then
+  echo "just togglespecialworkspace"
+  hyprctl dispatch togglespecialworkspace
+else
+  echo "just kitty"
+  kitty --title "my_player" yazi /mnt/second/music &
+  # hyprctl dispatch focuswindow title:my_player
+fi
+
+

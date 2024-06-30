@@ -1,0 +1,23 @@
+#window {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+box#main {
+  background-color: @theme_bg_color;
+}
+
+list#main {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+list#plugin {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+label#match-desc {
+  font-size: 10px;
+}
+
+label#plugin {
+  font-size: 14px;
+}
