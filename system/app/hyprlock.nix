@@ -1,4 +1,4 @@
-{pkgs}:
+{ pkgs }:
 pkgs.stdenv.mkDerivation (finalAttrs: {
   pname = "hyprlock";
   version = "0.3.0-6fa65e1";
@@ -36,8 +36,11 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
     description = "Hyprland's GPU-accelerated screen locking utility";
     homepage = "https://github.com/hyprwm/hyprlock";
     license = pkgs.lib.licenses.bsd3;
-    maintainers = with pkgs.lib.maintainers; [eclairevoyant];
+    maintainers = with pkgs.lib.maintainers; [ eclairevoyant ];
     mainProgram = "hyprlock";
-    platforms = ["aarch64-linux" "x86_64-linux"];
+    platforms = [
+      "aarch64-linux"
+      "x86_64-linux"
+    ];
   };
 })

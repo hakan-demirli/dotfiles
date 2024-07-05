@@ -1,15 +1,16 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "update_wp";
   propagatedBuildInputs = [
     pkgs.swww
-    (pkgs.python3.withPackages (pythonPackages:
-      with pythonPackages; [
+    (pkgs.python3.withPackages (
+      pythonPackages: with pythonPackages; [
         pillow
         requests
         google-auth-oauthlib
         google-api-python-client
-      ]))
+      ]
+    ))
   ];
   dontUnpack = true;
 

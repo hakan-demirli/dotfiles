@@ -1,12 +1,9 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "print_weather";
 
   propagatedBuildInputs = [
-    (pkgs.python3.withPackages (pythonPackages:
-      with pythonPackages; [
-        requests
-      ]))
+    (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [ requests ]))
   ];
   dontUnpack = true;
   installPhase = ''

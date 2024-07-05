@@ -15,6 +15,8 @@
       "<leader>/" = "live_grep";
       # "<leader>fr" = "oldfiles";
     };
-    extensions.fzf-native = {enable = true;};
+    extensions.fzf-native = {
+      enable = true;
+    };
   };
 }

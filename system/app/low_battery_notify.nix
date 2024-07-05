@@ -1,4 +1,5 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   low_level = "25";
   critical_level = "15";
 
@@ -22,7 +23,8 @@
             -i battery-empty \
             "Charge me or watch me die!"
   '';
-in {
+in
+{
   systemd.user.services."low_battery_notify" = {
     Unit.Description = "low battery notifier";
     Service.ExecStart = low_battery_notify;
@@ -36,6 +38,8 @@ in {
       Persistent = true;
       AccuracySec = "1s";
     };
-    Install = {WantedBy = ["timers.target"];};
+    Install = {
+      WantedBy = [ "timers.target" ];
+    };
   };
 }

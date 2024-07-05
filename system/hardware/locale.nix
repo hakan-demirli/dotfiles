@@ -3,7 +3,8 @@
   userSettings,
   systemSettings,
   ...
-}: {
+}:
+{
   time = {
     hardwareClockInLocalTime = false; # messes clock on windows
     timeZone = systemSettings.timezone;

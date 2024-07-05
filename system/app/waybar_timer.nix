@@ -1,10 +1,8 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "waybar_timer";
 
-  nativeBuildInputs = with pkgs; [
-    pkgs.gnome.zenity
-  ];
+  nativeBuildInputs = with pkgs; [ zenity ];
 
   propagatedBuildInputs = [
     pkgs.python3
@@ -19,6 +17,6 @@ pkgs.stdenv.mkDerivation {
 
   postFixup = ''
     substituteInPlace $out/bin/waybar_timer \
-      --replace 'ZENITY = "zenity"' 'ZENITY = "${pkgs.gnome.zenity}/bin/zenity"'
+      --replace 'ZENITY = "zenity"' 'ZENITY = "${pkgs.zenity}/bin/zenity"'
   '';
 }

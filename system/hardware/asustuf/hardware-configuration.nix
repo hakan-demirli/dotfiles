@@ -4,15 +4,21 @@
   pkgs,
   modulesPath,
   ...
-}: {
-  imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
-  ];
+}:
+{
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-  boot.initrd.availableKernelModules = ["xhci_pci" "nvme" "ahci" "usb_storage" "usbhid" "sd_mod"];
-  boot.initrd.kernelModules = [];
-  boot.kernelModules = ["kvm-amd"];
-  boot.extraModulePackages = [];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "nvme"
+    "ahci"
+    "usb_storage"
+    "usbhid"
+    "sd_mod"
+  ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-amd" ];
+  boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/3d330da9-01ed-4bf1-baf5-0961bdf7afab";
@@ -29,7 +35,10 @@
     device = "/dev/disk/by-uuid/0D11E693467F5A53";
     fsType = "ntfs-3g";
     # options = ["uid=1000" "gid=1000" "dmask=007" "fmask=117"];
-    options = ["rw" "uid=1000"];
+    options = [
+      "rw"
+      "uid=1000"
+    ];
   };
 
   swapDevices = [

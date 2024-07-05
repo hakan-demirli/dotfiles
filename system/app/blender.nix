@@ -1,5 +1,7 @@
-{pkgs, ...}: let
-  py-slvs = pythonPkgs:
+{ pkgs, ... }:
+let
+  py-slvs =
+    pythonPkgs:
     pythonPkgs.buildPythonPackage rec {
       pname = "py-slvs";
       version = "1.0.6";
@@ -10,7 +12,7 @@
         sha256 = "sha256-U6T/aXy0JTC1ptL5oBmch0ytSPmIkRA8XOi31NpArnI=";
       };
 
-      nativeBuildInputs = with pkgs; [swig];
+      nativeBuildInputs = with pkgs; [ swig ];
       pyproject = true;
 
       propagatedBuildInputs = with pythonPkgs; [
@@ -29,9 +31,9 @@
       };
     };
 
-  blenderWithPySlvs = pkgs.blender.withPackages (p: [(py-slvs p)]);
+  blenderWithPySlvs = pkgs.blender.withPackages (p: [ (py-slvs p) ]);
   blender = blenderWithPySlvs.overrideAttrs (oldAttrs: {
     pname = "blender";
   });
 in
-  blender
+blender

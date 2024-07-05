@@ -1,3 +1,1 @@
-{
-  plugins.harpoon.enable = true;
-}
+{ plugins.harpoon.enable = true; }

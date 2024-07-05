@@ -1,4 +1,4 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "gtk_applet";
 
@@ -8,11 +8,12 @@ pkgs.stdenv.mkDerivation {
     libappindicator
   ];
   propagatedBuildInputs = [
-    (pkgs.python3.withPackages (pythonPackages:
-      with pythonPackages; [
+    (pkgs.python3.withPackages (
+      pythonPackages: with pythonPackages; [
         pygobject3
         requests
-      ]))
+      ]
+    ))
   ];
   dontUnpack = true;
 

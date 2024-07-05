@@ -1,7 +1,4 @@
-{
-  pkgs,
-  lib,
-}:
+{ pkgs, lib }:
 pkgs.stdenv.mkDerivation {
   pname = "xdg-desktop-portal-termfilechooser";
   version = "0.1";
@@ -15,7 +12,7 @@ pkgs.stdenv.mkDerivation {
 
   strictDeps = true;
 
-  depsBuildBuild = [pkgs.pkg-config];
+  depsBuildBuild = [ pkgs.pkg-config ];
 
   nativeBuildInputs = with pkgs; [
     meson
@@ -36,7 +33,7 @@ pkgs.stdenv.mkDerivation {
     wayland-protocols
   ];
 
-  patches = [./termfilechooser.patch];
+  patches = [ ./termfilechooser.patch ];
 
   patchPhase = ''
     # sed -i '/pantheon/ s/$/;Hyprland/' termfilechooser.portal

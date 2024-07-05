@@ -14,7 +14,7 @@ pkgs.stdenv.mkDerivation rec {
     hash = "sha256-O02LVj1rrwERYxH8F7s1kghFMUNlsF318PzQObM7Ytk=";
   };
 
-  buildInputs = [python3];
+  buildInputs = [ python3 ];
 
   installPhase = ''
     mkdir -p $out/bin
@@ -28,6 +28,6 @@ pkgs.stdenv.mkDerivation rec {
     description = " Typing speed test in terminal ";
     homepage = "https://github.com/Mithil467/mitype";
     license = licenses.mit;
-    maintainers = with maintainers; [];
+    maintainers = with maintainers; [ ];
   };
 }

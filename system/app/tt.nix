@@ -1,12 +1,8 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "tt";
 
-  propagatedBuildInputs = [
-    (pkgs.python3.withPackages (pythonPackages:
-      with pythonPackages; [
-      ]))
-  ];
+  propagatedBuildInputs = [ (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [ ])) ];
   dontUnpack = true;
 
   src = ../scripts/python/tt;

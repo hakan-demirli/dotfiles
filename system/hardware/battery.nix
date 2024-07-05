@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   # $ nix search wget
   powerManagement = {
     enable = true;

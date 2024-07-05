@@ -1,4 +1,4 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "auto_refresh";
 
@@ -10,10 +10,7 @@ pkgs.stdenv.mkDerivation {
     gnused
   ];
   propagatedBuildInputs = [
-    (pkgs.python3.withPackages (pythonPackages:
-      with pythonPackages; [
-        pygobject3
-      ]))
+    (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [ pygobject3 ]))
   ];
   dontUnpack = true;
   installPhase = ''

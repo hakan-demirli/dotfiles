@@ -141,3 +141,13 @@
 
 * **Build in another distro**
     * https://scottworley.com/blog/2023-10-11-Linux-distros-packaging-each-other.html
+
+* **Asus fan control**
+    * Modify here:
+        * ```cd /sys/devices/platform/asus-nb-wmi```
+            * fan-turbo
+                * ```sudo sh -c "echo 1 >>  fan_boost_mode"; sudo sh -c "echo 1 >> throttle_thermal_policy"```
+            * fan-performance
+                * ```sudo sh -c "echo 0 >>  fan_boost_mode"; sudo sh -c "echo 0 >> throttle_thermal_policy"```
+            * fan-silent
+                * ```sudo sh -c "echo 2 >>  fan_boost_mode"; sudo sh -c "echo 2 >> throttle_thermal_policy"```

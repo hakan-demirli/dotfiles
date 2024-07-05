@@ -1,4 +1,4 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "gtk_indicator";
 
@@ -13,10 +13,7 @@ pkgs.stdenv.mkDerivation {
 
     pkgs.gvfs
 
-    (pkgs.python3.withPackages (pythonPackages:
-      with pythonPackages; [
-        pygobject3
-      ]))
+    (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [ pygobject3 ]))
   ];
   dontUnpack = true;
 

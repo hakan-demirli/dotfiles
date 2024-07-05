@@ -3,7 +3,8 @@
   userSettings,
   systemSettings,
   ...
-}: {
+}:
+{
   imports = [
     ../../system/hardware/asustuf/hardware-configuration.nix
     ../../system/hardware/asustuf/nvidia.nix
@@ -65,7 +66,7 @@
     wget
     neovim # default editor
     libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
-    (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix {})
+    (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
   ];
 
   # services
@@ -83,7 +84,7 @@
     };
     xserver = {
       enable = true;
-      excludePackages = [pkgs.xterm];
+      excludePackages = [ pkgs.xterm ];
     };
   };
 
@@ -102,7 +103,7 @@
       "quiet"
       "mitigations=off"
     ];
-    supportedFilesystems = ["ntfs"];
+    supportedFilesystems = [ "ntfs" ];
     tmp.cleanOnBoot = true;
   };
 
@@ -112,9 +113,9 @@
   systemd = {
     user.services.polkit-gnome-authentication-agent-1 = {
       description = "polkit-gnome-authentication-agent-1";
-      wantedBy = ["graphical-session.target"];
-      wants = ["graphical-session.target"];
-      after = ["graphical-session.target"];
+      wantedBy = [ "graphical-session.target" ];
+      wants = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
       serviceConfig = {
         Type = "simple";
         ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
@@ -126,8 +127,16 @@
   };
 
   # https://github.com/NixOS/nixpkgs/issues/97795#issuecomment-693354398
-  systemd.services.display-manager.wants = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
-  systemd.services.display-manager.after = ["systemd-user-sessions.service" "multi-user.target" "network-online.target"];
+  systemd.services.display-manager.wants = [
+    "systemd-user-sessions.service"
+    "multi-user.target"
+    "network-online.target"
+  ];
+  systemd.services.display-manager.after = [
+    "systemd-user-sessions.service"
+    "multi-user.target"
+    "network-online.target"
+  ];
 
   # https://github.com/NixOS/nixpkgs/issues/189851
   systemd.user.extraConfig = ''
@@ -152,7 +161,7 @@
       "input"
       "libvirtd"
     ];
-    packages = with pkgs; [];
+    packages = with pkgs; [ ];
     # uid = 1000;
   };
 
@@ -164,7 +173,7 @@
     NIXOS_OZONE_WL = "1";
   };
 
-  security.pam.services.swaylock = {}; # without this swaylock is broken
+  security.pam.services.swaylock = { }; # without this swaylock is broken
 
   # List packages installed in system profile. To search, run:
   # Some programs need SUID wrappers, can be configured further or are

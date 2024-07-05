@@ -4,7 +4,8 @@
   inputs,
   userSettings,
   ...
-}: {
+}:
+{
   imports = [
     ../../system/app/firefox.nix
     ../../system/app/low_battery_notify.nix
@@ -15,8 +16,8 @@
 
   dconf.settings = {
     "org/virt-manager/virt-manager/connections" = {
-      autoconnect = ["qemu:///system"];
-      uris = ["qemu:///system"];
+      autoconnect = [ "qemu:///system" ];
+      uris = [ "qemu:///system" ];
     };
   };
 
@@ -34,7 +35,10 @@
     historyFile = "/home/${userSettings.username}/.config/.bash_history";
     historyFileSize = -1;
     historySize = -1;
-    historyControl = ["ignoredups" "erasedups"];
+    historyControl = [
+      "ignoredups"
+      "erasedups"
+    ];
     enableCompletion = true;
     bashrcExtra = ''
       PROMPT_COMMAND="history -a; history -r"
@@ -173,7 +177,10 @@
     arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
 
     llama = ''nix run git+https://github.com/nixified-ai/flake.git#textgen-nvidia'';
-    # tor = ''nix run nixpkgs#tor-browser'';
+
+    fan-turbo = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 1 >>  fan_boost_mode"; sudo sh -c "echo 1 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
+    fan-performance = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 0 >>  fan_boost_mode"; sudo sh -c "echo 0 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
+    fan-silent = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 2 >>  fan_boost_mode"; sudo sh -c "echo 2 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
   };
   home.packages = with pkgs; [
     cpufrequtils
@@ -216,15 +223,13 @@
     playerctl
     swww
     mpv
-    (nerdfonts.override {fonts = ["JetBrainsMono"];})
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ripgrep
     ripdrag
     tmux
     ffmpeg-full
     bat
-    (btop.override {
-      cudaSupport = true;
-    })
+    (btop.override { cudaSupport = true; })
     libnotify
 
     trash-cli
@@ -237,7 +242,8 @@
     # helix-gpt
     asm-lsp
     nixd
-    alejandra
+    # alejandra
+    nixfmt-rfc-style
     ruff
     ruff-lsp
     pyright
@@ -273,20 +279,20 @@
     steam-run # quick runner for fsh compliant binaries
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
-    (pkgs.callPackage ../../system/app/waybar_timer.nix {})
-    (pkgs.callPackage ../../system/app/helix.nix {})
-    (pkgs.callPackage ../../system/app/mitype.nix {})
-    (pkgs.callPackage ../../system/app/gen_typing_test.nix {})
-    (pkgs.callPackage ../../system/app/hyprlock.nix {})
-    (pkgs.callPackage ../../system/app/print_weather.nix {})
-    (pkgs.callPackage ../../system/app/blender.nix {})
-    (pkgs.callPackage ../../system/app/veridian.nix {})
-    (pkgs.callPackage ../../system/app/update_wp.nix {})
-    (pkgs.callPackage ../../system/app/gtk_applet.nix {})
-    (pkgs.callPackage ../../system/app/gtk_indicator.nix {})
+    (pkgs.callPackage ../../system/app/waybar_timer.nix { })
+    (pkgs.callPackage ../../system/app/helix.nix { })
+    (pkgs.callPackage ../../system/app/mitype.nix { })
+    (pkgs.callPackage ../../system/app/gen_typing_test.nix { })
+    (pkgs.callPackage ../../system/app/hyprlock.nix { })
+    (pkgs.callPackage ../../system/app/print_weather.nix { })
+    (pkgs.callPackage ../../system/app/blender.nix { })
+    (pkgs.callPackage ../../system/app/veridian.nix { })
+    (pkgs.callPackage ../../system/app/update_wp.nix { })
+    (pkgs.callPackage ../../system/app/gtk_applet.nix { })
+    (pkgs.callPackage ../../system/app/gtk_indicator.nix { })
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
-    (pkgs.callPackage ../../system/app/youtube_sync.nix {})
-    (pkgs.callPackage ../../system/app/auto_refresh.nix {})
+    (pkgs.callPackage ../../system/app/youtube_sync.nix { })
+    (pkgs.callPackage ../../system/app/auto_refresh.nix { })
     # (pkgs.callPackage ../../system/app/clipboard_tts.nix {})
   ];
 

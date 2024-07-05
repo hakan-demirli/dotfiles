@@ -19,9 +19,7 @@ stdenv.mkDerivation rec {
   dontWrapQtApps = true;
   dontRewriteSymlinks = true;
 
-  propagatedBuildInputs = [
-    qtgraphicaleffects
-  ];
+  propagatedBuildInputs = [ qtgraphicaleffects ];
 
   installPhase = ''
     mkdir -p $out/share/sddm/themes/astronaut

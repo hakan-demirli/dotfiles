@@ -1,12 +1,13 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 pkgs.stdenv.mkDerivation {
   name = "gen_typing_test";
   propagatedBuildInputs = [
     pkgs.swww
-    (pkgs.python3.withPackages (pythonPackages:
-      with pythonPackages; [
+    (pkgs.python3.withPackages (
+      pythonPackages: with pythonPackages; [
         #
-      ]))
+      ]
+    ))
   ];
   dontUnpack = true;
 
