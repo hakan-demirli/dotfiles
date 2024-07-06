@@ -53,8 +53,10 @@ def findFirefoxProfileFolder():
 
 
 def removeAllFiles(dir: str, extensions: list) -> None:
+    print("Start removing old wallpapers:")
     for ext in extensions:
         for index, path in enumerate(pathlib.Path(dir).glob(ext)):
+            print(f"Removing: {path}")
             os.remove(path)
 
 
@@ -74,7 +76,7 @@ def changeStringInPlace(old_string: str, new_string: str, file: str) -> int:
 def setFirefoxWallpaper(wallpaper_path: str) -> None:
     chrome_folder_path = f"{findFirefoxProfileFolder()}/chrome/"
     new_wallpaper_name = chrome_folder_path + "wp.png"
-    types = [".jpg", ".png", ".jpeg"]
+    types = ["*.jpg", "*.png", "*.jpeg"]
     removeAllFiles(chrome_folder_path, types)  # del old wp
     new_wallpaper_path = pathlib.Path(wallpaper_path)
     shutil.copy2(wallpaper_path, chrome_folder_path)

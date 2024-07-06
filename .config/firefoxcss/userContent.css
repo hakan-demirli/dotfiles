@@ -5,7 +5,7 @@
     overflow: hidden !important;
   }
   #root {
-    background-image: url("wp.png") !important;
+    background-image: url("/home/emre/.mozilla/firefox/emre/chrome/wp.png") !important; /* TODO */
     background-size: cover !important;
   }
   /* Hide the ugly logo & wordmark sorry Mozilla */
