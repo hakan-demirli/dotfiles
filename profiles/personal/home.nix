@@ -236,6 +236,7 @@
     unar
     zip
     ghostscript
+    drawio
 
     citrix_workspace
     # helix

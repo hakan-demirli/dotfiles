@@ -23,16 +23,28 @@ local function entry(_, args)
     cmd_args = [[find -L . \
       \( -name '.git' \
       -o -name 'flake-inputs' \
+      -o -name '.ICAClient' \
+      -o -name '.cache' \
+      -o -name '.local' \
+      -o -name '.config' \
+      -o -name '.mill' \
+      -o -name '.metals' \
+      -o -name '.android' \
+      -o -name '.bloop' \
+      -o -name '.icons' \
+      -o -name '.ivy2' \
+      -o -name '.java' \
+      -o -name '.mozilla' \
+      -o -name '.pki' \
+      -o -name '.sbt' \
+      -o -name '.ssh' \
+      -o -name '.steel' \
+      -o -name '.smt_solvers' \
+      -o -name '.tor project' \
+      -o -name 'Downloads' \
       -o -name '.nix-defexpr' \
       -o -name '.nix-profile' \
-      -o -path './.config/figma-linux/Cache' \
-      -o -path './.config/Slack/Cache' \
-      -o -path './.config/Slack/Service Worker' \
-      -o -path './.config/google-chrome' \
-      -o -path './.local/share/navi/cheats' \
-      -o -path './.local/share/containers/storage/overlay' \
       -o -path './go/pkg' \
-      -o -name '.cache' \
       -o -name '.vscode' \
       -o -name '__pycache__' \
       -o -name '.github' \
