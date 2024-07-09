@@ -42,6 +42,8 @@ local function entry(_, args)
       -o -name '.smt_solvers' \
       -o -name '.tor project' \
       -o -name 'Downloads' \
+      -o -name 'nixpkgs' \
+      -o -name 'nixpkgs_mine' \
       -o -name '.nix-defexpr' \
       -o -name '.nix-profile' \
       -o -path './go/pkg' \
