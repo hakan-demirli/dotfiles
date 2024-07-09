@@ -49,6 +49,12 @@ auto-format = true
 [[language]]
 name = "markdown"
 formatter = { command = 'prettier', args = ["--parser", "markdown"] }
+language-servers = [
+  "marksman",
+  "markdown-oxide",
+  "typos",
+  "vale",
+]
 # auto-format = true
 
 [[language]]
@@ -91,6 +97,15 @@ comment-token = "#"
 indent = { tab-width = 4, unit = "    " }
 language-servers = ["asm-lsp"]
 auto-format = true
+
+[[language]]
+name = "git-commit"
+language-servers = [
+  "typos",
+  "vale",
+]
+
+
 
 
 
@@ -174,4 +189,11 @@ command = "nixd"
 [language-server.gpt]
 command = "helix-gpt"
 args = ["--handler","codeium","--logFile","/tmp/helix-gpt.log"]
+
+
+[language-server.vale]
+command = "vale-ls"
+
+[language-server.typos]
+command = "typos-lsp"
 

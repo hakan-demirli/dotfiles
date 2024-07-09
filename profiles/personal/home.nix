@@ -269,6 +269,8 @@
     verilator
 
     lua-language-server
+    vale-ls
+    typos-lsp
 
     neovim
     # taskwarrior
