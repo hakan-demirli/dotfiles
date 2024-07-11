@@ -187,6 +187,7 @@
     hypridle
     vim # default editor
     waybar
+    hyprlock
     kitty
     j4-dmenu-desktop
     # anyrun
@@ -208,7 +209,7 @@
     usbutils
     pavucontrol
     android-file-transfer
-    transmission_4-qt
+    # transmission_4-qt // https://github.com/NixOS/nixpkgs/pull/326057
     libsForQt5.kolourpaint
     libsForQt5.breeze-icons
     ventoy
@@ -271,6 +272,7 @@
     lua-language-server
     vale-ls
     typos-lsp
+    ltex-ls
 
     neovim
     # taskwarrior
@@ -286,7 +288,6 @@
     (pkgs.callPackage ../../system/app/helix.nix { })
     (pkgs.callPackage ../../system/app/mitype.nix { })
     (pkgs.callPackage ../../system/app/gen_typing_test.nix { })
-    (pkgs.callPackage ../../system/app/hyprlock.nix { })
     (pkgs.callPackage ../../system/app/print_weather.nix { })
     (pkgs.callPackage ../../system/app/blender.nix { })
     (pkgs.callPackage ../../system/app/veridian.nix { })
