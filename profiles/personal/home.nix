@@ -197,7 +197,7 @@
     # (lf.overrideAttrs (oldAttrs: {
     #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
     # }))
-    yazi
+    # yazi
     wl-clipboard
     wl-clip-persist
     pulseaudio
@@ -284,6 +284,7 @@
     steam-run # quick runner for fsh compliant binaries
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
+    (pkgs.callPackage ../../system/app/yazi.nix { })
     (pkgs.callPackage ../../system/app/waybar_timer.nix { })
     (pkgs.callPackage ../../system/app/helix.nix { })
     (pkgs.callPackage ../../system/app/mitype.nix { })
