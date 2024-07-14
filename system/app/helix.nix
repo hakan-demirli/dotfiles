@@ -9,16 +9,16 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "helix";
-  version = "24.03-dev";
+  version = "24.07-dev";
 
   src = fetchFromGitHub {
     owner = "helix-editor";
     repo = "helix";
-    rev = "dbacaaddcaa4a9dd39c73d0102d03ea7c24ca647";
-    sha256 = "sha256-56gWNGKHHBGQH4ZTG89DO6JLYt6cRssJfm953IfPKPU=";
+    rev = "079f544260f4f5eaff08104bf07abd57bfb7b611";
+    sha256 = "sha256-lKsjgqQAh1Pfo57T9N29YOsbJp/Fl5tOTxV5Fn4xFLg=";
   };
 
-  cargoHash = "sha256-jp86WO5S/h/rbA8reAiKnmA670Fj/lEEiGj9Na5YcJQ=";
+  cargoHash = "sha256-wQj0ZeNp+JoXqvJB7oh6EVgsOy2f8mKSsqKZ1Jl/vgI=";
 
   # disable fetching and building of tree-sitter grammars in favor of the custom build process in grammars.nix
   env.HELIX_DISABLE_AUTO_GRAMMAR_BUILD = "1";
