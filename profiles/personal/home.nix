@@ -209,7 +209,7 @@
     usbutils
     pavucontrol
     android-file-transfer
-    # transmission_4-qt // https://github.com/NixOS/nixpkgs/pull/326057
+    transmission_4-qt
     libsForQt5.kolourpaint
     libsForQt5.breeze-icons
     ventoy
