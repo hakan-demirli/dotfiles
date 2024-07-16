@@ -348,6 +348,7 @@
 
     PDK_ROOT = "$HOME/.local/share/pdk";
 
+    IGNOREEOF = "4";
     # needed by termfilechooser portal, # not working
     # TERMCMD = "${pkgs.kitty}/bin/kitty --class=file_chooser --override background_opacity=1";
   };
