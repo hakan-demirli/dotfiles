@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+is_running=$(pgrep "qalculate")
+echo "$is_running"
+
+if [ -n "$is_running" ]; then
+  echo "just togglespecialworkspace"
+  hyprctl dispatch togglespecialworkspace calculator
+else
+  echo "just qalculate"
+  qalculate-gtk &
+  # hyprctl dispatch focuswindow title:my_player
+fi
+
+

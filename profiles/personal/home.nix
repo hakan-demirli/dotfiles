@@ -152,7 +152,7 @@
     gs = "git status";
     gb = "fzf_git_branches";
     gc = "git commit";
-    gcm = "git commit -m";
+    gcm = "git commit -m ";
     gca = "git commit --amend";
     gl = "fzf_git_commits";
 
@@ -189,6 +189,7 @@
     waybar
     hyprlock
     kitty
+    xwaylandvideobridge
     # j4-dmenu-desktop
     # anyrun
     firefox
