@@ -118,7 +118,7 @@
   home = {
     homeDirectory = "/home/${userSettings.username}";
     username = userSettings.username;
-    stateVersion = "23.05"; # do not change
+    stateVersion = "24.05"; # do not change
   };
 
   home.shellAliases = {
@@ -192,7 +192,6 @@
     xwaylandvideobridge
     # j4-dmenu-desktop
     # anyrun
-    firefox
     tor-browser
     qalculate-qt
     # (lf.overrideAttrs (oldAttrs: {
