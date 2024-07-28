@@ -193,6 +193,7 @@
     # j4-dmenu-desktop
     # anyrun
     tor-browser
+    thunderbird
     qalculate-qt
     # (lf.overrideAttrs (oldAttrs: {
     #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
