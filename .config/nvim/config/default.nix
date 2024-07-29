@@ -1,10 +1,12 @@
+{ pkgs, ... }:
 {
+  extraPackages = [ pkgs.ripgrep ];
   imports = [
     ./bufferline.nix
-    ./telescope.nix
-    # ./harpoon.nix
     # ./treesitter.nix
     ./whichkey.nix
+    ./telescope.nix
+    ./harpoon2.nix
   ];
 
   colorschemes.dracula.enable = true;
@@ -38,5 +40,25 @@
       action = "\"+Y";
       options.desc = "yank to clipboard";
     }
+    {
+      mode = "n";
+      key = "<leader>/";
+      action.__raw = "fuzzyFindFiles()";
+      options.desc = "Fuzzy Find files";
+    }
   ];
+
+  extraConfigLuaPre = # lua
+    ''
+      function fuzzyFindFiles()
+        return function()
+          require("telescope.builtin").grep_string({
+            path_display = { 'smart' },
+            only_sort_text = true,
+            word_match = "-w",
+            search = "",
+          })
+        end 
+      end 
+    '';
 }
