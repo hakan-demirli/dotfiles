@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+is_running=$(pgrep -f "my_todo")
+echo "$is_running"
+
+if [ -n "$is_running" ]; then
+  echo "just togglespecialworkspace"
+  hyprctl dispatch togglespecialworkspace todo
+else
+  echo "just todo"
+  kitty --title "my_todo" hx /home/emre/Desktop/dotfiles/.config/mylib/todo.md &
+fi
+
