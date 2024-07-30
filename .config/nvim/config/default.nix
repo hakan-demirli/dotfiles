@@ -3,10 +3,13 @@
   extraPackages = [ pkgs.ripgrep ];
   imports = [
     ./bufferline.nix
-    # ./treesitter.nix
+    ./treesitter.nix
     ./whichkey.nix
     ./telescope.nix
     ./harpoon2.nix
+    ./lsp.nix
+    ./nvim-cmp.nix
+    ./gitsigns.nix
   ];
 
   colorschemes.dracula.enable = true;
