@@ -288,7 +288,16 @@
     (pkgs.callPackage ../../system/app/j4-dmenu-desktop.nix { })
     (pkgs.callPackage ../../system/app/yazi.nix { })
     (pkgs.callPackage ../../system/app/waybar_timer.nix { })
-    (pkgs.callPackage ../../system/app/helix.nix { })
+
+    ((pkgs.callPackage ../../system/app/helix.nix { }).overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [ ] ++ [
+        (fetchpatch {
+          url = "https://patch-diff.githubusercontent.com/raw/helix-editor/helix/pull/11164.diff";
+          hash = "sha256-iXf8WbuRjEB8ZjNRkymtJ+aul/htdTD3yKa+eA4fzvE=";
+        })
+      ];
+    }))
+
     (pkgs.callPackage ../../system/app/mitype.nix { })
     (pkgs.callPackage ../../system/app/gen_typing_test.nix { })
     (pkgs.callPackage ../../system/app/print_weather.nix { })

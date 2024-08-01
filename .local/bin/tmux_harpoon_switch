@@ -17,18 +17,28 @@ fi
 # Parse the hook_to_switch to get path, col, row, tmux_session, tmux_window
 IFS=':, ' read -r path col row tmux_window tmux_session tmux_command tmux_pane_path <<< "$hook_to_switch"
 
-# shorten the path. tmux send-keys is slow
-relative_path=$(realpath --relative-to="$tmux_pane_path" "$path")
-
 # Check if editor_command is in tmux_command
 if [[ "$tmux_command" == *"$editor_command"* ]]; then
   # check if window is still open in tmux
   if tmux has-session -t "$tmux_session:$tmux_window"; then
     # if window was open then just switch to it and send keys.
     tmux select-window -t "$tmux_session:$tmux_window"  2>/dev/null
-    tmux send-keys -t "$tmux_session:$tmux_window" ":o $relative_path:$col:$row" C-m
+    if [[ "$idx" == "1" ]]; then
+      tmux send-keys -t "$tmux_session:$tmux_window" M-u
+    fi
+    if [[ "$idx" == "2" ]]; then
+      tmux send-keys -t "$tmux_session:$tmux_window" M-i
+    fi
+    if [[ "$idx" == "3" ]]; then
+      tmux send-keys -t "$tmux_session:$tmux_window" M-o
+    fi
+    if [[ "$idx" == "4" ]]; then
+      tmux send-keys -t "$tmux_session:$tmux_window" M-p
+    fi
   else
     # if not create a window, switch to it and open hx inside then send keys
+    # shorten the path. tmux send-keys is slow
+    relative_path=$(realpath --relative-to="$tmux_pane_path" "$path")
     tmux new-window -t "$tmux_session:$tmux_window"  2>/dev/null
     tmux send-keys -t "$tmux_session:$tmux_window" "hx $relative_path:$col:$row" C-m
   fi
