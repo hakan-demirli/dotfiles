@@ -198,7 +198,7 @@
     # (lf.overrideAttrs (oldAttrs: {
     #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
     # }))
-    # yazi
+    yazi
     wl-clipboard
     wl-clip-persist
     pulseaudio
@@ -287,7 +287,6 @@
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
     (pkgs.callPackage ../../system/app/j4-dmenu-desktop.nix { })
-    (pkgs.callPackage ../../system/app/yazi.nix { })
     (pkgs.callPackage ../../system/app/waybar_timer.nix { })
 
     ((pkgs.callPackage ../../system/app/helix.nix { }).overrideAttrs (oldAttrs: {
