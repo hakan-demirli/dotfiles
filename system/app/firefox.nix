@@ -22,11 +22,12 @@
         # enable extensions in mozilla sites
         "extensions.webextensions.restrictedDomains" = "";
         "privacy.resistFingerprinting.block_mozAddonManager" = true;
+        "browser.translations.select.enable" = false;
 
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
         "browser.compactmode.show" = true;
-        "browser.toolbars.bookmarks.visibility" = "never";
+        "browser.toolbars.bookmarks.visibility" = "always";
         "browser.uidensity" = 1;
         "browser.download.autohideButton" = false;
         "ui.key.menuAccessKeyFocuses" = false;

@@ -203,6 +203,7 @@
     wl-clip-persist
     pulseaudio
     tree
+    anki-bin
 
     python3
 
@@ -293,7 +294,7 @@
       patches = oldAttrs.patches or [ ] ++ [
         (fetchpatch {
           url = "https://patch-diff.githubusercontent.com/raw/helix-editor/helix/pull/11164.diff";
-          hash = "sha256-iXf8WbuRjEB8ZjNRkymtJ+aul/htdTD3yKa+eA4fzvE=";
+          hash = "sha256-8SOv2H2ebOridRoBWE3W0rPFERfc0m0AolQOkAZV2IY=";
         })
       ];
     }))
