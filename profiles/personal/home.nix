@@ -253,6 +253,7 @@
     pyright
     # rustup component add rust-analyzer
     rust-analyzer
+    rustfmt
     clippy
     taplo
     nodePackages_latest.vscode-json-languageserver
