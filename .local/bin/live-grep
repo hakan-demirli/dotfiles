@@ -29,9 +29,10 @@ IFS=$'\n' readarray -t selected_matches < <(
       --bind "$KEYS"
 )
 
-# Print the file path and line number of each match
+# Print the absolute file path and line number of each match
 for line in "${selected_matches[@]:1}"; do
   file=$(echo "$line" | cut -d: -f1)
   line_number=$(echo "$line" | cut -d: -f2)
-  echo "$file:$line_number"
+  absolute_path=$(realpath "$file")
+  echo "$absolute_path:$line_number"
 done
