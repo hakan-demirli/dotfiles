@@ -78,6 +78,7 @@
       sddm = {
         enable = true;
         theme = "astronaut";
+        autoNumlock = true;
         # theme = "${import ../../system/app/sddm-astronaut.nix {inherit pkgs;}}";
         # theme = "${import ../../system/app/sddm-sugar-dark.nix {inherit pkgs;}}";
       };
