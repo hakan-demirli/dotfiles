@@ -303,7 +303,16 @@
     (pkgs.callPackage ../../system/app/gen_typing_test.nix { })
     (pkgs.callPackage ../../system/app/print_weather.nix { })
     (pkgs.callPackage ../../system/app/blender.nix { })
-    (pkgs.callPackage ../../system/app/veridian.nix { })
+
+    ((pkgs.callPackage ../../system/app/veridian.nix { }).overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [ ] ++ [
+        (fetchpatch {
+          url = "https://patch-diff.githubusercontent.com/raw/vivekmalneedi/veridian/pull/192.diff";
+          hash = "sha256-JIqywziHhls2tPyb9BUkuYCMIYi0NH/QqdqMFo1Dpak=";
+        })
+      ];
+    }))
+
     (pkgs.callPackage ../../system/app/update_wp.nix { })
     (pkgs.callPackage ../../system/app/gtk_applet.nix { })
     (pkgs.callPackage ../../system/app/gtk_indicator.nix { })

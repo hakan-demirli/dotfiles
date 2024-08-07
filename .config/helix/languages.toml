@@ -11,7 +11,7 @@ auto-format = true
 name = "verilog"
 auto-format = true
 formatter = { command = 'verible-verilog-format', args = ["--wrap_spaces","3","--indentation_spaces","3","-"] }
-language-servers = [ "dls" , "veridian"]
+language-servers = ["veridian"]
 indent = { tab-width = 3, unit = "   " }
 
 [[language]]
@@ -148,50 +148,12 @@ command = "veridian"
 [language-server.ruff-lsp]
 command = "ruff-lsp"
 
-
-
-
-[language-server.dls]
-command = "diagnostic-languageserver"
-args = [ "--stdio", "--log-level=2" ]
-
-[language-server.dls.config.filetypes]
-verilog = "verilator"
-systemverilog =  "verilator"
-
-[language-server.dls.config.linters.verilator]
-command= "sh"
-args= [
-    "-c",
-    "verilator --lint-only -Wall $(find . -type f -name '*.*' | xargs -n1 dirname | sort -u | awk '{print \"-I\" $0}') %file 2>&1 | grep %file"
-]
-isStdout = true
-isStderr = false
-sourceName = "verilator"
-# onSaveOnly = true -- DLS never receives onDidSave event.
-#  See:
-#    https://github.com/helix-editor/helix/issues/9034
-#    https://github.com/helix-editor/helix/pull/9101
-debounce = 1000
-formatLines = 1
-formatPattern= [
-    "^(%(Warning|Error)[^:]*:)?\\s*([^:]+):(\\d+):(\\d+)?:?\\s*(\\.\\.\\.)?\\s*(.*)$",
-    {line = 4, column = 5, message= [ 7 ], security= 2}
-]
-securities= {Error = "error", Warning= "warning", undefined= "info"}
-
-
-
 [language-server.nixd]
 command = "nixd"
 
-
-
-
-[language-server.gpt]
-command = "helix-gpt"
-args = ["--handler","codeium","--logFile","/tmp/helix-gpt.log"]
-
+# [language-server.gpt]
+# command = "helix-gpt"
+# args = ["--handler","codeium","--logFile","/tmp/helix-gpt.log"]
 
 [language-server.vale]
 command = "vale-ls"
