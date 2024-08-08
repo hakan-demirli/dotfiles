@@ -10,16 +10,16 @@
 rustPlatform.buildRustPackage (
   rec {
     pname = "veridian";
-    version = "2024-06-11";
+    version = "2024-08-08";
 
     src = fetchFromGitHub {
       owner = "vivekmalneedi";
       repo = pname;
-      rev = "966a49601ecb94a7e8a4a155ca97c4abc7ef26a9";
-      hash = "sha256-WdL8DgF5Ff7A+vcTs1DsrVgHZVezkwlqPL/Gr5JNwpQ=";
+      rev = "e156ac3f97408c816883659035687aa704064415";
+      hash = "sha256-brILumMj2OIEVksGM4JHNkITheL6h4o7amnZ1ZRyb+M=";
     };
 
-    cargoHash = "sha256-zyo0czRq8yGSHlTks2jnRo8XuK6DcaO+7KdqrxCIXN4=";
+    cargoHash = "sha256-MAeFbr4e64vHS9baQprOb5r96bNMQDS3aRb48KkAhGk=";
 
     doCheck = false;
 
