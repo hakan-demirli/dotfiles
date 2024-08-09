@@ -7,7 +7,7 @@
   # };
 
   services.tlp = {
-    enable = true;
+    enable = false;
     settings = {
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
@@ -19,8 +19,6 @@
       CPU_MAX_PERF_ON_AC = 100;
       CPU_MIN_PERF_ON_BAT = 0;
       CPU_MAX_PERF_ON_BAT = 70;
-
-      RUNTIME_PM_DRIVER_BLACKLIST = "nouveau nvidia"; # TODO: check if this prevents laggy mouse
     };
   };
 }
