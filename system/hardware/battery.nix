@@ -1,10 +1,10 @@
 { ... }:
 {
   # $ nix search wget
-  # powerManagement = {
-  #   enable = true;
-  #   cpuFreqGovernor = "ondemand";
-  # };
+  powerManagement = {
+    enable = true;
+    cpuFreqGovernor = "schedutil";
+  };
 
   services.tlp = {
     enable = false;
