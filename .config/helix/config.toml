@@ -56,6 +56,13 @@ s = [
 "y" = [":pipe-to tmux_harpoon_update","goto_type_definition"]
 "r" = [":pipe-to tmux_harpoon_update","goto_reference"]
 
+[keys.normal.m]
+s.a = "surround_add"
+s.r = "surround_replace"
+s.d = "surround_delete"
+r = "no_op"
+d = "no_op"
+
 [keys.select]
 y = "yank_main_selection_to_clipboard"
 
