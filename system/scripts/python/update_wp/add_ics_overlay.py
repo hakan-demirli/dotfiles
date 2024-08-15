@@ -104,7 +104,7 @@ def main():
     overlayed_file = tempfile.gettempdir() + "/overlayed.png"
     calendar_overlay_file = tempfile.gettempdir() + "/calendar_overlay.png"
     wp_dir = "/mnt/second/images/art/wallpapers_pc"
-    types = [".jpg", ".png", ".jpeg"]
+    types = [".jpg", ".png", ".jpeg", ".webp"]
 
     wallpapers = getFilesByType(wp_dir, types)
     wallpapers = sorted(wallpapers)
