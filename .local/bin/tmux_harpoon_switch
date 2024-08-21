@@ -7,7 +7,7 @@ editor_command=${EDITOR:-hx}
 tmux_cwd=$(pwd)
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
-data_file="$cache_dir/$tmux_cwd_hash.json"
+data_file="$cache_dir/$tmux_cwd_hash.yaml"
 
 hook_to_switch=$(sed -n "${idx}p" "$data_file")
 if [[ -z "$hook_to_switch" ]]; then

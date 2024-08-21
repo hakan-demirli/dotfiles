@@ -9,7 +9,7 @@ fi
 
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
-data_file="$cache_dir/$tmux_cwd_hash.json"
+data_file="$cache_dir/$tmux_cwd_hash.yaml"
 session_name=$(basename "$(pwd)")_$tmux_cwd_hash
 
 session_exist=$(tmux has-session -t "$session_name" 2>/dev/null)
