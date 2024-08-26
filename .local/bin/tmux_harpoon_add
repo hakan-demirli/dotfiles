@@ -42,7 +42,11 @@ else
   buffer_path=$(realpath "$buffer_path")
 fi
 
-
+# Create the data file if it doesn't exist
+if [[ ! -f "$data_file" ]]; then
+    mkdir -p "$cache_dir"
+    touch "$data_file"
+fi
 
 if [[ "$buffer_path" != *"/default_path"* ]]; then
   # Check if the buffer_path already exists in the data_file

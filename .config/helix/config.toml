@@ -67,6 +67,7 @@ d = "no_op"
 y = "yank_main_selection_to_clipboard"
 
 [editor]
+jump-label-alphabet = "dfghjkieruwonvls"
 true-color = true
 line-number = "relative"
 mouse = false
