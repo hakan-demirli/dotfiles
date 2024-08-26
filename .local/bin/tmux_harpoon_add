@@ -54,9 +54,21 @@ if [[ "$buffer_path" != *"/default_path"* ]]; then
     tmux_harpoon_update
   else
     new_line="$buffer_path:$cursor_row:$cursor_col,$tmux_window,$tmux_session,$tmux_command,$tmux_pane_path"
-    sed -i "1i$new_line" "$data_file"
+    if [[ ! -s "$data_file" ]]; then
+        # If the file is empty, append the new line
+        echo "$new_line" >> "$data_file"
+    else
+        # If the file has content, prepend the new line
+        sed -i "1i$new_line" "$data_file"
+    fi
   fi
 else
   new_line="$buffer_path:$cursor_row:$cursor_col,$tmux_window,$tmux_session,$tmux_command,$tmux_pane_path"
-  sed -i "1i$new_line" "$data_file"
+  if [[ ! -s "$data_file" ]]; then
+      # If the file is empty, append the new line
+      echo "$new_line" >> "$data_file"
+  else
+      # If the file has content, prepend the new line
+      sed -i "1i$new_line" "$data_file"
+  fi
 fi
