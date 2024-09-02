@@ -151,3 +151,10 @@
                 * ```sudo sh -c "echo 0 >>  fan_boost_mode"; sudo sh -c "echo 0 >> throttle_thermal_policy"```
             * fan-silent
                 * ```sudo sh -c "echo 2 >>  fan_boost_mode"; sudo sh -c "echo 2 >> throttle_thermal_policy"```
+
+* **Install Vivado**
+    * Dont. Use a VM.
+      * ```sudo apt install libtinfo5```
+      * Install cable drivers in a VM
+        * ```cd /tools/Xilinx/Vivado/2024.1/data/xicom/cable_drivers/lin64/install_script/install_drivers```
+        * ```sudo ./install_drivers```
