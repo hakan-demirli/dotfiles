@@ -241,7 +241,7 @@
     ghostscript
     drawio
 
-    citrix_workspace
+    # citrix_workspace
     # helix
     # helix-gpt
     asm-lsp
