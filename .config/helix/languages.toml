@@ -51,10 +51,10 @@ name = "markdown"
 formatter = { command = 'prettier', args = ["--parser", "markdown"] }
 language-servers = [
   "marksman",
-  "markdown-oxide",
-  "typos",
-  "vale",
-  "ltex"
+  # "markdown-oxide",
+  # "typos",
+  # "vale",
+  # "ltex"
 ]
 # auto-format = true
 

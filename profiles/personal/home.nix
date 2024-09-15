@@ -264,6 +264,7 @@
     lldb
     cmake-language-server
     marksman
+    # markdown-oxide
     gnumake
     texlab
     sioyek
@@ -273,9 +274,9 @@
     verilator
 
     lua-language-server
-    vale-ls
-    typos-lsp
-    ltex-ls
+    # vale-ls
+    # typos-lsp
+    # ltex-ls
 
     neovim
     # taskwarrior
@@ -305,6 +306,7 @@
     (pkgs.callPackage ../../system/app/blender.nix { })
 
     (pkgs.callPackage ../../system/app/veridian.nix { })
+    # (pkgs.callPackage ../../system/app/veridian.nix { withSlang = true; })
     (pkgs.callPackage ../../system/app/update_wp.nix { })
     (pkgs.callPackage ../../system/app/gtk_applet.nix { })
     (pkgs.callPackage ../../system/app/gtk_indicator.nix { })
@@ -350,6 +352,7 @@
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
     PYTHON_HISTORY = "$XDG_STATE_HOME/python/history";
     GOPATH = "$XDG_CACHE_HOME/go";
+    PARALLEL_HOME = "$XDG_CONFIG_HOME/parallel";
     # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${XDG_CONFIG_HOME}/java"; # not working
     KERAS_HOME = "$XDG_STATE_HOME/keras";
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
