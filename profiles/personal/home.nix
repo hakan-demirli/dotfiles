@@ -115,6 +115,30 @@
     yamlConfig = builtins.readFile ../../.config/xremap/config.yml;
   };
 
+  # services.activitywatch = {
+  #   enable = true;
+  #   # https://nix-community.github.io/home-manager/options.xhtml#opt-services.activitywatch.watchers
+  #   # https://docs.activitywatch.net/en/latest/configuration.html
+  #   # http://localhost:5600/
+  #   watchers = {
+  #     aw-watcher-afk = {
+  #       package = pkgs.activitywatch;
+  #       # settings = {
+  #       #   poll_time = 5;
+  #       #   timeout = 180;
+  #       # };
+  #     };
+
+  #     aw-watcher-window = {
+  #       package = pkgs.activitywatch;
+  #       # settings = {
+  #       #   exclude_title = false;
+  #       #   poll_time = 1;
+  #       # };
+  #     };
+  #   };
+  # };
+
   home = {
     homeDirectory = "/home/${userSettings.username}";
     username = userSettings.username;
@@ -235,6 +259,7 @@
     (btop.override { cudaSupport = true; })
     libnotify
 
+    imhex
     trash-cli
     unar
     zip
@@ -295,7 +320,7 @@
       patches = oldAttrs.patches or [ ] ++ [
         (fetchpatch {
           url = "https://patch-diff.githubusercontent.com/raw/helix-editor/helix/pull/11164.diff";
-          hash = "sha256-8SOv2H2ebOridRoBWE3W0rPFERfc0m0AolQOkAZV2IY=";
+          hash = "sha256-60kGTf4VcdIKMwTaAFfZEbLOEae3xSVvbC2R/5VOrlg=";
         })
       ];
     }))
