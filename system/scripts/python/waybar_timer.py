@@ -176,8 +176,9 @@ def main():
             if timer_target:
                 timer.set(int(timer_target))
         else:
-            if isinstance(args.minute, int):
-                timer.set(int(args.minute))
+            timer.set(int(args.minute))
+            print(f"Done. set to : {args.minute}")
+
     elif args.toggle:
         timer.toggle()
     elif args.clear:
