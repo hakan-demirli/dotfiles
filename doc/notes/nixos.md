@@ -158,3 +158,11 @@
       * Install cable drivers in a VM
         * ```cd /tools/Xilinx/Vivado/2024.1/data/xicom/cable_drivers/lin64/install_script/install_drivers```
         * ```sudo ./install_drivers```
+
+* **Claudflare Warp**
+    * ```NIXPKGS_ALLOW_UNFREE=1 nix shell --impure nixpkgs#cloudflare-warp```
+    * ```sudo warp-svc```
+    * ```warp-cli registration new```
+    * ```warp-cli connect```
+    * Check:
+        * ```https://www.whatismyip.com```
