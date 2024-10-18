@@ -66,6 +66,8 @@ keymap = [
 	# Bookmarks
 	{ on = [ "b", "d" ],       run = "cd ~/Desktop/dotfiles", desc = "cd dotfiles" },
 	{ on = [ "b", "p" ],       run = "cd /mnt/second/rep/personal_repo", desc = "cd personal_repo" },
+	{ on = [ "b", "s" ],       run = "cd /mnt/second/rep/tobb_master/s1/", desc = "cd school" },
+
 	# XXXXXXXXXXXXXXXXXXXXXX
 	# Default bindings below
 	# XXXXXXXXXXXXXXXXXXXXXX

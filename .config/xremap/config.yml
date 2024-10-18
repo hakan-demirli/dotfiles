@@ -17,6 +17,7 @@ keymap:
       KEY_RIGHTBRACE: reserved
       KEY_BACKSLASH: reserved
       KEY_LEFTBRACE: KEY_BACKSPACE
+      Ctrl-KEY_LEFTBRACE: Ctrl-KEY_BACKSPACE
       Alt-KEY_LEFTBRACE: KEY_BACKSPACE
       Shift-KEY_LEFTBRACE: KEY_DELETE
       Alt-Shift-KEY_LEFTBRACE: Shift-KEY_MINUS # underscore
@@ -54,6 +55,10 @@ keymap:
       Alt-j: KEY_DOWN
       Alt-k: KEY_UP
       Alt-l: KEY_RIGHT
+      Ctrl-Alt-h: Ctrl-KEY_LEFT
+      Ctrl-Alt-j: Ctrl-KEY_DOWN
+      Ctrl-Alt-k: Ctrl-KEY_UP
+      Ctrl-Alt-l: Ctrl-KEY_RIGHT
       Alt-KEY_SEMICOLON: reserved
 
       Alt-n: reserved
