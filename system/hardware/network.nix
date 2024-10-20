@@ -17,8 +17,8 @@
     extraHosts = ''
       0.0.0.0  9gag.com
       0.0.0.0  www.9gag.com
-      0.0.0.0  reddit.com
-      0.0.0.0  www.reddit.com
+      # 0.0.0.0  reddit.com
+      # 0.0.0.0  www.reddit.com
     '';
   };
 
