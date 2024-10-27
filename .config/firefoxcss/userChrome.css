@@ -88,3 +88,18 @@ toolbarbutton.bookmark-item:not(.subviewbutton) {
 #star-button-box {
   display: none !important;
 }
+
+/**************************** Remove Useless Menu Items From Right-click Menu  ***************************************/
+/* https://github.com/stonecrusher/simpleMenuWizard/blob/13bce1cb72c97d0627f18302d5863a106b1afb5e/simpleMenuWizard/link-context.css#L22 */
+#context-openlinkinusercontext-menu,    /* Open Link in New Container Tab   */
+#context-sep-open,                      /************ Separator *************/
+#context-bookmarklink,                  /* Bookmark Link                    */
+#context-savelink,                      /* Save Link As…                    */
+#context-savelinktopocket,              /* Save Link to Pocket              */
+#context-copylink,                      /* Copy Link                        */
+#context-sendlinktodevice,              /* Send Link to Device              */
+#context-sep-sendlinktodevice,          /************ Separator *************/
+#context-sep-copylink,                  /************ Separator *************/
+#frame-sep {
+  display: none !important;
+}
