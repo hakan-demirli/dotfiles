@@ -1,7 +1,7 @@
+import datetime
+import pathlib
 import subprocess
 import tempfile
-import pathlib
-import datetime
 
 from PIL import Image
 
@@ -103,7 +103,7 @@ def resize_image(input_image: str, output_image: str, width: int, height: int) -
 def main():
     overlayed_file = tempfile.gettempdir() + "/overlayed.png"
     calendar_overlay_file = tempfile.gettempdir() + "/calendar_overlay.png"
-    wp_dir = "/mnt/second/images/art/wallpapers_pc"
+    wp_dir = "/mnt/second/rep/images/art/wallpapers_pc"  # TODO: Fix abs path
     types = [".jpg", ".png", ".jpeg", ".webp"]
 
     wallpapers = getFilesByType(wp_dir, types)

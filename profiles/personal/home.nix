@@ -376,6 +376,7 @@
     PYTHONPYCACHEPREFIX = "$XDG_CACHE_HOME/python";
     PYTHONUSERBASE = "$XDG_DATA_HOME/python";
     PYTHON_HISTORY = "$XDG_STATE_HOME/python/history";
+    PYTHONSTARTUP = "$XDG_STATE_HOME/python/pythonrc";
     GOPATH = "$XDG_CACHE_HOME/go";
     PARALLEL_HOME = "$XDG_CONFIG_HOME/parallel";
     # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${XDG_CONFIG_HOME}/java"; # not working
