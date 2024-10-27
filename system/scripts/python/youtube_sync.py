@@ -102,6 +102,24 @@ def syncYoutubePlaylist(music_dir, playlist_file):
     print("[COMPLETED]")
 
 
+def create_m3u8_playlists(directory):
+    for dirpath, _, filenames in os.walk(directory):
+        # Collect audio files with relative paths (starting with './')
+        audio_files = sorted(
+            [f"./{f}" for f in filenames if f.lower().endswith((".opus"))]
+        )
+        if audio_files:
+            # Use directory name as playlist name
+            playlist_name = f"{Path(dirpath).name}.m3u8"
+            playlist_path = os.path.join(dirpath, playlist_name)
+
+            # Write audio file names to the playlist file
+            with open(playlist_path, "w") as playlist_file:
+                for audio_file in audio_files:
+                    playlist_file.write(f"{audio_file}\n")
+            print(f"Created playlist: {playlist_path}")
+
+
 def clean_dir(directory):
     # Define the file types to delete
     file_types = [
@@ -111,6 +129,7 @@ def clean_dir(directory):
         "*.json",
         "*.part",
         "*.description",
+        "*.m3u8",  # Will be regenerated
     ]
     for file_type in file_types:
         for dirpath, dirnames, filenames in os.walk(directory):
@@ -142,3 +161,5 @@ if __name__ == "__main__":
 
     syncYoutubePlaylist(args.music_dir, args.playlist_file)
     clean_dir(args.music_dir)
+    create_m3u8_playlists(args.music_dir)
+    print("[DONE]")
