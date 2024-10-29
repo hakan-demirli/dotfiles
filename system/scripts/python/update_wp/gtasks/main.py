@@ -118,19 +118,20 @@ def fetch_task_lists(service: googleapi.GoogleApiService):
     OUTPUT_DIR = tempfile.gettempdir()
     with open(OUTPUT_DIR + "/gtasks.txt", "w") as f:
         for task_list in task_lists:
-            for task in task_list.tasks:
-                if task.completed():
-                    continue
-                print("- " + insert_newlines(task.title, line_length=33), file=f)
-                for subtask in task.subtasks:
+            if task_list.title == "Frogs":
+                for task in task_list.tasks:
                     if task.completed():
                         continue
-                    print(
-                        "    * "
-                        + insert_newlines(subtask.title, line_length=31, offset=6),
-                        file=f,
-                    )
-                print("", file=f)
+                    print("- " + insert_newlines(task.title, line_length=33), file=f)
+                    for subtask in task.subtasks:
+                        if task.completed():
+                            continue
+                        print(
+                            "    * "
+                            + insert_newlines(subtask.title, line_length=31, offset=6),
+                            file=f,
+                        )
+                    print("", file=f)
 
 
 def insert_newlines(text, line_length=33, offset=0):

@@ -89,6 +89,17 @@ def setFirefoxWallpaper(wallpaper_path: str) -> None:
         shutil.copy2(wallpaper_path, new_wallpaper_name)
 
 
+def launch_onscreen_overlay(task_file_path: str) -> None:
+    subprocess.run(["pkill", "activate-linux"])
+
+    task = ""
+    with open(task_file_path, "r") as f:
+        lines = f.readlines()
+        task = lines[0].strip()  # Strip newline characters
+
+    os.system(f'activate-linux -t Task -m "{task}" & ')
+
+
 def main():
     ics_overlay()
     gtasks_overlay()
@@ -112,7 +123,7 @@ def main():
             "90",
         ]
     )
-
+    launch_onscreen_overlay("/tmp/gtasks.txt")  # TODO: fix ABSPATH
     image = Image.open(overlayed_file)
     width, height = image.size
     crop_box = (137, 26, width, height)

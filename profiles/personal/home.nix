@@ -248,7 +248,8 @@
     swaynotificationcenter
 
     playerctl
-    swww
+    swww # for update_wp
+    activate-linux # for update_wp
     mpv
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ripgrep

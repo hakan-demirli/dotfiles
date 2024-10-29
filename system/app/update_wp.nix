@@ -3,6 +3,7 @@ pkgs.stdenv.mkDerivation {
   name = "update_wp";
   propagatedBuildInputs = [
     pkgs.swww
+    pkgs.activate-linux
     (pkgs.python3.withPackages (
       pythonPackages: with pythonPackages; [
         pillow

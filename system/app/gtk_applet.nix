@@ -8,6 +8,7 @@ pkgs.stdenv.mkDerivation {
     libappindicator
   ];
   propagatedBuildInputs = [
+    pkgs.activate-linux # for update_wp
     (pkgs.python3.withPackages (
       pythonPackages: with pythonPackages; [
         pygobject3
