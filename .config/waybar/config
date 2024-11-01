@@ -1,5 +1,6 @@
 {
   "layer": "top",
+  "output": "eDP-1",
   "position": "right",
   "modules-left": [
     "hyprland/workspaces"
