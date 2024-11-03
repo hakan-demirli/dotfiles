@@ -111,6 +111,7 @@
   # # requires hardware.uinput.enable = true;
   services.xremap = {
     withWlroots = true;
+    watch = true;
     # username = userSettings.username;
     yamlConfig = builtins.readFile ../../.config/xremap/config.yml;
   };
