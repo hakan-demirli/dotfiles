@@ -381,6 +381,8 @@
     PYTHONSTARTUP = "$XDG_STATE_HOME/python/pythonrc";
     GOPATH = "$XDG_CACHE_HOME/go";
     PARALLEL_HOME = "$XDG_CONFIG_HOME/parallel";
+    MYSQL_HISTFILE = "$XDG_DATA_HOME/mysql_history";
+    SQLITE_HISTORY = "$XDG_CACHE_HOME/sqlite_history";
     # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${XDG_CONFIG_HOME}/java"; # not working
     KERAS_HOME = "$XDG_STATE_HOME/keras";
     # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager

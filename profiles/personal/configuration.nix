@@ -87,6 +87,8 @@
       enable = true;
       excludePackages = [ pkgs.xterm ];
     };
+
+    gnome.gnome-keyring.enable = true; # NOTE: Required for mysql-workbench
   };
 
   # test: `cpupower frequency-info`
