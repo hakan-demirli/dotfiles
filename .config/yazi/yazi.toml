@@ -74,11 +74,11 @@ bizarre_retry = 5
 image_alloc = 0  # 512MB
 image_bound = [ 0, 0 ]
 
-[plugins]
-preload = []
+# [plugins]
 
 [plugin]
 prepend_previewers = [{ name = "*.opus", run = "video" }]
+prepend_preloaders = [{ name = "*.opus", run = "video" }]
 
 [input]
 # cd
