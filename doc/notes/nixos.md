@@ -166,3 +166,7 @@
     * ```warp-cli connect```
     * Check:
         * ```https://www.whatismyip.com```
+
+* **cli overrides**
+    * ```NIXPKGS_ALLOW_UNFREE=1  nix run --impure --expr 'with import <nixpkgs> {}; application_name.override { cublasSupport = true; }'```
+
