@@ -146,13 +146,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--playlist_file",
         type=str,
-        default="/mnt/second/music/playlists.txt",  # ABS_PATH: better solution?
+        default="/mnt/second/rep/sounds/music/playlists.txt",  # ABS_PATH: better solution?
         help="The playlist file.",
     )
     parser.add_argument(
         "--music_dir",
         type=str,
-        default="/mnt/second/music",  # ABS_PATH: better solution?
+        default="/mnt/second/rep/sounds/music",  # ABS_PATH: better solution?
         help="The music directory.",
     )
 

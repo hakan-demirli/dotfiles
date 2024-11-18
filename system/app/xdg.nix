@@ -16,6 +16,7 @@
       immutable_configs = [
         "bat"
         "anyrun"
+        "tofi"
         "qmk"
         "gnome3-keybind-backup"
         "gtk_indicator"

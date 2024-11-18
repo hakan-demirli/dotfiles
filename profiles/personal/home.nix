@@ -215,6 +215,7 @@
     hyprlock
     kitty
     xwaylandvideobridge
+    tofi
     # j4-dmenu-desktop
     # anyrun
     tor-browser
@@ -315,7 +316,7 @@
     steam-run # quick runner for fsh compliant binaries
     udiskie
     # (pkgs.callPackage ../../system/app/tt.nix {})
-    (pkgs.callPackage ../../system/app/j4-dmenu-desktop.nix { })
+    # (pkgs.callPackage ../../system/app/j4-dmenu-desktop.nix { })
     (pkgs.callPackage ../../system/app/waybar_timer.nix { })
 
     ((pkgs.callPackage ../../system/app/helix.nix { }).overrideAttrs (oldAttrs: {

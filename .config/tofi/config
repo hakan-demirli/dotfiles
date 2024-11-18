@@ -1,0 +1,47 @@
+# Dmenu-like position
+anchor = top
+width = 100%
+horizontal = true
+
+# Height of bar
+height = 36
+
+# Padding
+padding-top = 5
+padding-bottom = 0
+padding-left = 5
+padding-right = 0
+
+# Font size
+font-size = 12
+font = monospace
+min-input-width = 120
+result-spacing = 15
+
+## Dracula theme
+background-color = #282A36
+
+# Prompt
+prompt-text = "Search: "
+prompt-color = #F8F8F2
+
+# Input
+input-color = #50FA7B
+input-background = #44475A
+input-background-padding = 3
+input-background-corner-radius = 8
+
+# Result color
+default-result-color = #6272A4
+
+# Selection text
+selection-color = #8BE9FD
+selection-match-color = #50FA7B
+
+# Border color
+border-width = 0
+border-color = #6272A4
+
+# Outline width
+outline-width = 0
+
