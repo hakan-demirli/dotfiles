@@ -170,3 +170,9 @@
 * **cli overrides**
     * ```NIXPKGS_ALLOW_UNFREE=1  nix run --impure --expr 'with import <nixpkgs> {}; application_name.override { cublasSupport = true; }'```
 
+* **Take out the trash**
+    * ```nix-collect-garbage -d```
+    * NEVER DO THIS!
+        * ```rm /nix/var/nix/gcroots/auto/*```
+        * After removing these, home-manager itself started to get garbage collected.
+

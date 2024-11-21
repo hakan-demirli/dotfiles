@@ -42,6 +42,10 @@
       "uid=1000"
     ];
   };
+  fileSystems."/mnt/third" = {
+    device = "/dev/disk/by-uuid/1f0ba19b-a6a7-42c7-b5fa-5805fd2001cb";
+    fsType = "ext4";
+  };
 
   swapDevices = [
     {
