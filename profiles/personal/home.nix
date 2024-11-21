@@ -318,7 +318,7 @@
       patches = oldAttrs.patches or [ ] ++ [
         (fetchpatch {
           url = "https://patch-diff.githubusercontent.com/raw/helix-editor/helix/pull/11164.diff";
-          hash = "sha256-60kGTf4VcdIKMwTaAFfZEbLOEae3xSVvbC2R/5VOrlg=";
+          hash = "sha256-7v5aVbXHuZfyuEuxpf57rx5GaoNznDVhKzV3CSF0Ifg=";
         })
       ];
     }))

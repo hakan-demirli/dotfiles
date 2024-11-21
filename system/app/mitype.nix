@@ -11,7 +11,7 @@ pkgs.stdenv.mkDerivation rec {
     owner = "Mithil467";
     repo = "mitype";
     rev = "cdb2da1f40611f6e44ccba50eccd135b3a503bc3";
-    hash = "sha256-O02LVj1rrwERYxH8F7s1kghFMUNlsF318PzQObM7Ytk=";
+    hash = "sha256-6jq5P1lC/C3D14l/djCTgaKPqOTJpn4EMBh2IvajiTs=";
   };
 
   buildInputs = [ python3 ];
