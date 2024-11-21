@@ -213,11 +213,7 @@
     vim # default editor
     waybar
     hyprlock
-    kitty
     xwaylandvideobridge
-    tofi
-    # j4-dmenu-desktop
-    # anyrun
     tor-browser
     thunderbird
     qalculate-qt
@@ -259,7 +255,6 @@
     tmux
     ffmpeg-full
     bat
-    (btop.override { cudaSupport = true; })
     libnotify
 
     imhex

@@ -51,6 +51,7 @@
         "task"
         "timewarrior"
         "starship.toml"
+        "zsh"
       ];
 
       immutable_data = [

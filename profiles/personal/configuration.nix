@@ -50,7 +50,7 @@
       keep-outputs = true;
       keep-derivations = true;
       # perf
-      max-substitution-jobs = 128;
+      max-substitution-jobs = 256;
     };
   };
 
@@ -61,6 +61,11 @@
   environment.systemPackages = with pkgs; [
     home-manager
     git
+
+    btop
+    fzf
+    kitty
+    tofi
 
     git-crypt
     wget
