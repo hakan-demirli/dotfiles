@@ -24,6 +24,26 @@
         "privacy.resistFingerprinting.block_mozAddonManager" = true;
         "browser.translations.select.enable" = false;
 
+        # This allows firefox devs changing options for a small amount of users to test out stuff.
+        # Not with me please ...
+        "app.normandy.enabled" = false;
+        "app.shield.optoutstudies.enabled" = false;
+
+        "beacon.enabled" = false; # No bluetooth location BS in my webbrowser please
+        "device.sensors.enabled" = false; # This isn't a phone
+        "geo.enabled" = false; # Disable geolocation alltogether
+
+        # Disable telemetry for privacy reasons
+        "toolkit.telemetry.archive.enabled" = false;
+        "toolkit.telemetry.enabled" = false; # enforced by nixos
+        "toolkit.telemetry.server" = "";
+        "toolkit.telemetry.unified" = false;
+        "extensions.webcompat-reporter.enabled" = false; # don't report compability problems to mozilla
+        "datareporting.policy.dataSubmissionEnabled" = false;
+        "datareporting.healthreport.uploadEnabled" = false;
+        "browser.ping-centre.telemetry" = false;
+        "browser.urlbar.eventTelemetry.enabled" = false; # (default)
+
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
         "browser.compactmode.show" = true;

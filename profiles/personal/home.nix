@@ -8,6 +8,7 @@
 {
   imports = [
     ../../system/app/firefox.nix
+    ../../system/app/thunderbird.nix
     ../../system/app/low_battery_notify.nix
     ../../system/app/xdg.nix
 
@@ -215,7 +216,6 @@
     hyprlock
     xwaylandvideobridge
     tor-browser
-    thunderbird
     qalculate-qt
     # (lf.overrideAttrs (oldAttrs: {
     #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
