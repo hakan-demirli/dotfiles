@@ -176,3 +176,6 @@
         * ```rm /nix/var/nix/gcroots/auto/*```
         * After removing these, home-manager itself started to get garbage collected.
 
+* **Create nixos bootable usb drive**
+    * ```cp nixos.iso /dev/sdX```
+
