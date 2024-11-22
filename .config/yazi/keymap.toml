@@ -90,8 +90,8 @@ keymap = [
 	{ on = [ "<PageDown>" ],   run = "arrow 100%",  desc = "Move cursor down one page" },
 
 
-	{ on = [ "H" ], run = "back",    desc = "Go back to the previous directory" },
-	{ on = [ "L" ], run = "forward", desc = "Go forward to the next directory" },
+	{ on = [ "<C-o>" ], run = "back",    desc = "Go back to the previous directory" },
+	{ on = [ "<C-i>" ], run = "forward", desc = "Go forward to the next directory" },
 
 	{ on = [ "<A-k>" ], run = "seek -5", desc = "Seek up 5 units in the preview" },
 	{ on = [ "<A-j>" ], run = "seek 5",  desc = "Seek down 5 units in the preview" },
