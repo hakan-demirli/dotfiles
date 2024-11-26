@@ -35,6 +35,7 @@
         "nwg"
         "qmk"
         "qutebrowser"
+        "rclone"
         "rmpc"
         "sioyek"
         "starship.toml"

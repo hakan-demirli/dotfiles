@@ -264,6 +264,7 @@
     ghostscript
     drawio
 
+    rclone
     # citrix_workspace
     # helix
     # helix-gpt
