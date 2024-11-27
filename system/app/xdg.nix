@@ -10,6 +10,7 @@
       mutable_configs = [
         ".bash_history"
         "hypr"
+        "rvc-cli"
         "mimeapps.list"
       ];
 
@@ -147,4 +148,25 @@
     recursive = true;
     executable = true;
   };
+
+  home.file.".config/rvc-cli/rvc/models/embedders/contentvec/pytorch_model.bin".source = "${
+    pkgs.fetchurl
+    {
+      url = "https://huggingface.co/IAHispano/Applio/resolve/main/Resources/embedders/contentvec/pytorch_model.bin";
+      sha256 = "sha256-2N1ADgVN305r512rWiVJ23SMyZ51agl8SWwJn2WkhU4=";
+    }
+  }";
+  home.file.".config/rvc-cli/rvc/models/embedders/contentvec/config.json".source = "${pkgs.fetchurl {
+    url = "https://huggingface.co/IAHispano/Applio/resolve/main/Resources/embedders/contentvec/config.json";
+    sha256 = "sha256-Ld3gY7eV042QUachWgkv7PTP4Ui1QlHjjeUdiNNWiYs=";
+  }}";
+  home.file.".config/rvc-cli/models/predictors/rmvpe.pt".source = "${pkgs.fetchurl {
+    url = "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt";
+    sha256 = "sha256-bWIhX0MG48ongkYYhgcgnwmvPcd+1CMu/dBpeYxOwZM=";
+  }}";
+  home.file.".config/rvc-cli/models/custom/".source = "${pkgs.fetchzip {
+    url = "https://huggingface.co/PGR-RVC/NieR_RVC_v2/resolve/main/EN/Pod042EN_e250_s14250_RVCv2_RMVPE.zip";
+    sha256 = "sha256-PGPCG5FwsoPGE6PGtYTBuE3fan1JTj95d5J3b77GLxg=";
+    stripRoot = false;
+  }}";
 }
