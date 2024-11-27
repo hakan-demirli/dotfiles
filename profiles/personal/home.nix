@@ -10,6 +10,7 @@
     ../../system/app/firefox.nix
     ../../system/app/thunderbird.nix
     ../../system/app/low_battery_notify.nix
+    ../../system/app/activitywatch.nix
     ../../system/app/xdg.nix
 
     inputs.xremap-flake.homeManagerModules.default
@@ -117,30 +118,6 @@
     yamlConfig = builtins.readFile ../../.config/xremap/config.yml;
   };
 
-  # services.activitywatch = {
-  #   enable = true;
-  #   # https://nix-community.github.io/home-manager/options.xhtml#opt-services.activitywatch.watchers
-  #   # https://docs.activitywatch.net/en/latest/configuration.html
-  #   # http://localhost:5600/
-  #   watchers = {
-  #     aw-watcher-afk = {
-  #       package = pkgs.activitywatch;
-  #       # settings = {
-  #       #   poll_time = 5;
-  #       #   timeout = 180;
-  #       # };
-  #     };
-
-  #     aw-watcher-window = {
-  #       package = pkgs.activitywatch;
-  #       # settings = {
-  #       #   exclude_title = false;
-  #       #   poll_time = 1;
-  #       # };
-  #     };
-  #   };
-  # };
-
   home = {
     homeDirectory = "/home/${userSettings.username}";
     username = userSettings.username;
@@ -209,6 +186,8 @@
     fan-silent = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 2 >>  fan_boost_mode"; sudo sh -c "echo 2 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
   };
   home.packages = with pkgs; [
+    awatcher
+
     cpufrequtils
     hypridle
     vim # default editor
