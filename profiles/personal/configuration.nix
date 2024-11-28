@@ -22,6 +22,7 @@
   # nix
   documentation.nixos.enable = false; # .desktop
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.cudaSupport = true;
   nix = {
     gc = {
       automatic = true;
@@ -62,7 +63,7 @@
     home-manager
     git
 
-    btop
+    (btop.override { cudaSupport = true; })
     fzf
     kitty
     tofi
