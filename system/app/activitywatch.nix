@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   services.activitywatch = {
-    enable = true;
+    enable = false; # use hyprland config
     package = pkgs.aw-server-rust;
 
     ## Buggy

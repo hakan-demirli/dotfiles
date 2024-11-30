@@ -10,7 +10,7 @@
     ../../system/app/firefox.nix
     ../../system/app/thunderbird.nix
     ../../system/app/low_battery_notify.nix
-    ../../system/app/activitywatch.nix
+    # ../../system/app/activitywatch.nix
     ../../system/app/xdg.nix
 
     inputs.xremap-flake.homeManagerModules.default
@@ -189,6 +189,7 @@
     awatcher
     aw-watcher-afk
     aw-watcher-window
+    aw-server-rust
     (pkgs.callPackage ../../system/app/aw-settings.nix { })
     (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
 
