@@ -36,6 +36,7 @@
         "nix"
         "npm"
         "nwg"
+        "parallel"
         "qmk"
         "qutebrowser"
         "rclone"

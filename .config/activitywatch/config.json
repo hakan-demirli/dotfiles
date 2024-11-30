@@ -1,10 +1,295 @@
 {
+  "always_active_pattern": "",
+  "durationDefault": 14400,
   "startOfWeek": "Monday",
-  "landingpage": "/home",
   "userSatisfactionPollData": {
     "isEnabled": true,
     "nextPollTime": "2024-12-04T15:16:45.037Z",
     "timesPollIsShown": 0
+  },
+  "requestTimeout": 30,
+  "theme": "dark",
+  "classes": [
+    {
+      "data": {
+        "color": "#FA28FF"
+      },
+      "id": 15,
+      "name": ["Work"],
+      "rule": {
+        "type": "none"
+      }
+    },
+    {
+      "data": {
+        "color": "#FFAB00"
+      },
+      "id": 16,
+      "name": ["Fun"],
+      "rule": {
+        "type": "none"
+      }
+    },
+    {
+      "data": {
+        "color": "#FF5252"
+      },
+      "id": 17,
+      "name": ["Wasted"],
+      "rule": {
+        "type": "none"
+      }
+    },
+    {
+      "data": {
+        "color": "#2202FF"
+      },
+      "id": 18,
+      "name": ["Filtered"],
+      "rule": {
+        "regex": "Filtered",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#FA8072"
+      },
+      "id": 19,
+      "name": ["Chore"],
+      "rule": {
+        "type": "none"
+      }
+    },
+    {
+      "data": {
+        "color": "#FF6347"
+      },
+      "id": 20,
+      "name": ["Chore", "Shopping"],
+      "rule": {
+        "regex": "AliExpress|Aliexpress|aliexpress|temu|Temu|amazon|Amazon|hepsiburada|Hepsiburada|Al\u0131\u015fveri\u015f Sepeti|Shopping|Sipari\u015f|PTT|\u00d6deme|Epey|VATAN",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#F06F40"
+      },
+      "id": 21,
+      "name": ["Chore", "Search"],
+      "rule": {
+        "regex": "Google Search",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#506F4F"
+      },
+      "id": 22,
+      "name": ["Chore", "OS"],
+      "rule": {
+        "regex": "Nixpkgs|nixpkgs|nixpk.gs|NixOS|Arch Linux|home-manager|dotfiles",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#F06F40"
+      },
+      "id": 23,
+      "name": ["Chore", "Telemetry"],
+      "rule": {
+        "regex": "ActivityWatch|aw-|AW Bucket Import Process",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#FA60F0"
+      },
+      "id": 24,
+      "name": ["Chore", "Workflow"],
+      "rule": {
+        "regex": "Google Calendar|Google Drive",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#0F0",
+        "score": 10
+      },
+      "id": 0,
+      "name": ["Work", "Coding"],
+      "rule": {
+        "regex": "ChatGPT|Claude|.*Microsoft Copilot.*|kitty|bash|vim|Spyder|Ghidra|kate|Scite|btop|my_todo|the_terminal|Code search results|Issue search results|MySQL|SQLite|Regex|.*flutter.*",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#4CAF50"
+      },
+      "id": 1,
+      "name": ["Work", "Research"],
+      "rule": {
+        "regex": "Google Docs|libreoffice|ReText|Stack Overflow|GitHub|BitBucket|Gitlab|LibreOffice|Google Sheets",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#8BC34A"
+      },
+      "id": 2,
+      "name": ["Work", "Lectures"],
+      "rule": {
+        "regex": "piazza|Zoom|Google Meet|Teams|BigBlueButton",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#00BCD4"
+      },
+      "id": 3,
+      "name": ["Work", "Lecture Videos"],
+      "rule": {
+        "regex": "YouTube.*(Lecture|Tutorial|Course|Physics|Programming|Educational|Ders)|.*Ders.*",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#F0B0D4"
+      },
+      "id": 4,
+      "name": ["Work", "Practice/Exercise/Study"],
+      "rule": {
+        "regex": ".*Exercise.*pdf|.*Practice.*pdf|B\u0130L",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#FFC107"
+      },
+      "id": 5,
+      "name": ["Work", "Comms"],
+      "rule": {
+        "regex": "Messenger|Telegram|Signal|WhatsApp|Slack|Discord|Gmail|Thunderbird|Proton Mail|Mail|Webmail|Horde",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#673AB7"
+      },
+      "id": 6,
+      "name": ["Work", "Media"],
+      "rule": {
+        "regex": "Spotify|Deezer|mpv|Plex|VLC|KolourPaint",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#E91E63"
+      },
+      "id": 7,
+      "name": ["Fun", "Anime"],
+      "rule": {
+        "regex": "Gogoanime|gogoanime|myanimelist|Anime|anime",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#561A6A"
+      },
+      "id": 8,
+      "name": ["Fun", "Movies"],
+      "rule": {
+        "regex": "Movies",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#9C27B0"
+      },
+      "id": 9,
+      "name": ["Fun", "Manga"],
+      "rule": {
+        "regex": "MangaDex|MangaReader|Manga|Scans",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#FF5722"
+      },
+      "id": 10,
+      "name": ["Fun", "Games"],
+      "rule": {
+        "regex": "Steam|Epic Games|GOG|Nier|NieR",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#FF5722"
+      },
+      "id": 11,
+      "name": ["Fun", "News"],
+      "rule": {
+        "regex": "Hacker News",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#F44336"
+      },
+      "id": 12,
+      "name": ["Wasted", "Brain Rot Videos"],
+      "rule": {
+        "regex": "YouTube",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#FF9800"
+      },
+      "id": 13,
+      "name": ["Wasted", "Social Media"],
+      "rule": {
+        "regex": "Reddit|reddit|Facebook|Twitter|Instagram|devRant|TikTok|r/|Imgur|wallstreetbets|LocalLlama",
+        "type": "regex"
+      }
+    },
+    {
+      "data": {
+        "color": "#607D8B"
+      },
+      "id": 14,
+      "name": ["Uncategorized"],
+      "rule": {
+        "type": "none"
+      }
+    }
+  ],
+  "startOfDay": "04:00",
+  "initialTimestamp": "2024-11-27T15:16:45.037Z",
+  "landingpage": "/home",
+  "newReleaseCheckData": {
+    "howOftenToCheck": 86400,
+    "isEnabled": true,
+    "nextCheckTime": "2024-12-01T23:59:10.578Z",
+    "timesChecked": 0
   },
   "views": [
     {
@@ -84,273 +369,17 @@
       "name": "Editor"
     },
     {
-      "elements": [],
+      "elements": [
+        {
+          "props": {
+            "title": "cpu_usage_percent",
+            "visname": "aw-watcher-system"
+          },
+          "type": "custom_vis"
+        }
+      ],
       "id": "69420",
       "name": "system"
     }
-  ],
-  "initialTimestamp": "2024-11-27T15:16:45.037Z",
-  "always_active_pattern": "",
-  "newReleaseCheckData": {
-    "howOftenToCheck": 86400,
-    "isEnabled": true,
-    "nextCheckTime": "2024-11-29T23:14:46.890Z",
-    "timesChecked": 0
-  },
-  "theme": "dark",
-  "classes": [
-    {
-      "data": {
-        "color": "#FA28FF"
-      },
-      "id": 14,
-      "name": ["Work"],
-      "rule": {
-        "type": "none"
-      }
-    },
-    {
-      "data": {
-        "color": "#FFAB00"
-      },
-      "id": 15,
-      "name": ["Fun"],
-      "rule": {
-        "type": "none"
-      }
-    },
-    {
-      "data": {
-        "color": "#FF5252"
-      },
-      "id": 16,
-      "name": ["Wasted"],
-      "rule": {
-        "type": "none"
-      }
-    },
-    {
-      "data": {
-        "color": "#2202FF"
-      },
-      "id": 17,
-      "name": ["Filtered"],
-      "rule": {
-        "regex": "Filtered",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#FA8072"
-      },
-      "id": 18,
-      "name": ["Chore"],
-      "rule": {
-        "type": "none"
-      }
-    },
-    {
-      "data": {
-        "color": "#FF6347"
-      },
-      "id": 19,
-      "name": ["Chore", "Shopping"],
-      "rule": {
-        "regex": "AliExpress|Aliexpress|aliexpress|temu|Temu|amazon|Amazon|hepsiburada|Hepsiburada|Alışveriş Sepeti|Shopping|Sipariş|PTT|Ödeme|Epey",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#F06F40"
-      },
-      "id": 20,
-      "name": ["Chore", "Search"],
-      "rule": {
-        "regex": "Google Search",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#506F4F"
-      },
-      "id": 20,
-      "name": ["Chore", "OS"],
-      "rule": {
-        "regex": "Nixpkgs|nixpkgs|nixpk.gs|NixOS|Arch Linux|home-manager",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#F06F40"
-      },
-      "id": 20,
-      "name": ["Chore", "Telemetry"],
-      "rule": {
-        "regex": "ActivityWatch|aw-|AW Bucket Import Process",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#0F0",
-        "score": 10
-      },
-      "id": 0,
-      "name": ["Work", "Coding"],
-      "rule": {
-        "regex": "ChatGPT|kitty|bash|vim|Spyder|Ghidra|kate|Scite|btop|my_todo|the_terminal|Code search results|Issue search results|MySQL|SQLite",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#4CAF50"
-      },
-      "id": 1,
-      "name": ["Work", "Research"],
-      "rule": {
-        "regex": "Google Docs|libreoffice|ReText|Stack Overflow|GitHub|BitBucket|Gitlab|LibreOffice",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#8BC34A"
-      },
-      "id": 2,
-      "name": ["Work", "Lectures"],
-      "rule": {
-        "regex": "piazza|Zoom|Google Meet|Teams|BigBlueButton",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#00BCD4"
-      },
-      "id": 3,
-      "name": ["Work", "Lecture Videos"],
-      "rule": {
-        "regex": "YouTube.*(Lecture|Tutorial|Course|Physics|Programming|Educational|Ders)",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#F0B0D4"
-      },
-      "id": 4,
-      "name": ["Work", "Practice/Exercise"],
-      "rule": {
-        "regex": ".*Exercise.*pdf|.*Practice.*pdf",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#FFC107"
-      },
-      "id": 5,
-      "name": ["Work", "Comms"],
-      "rule": {
-        "regex": "Messenger|Telegram|Signal|WhatsApp|Slack|Discord|Gmail|Thunderbird|Proton Mail|Mail|Webmail|Horde",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#673AB7"
-      },
-      "id": 6,
-      "name": ["Work", "Media"],
-      "rule": {
-        "regex": "Spotify|Deezer|mpv|Plex|VLC|Movies|KolourPaint",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#E91E63"
-      },
-      "id": 7,
-      "name": ["Fun", "Anime"],
-      "rule": {
-        "regex": "Gogoanime|gogoanime|myanimelist|Anime|anime",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#9C27B0"
-      },
-      "id": 8,
-      "name": ["Fun", "Manga"],
-      "rule": {
-        "regex": "MangaDex|MangaReader|Manga|Scans",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#FF5722"
-      },
-      "id": 9,
-      "name": ["Fun", "Games"],
-      "rule": {
-        "regex": "Steam|Epic Games|GOG|Nier|NieR",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#FF5722"
-      },
-      "id": 10,
-      "name": ["Fun", "News"],
-      "rule": {
-        "regex": "Hacker News",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#F44336"
-      },
-      "id": 11,
-      "name": ["Wasted", "Brain Rot Videos"],
-      "rule": {
-        "regex": "YouTube",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#FF9800"
-      },
-      "id": 12,
-      "name": ["Wasted", "Social Media"],
-      "rule": {
-        "regex": "Reddit|reddit|Facebook|Twitter|Instagram|devRant|TikTok|r/|Imgur|wallstreetbets|LocalLlama",
-        "type": "regex"
-      }
-    },
-    {
-      "data": {
-        "color": "#607D8B"
-      },
-      "id": 13,
-      "name": ["Uncategorized"],
-      "rule": {
-        "type": "none"
-      }
-    }
-  ],
-
-  "durationDefault": 14400,
-  "requestTimeout": 30,
-  "startOfDay": "04:00"
+  ]
 }
