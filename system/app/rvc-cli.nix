@@ -1,6 +1,8 @@
 {
+  config,
   pkgs,
   fetchFromGitHub,
+  enableCuda ? config.cudaSupport,
 }:
 
 let
@@ -15,8 +17,8 @@ pkgs.stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "hakan-demirli";
     repo = "rvc-cli";
-    rev = "8325b9e394ebfeb501a3f1bb047bc15a87a0e0ab";
-    sha256 = "sha256-MziJU6hxCmEWgjzslAaTEYsFVQFCVvgmuXNnlPjqoXQ=";
+    rev = "47db4efaa62b711eb021db5a4b5da1750287ce31";
+    sha256 = "sha256-OOMgbA3oGmOxLgoFAstci4HpJ269EYSaoKfi1k2xMRI=";
   };
 
   installPhase = ''
@@ -51,9 +53,11 @@ pkgs.stdenv.mkDerivation rec {
     soundfile
     parselmouth
     numba
-    torch
-    torchaudio
-    torchvision
+    # torch with cuda takes 8 hours to build! Using torch- bin instead
+    # (torch.override { cudaSupport = enableCuda; })
+    torch-bin
+    torchvision-bin
+    torchaudio-bin
     torchcrepe
     einops
     transformers

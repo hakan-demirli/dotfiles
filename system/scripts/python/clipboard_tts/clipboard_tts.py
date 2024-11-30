@@ -1,11 +1,14 @@
+#!/usr/bin/env python3
+
+import logging
 import os
+import queue
 import re
 import sys
-import time
-import queue
-import logging
 import threading
+import time
 from pathlib import Path
+
 import pyclip
 
 # Configuration and Constants
@@ -14,10 +17,10 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 CONFIG = {
     "TEMPO": 1.0,
     "OUTPUT_DIR": Path("/tmp/piper"),
-    "PIPER_MODEL": "/mnt/second/software/lin/piper/models/en_GB-jenny_dioco-medium.onnx",
+    "PIPER_MODEL": "/home/emre/.config/piper/models/jenny_dioco.onnx",
+    "PIPER_CONFIG": "/home/emre/.config/piper/models/jenny_dioco.json",
     "RVC_MODEL_PATH": "/home/emre/.config/rvc-cli/models/custom/Pod042EN_e250_s14250.pth",
     "RVC_INDEX_PATH": "/home/emre/.config/rvc-cli/models/custom/added_IVF2047_Flat_nprobe_1_Pod042EN_v2.index",
-    "RVC_INPUT_DIR": Path("/home/emre/Desktop/rvc-cli"),
     "DELIMITERS": "[?.!]",
     "RAND_SIZE": 16,
     "MAX_STR_SIZE": 20000,
@@ -53,7 +56,7 @@ def sanitize_string(input_str):
 
 
 def text_to_speech_with_piper(text, output_file):
-    command = f"echo '{text}' | piper --model {CONFIG['PIPER_MODEL']} --output_file {output_file}"
+    command = f"echo '{text}' | piper --model {CONFIG['PIPER_MODEL']} --config {CONFIG['PIPER_CONFIG']} --output_file {output_file}"
     result = os.system(command)
     if result != 0:
         logging.error(f"Piper TTS failed for text: {text}")

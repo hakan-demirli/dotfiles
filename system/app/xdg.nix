@@ -15,7 +15,9 @@
       ];
 
       immutable_configs = [
+        "activitywatch"
         "anyrun"
+        "awatcher"
         "bat"
         "btop"
         "cargo"
@@ -168,5 +170,13 @@
     url = "https://huggingface.co/PGR-RVC/NieR_RVC_v2/resolve/main/EN/Pod042EN_e250_s14250_RVCv2_RMVPE.zip";
     sha256 = "sha256-PGPCG5FwsoPGE6PGtYTBuE3fan1JTj95d5J3b77GLxg=";
     stripRoot = false;
+  }}";
+  home.file.".config/piper/models/jenny_dioco.onnx".source = "${pkgs.fetchurl {
+    url = "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx";
+    sha256 = "sha256-RpxjDSCeE53TkqZr9KveSrhjkKAmnB5HtOXXzoFSawE=";
+  }}";
+  home.file.".config/piper/models/jenny_dioco.json".source = "${pkgs.fetchurl {
+    url = "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx.json";
+    sha256 = "sha256-qaepOjF8mjy2Vj436wV9+e8JwGGIqKQ0Gw/LWMulTdQ=";
   }}";
 }

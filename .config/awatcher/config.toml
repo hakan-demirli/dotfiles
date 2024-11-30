@@ -1,0 +1,17 @@
+[server]
+# port = 5600
+# host = "127.0.0.1"
+
+[awatcher]
+# idle-timeout-seconds=180
+# poll-time-idle-seconds=5
+# poll-time-window-seconds=1
+
+# Filters for excluding "Tor Browser" and "Private Browsing"
+[[awatcher.filters]]
+match-title = ".*Tor Browser.*"
+replace-title = "Filtered"
+
+[[awatcher.filters]]
+match-title = ".*Private Browsing.*"
+replace-title = "Filtered"

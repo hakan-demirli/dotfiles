@@ -1,0 +1,8 @@
+[aw-watcher-window]
+exclude_title = true
+exclude_titles = [
+    ".*Tor Browser.*",
+    ".*Private Browsing.*"
+]
+poll_time = 5.0
+strategy_macos = "swift"

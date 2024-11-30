@@ -43,7 +43,12 @@
           inherit userSettings systemSettings;
         };
 
-        modules = [ (./. + "/profiles" + ("/" + systemSettings.profile) + "/configuration.nix") ]; # load configuration.nix from selected PROFILE
+        modules = [
+          # load configuration.nix from selected PROFILE
+          (./. + "/profiles" + ("/" + systemSettings.profile) + "/configuration.nix")
+          # load overlays
+          ./overlay.nix
+        ];
       };
       # home-manager switch --flake ~/Desktop/dotfiles/#emre
       homeConfigurations."${userSettings.username}" = home-manager.lib.homeManagerConfiguration {
@@ -55,7 +60,12 @@
           inherit inputs systemSettings userSettings;
         };
 
-        modules = [ ./profiles/personal/home.nix ]; # load home.nix from selected PROFILE
+        modules = [
+          # load home.nix from selected PROFILE
+          (./. + "/profiles" + ("/" + systemSettings.profile) + "/home.nix")
+          # load overlays
+          ./overlay.nix
+        ];
       };
     };
 }

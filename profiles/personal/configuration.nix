@@ -22,6 +22,19 @@
   # nix
   documentation.nixos.enable = false; # .desktop
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowUnfreePredicate =
+    p:
+    builtins.all (
+      license:
+      license.free
+      || builtins.elem license.shortName [
+        "CUDA EULA"
+        "cuDNN EULA"
+        "cuTENSOR EULA"
+        "NVidia OptiX EULA"
+      ]
+    ) (if builtins.isList p.meta.license then p.meta.license else [ p.meta.license ]);
+
   nixpkgs.config.cudaSupport = true;
   nix = {
     gc = {

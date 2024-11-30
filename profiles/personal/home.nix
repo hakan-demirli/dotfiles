@@ -187,6 +187,10 @@
   };
   home.packages = with pkgs; [
     awatcher
+    aw-watcher-afk
+    aw-watcher-window
+    (pkgs.callPackage ../../system/app/aw-settings.nix { })
+    (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
 
     cpufrequtils
     hypridle
@@ -205,6 +209,7 @@
     pulseaudio
     tree
     anki-bin
+    piper-tts
 
     python3
 
@@ -317,7 +322,7 @@
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
     (pkgs.callPackage ../../system/app/youtube_sync.nix { })
     (pkgs.callPackage ../../system/app/auto_refresh.nix { })
-    # (pkgs.callPackage ../../system/app/clipboard_tts.nix {})
+    (pkgs.callPackage ../../system/app/clipboard_tts.nix { })
   ];
 
   home.sessionVariables = rec {
@@ -328,7 +333,7 @@
 
     GTK_THEME = "Dracula"; # config.gtk.theme.name;
 
-    # export PATH="$XDG_DATA_HOME:$XDG_CONFIG_HOME:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
+    # export PATH="${config.home.sessionVariables.XDG_DATA_HOME}:${XDG_CONFIG_HOME}:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
     # env = PATH,$HOME/.local/bin:$PATH
     # env = PATH,/usr/local/bin:$PATH
 
@@ -339,33 +344,33 @@
 
     DIRENV_WARN_TIMEOUT = "8m";
 
-    WINEPREFIX = "${XDG_DATA_HOME}/wine"; # special case
+    WINEPREFIX = "${config.home.sessionVariables.XDG_DATA_HOME}/wine"; # special case
     DIRENV_CONFIG = "$HOME/.config/direnv/direnvrc";
-    ANDROID_HOME = "$XDG_DATA_HOME/android";
-    CARGO_HOME = "$XDG_DATA_HOME/cargo";
-    CUDA_CACHE_PATH = "$XDG_CACHE_HOME/nv";
-    GNUPGHOME = "$XDG_DATA_HOME/gnupg"; # handled in home manager
-    PASSWORD_STORE_DIR = "$XDG_DATA_HOME/password-store";
-    RUSTUP_HOME = "$XDG_DATA_HOME/rustup";
-    NUGET_PACKAGES = "$XDG_CACHE_HOME/NuGetPackages";
-    NPM_CONFIG_USERCONFIG = "$XDG_CONFIG_HOME/npm/npmrc";
+    ANDROID_HOME = "${config.home.sessionVariables.XDG_DATA_HOME}/android";
+    CARGO_HOME = "${config.home.sessionVariables.XDG_DATA_HOME}/cargo";
+    CUDA_CACHE_PATH = "${config.home.sessionVariables.XDG_CACHE_HOME}/nv";
+    GNUPGHOME = "${config.home.sessionVariables.XDG_DATA_HOME}/gnupg"; # handled in home manager
+    PASSWORD_STORE_DIR = "${config.home.sessionVariables.XDG_DATA_HOME}/password-store";
+    RUSTUP_HOME = "${config.home.sessionVariables.XDG_DATA_HOME}/rustup";
+    NUGET_PACKAGES = "${config.home.sessionVariables.XDG_CACHE_HOME}/NuGetPackages";
+    NPM_CONFIG_USERCONFIG = "${config.home.sessionVariables.XDG_CONFIG_HOME}/npm/npmrc";
     DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME";
-    WGETRC = "$XDG_CONFIG_HOME/wgetrc";
-    KIVY_HOME = "$XDG_CONFIG_HOME/kivy";
-    PYTHONPYCACHEPREFIX = "$XDG_CACHE_HOME/python";
-    PYTHONUSERBASE = "$XDG_DATA_HOME/python";
-    PYTHON_HISTORY = "$XDG_STATE_HOME/python/history";
-    PYTHONSTARTUP = "$XDG_STATE_HOME/python/pythonrc";
-    GOPATH = "$XDG_CACHE_HOME/go";
-    PARALLEL_HOME = "$XDG_CONFIG_HOME/parallel";
-    MYSQL_HISTFILE = "$XDG_DATA_HOME/mysql_history";
-    SQLITE_HISTORY = "$XDG_CACHE_HOME/sqlite_history";
-    # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${XDG_CONFIG_HOME}/java"; # not working
-    KERAS_HOME = "$XDG_STATE_HOME/keras";
-    # GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"; # handled in home manager
-    GTK_RC_FILES = "$XDG_CONFIG_HOME/gtk-1.0/gtkrc";
+    WGETRC = "${config.home.sessionVariables.XDG_CONFIG_HOME}/wgetrc";
+    KIVY_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/kivy";
+    PYTHONPYCACHEPREFIX = "${config.home.sessionVariables.XDG_CACHE_HOME}/python";
+    PYTHONUSERBASE = "${config.home.sessionVariables.XDG_DATA_HOME}/python";
+    PYTHON_HISTORY = "${config.home.sessionVariables.XDG_STATE_HOME}/python/history";
+    PYTHONSTARTUP = "${config.home.sessionVariables.XDG_STATE_HOME}/python/pythonrc";
+    GOPATH = "${config.home.sessionVariables.XDG_CACHE_HOME}/go";
+    PARALLEL_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/parallel";
+    MYSQL_HISTFILE = "${config.home.sessionVariables.XDG_DATA_HOME}/mysql_history";
+    SQLITE_HISTORY = "${config.home.sessionVariables.XDG_CACHE_HOME}/sqlite_history";
+    # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=$${XDG_CONFIG_HOME}}/java"; # not working
+    KERAS_HOME = "${config.home.sessionVariables.XDG_STATE_HOME}/keras";
+    # GTK2_RC_FILES = "${XDG_CONFIG_HOME}/gtk-2.0/gtkrc"; # handled in home manager
+    GTK_RC_FILES = "${config.home.sessionVariables.XDG_CONFIG_HOME}/gtk-1.0/gtkrc";
     # Breaks neovim
-    # VIMINIT = ''set nocp | source ''${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc'';
+    # VIMINIT = ''set nocp | source ''$${XDG_CONFIG_HOME}:-$HOME/.config}/vim/vimrc'';
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 
