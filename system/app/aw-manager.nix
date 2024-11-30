@@ -1,6 +1,6 @@
 { pkgs, ... }:
 pkgs.stdenv.mkDerivation {
-  name = "aw-settings";
+  name = "aw-manager";
 
   propagatedBuildInputs = [
     (pkgs.python3.withPackages (
@@ -13,6 +13,6 @@ pkgs.stdenv.mkDerivation {
   dontUnpack = true;
 
   installPhase = ''
-    install -Dm755 ${../scripts/python/aw-settings.py} $out/bin/aw-settings;
+    install -Dm755 ${../scripts/python/aw-manager.py} $out/bin/aw-manager;
   '';
 }

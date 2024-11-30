@@ -190,7 +190,7 @@
     aw-watcher-afk
     aw-watcher-window
     aw-server-rust
-    (pkgs.callPackage ../../system/app/aw-settings.nix { })
+    (pkgs.callPackage ../../system/app/aw-manager.nix { })
     (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
 
     cpufrequtils

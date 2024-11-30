@@ -1,8 +1,14 @@
 * Set activitywatch settings:
-  * ```aw-settings -s ./config.json```
+  * ```aw-manager settings -s config.json```
 
 * Get activitywatch settings:
-  * ```aw-settings -g ./output.json```
+  * ```aw-manager settings -g output.json```
+
+* Get activitywatch buckets:
+  * ```aw-manager buckets -g buckets_backup.json```
+
+* Set activitywatch buckets:
+  * ```aw-manager buckets -s buckets.json```
 
 * Add custom visualizer:
   * Pass it as an argument to `aw-server`
