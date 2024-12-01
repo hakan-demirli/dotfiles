@@ -236,7 +236,8 @@
     mpv
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ripgrep
-    ripdrag
+    # ripdrag # started to fail when nvidia gpu is enabled
+    dragon
     tmux
     ffmpeg-full
     bat
