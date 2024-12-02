@@ -19,7 +19,7 @@
     powerManagement.finegrained = true;
     open = false; # Use the open source version? nope
     # nvidiaSettings = true; # 	accessible via `nvidia-settings`.
-    package = config.boot.kernelPackages.nvidiaPackages.latest;
+    package = config.boot.kernelPackages.nvidiaPackages.production;
     prime = {
       offload.enable = true;
       offload.enableOffloadCmd = true;

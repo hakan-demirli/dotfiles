@@ -234,7 +234,8 @@
     swww # for update_wp
     activate-linux # for update_wp
     mpv
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    # (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    nerd-fonts.jetbrains-mono
     ripgrep
     # ripdrag # started to fail when nvidia gpu is enabled
     dragon

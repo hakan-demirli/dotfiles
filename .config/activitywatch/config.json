@@ -90,7 +90,7 @@
       "id": 22,
       "name": ["Chore", "OS"],
       "rule": {
-        "regex": "Nixpkgs|nixpkgs|nixpk.gs|NixOS|Arch Linux|home-manager|dotfiles",
+        "regex": "Nixpkgs|nixpkgs|nixpk.gs|NixOS|Arch Linux|home-manager|dotfiles|GNU/Linux.*",
         "type": "regex"
       }
     },
@@ -124,7 +124,7 @@
       "id": 0,
       "name": ["Work", "Coding"],
       "rule": {
-        "regex": "ChatGPT|Claude|.*Microsoft Copilot.*|kitty|bash|vim|Spyder|Ghidra|kate|Scite|btop|my_todo|the_terminal|Code search results|Issue search results|MySQL|SQLite|Regex|.*flutter.*",
+        "regex": "ChatGPT|Claude|.*Microsoft Copilot.*|kitty|bash|vim|Spyder|Ghidra|kate|Scite|btop|my_todo|the_terminal|Code search results|Issue search results|MySQL|SQLite|Regex|.*flutter.*|EgoCepte.*|DBeaver",
         "type": "regex"
       }
     },
