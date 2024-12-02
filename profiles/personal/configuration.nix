@@ -71,6 +71,12 @@
   programs.hyprland.enable = true;
   programs.gnome-disks.enable = true;
 
+  fonts = {
+    packages = [
+      pkgs.nerd-fonts.jetbrains-mono
+    ];
+  };
+
   # packages
   environment.systemPackages = with pkgs; [
     home-manager
@@ -79,6 +85,10 @@
     (btop.override { cudaSupport = true; })
     fzf
     kitty
+    alacritty # BACKUP TERMINAL
+    foot # BACKUP TERMINAL
+    xterm # BACKUP TERMINAL
+
     tofi
 
     git-crypt
