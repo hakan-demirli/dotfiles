@@ -135,7 +135,7 @@
       "id": 1,
       "name": ["Work", "Research"],
       "rule": {
-        "regex": "Google Docs|libreoffice|ReText|Stack Overflow|GitHub|BitBucket|Gitlab|LibreOffice|Google Sheets",
+        "regex": "Google Docs|libreoffice|ReText|Stack Overflow|GitHub|BitBucket|Gitlab|LibreOffice|Google Sheets|.*.pdf.*",
         "type": "regex"
       }
     },
@@ -168,7 +168,7 @@
       "id": 4,
       "name": ["Work", "Practice/Exercise/Study"],
       "rule": {
-        "regex": ".*Exercise.*pdf|.*Practice.*pdf|B\u0130L",
+        "regex": ".*Exercise.*pdf.*|.*Practice.*pdf.*|.*report.pdf.*|B\u0130L",
         "type": "regex"
       }
     },
