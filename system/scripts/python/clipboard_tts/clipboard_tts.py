@@ -3,25 +3,38 @@
 import logging
 import os
 import queue
+import random
 import re
+import string
 import sys
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from pathlib import Path
+from subprocess import PIPE, CalledProcessError, Popen, run
 
 import pyclip
 
 # Configuration and Constants
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(
+    stream=sys.stderr,
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 CONFIG = {
     "TEMPO": 1.0,
-    "OUTPUT_DIR": Path("/tmp/piper"),
-    "PIPER_MODEL": "/home/emre/.config/piper/models/jenny_dioco.onnx",
-    "PIPER_CONFIG": "/home/emre/.config/piper/models/jenny_dioco.json",
-    "RVC_MODEL_PATH": "/home/emre/.config/rvc-cli/models/custom/Pod042EN_e250_s14250.pth",
-    "RVC_INDEX_PATH": "/home/emre/.config/rvc-cli/models/custom/added_IVF2047_Flat_nprobe_1_Pod042EN_v2.index",
-    "DELIMITERS": "[?.!]",
+    "OUTPUT_DIR": Path(os.getenv("XDG_RUNTIME_DIR", "/tmp")) / "piper",
+    "PIPER_MODEL": Path(os.getenv("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+    / "piper/models/jenny_dioco.onnx",
+    "PIPER_CONFIG": Path(os.getenv("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+    / "piper/models/jenny_dioco.json",
+    "RVC_MODEL_PATH": Path(os.getenv("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+    / "rvc-cli/models/custom/Pod042EN_e250_s14250.pth",
+    "RVC_INDEX_PATH": Path(os.getenv("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+    / "rvc-cli/models/custom/added_IVF2047_Flat_nprobe_1_Pod042EN_v2.index",
+    "DELIMITERS": r"[?.!]",
     "RAND_SIZE": 16,
     "MAX_STR_SIZE": 20000,
     "BANNED_CHARACTERS": r"""\/*<>|`[]()^#%&@:+=}"{'~“”—""",
@@ -33,13 +46,13 @@ CONFIG = {
     },
 }
 
-
 # Utility Functions
-def get_random_string(length):
-    import random
-    import string
 
-    return "".join(random.choice(string.ascii_lowercase) for _ in range(length))
+
+def get_random_string(length):
+    random_str = "".join(random.choice(string.ascii_lowercase) for _ in range(length))
+    logging.debug(f"Generated random string: {random_str}")
+    return random_str
 
 
 def sanitize_string(input_str):
@@ -56,121 +69,299 @@ def sanitize_string(input_str):
 
 
 def text_to_speech_with_piper(text, output_file):
-    command = f"echo '{text}' | piper --model {CONFIG['PIPER_MODEL']} --config {CONFIG['PIPER_CONFIG']} --output_file {output_file}"
-    result = os.system(command)
-    if result != 0:
-        logging.error(f"Piper TTS failed for text: {text}")
-    else:
+    try:
+        run_args = [
+            "piper",
+            "--model",
+            str(CONFIG["PIPER_MODEL"]),
+            "--config",
+            str(CONFIG["PIPER_CONFIG"]),
+            "--output_file",
+            str(output_file),
+        ]
+        run(
+            run_args,
+            input=text,
+            text=True,
+            check=True,
+        )
         logging.info(f"Generated TTS output at {output_file}")
+    except CalledProcessError as e:
+        logging.error(f"Piper TTS failed for text: {text}. Error: {e}")
+        raise
 
 
 def apply_rvc_voice(input_file, output_file):
-    command = (
-        f"rvc_cli infer --pth_path {CONFIG['RVC_MODEL_PATH']} "
-        f"--index_path {CONFIG['RVC_INDEX_PATH']} "
-        f"--input_path {input_file} "
-        f"--output_path {output_file}"
-    )
-    result = os.system(command)
-    if result != 0:
-        logging.error(f"RVC voice conversion failed for file: {input_file}")
-    else:
-        logging.info(f"Generated RVC output at {output_file}")
-
-
-def process_sentence(sentence, seq_num, wav_queue):
     try:
-        sanitized_text = sanitize_string(sentence)
-        temp_wav = (
-            CONFIG["OUTPUT_DIR"] / f"{get_random_string(CONFIG['RAND_SIZE'])}.wav"
+        run_args = [
+            "rvc_cli",
+            "infer",
+            "--pth_path",
+            str(CONFIG["RVC_MODEL_PATH"]),
+            "--index_path",
+            str(CONFIG["RVC_INDEX_PATH"]),
+            "--input_path",
+            str(input_file),
+            "--output_path",
+            str(output_file),
+        ]
+        run(
+            run_args,
+            check=True,
         )
-        final_wav = CONFIG["OUTPUT_DIR"] / f"final_{seq_num}.wav"
-
-        text_to_speech_with_piper(sanitized_text, temp_wav)
-        apply_rvc_voice(temp_wav, final_wav)
-
-        wav_queue.put((seq_num, final_wav))
-    except Exception as e:
-        logging.error(f"Error processing sentence {seq_num}: {e}")
+        logging.info(f"Generated RVC output at {output_file}")
+    except CalledProcessError as e:
+        logging.error(f"RVC voice conversion failed for file: {input_file}. Error: {e}")
+        raise
 
 
-def process_text_to_audio(txt_queue, wav_queue):
-    while True:
-        try:
-            texts = txt_queue.get()
-            threads = []
-            for seq_num, text in enumerate(texts):
-                thread = threading.Thread(
-                    target=process_sentence,
-                    args=(text, seq_num, wav_queue),
-                    daemon=True,
+class BatchManager:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.current_batch_id = None
+        self.cancellation_event = threading.Event()
+        self.executor = ThreadPoolExecutor(max_workers=4)  # limited by GPU VRAM
+        self.playback_queue = queue.Queue()
+        self.futures = []
+        self.batch_counter = 0
+
+        # Event to signal playback to terminate
+        self.playback_terminate_event = threading.Event()
+
+    def start_new_batch(self, sentences):
+        with self.lock:
+            self.batch_counter += 1
+            new_batch_id = self.batch_counter
+            logging.info(f"Starting new batch {new_batch_id}")
+
+            # Signal cancellation to current processing
+            self.cancellation_event.set()
+
+            # Create a new cancellation event for the new batch
+            self.cancellation_event = threading.Event()
+
+            # Increment batch_id
+            self.current_batch_id = new_batch_id
+
+            # Cancel any existing futures
+            for future in self.futures:
+                future.cancel()
+            self.futures = []
+
+            # Signal playback to terminate current playback
+            self.playback_terminate_event.set()
+
+            # Clear any existing items in the playback queue
+            with self.playback_queue.mutex:
+                self.playback_queue.queue.clear()
+
+            # Reset the playback termination event
+            self.playback_terminate_event = threading.Event()
+
+            # Submit new processing tasks
+            for seq_num, sentence in enumerate(sentences):
+                future = self.executor.submit(
+                    self.process_sentence,
+                    sentence,
+                    seq_num,
+                    new_batch_id,
+                    self.cancellation_event,
                 )
-                threads.append(thread)
-                thread.start()
+                self.futures.append(future)
 
-            for thread in threads:
-                thread.join()
+    def process_sentence(self, sentence, seq_num, batch_id, cancellation_event):
+        if cancellation_event.is_set():
+            logging.info(f"Batch {batch_id} cancelled before processing started.")
+            return
+        try:
+            logging.debug(f"Processing sentence {seq_num}: {sentence}")
+            sanitized_text = sanitize_string(sentence)
+            random_string = get_random_string(CONFIG["RAND_SIZE"])
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
+
+            temp_wav = (
+                CONFIG["OUTPUT_DIR"]
+                / f"{random_string}_temp_{batch_id}_{seq_num}_{timestamp}.wav"
+            )
+            final_wav = (
+                CONFIG["OUTPUT_DIR"]
+                / f"final_{batch_id}_{seq_num}_{random_string}_{timestamp}.wav"
+            )
+
+            text_to_speech_with_piper(sanitized_text, temp_wav)
+            if cancellation_event.is_set():
+                logging.info(f"Batch {batch_id} cancelled during TTS processing.")
+                return
+            apply_rvc_voice(temp_wav, final_wav)
+            if cancellation_event.is_set():
+                logging.info(f"Batch {batch_id} cancelled during RVC processing.")
+                return
+
+            self.playback_queue.put((batch_id, seq_num, final_wav))
+
+            # Cleanup temporary file
+            if temp_wav.exists():
+                temp_wav.unlink()
         except Exception as e:
-            logging.error(f"Error in process_text_to_audio: {e}")
+            logging.error(f"Error processing sentence {seq_num}: {e}")
+
+    def get_playback_queue(self):
+        return self.playback_queue
+
+    def get_current_batch_id(self):
+        with self.lock:
+            return self.current_batch_id
+
+    def stop(self):
+        with self.lock:
+            self.cancellation_event.set()
+            self.playback_terminate_event.set()
+            for future in self.futures:
+                future.cancel()
+            self.executor.shutdown(wait=False)
+            logging.info("BatchManager stopped.")
 
 
-def play_audio(wav_queue):
-    next_seq = 0
+def play_audio(playback_queue, get_current_batch_id, playback_terminate_event):
+    """Plays audio files in sequence, respecting the current batch."""
+    current_batch_id = None
+    current_process = None
     buffers = {}
+    next_seq = 0
 
     while True:
         try:
-            seq_num, wav_file = wav_queue.get()
+            # Wait for the next audio file
+            batch_id, seq_num, wav_file = playback_queue.get()
+            logging.debug(
+                f"Received wav file {wav_file} for playback, batch_id: {batch_id}, seq_num: {seq_num}"
+            )
+
+            # If a new batch is detected, terminate the current playback
+            if current_batch_id != batch_id:
+                logging.info(f"Switching to new batch {batch_id}")
+                current_batch_id = batch_id
+                next_seq = 0
+                buffers = {}
+
+                # Signal to terminate any ongoing playback
+                if current_process and current_process.poll() is None:
+                    logging.info("Killing current playback process.")
+                    current_process.kill()
+                playback_terminate_event.clear()  # Reset termination event for the new batch
+
+            # Queue the audio file for playback
             buffers[seq_num] = wav_file
 
+            # Play files in order
             while next_seq in buffers:
-                # Ensure file exists before attempting to play
-                if os.path.exists(buffers[next_seq]):
-                    os.system(f"ffplay -autoexit -nodisp {buffers[next_seq]}")
+                wav_path = buffers[next_seq]
+
+                if wav_path.exists():
+                    logging.info(f"Playing audio file: {wav_path}")
+
+                    # Start ffplay asynchronously
+                    current_process = Popen(
+                        [
+                            "ffplay",
+                            "-autoexit",
+                            "-nodisp",
+                            "-hide_banner",
+                            "-loglevel",
+                            "error",
+                            str(wav_path),
+                        ],
+                        stdout=PIPE,
+                        stderr=PIPE,
+                    )
+
+                    # Monitor ffplay process
+                    while True:
+                        # Check if termination event is set
+                        if playback_terminate_event.is_set():
+                            logging.info(
+                                "Termination event detected. Killing ffplay process."
+                            )
+                            current_process.kill()
+                            break
+
+                        # Check if ffplay process has finished
+                        if current_process.poll() is not None:
+                            break
+
+                        time.sleep(0.1)  # Avoid busy waiting
+
+                    # Cleanup played file
+                    if wav_path.exists():
+                        wav_path.unlink()
+                    del buffers[next_seq]
+                    next_seq += 1
+
                 else:
-                    logging.error(f"File {buffers[next_seq]} does not exist.")
-                del buffers[next_seq]
-                next_seq += 1
+                    logging.error(f"File {wav_path} does not exist.")
+                    del buffers[next_seq]
+                    next_seq += 1
+
         except Exception as e:
             logging.error(f"Error in play_audio: {e}")
+            time.sleep(0.1)
 
 
-def listen_clipboard(txt_queue):
+def listen_clipboard(batch_manager):
+    """Monitors the clipboard for changes and triggers new batch processing."""
     recent_value = ""
     while True:
         try:
-            new_value = pyclip.paste(text=True)
-            if new_value != recent_value and len(new_value) < CONFIG["MAX_STR_SIZE"]:
+            new_value = pyclip.paste(text=True).strip()
+            if (
+                new_value
+                and new_value != recent_value
+                and len(new_value) < CONFIG["MAX_STR_SIZE"]
+            ):
                 recent_value = new_value
                 sanitized = sanitize_string(new_value)
                 sentences = re.split(CONFIG["DELIMITERS"], sanitized)
-                txt_queue.queue.clear()
-                txt_queue.put([s.strip() for s in sentences if s.strip()])
+                sentences = [s.strip() for s in sentences if s.strip()]
+                if sentences:
+                    logging.info("New clipboard content detected.")
+                    batch_manager.start_new_batch(sentences)
+            time.sleep(0.5)  # Polling interval
         except Exception as e:
             logging.error(f"Error in listen_clipboard: {e}")
-        time.sleep(0.8)
+            time.sleep(0.5)
 
 
 if __name__ == "__main__":
     os.makedirs(CONFIG["OUTPUT_DIR"], exist_ok=True)
+    logging.info(f"Output directory created: {CONFIG['OUTPUT_DIR']}")
 
-    txt_queue = queue.Queue()
-    wav_queue = queue.Queue()
+    batch_manager = BatchManager()
+    playback_queue = batch_manager.get_playback_queue()
 
-    threads = [
-        threading.Thread(target=listen_clipboard, args=(txt_queue,), daemon=True),
-        threading.Thread(
-            target=process_text_to_audio, args=(txt_queue, wav_queue), daemon=True
+    # Start playback thread
+    playback_thread = threading.Thread(
+        target=play_audio,
+        args=(
+            playback_queue,
+            batch_manager.get_current_batch_id,
+            batch_manager.playback_terminate_event,
         ),
-        threading.Thread(target=play_audio, args=(wav_queue,), daemon=True),
-    ]
+        daemon=True,
+    )
+    playback_thread.start()
+    logging.info(f"Started thread: {playback_thread.name}")
 
-    for thread in threads:
-        thread.start()
+    # Start clipboard listener thread
+    clipboard_thread = threading.Thread(
+        target=listen_clipboard, args=(batch_manager,), daemon=True
+    )
+    clipboard_thread.start()
+    logging.info(f"Started thread: {clipboard_thread.name}")
 
-    while True:
-        try:
+    try:
+        while True:
             time.sleep(1)
-        except KeyboardInterrupt:
-            logging.info("Ctrl+C pressed...")
-            sys.exit(1)
+    except KeyboardInterrupt:
+        logging.info("Ctrl+C pressed... Exiting.")
+        batch_manager.stop()
+        sys.exit(0)
