@@ -238,7 +238,7 @@
     # nerd-fonts.jetbrains-mono
     ripgrep
     # ripdrag # started to fail when nvidia gpu is enabled
-    dragon
+    xdragon
     tmux
     ffmpeg-full
     bat
