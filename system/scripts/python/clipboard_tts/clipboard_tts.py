@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 import logging
 import os
 import queue
@@ -38,15 +39,9 @@ CONFIG = {
     "RAND_SIZE": 16,
     "MAX_STR_SIZE": 20000,
     "BANNED_CHARACTERS": r"""\/*<>|`[]()^#%&@:+=}"{'~“”—""",
-    "CONTRACTIONS": {
-        "can't": "cannot",
-        "I'm": "I am",
-        "he's": "he is",
-        # Add other contractions as needed
-    },
+    "SUBSTITUTIONS": Path(os.getenv("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+    / "piper/substitutions.json",
 }
-
-# Utility Functions
 
 
 def get_random_string(length):
@@ -56,14 +51,27 @@ def get_random_string(length):
 
 
 def sanitize_string(input_str):
-    for char in CONFIG["BANNED_CHARACTERS"]:
-        input_str = input_str.replace(char, "")
-    for contraction, expanded in CONFIG["CONTRACTIONS"].items():
-        input_str = input_str.replace(contraction, expanded)
+    banned_characters = CONFIG["BANNED_CHARACTERS"]
+    translation_table = str.maketrans("", "", banned_characters)
+    input_str = input_str.translate(translation_table)
+
+    substitutions_path = CONFIG["SUBSTITUTIONS"]
+    if substitutions_path.exists():
+        with open(substitutions_path, "r") as f:
+            substitutions = json.load(f)
+        for contraction, expanded in substitutions.items():
+            input_str = input_str.replace(contraction, expanded)
+    else:
+        logging.warning(f"Substitutions file not found at {substitutions_path}")
+
+    # Replace newlines with spaces
     input_str = " ".join(input_str.splitlines())
+
+    # Replace floating point numbers
     input_str = re.sub(
         r"\d+\.\d+", lambda m: m.group(0).replace(".", " point "), input_str
     )
+
     logging.info(f"Sanitized string: {input_str}")
     return input_str
 

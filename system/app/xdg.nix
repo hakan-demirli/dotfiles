@@ -37,6 +37,7 @@
         "npm"
         "nwg"
         "parallel"
+        # "piper" # not working
         "qmk"
         "qutebrowser"
         "rclone"
@@ -180,4 +181,5 @@
     url = "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx.json";
     sha256 = "sha256-qaepOjF8mjy2Vj436wV9+e8JwGGIqKQ0Gw/LWMulTdQ=";
   }}";
+  home.file.".config/piper/substitutions.json".source = "${../../.config/piper/substitutions.json}"; # workaround
 }
