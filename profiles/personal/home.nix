@@ -374,6 +374,9 @@
     GTK_RC_FILES = "${config.home.sessionVariables.XDG_CONFIG_HOME}/gtk-1.0/gtkrc";
     # Breaks neovim
     # VIMINIT = ''set nocp | source ''$${XDG_CONFIG_HOME}:-$HOME/.config}/vim/vimrc'';
+    TEXMFHOME = "${config.home.sessionVariables.XDG_DATA_HOME}/texmf";
+    TEXMFVAR = "${config.home.sessionVariables.XDG_CACHE_HOME}/texlive/texmf-var";
+    TEXMFCONFIG = "${config.home.sessionVariables.XDG_CONFIG_HOME}/texlive/texmf-config";
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 

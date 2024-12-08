@@ -4,7 +4,7 @@
   "startOfWeek": "Monday",
   "userSatisfactionPollData": {
     "isEnabled": true,
-    "nextPollTime": "2024-12-04T15:16:45.037Z",
+    "nextPollTime": "2122-12-04T15:16:45.037Z",
     "timesPollIsShown": 0
   },
   "requestTimeout": 30,
@@ -135,7 +135,7 @@
       "id": 1,
       "name": ["Work", "Research"],
       "rule": {
-        "regex": "Google Docs|libreoffice|ReText|Stack Overflow|GitHub|BitBucket|Gitlab|LibreOffice|Google Sheets|.*.pdf.*",
+        "regex": "Google Docs|libreoffice|ReText|Stack Overflow|GitHub|BitBucket|Gitlab|LibreOffice|Google Sheets|.*.pdf.*|.*.drawio.*|SNARK|Figure 1|Wikipedia",
         "type": "regex"
       }
     },
