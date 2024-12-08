@@ -186,12 +186,12 @@
     fan-silent = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 2 >>  fan_boost_mode"; sudo sh -c "echo 2 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
   };
   home.packages = with pkgs; [
-    awatcher
-    aw-watcher-afk
-    aw-watcher-window
-    aw-server-rust
-    (pkgs.callPackage ../../system/app/aw-manager.nix { })
-    (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
+    # awatcher
+    # aw-watcher-afk
+    # aw-watcher-window
+    # aw-server-rust
+    # (pkgs.callPackage ../../system/app/aw-manager.nix { })
+    # (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
 
     cpufrequtils
     hypridle
