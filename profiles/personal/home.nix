@@ -10,7 +10,6 @@
     ../../system/app/firefox.nix
     ../../system/app/thunderbird.nix
     ../../system/app/low_battery_notify.nix
-    # ../../system/app/activitywatch.nix
     ../../system/app/xdg.nix
 
     inputs.xremap-flake.homeManagerModules.default
@@ -193,6 +192,8 @@
     # aw-server-rust
     # (pkgs.callPackage ../../system/app/aw-manager.nix { })
     # (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
+
+    (pkgs.callPackage ../../system/app/prometheus-exporters.nix { })
 
     cpufrequtils
     hypridle
