@@ -145,8 +145,8 @@
     git = "git_cached";
     "ga." = "git add .";
     ga = "git add";
-    gd = "git diff";
-    gdc = "git diff --cached";
+    gd = "git -c diff.external=difft diff";
+    gdc = "git -c diff.external=difft diff --cached";
     gp = "git push";
     gpf = "git push --force";
     gr = "git restore";
@@ -185,6 +185,7 @@
     fan-performance = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 0 >>  fan_boost_mode"; sudo sh -c "echo 0 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
     fan-silent = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 2 >>  fan_boost_mode"; sudo sh -c "echo 2 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
   };
+
   home.packages = with pkgs; [
     # awatcher
     # aw-watcher-afk
@@ -214,6 +215,7 @@
 
     python3
 
+    difftastic
     jq # to parse hyprctl
     usbutils
     pavucontrol
@@ -328,7 +330,7 @@
     (pkgs.callPackage ../../system/app/clipboard_tts.nix { })
   ];
 
-  home.sessionVariables = rec {
+  home.sessionVariables = {
     OPENER = "xdg-open";
     EDITOR = "hx";
     TERMINAL = "kitty";

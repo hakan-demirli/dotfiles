@@ -16,6 +16,7 @@
     ../../system/hardware/network.nix
     ../../system/hardware/automount.nix
     ../../system/hardware/sound.nix
+    ../../system/app/grafana.nix
     # ../../system/hardware/ydotool.nix
   ];
 
@@ -96,6 +97,7 @@
     neovim # default editor
     libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
     (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
+
   ];
 
   # services
