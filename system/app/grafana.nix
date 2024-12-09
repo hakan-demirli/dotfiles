@@ -7,14 +7,23 @@
 let
   grafanaAddr = "127.0.0.1";
   grafanaPort = 5000;
+
   prometheusAddr = "127.0.0.1";
   prometheusPort = 9090;
+
   exporterAddr = "127.0.0.10";
   exporterTestPort = 8010;
   exporterSystemPort = 8011;
   exporterReviewPort = 8012;
   exporterNetworkPort = 8013;
   exporterWindowPort = 8014;
+
+  mysqlAddr = "127.0.0.1";
+  mysqlPort = 9091;
+
+  mysqlDatabase = "grafana";
+  mysqlUser = "grafana";
+  mysqlPassword = "grafana";
 in
 {
   services.grafana = {
@@ -44,8 +53,18 @@ in
           name = "Prometheus";
           uid = "prometheus";
           type = "prometheus";
-          url = "http://${prometheusAddr}:${toString prometheusPort}"; # Prometheus URL
+          url = "http://${prometheusAddr}:${toString prometheusPort}";
           access = "proxy";
+        }
+        {
+          name = "MySQL";
+          uid = "mysql";
+          type = "mysql";
+          url = "mysql://${mysqlUser}:${mysqlPassword}@${mysqlAddr}:${toString mysqlPort}/${mysqlDatabase}";
+          access = "proxy";
+          database = mysqlDatabase;
+          user = mysqlUser;
+          password = mysqlPassword;
         }
       ];
     };
@@ -56,7 +75,6 @@ in
     listenAddress = prometheusAddr;
     port = prometheusPort;
 
-    # double check on http://127.0.0.1:9090/status
     retentionTime = "100000d"; # Equivalent to ~273 years
     scrapeConfigs = [
       {
@@ -92,6 +110,26 @@ in
     ];
   };
 
+  services.mysql = {
+    enable = true;
+    package = pkgs.mariadb;
+
+    settings.mysqld.port = mysqlPort;
+    settings.mysqld.bind-address = mysqlAddr;
+
+    ensureDatabases = [ mysqlDatabase ];
+    # ensureUsers = [
+    #   {
+    #     name = mysqlUser;
+    #     password = mysqlPassword;
+    #     host = "%";
+    #     privileges = {
+    #       "${mysqlDatabase}.*" = [ "ALL PRIVILEGES" ];
+    #     };
+    #   }
+    # ];
+  };
+
   # Export all to environment
   environment.sessionVariables = {
     EXPORTER_ADDR = exporterAddr;
@@ -100,10 +138,19 @@ in
     EXPORTER_NETWORK_PORT = toString exporterNetworkPort;
     EXPORTER_REVIEW_PORT = toString exporterReviewPort;
     EXPORTER_WINDOW_PORT = toString exporterWindowPort;
+
     GRAFANA_ADDR = grafanaAddr;
     GRAFANA_PORT = toString grafanaPort;
+
     PROMETHEUS_ADDR = prometheusAddr;
     PROMETHEUS_PORT = toString prometheusPort;
+
+    MYSQL_ADDR = mysqlAddr;
+    MYSQL_PORT = toString mysqlPort;
   };
-  environment.systemPackages = [ pkgs.prometheus ];
+
+  environment.systemPackages = [
+    pkgs.prometheus
+    pkgs.mariadb-client
+  ];
 }

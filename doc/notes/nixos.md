@@ -179,3 +179,14 @@
 * **Create nixos bootable usb drive**
     * ```cp nixos.iso /dev/sdX```
 
+
+* **Distributing a nix built package to non nix users**
+    * Not tested:
+        * Build a docker/OCI image, with a docker file
+            * https://mitchellh.com/writing/nix-with-dockerfiles
+        * Build docker/OCI image, straight from nix
+            * https://discourse.nixos.org/t/how-do-i-build-a-binary-on-nixos-that-i-can-run-on-other-distros/11230/14
+            * https://nix.dev/tutorials/nixos/building-and-running-docker-images.html
+            * https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-dockerTools
+        * Use flatpak / appimage
+            * https://github.com/ralismark/nix-appimage 
