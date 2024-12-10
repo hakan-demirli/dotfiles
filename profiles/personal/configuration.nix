@@ -16,13 +16,14 @@
     ../../system/hardware/network.nix
     ../../system/hardware/automount.nix
     ../../system/hardware/sound.nix
-    ../../system/app/grafana.nix
+    # ../../system/app/grafana.nix
     # ../../system/hardware/ydotool.nix
   ];
 
   # nix
   documentation.nixos.enable = false; # .desktop
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.cudaSupport = false; # takes hours to compile
   nixpkgs.config.allowUnfreePredicate =
     p:
     builtins.all (
@@ -36,7 +37,6 @@
       ]
     ) (if builtins.isList p.meta.license then p.meta.license else [ p.meta.license ]);
 
-  nixpkgs.config.cudaSupport = true;
   nix = {
     gc = {
       automatic = true;
