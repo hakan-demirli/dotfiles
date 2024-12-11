@@ -193,7 +193,9 @@
     # (pkgs.callPackage ../../system/app/aw-manager.nix { })
     # (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
 
-    (pkgs.callPackage ../../system/app/prometheus-exporters.nix { })
+    # (pkgs.callPackage ../../system/app/prometheus-exporters.nix { })
+    #
+    (pkgs.callPackage ../../system/app/quantifyself.nix { })
 
     cpufrequtils
     hypridle
@@ -309,7 +311,7 @@
       patches = oldAttrs.patches or [ ] ++ [
         (fetchpatch {
           url = "https://patch-diff.githubusercontent.com/raw/helix-editor/helix/pull/11164.diff";
-          hash = "sha256-7v5aVbXHuZfyuEuxpf57rx5GaoNznDVhKzV3CSF0Ifg=";
+          hash = "sha256-/XAW73R4xh7FzI1mZeoiJES9qQp2iOT9b+R9b75c7rw=";
         })
       ];
     }))

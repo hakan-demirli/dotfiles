@@ -37,8 +37,9 @@
         "npm"
         "nwg"
         "parallel"
-        # "piper" # not working
+        # "piper" # not working, workaround below
         "qmk"
+        "quantifyself"
         "qutebrowser"
         "rclone"
         "rmpc"
