@@ -385,6 +385,8 @@
     TEXMFVAR = "${config.home.sessionVariables.XDG_CACHE_HOME}/texlive/texmf-var";
     TEXMFCONFIG = "${config.home.sessionVariables.XDG_CONFIG_HOME}/texlive/texmf-config";
 
+    OLLAMA_MODELS = "${config.home.sessionVariables.XDG_DATA_HOME}/ollama/models ";
+
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 
     PDK_ROOT = "$HOME/.local/share/pdk";

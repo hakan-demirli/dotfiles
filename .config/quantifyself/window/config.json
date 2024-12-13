@@ -1,0 +1,18 @@
+{
+  "poll_time": 5,
+  "database_path": "/home/emre/.local/share/quantifyself/window/window.duckdb",
+  "filter": [
+    {
+      "class": "Tor Browser",
+      "title": "*"
+    },
+    {
+      "class": "firefox",
+      "title": ".*Private Browsing.*"
+    },
+    {
+      "class": "Opera",
+      "title": "*"
+    }
+  ]
+}

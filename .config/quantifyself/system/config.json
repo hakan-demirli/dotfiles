@@ -1,0 +1,4 @@
+{
+  "poll_time": 20,
+  "database_path": "/home/emre/.local/share/quantifyself/system/system.duckdb"
+}

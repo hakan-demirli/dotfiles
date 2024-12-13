@@ -1,4 +1,0 @@
-# Configuration for network_watcher
-poll_time = 20
-poll_host = 'cloudflare.com'
-database_path = '/home/emre/.local/share/quantifyself/netstatus/netstatus.duckdb'

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 import logging
 import os
 import socket
@@ -10,7 +11,6 @@ from time import sleep
 
 import psutil
 import requests
-import tomllib  # Python 3.11+ for reading TOML files
 
 XDG_DATA_HOME = os.getenv("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
 XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
@@ -19,18 +19,19 @@ XDG_CACHE_HOME = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
 LOG_FILE = os.path.join(XDG_CACHE_HOME, "quantifyself", "netstatus.log")
 
 QUANTIFYSELF_CONFIG_DIR = os.path.join(XDG_CONFIG_HOME, "quantifyself")
-QUANTIFYSELF_CONFIG_FILE = os.path.join(QUANTIFYSELF_CONFIG_DIR, "config.toml")
+QUANTIFYSELF_CONFIG_FILE = os.path.join(QUANTIFYSELF_CONFIG_DIR, "config.json")
 
 CONFIG_DIR = os.path.join(QUANTIFYSELF_CONFIG_DIR, "netstatus")
-CONFIG_FILE = os.path.join(CONFIG_DIR, "config.toml")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 
 default_settings = {
-    "poll_time": 1,  # seconds
+    "poll_time": 20,
     "poll_host": "cloudflare.com",
     "database_path": os.path.join(
         XDG_DATA_HOME, "quantifyself", "netstatus", "netstatus.duckdb"
     ),
 }
+
 # Logger setup
 logger = logging.getLogger(__name__)
 
@@ -43,10 +44,9 @@ def load_or_create_config():
     def load_config_file(path):
         if os.path.exists(path):
             try:
-                with open(path, "rb") as f:
-                    logger.info(f"Config file loaded from {f} .")
-                    return tomllib.load(f)
-
+                with open(path, "r") as f:
+                    logger.info(f"Config file loaded from {path}.")
+                    return json.load(f)
             except Exception as e:
                 logger.error(f"Failed to load config file {path}: {e}")
         raise FileNotFoundError(f"No configuration files found at {path}")
@@ -54,9 +54,7 @@ def load_or_create_config():
     if not os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "w") as f:
-                f.write("# Configuration for network_watcher\n")
-                for key, value in default_settings.items():
-                    f.write(f"{key} = {repr(value)}\n")
+                json.dump(default_settings, f, indent=4)
             logger.info(f"Config file created at {CONFIG_FILE} with default settings.")
         except Exception as e:
             logger.error(f"Failed to create config file: {e}")
@@ -69,10 +67,7 @@ def load_or_create_config():
     netstatus_config = load_config_file(CONFIG_FILE)
     root_config = load_config_file(QUANTIFYSELF_CONFIG_FILE)
 
-    # Merge configs: prioritize netstatus_config > root_config
-    merged_config = {**root_config, **netstatus_config}
-
-    return merged_config
+    return {**root_config, **netstatus_config}
 
 
 def get_connection_info():

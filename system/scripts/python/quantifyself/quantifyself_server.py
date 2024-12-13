@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import logging
 import os
 import signal
@@ -6,15 +7,14 @@ import sys
 import threading
 
 import duckdb
-import tomllib  # Python 3.11+ for reading TOML files
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 
 app = Flask(__name__)
 
 # Define paths for configuration
 XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
 QUANTIFYSELF_CONFIG_DIR = os.path.join(XDG_CONFIG_HOME, "quantifyself")
-QUANTIFYSELF_CONFIG_FILE = os.path.join(QUANTIFYSELF_CONFIG_DIR, "config.toml")
+QUANTIFYSELF_CONFIG_FILE = os.path.join(QUANTIFYSELF_CONFIG_DIR, "config.json")
 
 XDG_CACHE_HOME = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
 LOG_FILE = os.path.join(XDG_CACHE_HOME, "quantifyself", "server.log")
@@ -49,8 +49,8 @@ def load_or_create_config():
 
     if os.path.exists(QUANTIFYSELF_CONFIG_FILE):
         try:
-            with open(QUANTIFYSELF_CONFIG_FILE, "rb") as f:
-                config = tomllib.load(f)
+            with open(QUANTIFYSELF_CONFIG_FILE, "r") as f:
+                config = json.load(f)
             logger.info("Config loaded from file.")
         except Exception as e:
             logger.error(f"Failed to load config file: {e}")
@@ -59,13 +59,7 @@ def load_or_create_config():
         config = default_settings
         try:
             with open(QUANTIFYSELF_CONFIG_FILE, "w") as f:
-                for key, value in default_settings.items():
-                    if isinstance(value, dict):
-                        f.write(f"[{key}]\n")
-                        for sub_key, sub_value in value.items():
-                            f.write(f'{sub_key} = "{sub_value}"\n')
-                    else:
-                        f.write(f'{key} = "{value}"\n')
+                json.dump(default_settings, f, indent=4)
             logger.info(
                 f"Config file created at {QUANTIFYSELF_CONFIG_FILE} with default settings."
             )
@@ -92,15 +86,12 @@ def get_connection(db_file):
 
 @app.route("/execute", methods=["POST"])
 def execute_query():
-    """Endpoint to execute SQL queries on a specified database."""
     try:
-        # Parse input JSON
         data = request.get_json()
         if not data:
             return jsonify({"error": "No input provided"}), 400
 
         db_file = data.get("db_file")
-        logger.info(f"Request for db_file: {db_file}")
         if not db_file:
             return jsonify({"error": "Database file is missing"}), 400
 
@@ -110,17 +101,25 @@ def execute_query():
         if not query:
             return jsonify({"error": "Query is missing"}), 400
 
-        # Execute the query
         conn = get_connection(db_file)
-        if params:
-            result = conn.execute(query, params).fetchall()
-        else:
-            result = conn.execute(query).fetchall()
+
+        # Serialize all queries on this connection
+        with db_lock:
+            if params:
+                result = conn.execute(query, params).fetchall()
+            else:
+                result = conn.execute(query).fetchall()
 
         return jsonify({"status": "success", "result": result})
     except Exception as e:
         logger.error(f"Error executing query: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/")
+def serve_index():
+    """Serve the index.html file."""
+    return send_from_directory(app.static_folder or "static", "index.html")
 
 
 def shutdown_handler(signum, frame):
