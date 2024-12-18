@@ -154,6 +154,12 @@
     executable = true;
   };
 
+  home.file.".thunderbird/personal/ImapMail/imap.gmail.com/msgFilterRules.dat" = {
+    source = ../../.config/mylib/msgFilterRules.dat;
+    recursive = false;
+    executable = false;
+  };
+
   home.file.".config/rvc-cli/rvc/models/embedders/contentvec/pytorch_model.bin".source = "${
     pkgs.fetchurl
     {

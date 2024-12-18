@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import re
 import subprocess
 from datetime import datetime, timezone
 from time import sleep
@@ -25,15 +26,27 @@ default_settings = {
     "filter": [
         {
             "class": "Tor Browser",
-            "title": "*",
+            "title": ".*",
+            "new_title": "filtered",
+            "new_class": "Tor Browser",
         },
         {
             "class": "firefox",
             "title": ".*Private Browsing.*",
+            "new_title": "filtered",
+            "new_class": "firefox",
         },
         {
             "class": "Opera",
-            "title": "*",
+            "title": ".*",
+            "new_title": "filtered",
+            "new_class": "Opera",
+        },
+        {
+            "class": "kitty",
+            "title": ".*Yazi.*",
+            "new_title": "Yazi",
+            "new_class": "kitty",
         },
     ],
 }
@@ -96,9 +109,21 @@ class WindowWatcher:
         logger.info("window_watcher started")
         self.heartbeat_loop()
 
+    def is_locked(self) -> bool:
+        try:
+            subprocess.run(["pgrep", "hyprlock"], check=True, capture_output=True)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
     def heartbeat_loop(self):
         while True:
             try:
+                if self.is_locked():
+                    logger.debug("Screen is locked, skipping logging.")
+                    sleep(self.poll_time)
+                    continue
+
                 window_info = self.get_window_info()
                 logger.debug(f"Window Info: {window_info}")
                 self.log_event(window_info)
@@ -152,16 +177,21 @@ class WindowWatcher:
                 client_class = client.get("class", "unknown")
                 client_title = client.get("title", "unknown")
 
-                # Check if the client matches any filter
-                filtered = any(
-                    (f["class"] == "*" or f["class"] == client_class)
-                    and (f["title"] == "*" or f["title"] == client_title)
-                    for f in self.filter
+                matching_filter = next(
+                    (
+                        f
+                        for f in self.filter
+                        if re.fullmatch(f["class"], client_class)
+                        and re.fullmatch(f["title"], client_title)
+                    ),
+                    None,
                 )
 
-                if filtered:
+                if matching_filter:
+                    new_class = matching_filter["new_class"]
+                    new_title = matching_filter["new_title"]
                     window_info.append(
-                        {"client_class": "filtered", "client_title": "filtered"}
+                        {"client_class": new_class, "client_title": new_title}
                     )
                 else:
                     window_info.append(

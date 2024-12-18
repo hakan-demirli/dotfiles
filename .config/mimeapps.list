@@ -63,6 +63,19 @@ video/webm=mpv.desktop
 image/gif=mpv.desktop
 application/vnd.gtkwave-vcd=surfer.desktop
 application/pdf=sioyek.desktop
+x-scheme-handler/mailto=userapp-Thunderbird-4HP3Y2.desktop
+message/rfc822=userapp-Thunderbird-4HP3Y2.desktop
+x-scheme-handler/mid=userapp-Thunderbird-4HP3Y2.desktop
+x-scheme-handler/news=userapp-Thunderbird-OD43Y2.desktop
+x-scheme-handler/snews=userapp-Thunderbird-OD43Y2.desktop
+x-scheme-handler/nntp=userapp-Thunderbird-OD43Y2.desktop
+x-scheme-handler/feed=userapp-Thunderbird-ILS4Y2.desktop
+application/rss+xml=userapp-Thunderbird-ILS4Y2.desktop
+application/x-extension-rss=userapp-Thunderbird-ILS4Y2.desktop
+x-scheme-handler/webcal=userapp-Thunderbird-8H84Y2.desktop
+text/calendar=userapp-Thunderbird-8H84Y2.desktop
+application/x-extension-ics=userapp-Thunderbird-8H84Y2.desktop
+x-scheme-handler/webcals=userapp-Thunderbird-8H84Y2.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;
@@ -124,3 +137,14 @@ text/x-makefile=helix.desktop
 image/gif=mpv.desktop
 application/vnd.gtkwave-vcd=surfer.desktop
 application/pdf=sioyek.desktop
+x-scheme-handler/mailto=userapp-Thunderbird-4HP3Y2.desktop;
+x-scheme-handler/mid=userapp-Thunderbird-4HP3Y2.desktop;
+x-scheme-handler/news=userapp-Thunderbird-OD43Y2.desktop;
+x-scheme-handler/snews=userapp-Thunderbird-OD43Y2.desktop;
+x-scheme-handler/nntp=userapp-Thunderbird-OD43Y2.desktop;
+x-scheme-handler/feed=userapp-Thunderbird-ILS4Y2.desktop;
+application/rss+xml=userapp-Thunderbird-ILS4Y2.desktop;
+application/x-extension-rss=userapp-Thunderbird-ILS4Y2.desktop;
+x-scheme-handler/webcal=userapp-Thunderbird-8H84Y2.desktop;
+x-scheme-handler/webcals=userapp-Thunderbird-8H84Y2.desktop;
+

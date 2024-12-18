@@ -1,18 +1,30 @@
 {
-  "poll_time": 5,
-  "database_path": "/home/emre/.local/share/quantifyself/window/window.duckdb",
-  "filter": [
-    {
-      "class": "Tor Browser",
-      "title": "*"
-    },
-    {
-      "class": "firefox",
-      "title": ".*Private Browsing.*"
-    },
-    {
-      "class": "Opera",
-      "title": "*"
-    }
-  ]
+    "poll_time": 5,
+    "database_path": "/home/emre/.local/share/quantifyself/window/window.duckdb",
+    "filter": [
+        {
+            "class": "Tor Browser",
+            "title": ".*",
+            "new_title": "filtered",
+            "new_class": "Tor Browser"
+        },
+        {
+            "class": "firefox",
+            "title": ".*Private Browsing.*",
+            "new_title": "filtered",
+            "new_class": "firefox"
+        },
+        {
+            "class": "Opera",
+            "title": ".*",
+            "new_title": "filtered",
+            "new_class": "Opera"
+        },
+        {
+            "class": "kitty",
+            "title": ".*Yazi.*",
+            "new_title": "Yazi",
+            "new_class": "kitty"
+        }
+    ]
 }
