@@ -1,0 +1,95 @@
+/* General dark theme settings */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light text for contrast */
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(20rem, 1fr)
+  ); /* Responsive column widths */
+  gap: 2rem;
+  margin: 2rem;
+  padding: 1rem;
+}
+
+.chart {
+  background-color: #1e1e1e; /* Dark chart background */
+  border: 0.1rem solid #333; /* Subtle border */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20rem;
+}
+
+/* Define classes for multiple column spans */
+.chart.one-unit {
+  grid-column: span 1;
+}
+
+.chart.two-unit {
+  grid-column: span 2;
+}
+
+.chart.three-unit {
+  grid-column: span 3;
+}
+
+.chart.four-unit {
+  grid-column: span 4;
+}
+
+.chart.eight-unit {
+  grid-column: span 8;
+}
+
+.chart.sixteen-unit {
+  grid-column: span 16;
+}
+
+/* Titles inside the charts */
+.chart h3 {
+  color: #e0e0e0; /* Light text color */
+}
+
+/* Flatpickr dark theme */
+.flatpickr-calendar {
+  background-color: #1e1e1e; /* Calendar background */
+  border: 1px solid #333; /* Subtle border */
+  color: #e0e0e0; /* Light text */
+}
+
+.flatpickr-day {
+  color: #e0e0e0; /* Day text */
+  background-color: transparent;
+}
+
+.flatpickr-day:hover {
+  background-color: #333; /* Hover effect */
+}
+
+.flatpickr-day.selected {
+  background-color: #6200ea; /* Selected date background */
+  color: #fff; /* Selected date text */
+}
+
+.flatpickr-month {
+  color: #e0e0e0; /* Month text */
+}
+
+.flatpickr-current-month {
+  color: #fff; /* Current month text */
+}
+
+.flatpickr-time {
+  background-color: #1e1e1e; /* Time picker background */
+  color: #e0e0e0; /* Time text */
+}

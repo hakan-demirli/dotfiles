@@ -179,6 +179,10 @@
 * **Create nixos bootable usb drive**
     * ```cp nixos.iso /dev/sdX```
 
+* **Run docker via nix-shell**
+    * nix-shell -p docker
+    * sudo dockerd
+    * After u are done, ctrl+c
 
 * **Distributing a nix built package to non nix users**
     * Not tested:

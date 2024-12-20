@@ -7,6 +7,7 @@ pkgs.stdenv.mkDerivation {
       pythonPackages: with pythonPackages; [
         setuptools
         flask
+        flask-cors
         duckdb
         psutil
         requests

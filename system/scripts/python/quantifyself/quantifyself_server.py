@@ -7,9 +7,11 @@ import sys
 import threading
 
 import duckdb
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request
+from flask_cors import CORS  # Import Flask-CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://127.0.0.1*"}})  # or "http://localhost*"
 
 # Define paths for configuration
 XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
@@ -114,12 +116,6 @@ def execute_query():
     except Exception as e:
         logger.error(f"Error executing query: {e}")
         return jsonify({"error": str(e)}), 500
-
-
-@app.route("/")
-def serve_index():
-    """Serve the index.html file."""
-    return send_from_directory(app.static_folder or "static", "index.html")
 
 
 def shutdown_handler(signum, frame):

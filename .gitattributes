@@ -11,6 +11,8 @@
 .config/mylib/ics.json filter=git-crypt diff=git-crypt
 .config/mylib/gtoken.json filter=git-crypt diff=git-crypt
 .config/mylib/credentials.json filter=git-crypt diff=git-crypt
+.config/mylib/credentials.json filter=git-crypt diff=git-crypt
+.config/quantifyself-webui/window_categories.json filter=git-crypt diff=git-crypt
 .local/share/mytask/* filter=git-crypt diff=git-crypt
 .local/share/task/* filter=git-crypt diff=git-crypt
 .local/share/timewarrior/* filter=git-crypt diff=git-crypt

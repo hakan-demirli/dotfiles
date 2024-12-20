@@ -196,6 +196,7 @@
     # (pkgs.callPackage ../../system/app/prometheus-exporters.nix { })
     #
     (pkgs.callPackage ../../system/app/quantifyself.nix { })
+    (pkgs.callPackage ../../system/app/quantifyself-webui.nix { })
 
     cpufrequtils
     hypridle

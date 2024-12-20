@@ -40,6 +40,7 @@
         # "piper" # not working, workaround below
         "qmk"
         "quantifyself"
+        "quantifyself-webui"
         "qutebrowser"
         "rclone"
         "rmpc"
