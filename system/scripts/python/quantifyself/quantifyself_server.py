@@ -122,16 +122,27 @@ def shutdown_handler(signum, frame):
     """Handles graceful shutdown on receiving termination signals."""
     logger.info(f"Signal {signum} received. Gracefully shutting down.")
     try:
-        with db_lock:
-            for db_file, conn in db_connections.items():
-                try:
-                    logger.info(f"Executing database CHECKPOINT for {db_file}...")
-                    conn.execute("CHECKPOINT;")
-                    logger.info(f"Database CHECKPOINT completed for {db_file}.")
-                    conn.close()
-                    logger.info(f"Database connection closed for {db_file}.")
-                except Exception as e:
-                    logger.error(f"Error during shutdown for {db_file}: {e}")
+        # Attempt to acquire the lock with a timeout of 3 seconds
+        lock_acquired = db_lock.acquire(timeout=3)
+        if lock_acquired:
+            try:
+                for db_file, conn in db_connections.items():
+                    try:
+                        logger.info(f"Executing database CHECKPOINT for {db_file}...")
+                        conn.execute("CHECKPOINT;")
+                        logger.info(f"Database CHECKPOINT completed for {db_file}.")
+                        conn.close()
+                        logger.info(f"Database connection closed for {db_file}.")
+                    except Exception as e:
+                        logger.error(f"Error during shutdown for {db_file}: {e}")
+            finally:
+                db_lock.release()
+        else:
+            logger.warning(
+                "Could not acquire the lock within 3 seconds. Proceeding with shutdown."
+            )
+    except Exception as e:
+        logger.error(f"Unexpected error during shutdown: {e}")
     finally:
         sys.exit(0)
 
