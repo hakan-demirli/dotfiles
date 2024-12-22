@@ -198,6 +198,9 @@
     (pkgs.callPackage ../../system/app/quantifyself.nix { })
     (pkgs.callPackage ../../system/app/quantifyself-webui.nix { })
 
+    (pkgs.callPackage ../../system/app/html-preview-lsp.nix { })
+    (pkgs.callPackage ../../system/app/html-preview-server.nix { })
+
     cpufrequtils
     hypridle
     vim # default editor
@@ -226,6 +229,7 @@
     android-file-transfer
     transmission_4-qt
     libsForQt5.kolourpaint
+    libsForQt5.qt5.qtimageformats # webp support for kolourpaint
     libsForQt5.breeze-icons
     ventoy
     nwg-displays
@@ -375,6 +379,7 @@
     MYSQL_HISTFILE = "${config.home.sessionVariables.XDG_DATA_HOME}/mysql_history";
     SQLITE_HISTORY = "${config.home.sessionVariables.XDG_CACHE_HOME}/sqlite_history";
     DUCKDB_HISTORY = "${config.home.sessionVariables.XDG_CACHE_HOME}/duckdb_history";
+    GRIPHOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/grip";
 
     # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=$${XDG_CONFIG_HOME}}/java"; # not working
     KERAS_HOME = "${config.home.sessionVariables.XDG_STATE_HOME}/keras";

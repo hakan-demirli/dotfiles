@@ -27,6 +27,9 @@ auto-format = true
 [[language]]
 name = "html"
 formatter = { command = 'prettier', args = ["--parser", "html"] }
+language-servers = [
+  "html-preview-lsp"
+]
 
 [[language]]
 name = "json"
@@ -51,6 +54,7 @@ name = "markdown"
 formatter = { command = 'prettier', args = ["--parser", "markdown"] }
 language-servers = [
   "marksman",
+  "mdpls",
   # "markdown-oxide",
   # "typos",
   # "vale",
@@ -163,6 +167,14 @@ command = "typos-lsp"
 
 [language-server.ltex]
 command = "ltex-ls"
+
+[language-server.mdpls]
+command = "mdpls"
+config = { markdown.preview.serveStatic = true, markdown.preview.codeTheme = "github", markdown.preview.auto = true, markdown.preview.browser = "firefox" }
+
+[language-server.html-preview-lsp]
+command = "html-preview-lsp"
+
 
 
 # [language-server.dls]
