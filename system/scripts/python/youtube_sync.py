@@ -146,7 +146,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--playlist_file",
         type=str,
-        default="/mnt/second/rep/sounds/music/playlists.txt",  # ABS_PATH: better solution?
+        default="/home/emre/.local/share/sounds/music/playlists.txt",  # ABS_PATH: better solution?
         help="The playlist file.",
     )
     parser.add_argument(

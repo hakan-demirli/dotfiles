@@ -34,6 +34,7 @@
         username = "emre"; # username
         name = "EHD"; # name/identifier
         dotfilesDir = "/home/${username}/Desktop/dotfiles"; # absolute path of the local repo
+        gdriveDir = "/home/${username}/Desktop/gdrive";
       };
     in
     {

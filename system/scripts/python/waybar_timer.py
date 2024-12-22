@@ -31,7 +31,7 @@ class TimerState(Enum):
 def play_sound(file: str):
     try:
         subprocess.Popen(
-            f"ffplay -nodisp -autoexit $XDG_DATA_HOME/sounds/{file}", shell=True
+            f"ffplay -nodisp -autoexit $XDG_DATA_HOME/sounds/effects/{file}", shell=True
         )
     except Exception:
         # print(e)

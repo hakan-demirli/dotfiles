@@ -67,11 +67,8 @@
       immutable_data = [
         "applications"
         "fonts"
-        "sounds"
       ];
       mutable_data = [
-        "task"
-        "timewarrior"
       ];
 
       makeMutable = path: file: {
@@ -153,6 +150,18 @@
     source = ../../.local/bin;
     recursive = true;
     executable = true;
+  };
+
+  home.file.".local/share/sounds" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/sounds";
+    recursive = true;
+    executable = false;
+  };
+
+  home.file.".local/share/scratchpads" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/scratchpads";
+    recursive = true;
+    executable = false;
   };
 
   home.file.".thunderbird/personal/ImapMail/imap.gmail.com/msgFilterRules.dat" = {
