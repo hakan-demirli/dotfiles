@@ -164,6 +164,12 @@
     executable = false;
   };
 
+  home.file.".config/notify-scheduler" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/software/notify-scheduler";
+    recursive = true;
+    executable = false;
+  };
+
   home.file.".thunderbird/personal/ImapMail/imap.gmail.com/msgFilterRules.dat" = {
     source = ../../.config/mylib/msgFilterRules.dat;
     recursive = false;
