@@ -19,5 +19,4 @@
 .local/share/timewarrior/data/* filter=git-crypt diff=git-crypt
 .local/share/sounds/* filter=git-crypt diff=git-crypt
 
-system/scripts/* linguist-generated=true
-
+*.py linguist-generated
