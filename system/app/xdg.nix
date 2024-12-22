@@ -12,6 +12,7 @@
         "hypr"
         "rvc-cli"
         "mimeapps.list"
+        "rclone"
       ];
 
       immutable_configs = [
@@ -42,7 +43,6 @@
         "quantifyself"
         "quantifyself-webui"
         "qutebrowser"
-        "rclone"
         "rmpc"
         "sioyek"
         "starship.toml"
