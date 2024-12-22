@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+is_running=$(pgrep -f "my_btop")
+echo "$is_running"
+
+if [ -n "$is_running" ]; then
+  echo "just togglespecialworkspace"
+  hyprctl dispatch togglespecialworkspace btop
+else
+  echo "just btop"
+  kitty --title "my_btop" btop &
+fi
+

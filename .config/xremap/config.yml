@@ -61,7 +61,7 @@ keymap:
       Ctrl-Alt-l: Ctrl-KEY_RIGHT
       Alt-KEY_SEMICOLON: reserved
 
-      Alt-n: reserved
+      # Alt-n: toggle btop
       # Alt-m: workspace 1
       # Alt-comma: workspace 2
       # Alt-dot: workspace 3
