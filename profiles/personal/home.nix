@@ -226,7 +226,7 @@
     jq # to parse hyprctl
     usbutils
     pavucontrol
-    android-file-transfer
+    android-tools # adb
     transmission_4-qt
     libsForQt5.kolourpaint
     libsForQt5.qt5.qtimageformats # webp support for kolourpaint
