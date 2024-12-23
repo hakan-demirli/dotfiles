@@ -78,20 +78,23 @@ for sig in [
     signal.signal(sig, shutdown_handler)
 
 if __name__ == "__main__":
-    now = datetime.now().strftime("%H:%M")
+    now_time = datetime.now().strftime("%H:%M")
+
     for task_name, task_details in config.items():
         times = task_details.get("time", [])
         content = task_details.get("content", "")
         for task_time in times:
+            if task_time > now_time:
+                continue
             if should_notify(task_name, task_time):
                 send_notification("Reminder", content)
 
     while True:
-        now = datetime.now().strftime("%H:%M")
+        now_time = datetime.now().strftime("%H:%M")
         for task_name, task_details in config.items():
             times = task_details.get("time", [])
             content = task_details.get("content", "")
             for task_time in times:
-                if now == task_time and should_notify(task_name, task_time):
+                if now_time == task_time and should_notify(task_name, task_time):
                     send_notification("Reminder", content)
         time.sleep(60)
