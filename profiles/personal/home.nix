@@ -253,6 +253,7 @@
     ffmpeg-full
     bat
     libnotify
+    parallel-full
 
     imhex
     trash-cli

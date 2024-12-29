@@ -1,4 +1,5 @@
-.config/.bash_history filter=git-crypt diff=git-crypt
+.config/.bash_history* filter=git-crypt diff=git-crypt
+.config/bash_history* filter=git-crypt diff=git-crypt
 .config/git/config filter=git-crypt diff=git-crypt
 .config/rclone/* filter=git-crypt diff=git-crypt
 .config/task/* filter=git-crypt diff=git-crypt

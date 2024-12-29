@@ -152,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--music_dir",
         type=str,
-        default="/mnt/second/rep/sounds/music",  # ABS_PATH: better solution?
+        default="/home/emre/.local/share/sounds/music",  # ABS_PATH: better solution?
         help="The music directory.",
     )
 

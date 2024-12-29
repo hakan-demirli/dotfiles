@@ -64,7 +64,7 @@
   },
   "memory": {
     "format": "{}% ",
-    "on-click": "$HOME/.local/bin/launchOrFocus --title btop"
+    "on-click": "btop_my"
   },
   "pulseaudio": {
     "format": "\n{volume}% {icon}\n",
