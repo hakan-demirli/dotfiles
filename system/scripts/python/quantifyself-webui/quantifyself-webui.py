@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 
-import os
 import json
 import logging
-from flask import Flask, send_from_directory, jsonify
+import os
+
+from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS  # Import CORS
 
 # Assumes your index.html is in the "static" folder.
 app = Flask(__name__, static_folder="static")
+
+# Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "http://127.0.0.1*"}})  # or "http://localhost*"
 
 XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
 APP_CONFIG_DIR = os.path.join(XDG_CONFIG_HOME, "quantifyself-webui")

@@ -4,19 +4,26 @@ import { drawRamHistoryChart } from "./ram_history_plot.js";
 import { drawRamChart } from "./ram_plot.js";
 import { drawWindowRegexPieChart } from "./window_regex_pie.js";
 import { drawWindowRegexStackedChart } from "./window_regex_stacked.js";
+import { drawWindowRegexGridChart } from "./daily_grid_plot.js";
 
 const plots = [
+  // {
+  //   id: "cpu-chart",
+  //   title: "CPU Usage",
+  //   drawFunction: drawCpuChart,
+  //   unit: "one-unit",
+  // },
+  // {
+  //   id: "ram-chart",
+  //   title: "RAM Usage",
+  //   drawFunction: drawRamChart,
+  //   unit: "one-unit",
+  // },
   {
-    id: "cpu-chart",
-    title: "CPU Usage",
-    drawFunction: drawCpuChart,
-    unit: "one-unit",
-  },
-  {
-    id: "ram-chart",
-    title: "RAM Usage",
-    drawFunction: drawRamChart,
-    unit: "one-unit",
+    id: "window-regex-stacked-chart",
+    title: "Window Regex Stacked",
+    drawFunction: drawWindowRegexStackedChart,
+    unit: "two-unit",
   },
   {
     id: "window-regex-pie-chart",
@@ -24,25 +31,24 @@ const plots = [
     drawFunction: drawWindowRegexPieChart,
     unit: "two-unit",
   },
+  // {
+  //   id: "cpu-history-chart",
+  //   title: "CPU History",
+  //   drawFunction: drawCpuHistoryChart,
+  //   unit: "one-unit",
+  //   // gridColumn: "1 / -1",
+  // },
+  // {
+  //   id: "ram-history-chart",
+  //   title: "RAM History",
+  //   drawFunction: drawRamHistoryChart,
+  //   unit: "one-unit",
+  // },
   {
-    id: "window-regex-stacked-chart",
-    title: "Window Regex Stacked",
-    drawFunction: drawWindowRegexStackedChart,
+    id: "window-regex-grid-chart",
+    title: "Window Grid",
+    drawFunction: drawWindowRegexGridChart,
     unit: "four-unit",
-    gridColumn: "1 / -1",
-  },
-  {
-    id: "cpu-history-chart",
-    title: "CPU History",
-    drawFunction: drawCpuHistoryChart,
-    unit: "one-unit",
-    // gridColumn: "1 / -1",
-  },
-  {
-    id: "ram-history-chart",
-    title: "RAM History",
-    drawFunction: drawRamHistoryChart,
-    unit: "one-unit",
   },
 ];
 

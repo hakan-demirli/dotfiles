@@ -1,252 +1,30 @@
-import { fetchData } from "./api.js";
-import { getWindowCategories } from "./window_category.js";
 import * as d3 from "https://cdn.skypack.dev/d3";
-
-let resizeListenerAdded = false;
-
-// Cache for various operations
-const cache = {
-  workDuration: {},
-  classifyRow: {},
-  color: {},
-  processedData: {},
-  windowCategories: null,
-};
-
-// Helper function to generate cache keys
-function generateCacheKey(prefix, ...args) {
-  return `${prefix}__${args.join("__")}`;
-}
-
-async function getWindowCategoriesCached() {
-  if (cache.windowCategories) {
-    return cache.windowCategories;
-  }
-  cache.windowCategories = await getWindowCategories();
-  return cache.windowCategories;
-}
-
-function classifyRow(categories, clientClass, clientTitle) {
-  const cacheKey = generateCacheKey("classifyRow", clientClass, clientTitle);
-  if (cache.classifyRow[cacheKey]) {
-    return cache.classifyRow[cacheKey];
-  }
-
-  for (const category of categories) {
-    for (const [subgroup, subgroupDetails] of Object.entries(category.childs)) {
-      for (const matchRule of subgroupDetails.match) {
-        // Convert Title and Class to RegExp
-        const titleRegex = new RegExp(matchRule.Title);
-        const classRegex = new RegExp(matchRule.Class);
-
-        const titleMatch = titleRegex.test(clientTitle);
-        const classMatch = classRegex.test(clientClass);
-        if (titleMatch && classMatch) {
-          const result = { group: category.name, subgroup }; // Use the category name
-          cache.classifyRow[cacheKey] = result;
-          return result;
-        }
-      }
-    }
-  }
-  const result = { group: "Uncategorized", subgroup: null };
-  cache.classifyRow[cacheKey] = result;
-  return result;
-}
-
-async function fetchDataForDate(date, dbFile) {
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
-
-  const query = `
-    SELECT timestamp, client_class, client_title
-    FROM window_metrics
-    WHERE timestamp >= '${startOfDay.toISOString()}'
-    AND timestamp < '${endOfDay.toISOString()}'
-    ORDER BY timestamp;
-  `;
-
-  const payload = { db_file: dbFile, query };
-  return fetchData(payload);
-}
-
-function transformData(data, categories, timezoneOffset) {
-  return data.map(([timestampStr, clientClass, clientTitle]) => {
-    const timestamp = new Date(timestampStr);
-    // Convert UTC timestamp to local timestamp
-    const localTimestamp = new Date(
-      timestamp.getTime() + timezoneOffset * 60 * 60 * 1000,
-    );
-    const { group, subgroup } = classifyRow(
-      categories,
-      clientClass,
-      clientTitle,
-    );
-    return {
-      timestamp: localTimestamp, // Store local timestamp
-      clientClass,
-      clientTitle,
-      group,
-      subgroup,
-    };
-  });
-}
-
-function calculateDurations(enrichedData, idleMaxDuration = 60) {
-  const durationData = [];
-  for (let i = 0; i < enrichedData.length; i++) {
-    const current = enrichedData[i];
-    const next = enrichedData[i + 1];
-    const duration =
-      next && (next.timestamp - current.timestamp) / 1000 <= idleMaxDuration
-        ? (next.timestamp - current.timestamp) / 1000
-        : 5;
-    durationData.push({ ...current, duration });
-  }
-  return durationData;
-}
-
-function get15MinuteInterval(date) {
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const interval = Math.floor(minutes / 15);
-  return hours * 4 + interval;
-}
-
-async function fetchAndProcessData(date, dbFile, timezoneOffset) {
-  const dateString = date.toISOString().split("T")[0];
-  const cacheKey = generateCacheKey("processedData", dateString);
-
-  if (cache.processedData[cacheKey]) {
-    return cache.processedData[cacheKey];
-  }
-
-  const data = await fetchDataForDate(date, dbFile);
-
-  if (data.length === 0) {
-    cache.processedData[cacheKey] = {
-      durationData: [],
-      groupedData: {},
-    };
-    return cache.processedData[cacheKey];
-  }
-
-  const categories = await getWindowCategoriesCached();
-  const enrichedData = transformData(data, categories, timezoneOffset); // Pass timezoneOffset
-  const durationData = calculateDurations(enrichedData, 300);
-
-  const groupedData = {};
-  durationData.forEach(({ timestamp, group, subgroup, duration }) => {
-    const timeKey = get15MinuteInterval(timestamp); // Use 15 min interval key
-    if (!groupedData[timeKey]) {
-      groupedData[timeKey] = {};
-    }
-    if (!groupedData[timeKey][group]) {
-      groupedData[timeKey][group] = {};
-    }
-    if (!groupedData[timeKey][group][subgroup]) {
-      groupedData[timeKey][group][subgroup] = 0;
-    }
-    groupedData[timeKey][group][subgroup] += duration;
-  });
-
-  cache.processedData[cacheKey] = { durationData, groupedData };
-  return cache.processedData[cacheKey];
-}
-
-async function calculateWorkDuration(date, dbFile, timezoneOffset) {
-  const dateString = date.toISOString().split("T")[0];
-  const cacheKey = generateCacheKey("workDuration", dateString);
-  if (cache.workDuration[cacheKey] !== undefined) {
-    return cache.workDuration[cacheKey];
-  }
-
-  const data = await fetchDataForDate(date, dbFile);
-
-  if (data.length === 0) {
-    cache.workDuration[cacheKey] = 0;
-    return 0;
-  }
-
-  const categories = await getWindowCategoriesCached();
-  const enrichedData = transformData(data, categories, timezoneOffset);
-  const durationData = calculateDurations(enrichedData);
-
-  let workDuration = 0;
-  durationData.forEach((d) => {
-    if (d.group === "Work") workDuration += d.duration;
-  });
-
-  cache.workDuration[cacheKey] = workDuration;
-  return workDuration;
-}
-
-function getColorForWorkDuration(durationInSeconds) {
-  const cacheKey = generateCacheKey("color", durationInSeconds);
-  if (cache.color[cacheKey]) {
-    return cache.color[cacheKey];
-  }
-
-  const maxHours = 12;
-  const maxWorkDuration = maxHours * 60 * 60;
-  const clampedDuration = Math.min(durationInSeconds, maxWorkDuration);
-  const percentage = clampedDuration / maxWorkDuration;
-  const lightness = 100 * (1 - percentage);
-  const lightnessCapped = Math.max(25, Math.min(lightness, 99));
-
-  let color = `hsl(120, 100%, ${lightnessCapped}%)`; // 120 is green in HSL
-  if (percentage === 0) {
-    color = `transparent`;
-  }
-
-  cache.color[cacheKey] = color;
-  return color;
-}
-
-function padDataWithMissingIntervals(combinedGroupedData, groups, subgroups) {
-  const allIntervals = Array.from({ length: 24 * 4 }, (_, i) => i); // 24 hours * 4 intervals per hour
-  const paddedData = allIntervals.map((interval) => {
-    const entry = { time: interval };
-    groups.forEach((group) => {
-      entry[group] = {};
-      subgroups.forEach((subgroup) => {
-        entry[group][subgroup] =
-          combinedGroupedData[interval]?.[group]?.[subgroup] || 0;
-      });
-    });
-    return entry;
-  });
-  return paddedData;
-}
+import { BaseChart } from "./chart_base.js";
+import {
+  fetchAndProcessData,
+  padDataWithMissingIntervals,
+} from "./data_handler.js";
+import { DB_FILE } from "./constants.js";
 
 export async function drawWindowRegexStackedChart(
   containerId,
   startDate = new Date(),
   numberOfDays = 7,
 ) {
-  const DB_FILE = "/home/emre/.local/share/quantifyself/window/window.duckdb";
-  const TIMEZONE_OFFSET = 3; // Your Timezone Offset (GMT+3)
-
-  const container = d3.select(containerId);
-  container.selectAll("*").remove();
+  const chart = new BaseChart(containerId);
+  chart.clearContainer();
 
   const allDaysData = [];
   for (let i = 0; i < numberOfDays; i++) {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() - i);
 
-    const { durationData, groupedData } = await fetchAndProcessData(
-      date,
-      DB_FILE,
-      TIMEZONE_OFFSET,
-    );
-    allDaysData.push({ date, durationData, groupedData });
+    const { groupedData } = await fetchAndProcessData(date, DB_FILE);
+    allDaysData.push({ date, groupedData });
   }
 
   let combinedGroupedData = {};
-  for (const { date, groupedData } of allDaysData) {
+  for (const { groupedData } of allDaysData) {
     for (const timeKey in groupedData) {
       if (!combinedGroupedData[timeKey]) {
         combinedGroupedData[timeKey] = {};
@@ -309,16 +87,12 @@ export async function drawWindowRegexStackedChart(
     subgroups,
   );
 
-  const containerWidth = parseInt(container.style("width"));
-  const containerHeight = parseInt(container.style("height"));
-  const margin = { top: 20, right: 30, bottom: 80, left: 50 }; // Increased bottom margin for legend
-  const width = containerWidth - margin.left - margin.right;
-  const height = containerHeight - margin.top - margin.bottom;
+  const { width, height, margin } = chart.getDimensions();
 
-  const svg = container
+  const svg = chart.container
     .append("svg")
-    .attr("width", containerWidth)
-    .attr("height", containerHeight)
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -404,17 +178,6 @@ export async function drawWindowRegexStackedChart(
     .y0((d) => y(d[0]))
     .y1((d) => y(d[1]));
 
-  const tooltip = d3
-    .select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("position", "absolute")
-    .style("background-color", "white")
-    .style("border", "1px solid #ccc")
-    .style("padding", "5px")
-    .style("display", "none")
-    .style("pointer-events", "none");
-
   svg
     .selectAll(".area-group")
     .data(series)
@@ -432,20 +195,14 @@ export async function drawWindowRegexStackedChart(
       const hours = Math.floor(totalDuration / 3600);
       const minutes = Math.floor((totalDuration % 3600) / 60);
       const seconds = Math.floor(totalDuration % 60);
-      tooltip
-        .style("display", "block")
-        .html(`${d.key} : ${hours}h ${minutes}m ${seconds}s`)
-        .style("left", `${event.pageX + 10}px`)
-        .style("top", `${event.pageY - 20}px`);
+      chart.showTooltip(event, `${d.key} : ${hours}h ${minutes}m ${seconds}s`);
     })
     .on("mousemove", (event) => {
-      tooltip
-        .style("left", `${event.pageX + 10}px`)
-        .style("top", `${event.pageY - 20}px`);
+      chart.moveTooltip(event);
     })
     .on("mouseout", function () {
       d3.select(this).style("opacity", 1);
-      tooltip.style("display", "none");
+      chart.hideTooltip();
     });
 
   // ------ Legend Changes Start Here ------
@@ -486,15 +243,7 @@ export async function drawWindowRegexStackedChart(
     .text(([group]) => group);
   // ------ Legend Changes End Here ------
 
-  if (!resizeListenerAdded) {
-    resizeListenerAdded = true;
-    let resizeTimeout;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(
-        () => drawWindowRegexStackedChart(containerId, startDate, numberOfDays),
-        300,
-      );
-    });
-  }
+  chart.addResizeListener(() =>
+    drawWindowRegexStackedChart(containerId, startDate, numberOfDays),
+  );
 }

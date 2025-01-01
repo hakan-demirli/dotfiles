@@ -13,8 +13,8 @@ body {
     auto-fit,
     minmax(20rem, 1fr)
   ); /* Responsive column widths */
-  gap: 2rem;
-  margin: 2rem;
+  gap: 1rem;
+  margin: 1rem;
   padding: 1rem;
 }
 
@@ -92,4 +92,9 @@ body {
 .flatpickr-time {
   background-color: #1e1e1e; /* Time picker background */
   color: #e0e0e0; /* Time text */
+}
+
+/* Throwing off divs and doing nothing. Fucking little shit.*/
+.flatpickr-input {
+  width: 0 !important;
 }
