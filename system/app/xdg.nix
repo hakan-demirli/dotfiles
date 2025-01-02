@@ -170,6 +170,12 @@
     executable = false;
   };
 
+  home.file.".local/share/quantifyself" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/archives/quantifyself";
+    recursive = true;
+    executable = false;
+  };
+
   home.file.".thunderbird/personal/ImapMail/imap.gmail.com/msgFilterRules.dat" = {
     source = ../../.config/mylib/msgFilterRules.dat;
     recursive = false;
