@@ -26,6 +26,8 @@
 
   programs.starship.enable = true;
   services.udiskie.enable = true;
+  # https://github.com/nix-community/home-manager/issues/2064
+  systemd.user.targets.tray.Unit.Requires = [ "graphical-session.target" ];
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
