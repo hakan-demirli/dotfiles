@@ -23,28 +23,27 @@
   ];
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/17520f54-f478-4b73-a4af-91c25bbb886e";
+    device = "/dev/disk/by-uuid/3b02a7db-5ed5-47c5-ba4c-0feb7876c7b7";
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/8280-EA75";
+    device = "/dev/disk/by-uuid/3617-EB8F";
     fsType = "vfat";
+    options = [
+      "fmask=0077"
+      "dmask=0077"
+    ];
   };
 
-  # /dev/disk/by-uuid/0D11E693467F5A53 /mnt/second ntfs nosuid,nodev,nofail 0 0
   fileSystems."/mnt/second" = {
-    device = "/dev/disk/by-uuid/0D11E693467F5A53";
+    device = "/dev/disk/by-uuid/75AA2E4F583B3E35";
     fsType = "ntfs-3g";
     # options = ["uid=1000" "gid=1000" "dmask=007" "fmask=117"];
     options = [
       "rw"
       "uid=1000"
     ];
-  };
-  fileSystems."/mnt/third" = {
-    device = "/dev/disk/by-uuid/1f0ba19b-a6a7-42c7-b5fa-5805fd2001cb";
-    fsType = "ext4";
   };
 
   swapDevices = [

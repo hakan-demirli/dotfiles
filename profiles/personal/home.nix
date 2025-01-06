@@ -315,15 +315,7 @@
     # (pkgs.callPackage ../../system/app/j4-dmenu-desktop.nix { })
     (pkgs.callPackage ../../system/app/waybar_timer.nix { })
 
-    ((pkgs.callPackage ../../system/app/helix.nix { }).overrideAttrs (oldAttrs: {
-      patches = oldAttrs.patches or [ ] ++ [
-        (fetchpatch {
-          url = "https://patch-diff.githubusercontent.com/raw/helix-editor/helix/pull/11164.diff";
-          hash = "sha256-/XAW73R4xh7FzI1mZeoiJES9qQp2iOT9b+R9b75c7rw=";
-        })
-      ];
-    }))
-
+    (pkgs.callPackage ../../system/app/helix.nix { })
     (pkgs.callPackage ../../system/app/mitype.nix { })
     # (pkgs.callPackage ../../system/app/rvc-cli.nix { })
     (pkgs.callPackage ../../system/app/gen_typing_test.nix { })
