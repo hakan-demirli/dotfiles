@@ -18,6 +18,7 @@
       immutable_configs = [
         "activitywatch"
         "anyrun"
+        "xilinx"
         "awatcher"
         "bat"
         "btop"

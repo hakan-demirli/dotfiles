@@ -176,6 +176,10 @@
     };
   };
 
+  services.cloudflare-warp = {
+    enable = true;
+    package = pkgs.cloudflare-warp;
+  };
   # # https://github.com/NixOS/nixpkgs/issues/97795#issuecomment-693354398
   # systemd.services.display-manager.wants = [
   #   "systemd-user-sessions.service"
