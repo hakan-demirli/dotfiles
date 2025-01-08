@@ -113,6 +113,7 @@
   };
   # # requires hardware.uinput.enable = true;
   services.xremap = {
+    enable = true;
     withWlroots = true;
     watch = true;
     # username = userSettings.username;

@@ -37,7 +37,7 @@
   };
 
   fileSystems."/mnt/second" = {
-    device = "/dev/disk/by-uuid/75AA2E4F583B3E35";
+    device = "/dev/disk/by-uuid/120CC7A90CC785E7";
     fsType = "ntfs-3g";
     # options = ["uid=1000" "gid=1000" "dmask=007" "fmask=117"];
     options = [
