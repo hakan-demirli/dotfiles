@@ -177,7 +177,7 @@
     executable = false;
   };
 
-  home.file.".thunderbird/personal/ImapMail/imap.gmail.com/msgFilterRules.dat" = {
+  home.file.".thunderbird/personal/ImapMail/imap.gmail-1.com/msgFilterRules.dat" = {
     source = ../../.config/mylib/msgFilterRules.dat;
     recursive = false;
     executable = false;
