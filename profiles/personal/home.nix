@@ -11,8 +11,6 @@
     ../../system/app/thunderbird.nix
     ../../system/app/low_battery_notify.nix
     ../../system/app/xdg.nix
-
-    inputs.xremap-flake.homeManagerModules.default
   ];
 
   dconf.settings = {
@@ -112,13 +110,15 @@
     platformTheme.name = "gtk";
   };
   # # requires hardware.uinput.enable = true;
-  services.xremap = {
-    enable = true;
-    withWlroots = true;
-    watch = true;
-    # username = userSettings.username;
-    yamlConfig = builtins.readFile ../../.config/xremap/config.yml;
-  };
+
+  # Inconsistent launch on boot
+  # services.xremap = {
+  #   enable = true;
+  #   withWlroots = true;
+  #   watch = true;
+  #   # username = userSettings.username;
+  #   yamlConfig = builtins.readFile ../../.config/xremap/config.yml;
+  # };
 
   home = {
     homeDirectory = "/home/${userSettings.username}";
@@ -315,6 +315,7 @@
     # (pkgs.callPackage ../../system/app/tt.nix {})
     # (pkgs.callPackage ../../system/app/j4-dmenu-desktop.nix { })
     (pkgs.callPackage ../../system/app/waybar_timer.nix { })
+    (pkgs.callPackage ../../system/app/xremap.nix { })
 
     (pkgs.callPackage ../../system/app/helix.nix { })
     (pkgs.callPackage ../../system/app/mitype.nix { })
