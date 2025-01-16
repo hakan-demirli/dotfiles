@@ -71,14 +71,14 @@ rules = [
 micro_workers = 5
 macro_workers = 10
 bizarre_retry = 5
-image_alloc = 0  # 512MB
+image_alloc = 0  # 512MB # 0 means unlimited
 image_bound = [ 0, 0 ]
 
 # [plugins]
 
-# [plugin]
-# prepend_previewers = [{ name = "*.opus", run = "video" }]
-# prepend_preloaders = [{ name = "*.opus", run = "video" }]
+[plugin]
+prepend_previewers = [{ name = "*.opus", run = "opus-preview" }]
+prepend_preloaders = [{ name = "*.opus", run = "opus-preview" }]
 
 [input]
 # cd

@@ -254,6 +254,7 @@
     xdragon
     tmux
     ffmpeg-full
+    ffmpegthumbnailer # for yazi opus plugin
     bat
     libnotify
     parallel-full
