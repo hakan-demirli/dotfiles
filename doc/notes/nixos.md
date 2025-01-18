@@ -10,10 +10,15 @@
 * **Restart touchpad driver**
     * Find kernel module responsible for the touchpad:
         * `lsmod`
+            * Its probably one of these:
+                * `hid_generic`
+                * `hid_multitouch`
+                * `psmouse`
+                * `i2c_hid_acpi`
     * Kill it:
-        * `sudo modprobe -r hid_multitouch`
+        * `sudo modprobe -r hid_generic`
     * Restart it:
-        * `sudo modprobe hid_multitouch`
+        * `sudo modprobe hid_generic`
 
 * **What is configuration.nix file?**
     * It's default location is: ```/etc/nixos/configuration.nix```

@@ -212,6 +212,7 @@
     xwaylandvideobridge
     tor-browser
     qalculate-qt
+    libqalculate
     # (lf.overrideAttrs (oldAttrs: {
     #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
     # }))

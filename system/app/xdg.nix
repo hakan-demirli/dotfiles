@@ -18,7 +18,6 @@
       immutable_configs = [
         "activitywatch"
         "anyrun"
-        "xilinx"
         "awatcher"
         "bat"
         "btop"
@@ -40,6 +39,7 @@
         "nwg"
         "parallel"
         # "piper" # not working, workaround below
+        "qalculate"
         "qmk"
         "quantifyself"
         "quantifyself-webui"
@@ -59,6 +59,7 @@
         "waybar"
         "wgetrc"
         "wofi"
+        "xilinx"
         "xremap"
         "yazi"
         "zathura"

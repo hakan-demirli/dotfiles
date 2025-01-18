@@ -40,6 +40,13 @@ name = "css"
 formatter = { command = 'prettier', args = ["--parser", "css"] }
 
 [[language]]
+name = "java"
+language-servers =[
+  "jdtls"
+]
+auto-format = true
+
+[[language]]
 name = "javascript"
 formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
@@ -175,6 +182,13 @@ config = { markdown.preview.serveStatic = true, markdown.preview.codeTheme = "gi
 [language-server.html-preview-lsp]
 command = "html-preview-lsp"
 
+
+[language-server.jdtls]
+command = "jdtls"
+args = [
+  "-data", "/home/emre/.cache/jdtls/workspace", # WARNING: abs path
+  "-configuration", "/home/emre/.cache/jdtls/config", # WARNING: abs path
+]
 
 
 # [language-server.dls]

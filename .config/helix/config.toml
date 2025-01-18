@@ -24,6 +24,8 @@ C-d = ["page_cursor_half_down","align_view_center"]
 "A-o" = ':open %sh{tmux_harpoon_echo 3}'
 "A-p" = ':open %sh{tmux_harpoon_echo 4}'
 
+"+" = 'expand_selection'
+"-" = 'shrink_selection'
 
 # j = "move_line_down"
 # k = "move_line_up"
