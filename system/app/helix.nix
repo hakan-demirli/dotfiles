@@ -14,11 +14,11 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "tdaron";
     repo = "helix";
-    rev = "c5a06ef8306c61dd16470deb1c020ea9a5fdb6e1";
-    sha256 = "sha256-C0ylnLXsfis4L/XePk4udnNpI7m1zNPZ8NfZ5DmthyU=";
+    rev = "78cb6b6fc8abb71a4bac94d0f9821db387a07bb7";
+    sha256 = "sha256-RQKDH9VhD3HkYhtpFsmVi/1FTklgU7SiBNjxGF5wQ9U=";
   };
 
-  cargoHash = "sha256-UVlSb3TV2m4tXIOlDNZeOf7AWfglIdbkCwA1Xn+FotM=";
+  cargoHash = "sha256-BGGdCQgc2nQijvHWd7y22N7HTyuxWFT91HjDTNKqSbg=";
 
   # Disable fetching and building of tree-sitter grammars in favor of the custom build process in grammars.nix
   env.HELIX_DISABLE_AUTO_GRAMMAR_BUILD = "1";
