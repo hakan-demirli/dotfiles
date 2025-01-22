@@ -62,6 +62,7 @@ formatter = { command = 'prettier', args = ["--parser", "markdown"] }
 language-servers = [
   "marksman",
   "mdpls",
+  "lsp-ai",
   # "markdown-oxide",
   # "typos",
   # "vale",
@@ -126,8 +127,9 @@ language-servers = [
 [language-server.rust-analyzer.config.check]
 command = "clippy"
 
-[language-server]
-clangd = { command = "clangd", args = ['--fallback-style=Webkit'] }
+[language-server.clangd]
+command = "clangd"
+args = ['--fallback-style=Webkit']
 
 [language-server.texlab]
 command = "texlab"
@@ -191,6 +193,33 @@ args = [
 ]
 
 
+
+[language-server.lsp-ai]
+command = "lsp-ai"
+
+[language-server.lsp-ai.config.memory]
+file_store = { }
+
+[language-server.lsp-ai.config.models.model1]
+type = "ollama"
+chat_endpoint = "{{ollama_address}}/ollama/api/chat"
+generate_endpoint = "{{ollama_address}}/ollama/api/generate"
+# model = "deepseek-coder-v2:latest"
+# model = "deepseek-r1:7b"
+model = "deepseek-r1:8b"
+# auth_token_env_var_name = "OLLAMA_API_TOKEN"
+
+[[language-server.lsp-ai.config.chat]]
+trigger = "!C"
+action_display_name = "Chat"
+model = "model1"
+
+[language-server.lsp-ai.config.chat.parameters]
+max_context = 4096
+max_tokens = 1024
+system = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately"
+
+
 # [language-server.dls]
 # command = "diagnostic-languageserver"
 # args = [ "--stdio", "--log-level=2" ]
@@ -217,4 +246,5 @@ args = [
 #     {line = 4, column = 5, message= [ 7 ], security= 2}
 # ]
 # securities= {Error = "error", Warning= "warning", undefined= "info"}
+
 

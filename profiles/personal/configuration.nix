@@ -22,21 +22,24 @@
 
   # nix
   documentation.nixos.enable = false; # .desktop
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.cudaSupport = false; # takes hours to compile
-  nixpkgs.config.allowUnfreePredicate =
-    p:
-    builtins.all (
-      license:
-      license.free
-      || builtins.elem license.shortName [
-        "CUDA EULA"
-        "cuDNN EULA"
-        "cuTENSOR EULA"
-        "NVidia OptiX EULA"
-      ]
-    ) (if builtins.isList p.meta.license then p.meta.license else [ p.meta.license ]);
-
+  nixpkgs.config = {
+    allowUnfree = true;
+    rocmSupport = false;
+    cudaSupport = true; # ok with cachix
+    # cudaSupport = false; # takes hours to compile, dont touch
+    allowUnfreePredicate =
+      p:
+      builtins.all (
+        license:
+        license.free
+        || builtins.elem license.shortName [
+          "CUDA EULA"
+          "cuDNN EULA"
+          "cuTENSOR EULA"
+          "NVidia OptiX EULA"
+        ]
+      ) (if builtins.isList p.meta.license then p.meta.license else [ p.meta.license ]);
+  };
   nix = {
     gc = {
       automatic = true;
@@ -46,12 +49,16 @@
 
     settings = {
       substituters = [
+        "https://ai.cachix.org"
+        "https://nix-community.cachix.org"
         "https://cuda-maintainers.cachix.org"
-        "https://openlane.cachix.org"
+        "https://numtide.cachix.org"
       ];
       trusted-public-keys = [
-        "openlane.cachix.org-1:qqdwh+QMNGmZAuyeQJTH9ErW57OWSvdtuwfBKdS254E="
+        "ai.cachix.org-1:N9dzRK+alWwoKXQlnn0H6aUx0lU/mspIoz8hMvGvbbc="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+        "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE="
       ];
 
       max-jobs = systemSettings.threads;
@@ -86,7 +93,6 @@
     (btop.override { cudaSupport = true; })
     fzf
     kitty
-    alacritty # BACKUP TERMINAL
     foot # BACKUP TERMINAL
     xterm # BACKUP TERMINAL
 
@@ -97,7 +103,6 @@
     neovim # default editor
     libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
     (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
-
   ];
 
   # services
@@ -140,6 +145,7 @@
 
   # test: `cpupower frequency-info`
   boot = {
+    kernel.sysctl."fs.file-max" = 100000; # https://github.com/NixOS/nix/issues/8684
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       # "amd_iommu=off"

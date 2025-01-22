@@ -120,6 +120,23 @@
   #   yamlConfig = builtins.readFile ../../.config/xremap/config.yml;
   # };
 
+  # https://github.com/NixOS/nixpkgs/issues/333123
+  # services.ollama = {
+  #   package = pkgs.ollama-cuda;
+  #   enable = true;
+  #   # openFirewall = true;
+  #   # host = "0.0.0.0";
+  #   # port = 11434;
+  #   # models = "/tmp";
+  #   acceleration = "cuda";
+
+  #   environmentVariables = {
+  #     HSA_OVERRIDE_GFX_VERSION = "10.1.0";
+  #     CUDA_VISIBLE_DEVICES = "1";
+  #     LD_LIBRARY_PATH = "${pkgs.cudaPackages.cudatoolkit}/lib:${pkgs.cudaPackages.cudatoolkit}/lib64";
+  #   };
+  # };
+
   home = {
     homeDirectory = "/home/${userSettings.username}";
     username = userSettings.username;
@@ -181,7 +198,7 @@
     wget = ''wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'';
     arduino-cli = "arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml";
 
-    llama = ''nix run git+https://github.com/nixified-ai/flake.git#textgen-nvidia'';
+    # llama = ''nix run git+https://github.com/nixified-ai/flake.git#textgen-nvidia'';
 
     fan-turbo = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 1 >>  fan_boost_mode"; sudo sh -c "echo 1 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
     fan-performance = ''cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 0 >>  fan_boost_mode"; sudo sh -c "echo 0 >> throttle_thermal_policy"; source ~/.bashrc; cd ~;'';
@@ -271,6 +288,9 @@
     # citrix_workspace
     # helix
     # helix-gpt
+    # (koboldcpp.override { cublasSupport = true; })
+    # (pkgs.llama-cpp.override { cudaSupport = true; })
+    lsp-ai
     asm-lsp
     nixd
     # alejandra
@@ -290,7 +310,7 @@
     clang-tools
     lldb
     cmake-language-server
-    marksman
+    # marksman # build failure
     # markdown-oxide
     gnumake
     texlab

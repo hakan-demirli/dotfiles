@@ -199,3 +199,5 @@
             * https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-dockerTools
         * Use flatpak / appimage
             * https://github.com/ralismark/nix-appimage 
+* **Remove default file associations**
+    * xdgmime is already read only so look inside ```.local/share/applications/``` and remove annoying entries.
