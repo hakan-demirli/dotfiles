@@ -37,6 +37,7 @@ C-d = ["page_cursor_half_down","align_view_center"]
 "f" = [":pipe-to tmux_harpoon_update","file_picker"]
 "F" = [":pipe-to tmux_harpoon_update","file_picker_in_current_directory"]
 "b" = [":pipe-to tmux_harpoon_update","buffer_picker"]
+"6" = [":pipe-to tmux_harpoon_update", ":open %sh{tmux display-popup -w 80%% -E 'yazi --chooser-file /tmp/yazi-chooser-file' && cat /tmp/yazi-chooser-file}"]
 
 [keys.normal.g]
 l = ["collapse_selection", "extend_to_line_end"]
