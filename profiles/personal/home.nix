@@ -290,6 +290,7 @@
     # helix-gpt
     # (koboldcpp.override { cublasSupport = true; })
     # (pkgs.llama-cpp.override { cudaSupport = true; })
+    ollama-cuda
     lsp-ai
     asm-lsp
     nixd
@@ -310,7 +311,7 @@
     clang-tools
     lldb
     cmake-language-server
-    # marksman # build failure
+    marksman
     # markdown-oxide
     gnumake
     texlab
