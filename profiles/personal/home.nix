@@ -412,7 +412,8 @@
     TEXMFVAR = "${config.home.sessionVariables.XDG_CACHE_HOME}/texlive/texmf-var";
     TEXMFCONFIG = "${config.home.sessionVariables.XDG_CONFIG_HOME}/texlive/texmf-config";
 
-    OLLAMA_MODELS = "${config.home.sessionVariables.XDG_DATA_HOME}/ollama/models ";
+    OLLAMA_MODELS = "${config.home.sessionVariables.XDG_DATA_HOME}/ollama/models";
+    LEIN_HOME = "${config.home.sessionVariables.XDG_DATA_HOME}/lein";
 
     LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
 

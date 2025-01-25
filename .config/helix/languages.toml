@@ -136,19 +136,25 @@ command = "texlab"
 cleanArtifacts = true
 
 [language-server.texlab.config.texlab.build]
+args = ["-shell-escape", "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f"]
 onSave = true
 forwardSearchAfter = true
+
 
 [language-server.texlab.config.texlab.forwardSearch]
 executable = "sioyek"
 args = [
-  "--execute-command",
-  "turn_on_synctex",
-  "%p",
-  "--forward-search-file",
-  "%f",
-  "--forward-search-line",
-  "%l",
+    "--reuse-window",
+    "--nofocus",
+    "--execute-command",
+    "toggle_synctex",
+    "--inverse-search",
+    "texlab inverse-search -i \"%%1\" -l %%2",
+    "--forward-search-file",
+    "%f",
+    "--forward-search-line",
+    "%l",
+    "%p",  
 ]
 
 [language-server.texlab.config.texlab.chktex]
@@ -239,7 +245,7 @@ action_display_name = "Complete Via Prompt"
 model = "model1"
 parameters.max_context = 4096
 parameters.options.num_predict = 512
-parameters.system = "Be practical. Do not explain unless asked to. Short, concise and complete ansers."
+parameters.system = "Be practical. Do not explain unless asked to. Short, concise and complete answers."
 parameters.messages = [
     { role = "user", content = "{CODE}" }
 ]
