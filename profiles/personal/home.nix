@@ -221,6 +221,7 @@
     (pkgs.callPackage ../../system/app/html-preview-lsp.nix { })
     (pkgs.callPackage ../../system/app/html-preview-server.nix { })
 
+    bandwhich # network monitoring TUI
     cpufrequtils
     hypridle
     vim # default editor
