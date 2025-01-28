@@ -379,8 +379,9 @@
 
     DIRENV_WARN_TIMEOUT = "8m";
 
+    # WARNING: DO NOT SET DIRENV_CONFIG
+    # DIRENV_CONFIG = "${config.home.sessionVariables.XDG_CONFIG_HOME}/direnv/direnvrc";
     WINEPREFIX = "${config.home.sessionVariables.XDG_DATA_HOME}/wine"; # special case
-    DIRENV_CONFIG = "$HOME/.config/direnv/direnvrc";
     ANDROID_HOME = "${config.home.sessionVariables.XDG_DATA_HOME}/android";
     CARGO_HOME = "${config.home.sessionVariables.XDG_DATA_HOME}/cargo";
     CUDA_CACHE_PATH = "${config.home.sessionVariables.XDG_CACHE_HOME}/nv";
@@ -416,9 +417,9 @@
     OLLAMA_MODELS = "${config.home.sessionVariables.XDG_DATA_HOME}/ollama/models";
     LEIN_HOME = "${config.home.sessionVariables.XDG_DATA_HOME}/lein";
 
-    LM_LICENSE_FILE = "$HOME/.config/mylib/questa_license.dat";
+    LM_LICENSE_FILE = "${config.home.sessionVariables.XDG_CONFIG_HOME}/mylib/questa_license.dat";
 
-    PDK_ROOT = "$HOME/.local/share/pdk";
+    PDK_ROOT = "${config.home.sessionVariables.XDG_DATA_HOME}/pdk";
 
     IGNOREEOF = "4";
     # needed by termfilechooser portal, # not working

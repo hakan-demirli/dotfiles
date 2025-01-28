@@ -53,9 +53,27 @@
         * ```sudo apt install breeze```
 
 * **How to share folder KVM/QEMU Virt-Manager**
-    * [Virtiofs](https://github.com/virtio-win/kvm-guest-drivers-windows/wiki/VirtIO-FS:-Shared-file-system)
-        * Open the Virtual Machine Manager and enable XML editing.
-            * Edit -> Preferences -> Enable XML
+    * Windows guest:
+        * [Virtiofs](https://github.com/virtio-win/kvm-guest-drivers-windows/wiki/VirtIO-FS:-Shared-file-system)
+            * Open the Virtual Machine Manager and enable XML editing.
+                * Edit -> Preferences -> Enable XML
+            * Enable shared memory
+            * Add Hardware -> Filesystem
+                * Set source path
+                    * Select the directory you want to share.
+                        * Browse -> Browse Local
+                * Set target path
+                    * I name it `shared`
+                * Driver -> virtiofs
+                * Be sure the xml has something similar:
+                    * ```<driver type="virtiofs" queue="1024"/>```
+            * Download and install [WinFSP](https://github.com/winfsp/winfsp/releases) with at least "Core" feature enabled.
+            * Install VirtIO-FS driver and service from [VirtIO-Win package](https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md).
+            * Open command promprt as admin
+            * Setup VirtIO-FS service by running ```sc create VirtioFsSvc binPath="<path to the binary>\virtiofs.exe" start=auto depend=VirtioFsDrv```. Don't forget to appropriately set binPath.
+            * You can immediately start the service by running ```sc start VirtioFsSvc```.
+            * The letter will be `Z`. Be sure it is available.
+    * Linux guest:
         * Enable shared memory
         * Add Hardware -> Filesystem
             * Set source path
@@ -64,14 +82,10 @@
             * Set target path
                 * I name it `shared`
             * Driver -> virtiofs
-            * Be sure the xml has something similar:
-                * ```<driver type="virtiofs" queue="1024"/>```
-        * Download and install [WinFSP](https://github.com/winfsp/winfsp/releases) with at least "Core" feature enabled.
-        * Install VirtIO-FS driver and service from [VirtIO-Win package](https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md).
-        * Open command promprt as admin
-        * Setup VirtIO-FS service by running ```sc create VirtioFsSvc binPath="<path to the binary>\virtiofs.exe" start=auto depend=VirtioFsDrv```. Don't forget to appropriately set binPath.
-        * You can immediately start the service by running ```sc start VirtioFsSvc```.
-        * The letter will be `Z`. Be sure it is available.
+        * In the VM:
+            * mkdir ~/shared
+            * sudo mount -t virtiofs shared /home/emre/shared
+
 
 * **How to mount multiple folders QEMU-KVM Virtiofs**
     * The tutorials didn't work.

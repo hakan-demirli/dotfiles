@@ -104,12 +104,20 @@
     ```
 
 * **Virtiofs not working**
-    * Install virtiofsd package.
-        * Try again
-    * ```internal error: virtiofsd binary '/run/current-system/sw/bin/virtiofsd' is not executable```
-        * One solution is to add `<binary path="path/to/virtiofsd"/>` to the filesystem section.
-        * The quick and dirty way is to use `/run/current-system/sw/bin/virtiofsd`.
-    * Try 9p drivers
+    * Proper way:
+```nix
+virtualisation.libvirtd = {
+  enable = true;
+  qemu.vhostUserPackages = with pkgs; [ virtiofsd ];
+};
+```
+    * Hacky way:
+        * Install virtiofsd package.
+            * Try again
+        * ```internal error: virtiofsd binary '/run/current-system/sw/bin/virtiofsd' is not executable```
+            * One solution is to add `<binary path="path/to/virtiofsd"/>` to the filesystem section.
+            * The quick and dirty way is to use `/run/current-system/sw/bin/virtiofsd`.
+        * Try 9p drivers
 
 * **Run AI Models**
     * https://github.com/nixified-ai/flake
