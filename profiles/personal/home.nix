@@ -315,7 +315,7 @@
     marksman
     # markdown-oxide
     gnumake
-    texlab
+    (pkgs.callPackage ../../system/app/texlab.nix { })
     sioyek
     yaml-language-server
     verible
