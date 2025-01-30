@@ -10,9 +10,9 @@
       mutable_configs = [
         ".bash_history"
         "hypr"
-        "rvc-cli"
         "mimeapps.list"
         "rclone"
+        "rvc-cli"
       ];
 
       immutable_configs = [
@@ -70,7 +70,12 @@
         "applications"
         "fonts"
       ];
+
       mutable_data = [
+      ];
+
+      mutable_state = [
+        "bash"
       ];
 
       makeMutable = path: file: {
@@ -106,6 +111,13 @@
         }) mutable_data
       );
 
+      mutableStateFiles = builtins.listToAttrs (
+        map (file: {
+          name = file;
+          value = makeMutable ".local/state" file;
+        }) mutable_state
+      );
+
       immutableDataFiles = builtins.listToAttrs (
         map (file: {
           name = file;
@@ -116,6 +128,7 @@
     {
       configFile = mutableConfigFiles // immutableConfigFiles;
       dataFile = mutableDataFiles // immutableDataFiles;
+      stateFile = mutableStateFiles;
 
       portal = {
         enable = true;

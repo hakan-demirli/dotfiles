@@ -215,13 +215,14 @@ models.model1.generate_endpoint = "http://127.0.0.1:11434/api/generate"
 # models.model1.model = "codellama:7b" # ok
 # models.model1.model = "codegemma:7b" # ok
 models.model1.model = "yi-coder:9b" # good
+# models.model1.model = "qwen2.5-coder:14b-instruct-q6_K" # great, but slow
 # models.model1.model = "deepseek-coder:6.7b" # not tested
 # models.model1.model = "qwen2.5-coder:7b" # not tested
 
-completion.model = "model1"
-completion.parameters.max_context = 4096
-completion.parameters.options.num_predict = 64
-completion.parameters.options.stop = ["\n"]
+# completion.model = "model1"
+# completion.parameters.max_context = 4096
+# completion.parameters.options.num_predict = 64
+# completion.parameters.options.stop = ["\n"]
 [[language-server.lsp-ai.config.actions]]
 action_display_name = "Complete"
 model = "model1"

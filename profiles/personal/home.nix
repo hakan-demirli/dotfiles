@@ -33,7 +33,7 @@
   };
   programs.bash = {
     enable = true;
-    historyFile = "/home/${userSettings.username}/.config/.bash_history";
+    historyFile = "${config.home.sessionVariables.XDG_STATE_HOME}/bash/history";
     historyFileSize = -1;
     historySize = -1;
     historyControl = [
@@ -403,7 +403,7 @@
     SQLITE_HISTORY = "${config.home.sessionVariables.XDG_CACHE_HOME}/sqlite_history";
     DUCKDB_HISTORY = "${config.home.sessionVariables.XDG_CACHE_HOME}/duckdb_history";
     GRIPHOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/grip";
-
+    GDBHISTFILE = "${config.home.sessionVariables.XDG_STATE_HOME}/gdb/gdb_history";
     # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=$${XDG_CONFIG_HOME}}/java"; # not working
     KERAS_HOME = "${config.home.sessionVariables.XDG_STATE_HOME}/keras";
     # GTK2_RC_FILES = "${XDG_CONFIG_HOME}/gtk-2.0/gtkrc"; # handled in home manager
