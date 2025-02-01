@@ -1,1 +1,26 @@
+# Better GDB defaults ----------------------------------------------------------
+
+set history save
+set verbose off
+set print pretty on
+set print array off
+set print array-indexes on
+set python print-stack full
+
+
+
+# Sources ----------------------------------------------------------------------
+
 source ~/.config/gdb/gdb-fzf.py
+source ~/.config/gdb/gdb-dashboard.py
+
+# Start ------------------------------------------------------------------------
+
+python Dashboard.start()
+
+# File variables ---------------------------------------------------------------
+
+# vim: filetype=python
+# Local Variables:
+# mode: python
+# End:
