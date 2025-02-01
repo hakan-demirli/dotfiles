@@ -403,7 +403,7 @@
     SQLITE_HISTORY = "${config.home.sessionVariables.XDG_CACHE_HOME}/sqlite_history";
     DUCKDB_HISTORY = "${config.home.sessionVariables.XDG_CACHE_HOME}/duckdb_history";
     GRIPHOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/grip";
-    GDBHISTFILE = "${config.home.sessionVariables.XDG_STATE_HOME}/gdb/gdb_history";
+    GDBHISTFILE = "${config.home.sessionVariables.XDG_STATE_HOME}/gdb/history";
     # _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=$${XDG_CONFIG_HOME}}/java"; # not working
     KERAS_HOME = "${config.home.sessionVariables.XDG_STATE_HOME}/keras";
     # GTK2_RC_FILES = "${XDG_CONFIG_HOME}/gtk-2.0/gtkrc"; # handled in home manager

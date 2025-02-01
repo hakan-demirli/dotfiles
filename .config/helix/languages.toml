@@ -223,24 +223,24 @@ models.model1.model = "yi-coder:9b" # good
 # completion.parameters.max_context = 4096
 # completion.parameters.options.num_predict = 64
 # completion.parameters.options.stop = ["\n"]
-[[language-server.lsp-ai.config.actions]]
-action_display_name = "Complete"
-model = "model1"
-parameters.max_context = 4096
-parameters.options.num_predict = 512
-# parameters.options.stop = ["<file_sep>", "\n\n"]
-[[language-server.lsp-ai.config.actions]]
-action_display_name = "FIM Complete"
-model = "model1"
-parameters.max_context = 4096
-parameters.fim.start = "<｜fim▁begin｜>"
-parameters.fim.middle = "<｜fim▁hole｜>"
-parameters.fim.end = "<｜fim▁end｜>"
+# [[language-server.lsp-ai.config.actions]]
+# action_display_name = "Complete"
+# model = "model1"
+# parameters.max_context = 4096
+# parameters.options.num_predict = 512
+# # parameters.options.stop = ["<file_sep>", "\n\n"]
+# [[language-server.lsp-ai.config.actions]]
+# action_display_name = "FIM Complete"
+# model = "model1"
+# parameters.max_context = 4096
+# parameters.fim.start = "<｜fim▁begin｜>"
+# parameters.fim.middle = "<｜fim▁hole｜>"
+# parameters.fim.end = "<｜fim▁end｜>"
 # parameters.fim.start = "<fim_prefix>"
 # parameters.fim.middle = "<fim_middle>"
 # parameters.fim.end = "<fim_suffix>"
-parameters.options.num_predict = 512
-parameters.options.stop = ["<file_sep>", "\n\n"]
+# parameters.options.num_predict = 512
+# parameters.options.stop = ["<file_sep>", "\n\n"]
 [[language-server.lsp-ai.config.actions]]
 action_display_name = "Complete Via Prompt"
 model = "model1"
@@ -252,15 +252,15 @@ parameters.messages = [
 ]
 # post_process.extractor = "(?s)<answer>(.*?)</answer>"
 
-[[language-server.lsp-ai.config.chat]]
-trigger = "!C"
-action_display_name = "Chat"
-model = "model1"
-parameters.max_context = 4096
-parameters.max_tokens = 1024
-parameters.messages = [
-  { "role" = "system", "content" = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately" }
-]
+# [[language-server.lsp-ai.config.chat]]
+# trigger = "!C"
+# action_display_name = "Chat"
+# model = "model1"
+# parameters.max_context = 4096
+# parameters.max_tokens = 1024
+# parameters.messages = [
+#   { "role" = "system", "content" = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately" }
+# ]
 
 
 # [language-server.dls]

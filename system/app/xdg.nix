@@ -23,6 +23,7 @@
         "btop"
         "cargo"
         "firefoxcss"
+        "gdb"
         "git"
         "gnome3-keybind-backup"
         "gnome-extensions"
@@ -76,6 +77,7 @@
 
       mutable_state = [
         "bash"
+        "gdb"
       ];
 
       makeMutable = path: file: {

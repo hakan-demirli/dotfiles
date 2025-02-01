@@ -18,8 +18,8 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "hakan-demirli";
     repo = "texlab";
-    rev = "9a898cc69b8ce92d90d99a3db772c63b9cfb4435";
-    hash = "sha256-IxoME4aaQh1MicRA+GzFXB6m1yUAdNybNotv2iiOyMY=";
+    rev = "5a53c7a4c88b19df418fbf4ba4da2a45d199e4af";
+    hash = "sha256-Lg0cZJWPwejSRESTV7U0/WC3A0qBJpj4RRuSCLuEaz4=";
   };
 
   cargoHash = "sha256-YU4/qdkZhjjzgza7R6yWG/pqwGWt0WkHMDuSMxuCcCo=";
