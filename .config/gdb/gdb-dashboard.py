@@ -1628,6 +1628,9 @@ A value of 0 uses the whole height.""",
 class Variables(Dashboard.Module):
     """Show arguments and locals of the selected frame."""
 
+    def __init__(self):
+        self.previous_values = {}
+
     def label(self):
         return "Variables"
 
@@ -1639,6 +1642,7 @@ class Variables(Dashboard.Module):
             self.compact,
             self.align,
             self.sort,
+            self,
         )
 
     def attributes(self):
@@ -1669,7 +1673,7 @@ class Variables(Dashboard.Module):
         }
 
     @staticmethod
-    def format_frame(frame, show_arguments, show_locals, compact, align, sort):
+    def format_frame(frame, show_arguments, show_locals, compact, align, sort, myself):
         out = []
         # fetch frame arguments and locals
         decorator = gdb.FrameDecorator.FrameDecorator(frame)
@@ -1680,7 +1684,9 @@ class Variables(Dashboard.Module):
                 return Stack.format_line("arg", line)
 
             frame_args = decorator.frame_args()
-            args_lines = Variables.fetch(frame, frame_args, compact, align, sort)
+            args_lines = Variables.fetch(
+                frame, frame_args, compact, align, sort, myself
+            )
             if args_lines:
                 if compact:
                     args_line = separator.join(args_lines)
@@ -1694,7 +1700,9 @@ class Variables(Dashboard.Module):
                 return Stack.format_line("loc", line)
 
             frame_locals = decorator.frame_locals()
-            locals_lines = Variables.fetch(frame, frame_locals, compact, align, sort)
+            locals_lines = Variables.fetch(
+                frame, frame_locals, compact, align, sort, myself
+            )
             if locals_lines:
                 if compact:
                     locals_line = separator.join(locals_lines)
@@ -1705,18 +1713,21 @@ class Variables(Dashboard.Module):
         return out
 
     @staticmethod
-    def fetch(frame, data, compact, align, sort):
+    def fetch(frame, data, compact, align, sort, myself):
         lines = []
         name_width = 0
         if align and not compact:
             name_width = max(len(str(elem.sym)) for elem in data) if data else 0
         for elem in data or []:
-            name = ansi(elem.sym, R.style_high) + " " * (
-                name_width - len(str(elem.sym))
-            )
+            raw_name = str(elem.sym)
+            name = ansi(elem.sym, R.style_high) + " " * (name_width - len(raw_name))
             equal = ansi("=", R.style_low)
             value = format_value(elem.sym.value(frame), compact)
-            lines.append("{} {} {}".format(name, equal, value))
+            changed = myself and (myself.previous_values.get(raw_name, "") != value)
+            if myself:
+                myself.previous_values[raw_name] = value
+            style = R.style_selected_1 if changed else ""
+            lines.append("{} {} {}".format(name, equal, ansi(value, style)))
         if sort:
             lines.sort()
         return lines
@@ -1834,6 +1845,7 @@ class Stack(Dashboard.Module):
             self.compact,
             self.align,
             self.sort,
+            False,
         )
         frame_lines.extend(variables)
         return frame_lines
