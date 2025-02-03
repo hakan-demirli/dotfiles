@@ -101,8 +101,13 @@
     git-crypt
     wget
     neovim # default editor
-    libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
-    (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
+
+    (pkgs.callPackage ../../system/app/sddm-astronaut.nix {
+      # theme = "pixel_sakura";
+    })
+
+    # libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
+    # (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
   ];
 
   # services
@@ -110,14 +115,15 @@
     dbus.enable = true;
     # services.asusd.enable = true;
     # services.asusd.enableUserService = true;
-    displayManager = {
-      sddm = {
-        enable = true;
-        theme = "astronaut";
-        autoNumlock = true;
-        # theme = "${import ../../system/app/sddm-astronaut.nix {inherit pkgs;}}";
-        # theme = "${import ../../system/app/sddm-sugar-dark.nix {inherit pkgs;}}";
-      };
+    displayManager.sddm = {
+      enable = true;
+      package = pkgs.kdePackages.sddm;
+      theme = "sddm-astronaut-theme";
+      extraPackages = with pkgs; [
+        kdePackages.qtmultimedia
+        kdePackages.qtsvg
+        kdePackages.qtvirtualkeyboard
+      ];
     };
     xserver = {
       enable = true;
