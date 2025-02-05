@@ -1,5 +1,5 @@
 # https://nixos.wiki/wiki/Nvidia
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   services.xserver.videoDrivers = [
     "nvidia"

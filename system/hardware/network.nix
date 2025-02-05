@@ -1,6 +1,4 @@
 {
-  pkgs,
-  userSettings,
   systemSettings,
   ...
 }:

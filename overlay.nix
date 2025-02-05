@@ -1,18 +1,11 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
-
-{
+_: {
   nixpkgs.overlays = [
     # https://github.com/NixOS/nixpkgs/issues/351717
     (final: prev: {
       python312 = prev.python312.override {
-        packageOverrides = final: prevPy: {
+        packageOverrides = _: prevPy: {
 
-          triton-bin = prevPy.triton-bin.overridePythonAttrs (oldAttrs: {
+          triton-bin = prevPy.triton-bin.overridePythonAttrs (_: {
             postFixup = ''
               chmod +x "$out/${prev.python312.sitePackages}/triton/backends/nvidia/bin/ptxas"
               substituteInPlace $out/${prev.python312.sitePackages}/triton/backends/nvidia/driver.py \

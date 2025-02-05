@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 {
   # environment.systemPackages = with pkgs; [virt-manager virtualbox distrobox];
   programs.virt-manager.enable = true;
