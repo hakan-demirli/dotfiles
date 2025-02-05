@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # Bootloader.
   boot.loader = {
     grub = {

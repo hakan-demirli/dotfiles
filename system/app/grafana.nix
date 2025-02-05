@@ -1,6 +1,5 @@
 {
   pkgs,
-  config,
   ...
 }:
 
@@ -26,108 +25,110 @@ let
   mysqlPassword = "grafana";
 in
 {
-  services.grafana = {
-    enable = true;
+  services = {
 
-    settings = {
-      server = {
-        http_addr = grafanaAddr;
-        http_port = grafanaPort;
-      };
-
-      "auth.anonymous" = {
-        enabled = true;
-        org_role = "Admin";
-      };
-
-      panels = {
-        disable_sanitize_html = true;
-      };
-    };
-
-    provision = {
+    grafana = {
       enable = true;
 
-      datasources.settings.datasources = [
+      settings = {
+        server = {
+          http_addr = grafanaAddr;
+          http_port = grafanaPort;
+        };
+
+        "auth.anonymous" = {
+          enabled = true;
+          org_role = "Admin";
+        };
+
+        panels = {
+          disable_sanitize_html = true;
+        };
+      };
+
+      provision = {
+        enable = true;
+
+        datasources.settings.datasources = [
+          {
+            name = "Prometheus";
+            uid = "prometheus";
+            type = "prometheus";
+            url = "http://${prometheusAddr}:${toString prometheusPort}";
+            access = "proxy";
+          }
+          {
+            name = "MySQL";
+            uid = "mysql";
+            type = "mysql";
+            url = "mysql://${mysqlUser}:${mysqlPassword}@${mysqlAddr}:${toString mysqlPort}/${mysqlDatabase}";
+            access = "proxy";
+            database = mysqlDatabase;
+            user = mysqlUser;
+            password = mysqlPassword;
+          }
+        ];
+      };
+    };
+    prometheus = {
+      enable = true;
+      listenAddress = prometheusAddr;
+      port = prometheusPort;
+
+      retentionTime = "100000d"; # Equivalent to ~273 years
+      scrapeConfigs = [
         {
-          name = "Prometheus";
-          uid = "prometheus";
-          type = "prometheus";
-          url = "http://${prometheusAddr}:${toString prometheusPort}";
-          access = "proxy";
+          job_name = "exporter_test";
+          static_configs = [
+            { targets = [ "${exporterAddr}:${toString exporterTestPort}" ]; }
+          ];
         }
         {
-          name = "MySQL";
-          uid = "mysql";
-          type = "mysql";
-          url = "mysql://${mysqlUser}:${mysqlPassword}@${mysqlAddr}:${toString mysqlPort}/${mysqlDatabase}";
-          access = "proxy";
-          database = mysqlDatabase;
-          user = mysqlUser;
-          password = mysqlPassword;
+          job_name = "exporter_system";
+          static_configs = [
+            { targets = [ "${exporterAddr}:${toString exporterSystemPort}" ]; }
+          ];
+        }
+        {
+          job_name = "exporter_review";
+          static_configs = [
+            { targets = [ "${exporterAddr}:${toString exporterReviewPort}" ]; }
+          ];
+        }
+        {
+          job_name = "exporter_network";
+          static_configs = [
+            { targets = [ "${exporterAddr}:${toString exporterNetworkPort}" ]; }
+          ];
+        }
+        {
+          job_name = "exporter_window";
+          static_configs = [
+            { targets = [ "${exporterAddr}:${toString exporterWindowPort}" ]; }
+          ];
         }
       ];
     };
-  };
 
-  services.prometheus = {
-    enable = true;
-    listenAddress = prometheusAddr;
-    port = prometheusPort;
+    mysql = {
+      enable = true;
+      package = pkgs.mariadb;
 
-    retentionTime = "100000d"; # Equivalent to ~273 years
-    scrapeConfigs = [
-      {
-        job_name = "exporter_test";
-        static_configs = [
-          { targets = [ "${exporterAddr}:${toString exporterTestPort}" ]; }
-        ];
-      }
-      {
-        job_name = "exporter_system";
-        static_configs = [
-          { targets = [ "${exporterAddr}:${toString exporterSystemPort}" ]; }
-        ];
-      }
-      {
-        job_name = "exporter_review";
-        static_configs = [
-          { targets = [ "${exporterAddr}:${toString exporterReviewPort}" ]; }
-        ];
-      }
-      {
-        job_name = "exporter_network";
-        static_configs = [
-          { targets = [ "${exporterAddr}:${toString exporterNetworkPort}" ]; }
-        ];
-      }
-      {
-        job_name = "exporter_window";
-        static_configs = [
-          { targets = [ "${exporterAddr}:${toString exporterWindowPort}" ]; }
-        ];
-      }
-    ];
-  };
+      settings.mysqld.port = mysqlPort;
+      settings.mysqld.bind-address = mysqlAddr;
 
-  services.mysql = {
-    enable = true;
-    package = pkgs.mariadb;
-
-    settings.mysqld.port = mysqlPort;
-    settings.mysqld.bind-address = mysqlAddr;
-
-    ensureDatabases = [ mysqlDatabase ];
-    # ensureUsers = [
-    #   {
-    #     name = mysqlUser;
-    #     password = mysqlPassword;
-    #     host = "%";
-    #     privileges = {
-    #       "${mysqlDatabase}.*" = [ "ALL PRIVILEGES" ];
-    #     };
-    #   }
-    # ];
+      ensureDatabases = [ mysqlDatabase ];
+      # ensureUsers = [
+      #   {
+      #     name = mysqlUser;
+      #     password = mysqlPassword;
+      #     host = "%";
+      #     privileges = {
+      #       "${mysqlDatabase}.*" = [ "ALL PRIVILEGES" ];
+      #     };
+      #   }
+      # ];
+    };
   };
 
   # Export all to environment

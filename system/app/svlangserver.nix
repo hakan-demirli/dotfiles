@@ -1,8 +1,8 @@
 { pkgs }:
 let
-  lib = pkgs.lib;
-  buildNpmPackage = pkgs.buildNpmPackage;
-  fetchFromGitHub = pkgs.fetchFromGitHub;
+  inherit (pkgs) lib; # Equivalent to lib = pkgs.lib;
+  inherit (pkgs) buildNpmPackage;
+  inherit (pkgs) fetchFromGitHub;
 in
 buildNpmPackage rec {
   pname = "svlangserver";

@@ -8,42 +8,44 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-  boot.initrd.availableKernelModules = [
-    "xhci_pci"
-    "nvme"
-    "ahci"
-    "usb_storage"
-    "usbhid"
-    "sd_mod"
-  ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [
-    # config.boot.kernelPackages.evdi # build failure
-  ];
-
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/3b02a7db-5ed5-47c5-ba4c-0feb7876c7b7";
-    fsType = "ext4";
-  };
-
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/3617-EB8F";
-    fsType = "vfat";
-    options = [
-      "fmask=0077"
-      "dmask=0077"
+  boot = {
+    initrd.availableKernelModules = [
+      "xhci_pci"
+      "nvme"
+      "ahci"
+      "usb_storage"
+      "usbhid"
+      "sd_mod"
+    ];
+    initrd.kernelModules = [ ];
+    kernelModules = [ "kvm-amd" ];
+    extraModulePackages = [
+      # config.boot.kernelPackages.evdi # build failure
     ];
   };
 
-  fileSystems."/mnt/second" = {
-    device = "/dev/disk/by-uuid/120CC7A90CC785E7";
-    fsType = "ntfs-3g";
-    # options = ["uid=1000" "gid=1000" "dmask=007" "fmask=117"];
-    options = [
-      "rw"
-      "uid=1000"
-    ];
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-uuid/3b02a7db-5ed5-47c5-ba4c-0feb7876c7b7";
+      fsType = "ext4";
+    };
+    "/boot" = {
+      device = "/dev/disk/by-uuid/3617-EB8F";
+      fsType = "vfat";
+      options = [
+        "fmask=0077"
+        "dmask=0077"
+      ];
+    };
+    "/mnt/second" = {
+      device = "/dev/disk/by-uuid/120CC7A90CC785E7";
+      fsType = "ntfs-3g";
+      # options = ["uid=1000" "gid=1000" "dmask=007" "fmask=117"];
+      options = [
+        "rw"
+        "uid=1000"
+      ];
+    };
   };
 
   swapDevices = [

@@ -85,31 +85,40 @@
     ];
   };
 
-  # packages
-  environment.systemPackages = with pkgs; [
-    home-manager
-    git
+  environment = {
+    localBinInPath = true;
 
-    (btop.override { cudaSupport = true; })
-    fzf
-    kitty
-    foot # BACKUP TERMINAL
-    xterm # BACKUP TERMINAL
+    sessionVariables = {
+      # If your cursor becomes invisible
+      WLR_NO_HARDWARE_CURSORS = "1";
+      # Hint electron apps to use wayland
+      NIXOS_OZONE_WL = "1";
+    };
 
-    tofi
+    systemPackages = with pkgs; [
+      home-manager
+      git
 
-    git-crypt
-    wget
-    neovim # default editor
+      (btop.override { cudaSupport = true; })
+      fzf
+      kitty
+      foot # BACKUP TERMINAL
+      xterm # BACKUP TERMINAL
 
-    (pkgs.callPackage ../../system/app/sddm-astronaut.nix {
-      # theme = "pixel_sakura";
-    })
+      tofi
 
-    # libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
-    # (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
-  ];
+      git-crypt
+      wget
+      neovim # default editor
 
+      (pkgs.callPackage ../../system/app/sddm-astronaut.nix {
+        # theme = "pixel_sakura";
+      })
+
+      # libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
+      # (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
+    ];
+  };
   # services
   services = {
     dbus.enable = true;
@@ -229,14 +238,6 @@
     ];
     packages = with pkgs; [ ];
     # uid = 1000;
-  };
-
-  environment.localBinInPath = true;
-  environment.sessionVariables = {
-    # If your cursor becomes invisible
-    WLR_NO_HARDWARE_CURSORS = "1";
-    # Hint electron apps to use wayland
-    NIXOS_OZONE_WL = "1";
   };
 
   security.pam.services.swaylock = { }; # without this swaylock is broken

@@ -53,7 +53,7 @@
       # home-manager switch --flake ~/Desktop/dotfiles/#emre
       homeConfigurations."${userSettings.username}" = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs {
-          system = systemSettings.system;
+          inherit (systemSettings) system; # Equivalent to system = systemSettings.system;
           config.allowUnfree = true;
         };
         extraSpecialArgs = {
