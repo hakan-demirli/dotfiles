@@ -104,5 +104,25 @@
           ./overlay.nix
         ];
       };
+      # home-manager switch --flake ~/Desktop/dotfiles/#vm
+      homeConfigurations."vm" = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs {
+          system = baseSystemSettings.system;
+          config.allowUnfree = true;
+        };
+        extraSpecialArgs = {
+          inherit inputs;
+          systemSettings = baseSystemSettings // {
+            profile = "vm";
+            threads = 16;
+          };
+          userSettings = baseUserSettings;
+        };
+
+        modules = [
+          ./profiles/vm/home.nix
+          ./overlay.nix
+        ];
+      };
     };
 }
