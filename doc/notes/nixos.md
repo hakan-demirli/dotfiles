@@ -209,3 +209,8 @@ virtualisation.libvirtd = {
             * https://github.com/ralismark/nix-appimage 
 * **Remove default file associations**
     * xdgmime is already read only so look inside ```.local/share/applications/``` and remove annoying entries.
+
+* **Share internet over usb/ethernet**
+    * Network manager > add new connection > ipv4 > shared to other computers
+    * To add static IP:
+        * Addresses(optional) > Add > "Address=192.168.2.100 Netmask:24 Gateaway:192.168.2.1"
