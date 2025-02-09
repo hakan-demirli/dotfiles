@@ -58,10 +58,7 @@
             threads = 16;
             hostname = "nixos-server"; # You can override other settings too
           };
-          userSettings = baseUserSettings // {
-            username = "server-admin";
-            dotfilesDir = "/home/server-admin/dotfiles";
-          };
+          userSettings = baseUserSettings;
         };
 
         modules = [
