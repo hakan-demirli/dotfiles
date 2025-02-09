@@ -16,13 +16,13 @@ rustPlatform.buildRustPackage rec {
   version = "5.21.11";
 
   src = fetchFromGitHub {
-    owner = "hakan-demirli";
+    owner = "latex-lsp";
     repo = "texlab";
-    rev = "5a53c7a4c88b19df418fbf4ba4da2a45d199e4af";
-    hash = "sha256-Lg0cZJWPwejSRESTV7U0/WC3A0qBJpj4RRuSCLuEaz4=";
+    rev = "29bdb931e8bb5e459818c47bb82bba544bd01f2e";
+    hash = "sha256-zBxYf8yy7HAYWnTjDwvzahQ9s7SyLIav5m+YhZV+/KU=";
   };
 
-  cargoHash = "sha256-YU4/qdkZhjjzgza7R6yWG/pqwGWt0WkHMDuSMxuCcCo=";
+  cargoHash = "sha256-7J7JpHQgmObYaHK9mkCKichUD5vhg86pmPCAK8D3f0U=";
 
   outputs = [ "out" ] ++ lib.optional (!isCross) "man";
 

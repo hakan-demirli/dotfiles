@@ -29,6 +29,8 @@
 * ```nix-shell -p git git-crypt home-manager helix```
 * If you don't have the git-crypt key remove/rename git config.
   * ```mv ./.config/git/config ./.config/git/config_bckp```
+  * Create an empty config to bypass missing symlink issue:
+    * ```touch ./.config/git/config```
 * If you have the key decrypt gitconfig
   * ```git-crypt unlock ../git-crypt-key```
 * ```sudo nixos-rebuild switch --flake ~/Desktop/dotfiles/#emre```
