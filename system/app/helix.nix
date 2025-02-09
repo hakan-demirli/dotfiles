@@ -12,10 +12,10 @@ rustPlatform.buildRustPackage rec {
   version = "24.07-dev";
 
   src = fetchFromGitHub {
-    owner = "hakan-demirli";
+    owner = "helix-editor";
     repo = "helix";
-    rev = "0c26ad987e7360c0fe2a94bf1599d25d71144ea4";
-    sha256 = "sha256-/lW85OJHttQGfG7L3rnuMS661eGZlBkhxJX0nBigpVk=";
+    rev = "6f865972869c0fe6a588252e62e952fc0122b83f";
+    sha256 = "sha256-iJps/ytjOAv5BboU5IAo34IS7aIZ7yAydqr4ztlDhtI=";
   };
 
   cargoHash = "sha256-jxZ4fFYECXEv1Tq1Qcn3/+gw52W6XkSi3kMBifVLJgU=";

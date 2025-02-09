@@ -21,7 +21,7 @@
   documentation.nixos.enable = false; # .desktop
   nixpkgs.config = {
     allowUnfree = true;
-    rocmSupport = true;
+    rocmSupport = false; # torch broken
     cudaSupport = false; # ok with cachix
     # cudaSupport = false; # takes hours to compile, dont touch
     allowUnfreePredicate =
