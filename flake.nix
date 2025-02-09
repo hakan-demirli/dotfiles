@@ -16,53 +16,77 @@
       ...
     }@inputs:
     let
-      # ---- SYSTEM SETTINGS ---- #
-      systemSettings = {
+      # ---- BASE SYSTEM SETTINGS ---- #
+      baseSystemSettings = {
         system = "x86_64-linux";
-        hostname = "nixos";
-        profile = "personal"; # select a profile defined from ./profiles directory
         timezone = "Europe/Istanbul";
-        locale = "en_US.UTF-8"; # default locale
-        locale_extra = "en_GB.UTF-8"; # extra locale
-        threads = 16; # cpu threads
+        locale = "en_US.UTF-8";
+        locale_extra = "en_GB.UTF-8";
       };
 
-      # ----- USER SETTINGS ----- #
-      userSettings = rec {
-        username = "emre"; # username
-        name = "EHD"; # name/identifier
-        dotfilesDir = "/home/${username}/Desktop/dotfiles"; # absolute path of the local repo
-        gdriveDir = "/home/${username}/Desktop/gdrive";
+      # ----- BASE USER SETTINGS ----- #
+      baseUserSettings = {
+        username = "emre";
+        name = "EHD";
+        dotfilesDir = "/home/emre/Desktop/dotfiles";
+        gdriveDir = "/home/emre/Desktop/gdrive";
       };
     in
     {
-      # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#myNixos
-      nixosConfigurations."myNixos" = nixpkgs.lib.nixosSystem {
+      # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#emre
+      nixosConfigurations."emre" = nixpkgs.lib.nixosSystem {
         specialArgs = {
-          inherit userSettings systemSettings;
+          systemSettings = baseSystemSettings // {
+            profile = "personal";
+            hostname = "nixos";
+            threads = 16;
+          };
+          userSettings = baseUserSettings;
         };
 
         modules = [
-          # load configuration.nix from selected PROFILE
-          (./. + "/profiles" + ("/" + systemSettings.profile) + "/configuration.nix")
-          # load overlays
+          ./profiles/personal/configuration.nix
           ./overlay.nix
         ];
       };
-      # home-manager switch --flake ~/Desktop/dotfiles/#emre
-      homeConfigurations."${userSettings.username}" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs {
-          inherit (systemSettings) system; # Equivalent to system = systemSettings.system;
-          config.allowUnfree = true;
-        };
-        extraSpecialArgs = {
-          inherit inputs systemSettings userSettings;
+
+      # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#server
+      nixosConfigurations."server" = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          systemSettings = baseSystemSettings // {
+            profile = "server";
+            threads = 16;
+            hostname = "nixos-server"; # You can override other settings too
+          };
+          userSettings = baseUserSettings // {
+            username = "server-admin";
+            dotfilesDir = "/home/server-admin/dotfiles";
+          };
         };
 
         modules = [
-          # load home.nix from selected PROFILE
-          (./. + "/profiles" + ("/" + systemSettings.profile) + "/home.nix")
-          # load overlays
+          ./profiles/server/configuration.nix
+          ./overlay.nix
+        ];
+      };
+
+      # home-manager switch --flake ~/Desktop/dotfiles/#emre
+      homeConfigurations."${baseUserSettings.username}" = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs {
+          system = baseSystemSettings.system;
+          config.allowUnfree = true;
+        };
+        extraSpecialArgs = {
+          inherit inputs;
+          systemSettings = baseSystemSettings // {
+            profile = "personal";
+            threads = 16;
+          };
+          userSettings = baseUserSettings;
+        };
+
+        modules = [
+          ./profiles/personal/home.nix
           ./overlay.nix
         ];
       };

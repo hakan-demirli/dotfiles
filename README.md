@@ -31,5 +31,5 @@
   * ```mv ./.config/git/config ./.config/git/config_bckp```
 * If you have the key decrypt gitconfig
   * ```git-crypt unlock ../git-crypt-key```
-* ```sudo nixos-rebuild switch --flake ~/Desktop/dotfiles/#myNixos```
+* ```sudo nixos-rebuild switch --flake ~/Desktop/dotfiles/#emre```
 * ```home-manager switch --flake ~/Desktop/dotfiles/#emre```
