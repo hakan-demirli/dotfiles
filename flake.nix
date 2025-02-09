@@ -56,7 +56,7 @@
           systemSettings = baseSystemSettings // {
             profile = "server";
             threads = 16;
-            hostname = "nixos-server"; # You can override other settings too
+            hostname = "nixos-server";
           };
           userSettings = baseUserSettings;
         };
@@ -67,8 +67,25 @@
         ];
       };
 
+      # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#vm
+      nixosConfigurations."vm" = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          systemSettings = baseSystemSettings // {
+            profile = "vm";
+            threads = 16;
+            hostname = "nixos-vm";
+          };
+          userSettings = baseUserSettings;
+        };
+
+        modules = [
+          ./profiles/vm/configuration.nix
+          ./overlay.nix
+        ];
+      };
+
       # home-manager switch --flake ~/Desktop/dotfiles/#emre
-      homeConfigurations."${baseUserSettings.username}" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."emre" = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs {
           system = baseSystemSettings.system;
           config.allowUnfree = true;
