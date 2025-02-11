@@ -27,6 +27,8 @@
 
 # Install
 * ```nix-shell -p git git-crypt home-manager helix```
+* Enable flakes and commands:
+  * ```cp ~/Desktop/dotfiles/.config/nix/nix.conf ~/.config/nix/nix.conf```
 * If you don't have the git-crypt key remove/rename git config.
   * ```mv ./.config/git/config ./.config/git/config_bckp```
   * Create an empty config to bypass missing symlink issue:

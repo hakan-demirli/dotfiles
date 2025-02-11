@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import logging
 import os
 import shutil
@@ -12,7 +13,11 @@ GIT = "git"
 def setup_logger():
     cache_dir = create_cache_dir()
     log_file = os.path.join(cache_dir, "git_cache.log")
-    logging.basicConfig(filename=log_file, level=logging.INFO)
+    logging.basicConfig(
+        filename=log_file,
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
 
 
 def create_cache_dir():
@@ -22,102 +27,129 @@ def create_cache_dir():
     return cache_dir
 
 
-def gitc_clone(url, depth=None, dst_path=None):
-    print(url)
-    print(depth)
-    print(dst_path)
+def run_git(cmd_args, cwd=None, ignore_unshallow_error=False):
+    try:
+        result = subprocess.run(
+            [GIT] + cmd_args,
+            check=True,
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        output = (e.stdout or "") + (e.stderr or "")
+        if (
+            ignore_unshallow_error
+            and "fatal: --unshallow on a complete repository does not make sense"
+            in output
+        ):
+            return output
+        else:
+            sys.stderr.write(output)
+            sys.exit(e.returncode)
 
+
+def gitc_clone(
+    url, depth=None, branch=None, extra_args=None, dst_path=None, original_args=None
+):
+    """
+    Clones the repository using a cache. If the destination already exists,
+    delegate to the underlying Git command to produce its standard error message.
+    """
+    extra_args = extra_args or []
     cache_dir = create_cache_dir()
 
-    # Remove .git from the end of the url if it exists
+    # Normalize URL by stripping trailing .git if present.
     if url.endswith(".git"):
         url = url[:-4]
 
     parsed_url = urlparse(url)
     path_parts = parsed_url.path.strip("/").split("/")
     if len(path_parts) < 2:
-        git(
-            ["clone", "--recurse-submodules", "-j8", url]
-            + (["--depth", str(depth)] if depth else [])
-        )
+        # If URL is not in the expected form, delegate to Git.
+        subprocess.run([GIT] + original_args)
+        return
 
+    # Build cache paths.
     website_dir = os.path.join(cache_dir, parsed_url.netloc)
     os.makedirs(website_dir, exist_ok=True)
-
     user_dir = os.path.join(website_dir, path_parts[-2])
     os.makedirs(user_dir, exist_ok=True)
-
     repo_dir = os.path.join(user_dir, path_parts[-1])
-    if os.path.exists(repo_dir):
-        subprocess.run([GIT, "-C", repo_dir, "fetch", "--unshallow"])
-        subprocess.run([GIT, "-C", repo_dir, "pull"])
-        subprocess.run([GIT, "-C", repo_dir, "submodule", "update", "--recursive"])
-        logging.info("repo exists.")
-    else:
-        if depth is not None:
-            subprocess.run(
-                [
-                    GIT,
-                    "clone",
-                    "--recurse-submodules",
-                    "-j8",
-                    "--depth",
-                    str(depth),
-                    url,
-                    repo_dir,
-                ]
-            )
-            logging.info("depth copy is performed.")
-        else:
-            subprocess.run([GIT, "clone", "--recurse-submodules", "-j8", url, repo_dir])
-            logging.info("no depth copy is performed.")
 
+    # Update or create the cached repository.
+    if os.path.exists(repo_dir):
+        run_git(["-C", repo_dir, "fetch", "--unshallow"], ignore_unshallow_error=True)
+        run_git(["-C", repo_dir, "pull"])
+        run_git(["-C", repo_dir, "submodule", "update", "--recursive"])
+        logging.info("Repository cache exists; updated cache repository.")
+    else:
+        clone_cmd = ["clone", "--recurse-submodules", "-j8"]
+        if branch:
+            clone_cmd += ["-b", branch]
+        if depth:
+            clone_cmd += ["--depth", str(depth)]
+        clone_cmd += extra_args + [url, repo_dir]
+        run_git(clone_cmd)
+        logging.info("Repository cache created.")
+
+    if branch:
+        run_git(["-C", repo_dir, "checkout", branch])
+        run_git(["-C", repo_dir, "pull"])
+        logging.info("Checked out branch '%s' in cache.", branch)
+
+    # Determine the destination directory.
     dst_dir = (
         os.path.join(os.getcwd(), path_parts[-1]) if dst_path is None else dst_path
     )
+
+    # If the destination already exists, delegate to Git so that Git produces its error.
     if os.path.exists(dst_dir):
-        logging.info(
-            f"Directory {dst_dir} already exists. Please remove it before running the script."
-        )
-    else:
-        shutil.copytree(repo_dir, dst_dir)
+        subprocess.run([GIT] + original_args)
+        return
+
+    # Copy from the cache into the destination.
+    shutil.copytree(repo_dir, dst_dir)
+    logging.info("Copied repository to destination %s.", dst_dir)
+    if branch:
+        run_git(["-C", dst_dir, "checkout", branch])
+
+
+def parse_clone_args(args):
+    parser = argparse.ArgumentParser(prog="git clone", add_help=False)
+    parser.add_argument("--depth", type=int, default=None)
+    parser.add_argument("-b", "--branch", dest="branch", default=None)
+    parser.add_argument("url", nargs="?", default=None)
+    parser.add_argument("dst", nargs="?", default=None)
+    parsed, unknown = parser.parse_known_args(args)
+    return parsed.depth, parsed.branch, parsed.url, parsed.dst, unknown
 
 
 def git_command(args):
-    if not args or (args[0] != "clone" or len(args) < 2) or "--branch" in args:
-        git(args)
-    else:
-        depth = None
-        dst_path = None
-        url = None
-        depth_next = False
-        args = args[1:]  # Remove the first argument
-        for i, arg in enumerate(args):
-            if "--depth" == arg:
-                # depth = next arg is depth number
-                # check if it is number before assigning.
-                # if not just call git(args)
-                if i + 1 < len(args) and args[i + 1].isdigit():
-                    depth = int(args[i + 1])
-                    depth_next = True
-                else:
-                    git(args)
-                    return
-            elif depth_next:
-                depth_next = False
-            elif url is None:
-                url = arg
-            elif dst_path is None:
-                dst_path = arg
-        gitc_clone(url, depth, dst_path)
+    # For any non-clone command, simply delegate to Git.
+    if not args or args[0] != "clone":
+        subprocess.run([GIT] + args)
+        return
+
+    # Parse clone arguments.
+    clone_args = args[1:]
+    depth, branch, url, dst, unknown = parse_clone_args(clone_args)
+    # If URL is missing or there are unknown arguments, delegate to Git.
+    if url is None or unknown:
+        subprocess.run([GIT] + args)
+        return
+
+    # Call our caching clone function and pass the original clone arguments
+    # so that we can delegate error-handling if necessary.
+    gitc_clone(url, depth, branch, extra_args=unknown, dst_path=dst, original_args=args)
 
 
-def git(args):
-    logging.info(f"Unsupported flag combination: {args}")
-    logging.info("Deferring to original git.")
-    subprocess.run([GIT] + args)
+def main():
+    setup_logger()
+    git_command(sys.argv[1:])
 
 
 if __name__ == "__main__":
-    setup_logger()
-    git_command(sys.argv[1:])
+    main()
