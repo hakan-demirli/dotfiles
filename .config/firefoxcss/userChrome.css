@@ -96,10 +96,27 @@ toolbarbutton.bookmark-item:not(.subviewbutton) {
 #context-bookmarklink,                  /* Bookmark Link                    */
 #context-savelink,                      /* Save Link As…                    */
 #context-savelinktopocket,              /* Save Link to Pocket              */
-#context-copylink,                      /* Copy Link                        */
 #context-sendlinktodevice,              /* Send Link to Device              */
 #context-sep-sendlinktodevice,          /************ Separator *************/
 #context-sep-copylink,                  /************ Separator *************/
 #frame-sep {
+  display: none !important;
+}
+
+/* Hide the tracking copy link when it's disabled */
+#context-stripOnShareLink[disabled="true"],
+#strip-on-share[disabled="true"] {
+  display: none !important;
+}
+
+/* Rename the tracking copy link to "Copy Link" */
+#context-stripOnShareLink::before,
+#strip-on-share::before {
+  content: "Copy Link" !important;
+}
+
+/* Hide the built-in regular copy link only when a non-disabled tracking link is available */
+#context-copylink:has(+ #context-stripOnShareLink:not([disabled="true"])),
+menuitem[label="Copy Link"]:has(+ #strip-on-share:not([disabled="true"])) {
   display: none !important;
 }
