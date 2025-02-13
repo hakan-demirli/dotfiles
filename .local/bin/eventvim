@@ -3,6 +3,7 @@ import curses
 import curses.textpad
 import datetime
 import json
+import math
 import os
 import re  # For parsing duration input
 import sys
@@ -175,19 +176,44 @@ def init_colors():
 # Draw Time Column
 # ========================
 def draw_time_column(stdscr, time_col_width, height):
-    num_labels = 25  # 00:00 to 24:00
-    available_rows = height - 2  # rows 1..height-1 available
-    spacing = available_rows // (num_labels - 1)
-    for i in range(num_labels):
+    """
+    Draws time labels along the left column.
+    Dynamically reduces the number of labels if there isn’t enough vertical space,
+    ensuring at least a 2-to-1 ratio between rows and labels.
+    """
+    available_rows = height - 2  # rows 1 .. height-1 are available for labels
+    # Maximum labels that can be shown while keeping at least 2 rows per label.
+    max_labels = (available_rows // 2) + 1
+
+    # We would like to have 25 labels (for 0:00 to 24:00) if possible.
+    # Otherwise, we use a reduced number.
+    desired_count = min(25, max_labels)
+    if desired_count < 2:
+        desired_count = 2
+
+    # Calculate the step in hours.
+    # Using math.ceil ensures that we do not overshoot the space (i.e. keep spacing >=2).
+    step = math.ceil(24 / (desired_count - 1))
+
+    # Create a list of label hours. Always include 0 and 24.
+    labels = list(range(0, 25, step))
+    if labels[-1] != 24:
+        labels.append(24)
+    num_labels = len(labels)
+
+    # Calculate spacing between labels (in rows)
+    spacing = available_rows // (num_labels - 1) if num_labels > 1 else 0
+
+    for i, hour in enumerate(labels):
         row = 1 + i * spacing
         if row >= height:
             break
-        time_str = f"{i:02d}:00"
+        time_str = f"{hour:02d}:00"
         try:
             stdscr.addstr(
                 row,
                 0,
-                time_str.ljust(TIME_COL_WIDTH)[:TIME_COL_WIDTH],
+                time_str.ljust(time_col_width)[:time_col_width],
                 curses.color_pair(COLOR_TIME),
             )
         except curses.error:
