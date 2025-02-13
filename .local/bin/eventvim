@@ -1,0 +1,744 @@
+#!/usr/bin/env python3
+import curses
+import curses.textpad
+import datetime
+import json
+import os
+import re  # For parsing duration input
+import sys
+import textwrap  # For wrapping inserted text
+
+# ========================
+# Constants for customization
+# ========================
+TIME_COL_WIDTH = 6  # Fixed width for the "time" column
+NUM_DAY_COLUMNS = 7  # Number of day columns
+
+# Color pair indices
+COLOR_HEADER = 1  # For header labels (day headers)
+COLOR_TIME = 2  # For time labels (00:00, 01:00, etc.)
+COLOR_GRID = 3  # For grid dividers and current time line
+COLOR_EVENT = 4  # Base event color (normal green)
+COLOR_SELECTED = 7  # For the selected event border (red)
+
+# Additional event colors will have pair indices 5 and 6.
+event_color_pairs = []  # Populated in init_colors()
+
+# Global time offset in hours (added to current time)
+TIME_OFFSET = 0
+
+# Global persistent events.
+# Keys are event ids. Each value is a dict with:
+#    "duration": duration of the event in minutes,
+#    "text": user-inserted text (default is empty string)
+persistent_events = {}
+
+# Global dynamic events layout.
+# This is computed from persistent_events whenever needed.
+# Keys are day offsets (0 for today, 1 for tomorrow, etc.).
+# Each value is a list of event segments (dicts) with keys:
+#   "start", "end", "color", "eid", and "text"
+events_by_day = {}
+
+# Global event counter.
+event_counter = 0
+
+# Global selected event id.
+selected_event_id = None
+
+# Global undo/redo stacks (for deletion).
+# For undo records we store a dict: { "eid": event id, "data": persistent event data }
+undo_stack = []
+redo_stack = []
+
+if len(sys.argv) > 1:
+    try:
+        TIME_OFFSET = int(sys.argv[1])
+    except ValueError:
+        pass  # If conversion fails, default to 5
+
+
+# ========================
+# Persistence Functions
+# ========================
+def get_cache_file_path():
+    """Return the path to the events.json file in the cache directory."""
+    cache_dir = os.path.expanduser("~/.cache/eventvim")
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir, exist_ok=True)
+    return os.path.join(cache_dir, "events.json")
+
+
+def load_events():
+    """Load persistent_events and the event counter from the JSON file."""
+    global persistent_events, event_counter
+    file_path = get_cache_file_path()
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+            # JSON keys are strings; convert back to ints.
+            persistent_events = {
+                int(k): v for k, v in data.get("persistent_events", {}).items()
+            }
+            event_counter = data.get("event_counter", 0)
+    except Exception:
+        persistent_events = {}
+        event_counter = 0
+
+
+def save_events():
+    """Save persistent_events and the event counter to the JSON file."""
+    file_path = get_cache_file_path()
+    data = {"persistent_events": persistent_events, "event_counter": event_counter}
+    with open(file_path, "w") as f:
+        json.dump(data, f)
+
+
+# ========================
+# Dynamic Layout: Recalculate events_by_day from persistent_events
+# ========================
+def recalc_events():
+    """
+    Build events_by_day dynamically based on persistent_events.
+    Each event is laid out consecutively starting from the current time.
+    The event’s color is computed dynamically (based on its id).
+    """
+    global events_by_day
+    events_by_day = {}
+    # Sort persistent events by event id (assumed insertion order).
+    sorted_events = sorted(persistent_events.items(), key=lambda kv: kv[0])
+    now = datetime.datetime.now() + datetime.timedelta(hours=TIME_OFFSET)
+    current_abs = now.hour * 60 + now.minute  # minutes since midnight (dynamic start)
+    for eid, data in sorted_events:
+        duration = data["duration"]
+        text = data.get("text", "")
+        new_abs_start = current_abs
+        new_abs_end = new_abs_start + duration
+        color = event_color_pairs[eid % len(event_color_pairs)]
+        start_day = new_abs_start // 1440
+        end_day = (new_abs_end - 1) // 1440
+        for d in range(start_day, end_day + 1):
+            if d == start_day:
+                portion_start = new_abs_start % 1440
+            else:
+                portion_start = 0
+            if d == end_day:
+                portion_end = new_abs_end % 1440
+                if portion_end == 0:
+                    portion_end = 1440
+            else:
+                portion_end = 1440
+            if d < NUM_DAY_COLUMNS:
+                events_by_day.setdefault(d, []).append(
+                    {
+                        "start": portion_start,
+                        "end": portion_end,
+                        "color": color,
+                        "eid": eid,
+                        "text": text,
+                    }
+                )
+        current_abs = new_abs_end
+
+
+# ========================
+# Initialize Colors
+# ========================
+def init_colors():
+    global event_color_pairs
+    if curses.has_colors():
+        curses.start_color()
+        curses.use_default_colors()
+        curses.init_pair(COLOR_HEADER, curses.COLOR_BLACK, curses.COLOR_CYAN)
+        curses.init_pair(COLOR_TIME, curses.COLOR_YELLOW, -1)
+        curses.init_pair(COLOR_GRID, curses.COLOR_WHITE, -1)
+        curses.init_pair(COLOR_EVENT, curses.COLOR_BLACK, curses.COLOR_GREEN)
+        curses.init_pair(COLOR_SELECTED, curses.COLOR_RED, -1)  # For selected border
+
+        if curses.can_change_color():
+            DARK_GREEN = 10
+            LIGHT_GREEN = 11
+            curses.init_color(DARK_GREEN, 0, 600, 0)
+            curses.init_color(LIGHT_GREEN, 0, 800, 0)
+            curses.init_pair(5, curses.COLOR_BLACK, DARK_GREEN)
+            curses.init_pair(6, curses.COLOR_BLACK, LIGHT_GREEN)
+            event_color_pairs = [COLOR_EVENT, 5, 6]
+        else:
+            curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_BLUE)
+            curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_CYAN)
+            event_color_pairs = [COLOR_EVENT, 5, 6]
+    else:
+        event_color_pairs = [COLOR_EVENT]
+
+
+# ========================
+# Draw Time Column
+# ========================
+def draw_time_column(stdscr, time_col_width, height):
+    num_labels = 25  # 00:00 to 24:00
+    available_rows = height - 2  # rows 1..height-1 available
+    spacing = available_rows // (num_labels - 1)
+    for i in range(num_labels):
+        row = 1 + i * spacing
+        if row >= height:
+            break
+        time_str = f"{i:02d}:00"
+        try:
+            stdscr.addstr(
+                row,
+                0,
+                time_str.ljust(TIME_COL_WIDTH)[:TIME_COL_WIDTH],
+                curses.color_pair(COLOR_TIME),
+            )
+        except curses.error:
+            pass
+
+
+# ========================
+# Draw Day Columns
+# ========================
+def draw_day_columns(stdscr, time_col_width, width, height):
+    available_width = width - time_col_width
+    col_width = available_width // NUM_DAY_COLUMNS
+    extra = available_width - (col_width * NUM_DAY_COLUMNS)
+    today = datetime.date.today() + datetime.timedelta(hours=TIME_OFFSET)
+    for i in range(NUM_DAY_COLUMNS):
+        current_col_width = col_width + (extra if i == NUM_DAY_COLUMNS - 1 else 0)
+        x_start = time_col_width + i * col_width
+        day_date = today + datetime.timedelta(days=i)
+        header = day_date.strftime("%a %d %b")
+        header_centered = header.center(current_col_width)[:current_col_width]
+        try:
+            stdscr.addstr(
+                0,
+                x_start,
+                header_centered,
+                curses.color_pair(COLOR_HEADER) | curses.A_BOLD,
+            )
+        except curses.error:
+            pass
+        for y in range(height):
+            try:
+                stdscr.addch(
+                    y,
+                    x_start + current_col_width - 1,
+                    curses.ACS_VLINE,
+                    curses.color_pair(COLOR_GRID),
+                )
+            except curses.error:
+                pass
+
+
+# ========================
+# Draw the Current Time Line
+# ========================
+def draw_current_time_line(stdscr, time_col_width, width, height):
+    available_rows = height - 1
+    now = datetime.datetime.now() + datetime.timedelta(hours=TIME_OFFSET)
+    current_minutes = now.hour * 60 + now.minute
+    total_minutes = 24 * 60
+    row = 1 + int((current_minutes / total_minutes) * available_rows)
+    if row >= height:
+        row = height - 1
+    available_width = width - time_col_width
+    col_width = available_width // NUM_DAY_COLUMNS
+    x_start = time_col_width
+    dash_length = max(col_width - 1, 1)
+    dash_line = "-" * dash_length
+    try:
+        stdscr.addstr(row, x_start, dash_line, curses.color_pair(COLOR_GRID))
+    except curses.error:
+        pass
+
+
+# ========================
+# Helper: Draw Rectangle with Given Attribute
+# ========================
+def draw_rectangle(stdscr, r1, c1, r2, c2, attr):
+    try:
+        for x in range(c1, c2 + 1):
+            stdscr.addch(r1, x, curses.ACS_HLINE, attr)
+            stdscr.addch(r2, x, curses.ACS_HLINE, attr)
+        for y in range(r1, r2 + 1):
+            stdscr.addch(y, c1, curses.ACS_VLINE, attr)
+            stdscr.addch(y, c2, curses.ACS_VLINE, attr)
+        stdscr.addch(r1, c1, curses.ACS_ULCORNER, attr)
+        stdscr.addch(r1, c2, curses.ACS_URCORNER, attr)
+        stdscr.addch(r2, c1, curses.ACS_LLCORNER, attr)
+        stdscr.addch(r2, c2, curses.ACS_LRCORNER, attr)
+    except curses.error:
+        pass
+
+
+# ========================
+# Draw Events (with wrapped text if available)
+# ========================
+def draw_events(stdscr, time_col_width, width, height, events_by_day):
+    available_rows = height - 2  # rows 1..height-1 map to 0-1440 minutes
+    available_width = width - time_col_width
+    col_width = available_width // NUM_DAY_COLUMNS
+    for day_offset in range(NUM_DAY_COLUMNS):
+        x_start = time_col_width + day_offset * col_width
+        x_end = x_start + col_width - 2  # Avoid overlapping the divider.
+        day_events = events_by_day.get(day_offset, [])
+        for event in day_events:
+            start_minutes = event["start"]
+            end_minutes = event["end"]
+            color_pair = event["color"]
+            event_id = event["eid"]
+            text = event.get("text", "")
+            row_start = 1 + int((start_minutes / (24 * 60)) * available_rows)
+            row_end = 1 + int((end_minutes / (24 * 60)) * available_rows)
+            if row_end <= row_start:
+                row_end = row_start + 1
+            if event_id is not None and event_id == selected_event_id:
+                border_attr = curses.color_pair(COLOR_SELECTED)
+            else:
+                border_attr = curses.color_pair(COLOR_GRID)
+            draw_rectangle(stdscr, row_start, x_start, row_end, x_end, border_attr)
+            # Fill inside with event background.
+            for y in range(row_start + 1, row_end):
+                try:
+                    stdscr.addstr(
+                        y,
+                        x_start + 1,
+                        " " * (x_end - x_start - 1),
+                        curses.color_pair(color_pair),
+                    )
+                except curses.error:
+                    pass
+            max_width = x_end - x_start - 1  # available width inside box
+            # Always display the event id on the first inside line.
+            event_id_str = str(event_id)
+            id_start_x = x_start + 1 + (max_width - len(event_id_str)) // 2
+            try:
+                stdscr.addstr(
+                    row_start + 1,
+                    id_start_x,
+                    event_id_str,
+                    curses.color_pair(color_pair) | curses.A_BOLD,
+                )
+            except curses.error:
+                pass
+            # If there is inserted text, display it starting one line below the event id.
+            if text:
+                available_text_lines = (
+                    row_end - row_start - 1
+                ) - 1  # reserve first line for id
+                if available_text_lines > 0:
+                    wrapped_lines = textwrap.wrap(text, width=max_width)
+                    for i, line in enumerate(wrapped_lines[:available_text_lines]):
+                        line_start_x = x_start + 1 + (max_width - len(line)) // 2
+                        try:
+                            stdscr.addstr(
+                                row_start + 2 + i,  # one line below the event id
+                                line_start_x,
+                                line,
+                                curses.color_pair(color_pair) | curses.A_BOLD,
+                            )
+                        except curses.error:
+                            pass
+
+
+# ========================
+# Get Sorted List of Unique Event IDs
+# ========================
+def get_all_event_ids():
+    return sorted(persistent_events.keys())
+
+
+# ========================
+# Insert Event (updated duration input format)
+# ========================
+def insert_event(stdscr, height):
+    global event_counter, selected_event_id
+    curses.curs_set(1)
+    prompt_y = height - 1
+    stdscr.move(prompt_y, 0)
+    stdscr.clrtoeol()
+    stdscr.addstr(prompt_y, 0, "Insert event: Duration (e.g., 1h, 45m, 1h1m): ")
+    stdscr.refresh()
+    duration_input = ""
+    while True:
+        key = stdscr.getch()
+        if key in (27,):  # ESC cancels
+            curses.curs_set(0)
+            return None
+        elif key in (curses.KEY_ENTER, 10, 13):
+            break
+        elif key in (curses.KEY_BACKSPACE, 127):
+            duration_input = duration_input[:-1]
+        else:
+            if (48 <= key <= 57) or key in (ord("h"), ord("H"), ord("m"), ord("M")):
+                duration_input += chr(key)
+        stdscr.move(prompt_y, 0)
+        stdscr.clrtoeol()
+        stdscr.addstr(
+            prompt_y,
+            0,
+            "Insert event: Duration (e.g., 1h, 45m, 1h1m): " + duration_input,
+        )
+        stdscr.refresh()
+    curses.curs_set(0)
+    duration_input = duration_input.strip().lower()
+    pattern = r"^(?:(\d+)h)?(?:(\d+)m)?$"
+    match = re.match(pattern, duration_input)
+    if not match or (match.group(1) is None and match.group(2) is None):
+        return None
+    hours = int(match.group(1)) if match.group(1) is not None else 0
+    minutes = int(match.group(2)) if match.group(2) is not None else 0
+    duration_total = hours * 60 + minutes
+    if duration_total < 60:
+        return None
+    # Create the new event (its start/end and color are dynamic).
+    eid = event_counter
+    persistent_events[eid] = {"duration": duration_total, "text": ""}
+    event_counter += 1
+    recalc_events()
+    ids = get_all_event_ids()
+    if ids:
+        selected_event_id = ids[0]
+    return True
+
+
+# ========================
+# Deletion Helper: Delete Event by ID
+# ========================
+def delete_event_by_id(event_id):
+    global selected_event_id
+    if event_id in persistent_events:
+        # Save for undo.
+        record = {"eid": event_id, "data": persistent_events[event_id]}
+        del persistent_events[event_id]
+        recalc_events()
+        ids = get_all_event_ids()
+        old_focus = selected_event_id
+        if old_focus in ids:
+            selected_event_id = old_focus
+        else:
+            selected_event_id = ids[0] if ids else None
+        return record
+    return None
+
+
+# ========================
+# Delete Mode: Prompt Delete by ID ("D")
+# ========================
+def prompt_delete_event(stdscr, height):
+    global undo_stack, redo_stack
+    curses.curs_set(1)
+    prompt_y = height - 1
+    stdscr.move(prompt_y, 0)
+    stdscr.clrtoeol()
+    stdscr.addstr(prompt_y, 0, "Delete event (by id): Enter event id: ")
+    stdscr.refresh()
+    id_input = ""
+    while True:
+        key = stdscr.getch()
+        if key in (27,):
+            curses.curs_set(0)
+            return
+        elif key in (curses.KEY_ENTER, 10, 13):
+            break
+        elif key in (curses.KEY_BACKSPACE, 127):
+            id_input = id_input[:-1]
+        elif 48 <= key <= 57:
+            id_input += chr(key)
+        stdscr.move(prompt_y, 0)
+        stdscr.clrtoeol()
+        stdscr.addstr(prompt_y, 0, "Delete event (by id): Enter event id: " + id_input)
+        stdscr.refresh()
+    curses.curs_set(0)
+    if not id_input:
+        return
+    try:
+        event_id_to_delete = int(id_input)
+    except ValueError:
+        return
+    if event_id_to_delete not in get_all_event_ids():
+        return
+    record = delete_event_by_id(event_id_to_delete)
+    if record is not None:
+        undo_stack.append(record)
+        redo_stack.clear()
+
+
+# ========================
+# Delete Current Event ("d") with Confirmation Subkey
+# ========================
+def confirm_delete_current_event(stdscr, height):
+    curses.curs_set(1)
+    prompt_y = height - 1
+    stdscr.move(prompt_y, 0)
+    stdscr.clrtoeol()
+    stdscr.addstr(
+        prompt_y, 0, "Press 'd' again to confirm deletion, any other key to cancel"
+    )
+    stdscr.refresh()
+    key = stdscr.getch()
+    curses.curs_set(0)
+    if key == ord("d"):
+        record = delete_event_by_id(selected_event_id)
+        if record is not None:
+            undo_stack.append(record)
+            redo_stack.clear()
+
+
+# ========================
+# Undo Deletion ("u")
+# ========================
+def undo_deletion():
+    global selected_event_id
+    if not undo_stack:
+        return
+    record = undo_stack.pop()
+    eid = record["eid"]
+    persistent_events[eid] = record["data"]
+    recalc_events()
+    selected_event_id = eid
+    redo_stack.append(record)
+
+
+# ========================
+# Redo Deletion ("U")
+# ========================
+def redo_deletion():
+    global selected_event_id
+    if not redo_stack:
+        return
+    record = redo_stack.pop()
+    eid = record["eid"]
+    if eid in persistent_events:
+        new_record = delete_event_by_id(eid)
+        if new_record is not None:
+            undo_stack.append(new_record)
+
+
+# ========================
+# Prompt for Event Text (for "i")
+# ========================
+def prompt_event_text(stdscr, height):
+    curses.curs_set(1)
+    prompt_y = height - 1
+    stdscr.move(prompt_y, 0)
+    stdscr.clrtoeol()
+    stdscr.addstr(prompt_y, 0, "Insert text: ")
+    stdscr.refresh()
+    text_input = ""
+    while True:
+        key = stdscr.getch()
+        if key in (27,):
+            curses.curs_set(0)
+            return None
+        elif key in (curses.KEY_ENTER, 10, 13):
+            break
+        elif key in (curses.KEY_BACKSPACE, 127):
+            text_input = text_input[:-1]
+        else:
+            if 32 <= key <= 126:
+                text_input += chr(key)
+        stdscr.move(prompt_y, 0)
+        stdscr.clrtoeol()
+        stdscr.addstr(prompt_y, 0, "Insert text: " + text_input)
+        stdscr.refresh()
+    curses.curs_set(0)
+    return text_input
+
+
+# ========================
+# Insert Text into Selected Event ("i")
+# ========================
+def insert_text_into_event(text):
+    if selected_event_id is None:
+        return
+    if selected_event_id in persistent_events:
+        persistent_events[selected_event_id]["text"] = text
+    recalc_events()
+
+
+# ========================
+# Selection Movement: Horizontal (Columns)
+# ========================
+def move_selection_column(direction):
+    global selected_event_id
+    # Compute positions from dynamic events_by_day.
+    positions = {}
+    for day, segs in events_by_day.items():
+        for seg in segs:
+            eid = seg["eid"]
+            if eid not in positions:
+                positions[eid] = (day, seg["start"])
+            else:
+                col, st = positions[eid]
+                if day < col or (day == col and seg["start"] < st):
+                    positions[eid] = (day, seg["start"])
+    if selected_event_id not in positions:
+        return
+    cur_col, cur_start = positions[selected_event_id]
+    target_col = cur_col + direction
+    candidates = [(eid, pos) for eid, pos in positions.items() if pos[0] == target_col]
+    if not candidates:
+        return
+    candidates.sort(key=lambda item: abs(item[1][1] - cur_start))
+    selected_event_id = candidates[0][0]
+
+
+# ========================
+# Selection Movement: Order-Based (Vertical)
+# ========================
+def move_selection_order(direction):
+    global selected_event_id
+    ids = get_all_event_ids()
+    if not ids:
+        selected_event_id = None
+        return
+    if selected_event_id is None:
+        selected_event_id = ids[0]
+        return
+    try:
+        idx = ids.index(selected_event_id)
+    except ValueError:
+        idx = 0
+    idx = (idx + direction) % len(ids)
+    selected_event_id = ids[idx]
+
+
+# ========================
+# Draw the Grid Layout
+# ========================
+def draw_grid(stdscr):
+    stdscr.erase()  # Erase without immediately refreshing
+    height, width = stdscr.getmaxyx()
+    if width < TIME_COL_WIDTH + NUM_DAY_COLUMNS:
+        stdscr.addstr(0, 0, "Terminal too small!")
+    else:
+        draw_time_column(stdscr, TIME_COL_WIDTH, height)
+        draw_day_columns(stdscr, TIME_COL_WIDTH, width, height)
+        draw_current_time_line(stdscr, TIME_COL_WIDTH, width, height)
+        draw_events(stdscr, TIME_COL_WIDTH, width, height, events_by_day)
+    stdscr.noutrefresh()  # Mark this window as ready to refresh
+    curses.doupdate()  # Refresh all windows at once
+
+
+# ========================
+# Goto Mode: Get Event ID & Set Focus
+# ========================
+def goto_event(stdscr, height):
+    global selected_event_id
+    curses.curs_set(1)
+    prompt_y = height - 1
+    stdscr.move(prompt_y, 0)
+    stdscr.clrtoeol()
+    stdscr.addstr(prompt_y, 0, "Goto event: Enter event id: ")
+    stdscr.refresh()
+    id_input = ""
+    while True:
+        key = stdscr.getch()
+        if key in (27,):
+            curses.curs_set(0)
+            return
+        elif key in (curses.KEY_ENTER, 10, 13):
+            break
+        elif key in (curses.KEY_BACKSPACE, 127):
+            id_input = id_input[:-1]
+        elif 48 <= key <= 57:
+            id_input += chr(key)
+        stdscr.move(prompt_y, 0)
+        stdscr.clrtoeol()
+        stdscr.addstr(prompt_y, 0, "Goto event: Enter event id: " + id_input)
+        stdscr.refresh()
+    curses.curs_set(0)
+    if not id_input:
+        return
+    try:
+        goto_id = int(id_input)
+    except ValueError:
+        return
+    ids = get_all_event_ids()
+    if goto_id in ids:
+        selected_event_id = goto_id
+    return
+
+
+# ========================
+# Main Function
+# ========================
+def main(stdscr):
+    global selected_event_id
+    curses.curs_set(0)
+    init_colors()
+    load_events()  # Load persistent events from JSON.
+    recalc_events()  # Build the dynamic layout.
+    mode = "normal"  # Modes: normal, insert, delete, goto
+    stdscr.timeout(1000)
+    now = datetime.datetime.now() + datetime.timedelta(hours=TIME_OFFSET)
+    last_quarter = now.minute // 15
+    draw_grid(stdscr)
+    ids = get_all_event_ids()
+    if ids:
+        selected_event_id = ids[0]
+    else:
+        selected_event_id = None
+    while True:
+        key = stdscr.getch()
+        now = datetime.datetime.now() + datetime.timedelta(hours=TIME_OFFSET)
+        current_quarter = now.minute // 15
+        if current_quarter != last_quarter:
+            recalc_events()
+            draw_grid(stdscr)
+            last_quarter = current_quarter
+        if mode == "normal":
+            if key in (ord("q"), ord("Q")):
+                break
+            elif key in (curses.KEY_LEFT, ord("h")):
+                move_selection_column(-1)
+                draw_grid(stdscr)
+            elif key in (curses.KEY_RIGHT, ord("l")):
+                move_selection_column(1)
+                draw_grid(stdscr)
+            elif key in (curses.KEY_UP, ord("k")):
+                move_selection_order(-1)
+                draw_grid(stdscr)
+            elif key in (curses.KEY_DOWN, ord("j")):
+                move_selection_order(1)
+                draw_grid(stdscr)
+            elif key == ord("o"):
+                mode = "insert"
+                insert_event(stdscr, stdscr.getmaxyx()[0])
+                mode = "normal"
+                draw_grid(stdscr)
+            elif key == ord("d"):
+                confirm_delete_current_event(stdscr, stdscr.getmaxyx()[0])
+                draw_grid(stdscr)
+            elif key == ord("D"):
+                mode = "delete"
+                prompt_delete_event(stdscr, stdscr.getmaxyx()[0])
+                mode = "normal"
+                draw_grid(stdscr)
+            elif key == ord("g"):
+                mode = "goto"
+                goto_event(stdscr, stdscr.getmaxyx()[0])
+                mode = "normal"
+                draw_grid(stdscr)
+            elif key == ord("u"):
+                undo_deletion()
+                draw_grid(stdscr)
+            elif key == ord("U"):
+                redo_deletion()
+                draw_grid(stdscr)
+            elif key == ord("i"):
+                if selected_event_id is not None:
+                    text = prompt_event_text(stdscr, stdscr.getmaxyx()[0])
+                    if text is not None:
+                        insert_text_into_event(text)
+                draw_grid(stdscr)
+            elif key == curses.KEY_RESIZE:
+                draw_grid(stdscr)
+    save_events()  # Save persistent events on exit.
+
+
+# ========================
+# Entry Point
+# ========================
+if __name__ == "__main__":
+    curses.wrapper(main)
