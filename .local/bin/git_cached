@@ -111,7 +111,7 @@ def gitc_clone(
         return
 
     # Copy from the cache into the destination.
-    shutil.copytree(repo_dir, dst_dir)
+    shutil.copytree(repo_dir, dst_dir, symlinks=True)
     logging.info("Copied repository to destination %s.", dst_dir)
     if branch:
         run_git(["-C", dst_dir, "checkout", branch])
