@@ -12,14 +12,14 @@ in
     (import ../../pkgs/derivations/firefox.nix {
       inherit username;
     })
-    (import ../../pkgs/derivations/xdg.nix {
+    ../../pkgs/derivations/thunderbird.nix
+    ../../pkgs/derivations/low_battery_notify.nix
+
+    (import ../common/xdg.nix {
       inherit pkgs inputs config;
       gdriveDir = /home/${username}/Desktop/gdrive;
       dotfilesDir = /home/${username}/Desktop/dotfiles;
     })
-    ../../pkgs/derivations/thunderbird.nix
-    ../../pkgs/derivations/low_battery_notify.nix
-
     ../common/sessionVariables.nix
     ../common/shellAliases.nix
   ];

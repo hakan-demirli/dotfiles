@@ -9,7 +9,7 @@ let
 in
 {
   imports = [
-    (import ../../pkgs/derivations/xdg.nix {
+    (import ../common/xdg.nix {
       inherit pkgs inputs config;
       gdriveDir = /home/${username}/Desktop/gdrive;
       dotfilesDir = /home/${username}/Desktop/dotfiles;
