@@ -115,7 +115,7 @@
     imports = [
       inputs.impermanence.nixosModules.home-manager.impermanence
 
-      (import ../../users/emre/home.nix {
+      (import ../../users/emre-server/home.nix {
         inherit pkgs inputs config;
         gdriveDir = /home/emre/Desktop/gdrive;
         dotfilesDir = /home/emre/Desktop/dotfiles;
