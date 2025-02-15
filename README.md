@@ -15,14 +15,18 @@
 ```
 .
 ├── doc
-│   ├── assets: Stores static files like images for documentation.
-│   └── notes: Contains markdown notes.
-├── profiles
-│   └── personal: Contains personal nix profile.
-└── system
-    ├── app: Contains nix applications and patches.
-    ├── hardware: Contains hardware-specific nix configurations.
-    └── scripts: Contains various scripts.
+│   ├── assets: Static files like images for documentation.
+│   └── notes: Markdown notes.
+├── hosts
+│   ├── laptop: Laptop configuration (system and hardware settings).
+│   └── vm: Virtual machine configuration (system and hardware settings).
+├── pkgs
+│   ├── derivations: Nix derivations for srcs.
+│   └── src: Source code for derivations.
+├── secrets: Tokens and certificates.
+├── overlay.nix: Custom Nix package overlays.
+└── users
+    └── emre: # User-specific configurations.
 ```
 
 # Install
