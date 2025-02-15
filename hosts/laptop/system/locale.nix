@@ -1,26 +1,23 @@
 {
-  systemSettings,
   ...
 }:
 {
   time = {
     hardwareClockInLocalTime = false; # messes clock on windows
-    timeZone = systemSettings.timezone;
+    timeZone = "Europe/Istanbul";
   };
-
-  # Select internationalisation properties.
   i18n = {
-    defaultLocale = systemSettings.locale;
+    defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = {
-      LC_ADDRESS = systemSettings.locale_extra;
-      LC_IDENTIFICATION = systemSettings.locale_extra;
-      LC_MEASUREMENT = systemSettings.locale_extra;
-      LC_MONETARY = systemSettings.locale_extra;
-      LC_NAME = systemSettings.locale_extra;
-      LC_NUMERIC = systemSettings.locale_extra;
-      LC_PAPER = systemSettings.locale_extra;
-      LC_TELEPHONE = systemSettings.locale_extra;
-      LC_TIME = systemSettings.locale_extra;
+      LC_ADDRESS = "en_GB.UTF-8";
+      LC_IDENTIFICATION = "en_GB.UTF-8";
+      LC_MEASUREMENT = "en_GB.UTF-8";
+      LC_MONETARY = "en_GB.UTF-8";
+      LC_NAME = "en_GB.UTF-8";
+      LC_NUMERIC = "en_GB.UTF-8";
+      LC_PAPER = "en_GB.UTF-8";
+      LC_TELEPHONE = "en_GB.UTF-8";
+      LC_TIME = "en_GB.UTF-8";
     };
   };
 }
