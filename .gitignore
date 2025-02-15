@@ -8,3 +8,5 @@
 **/venv
 **/.direnv
 *fuse_hidden*
+.config/git/config_user
+.config/git/git_tokens

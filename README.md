@@ -29,11 +29,12 @@
 * ```nix-shell -p git git-crypt home-manager helix```
 * Enable flakes and commands:
   * ```cp ~/Desktop/dotfiles/.config/nix/nix.conf ~/.config/nix/nix.conf```
-* If you don't have the git-crypt key remove/rename git config.
-  * ```mv ./.config/git/config ./.config/git/config_bckp```
-  * Create an empty config to bypass missing symlink issue:
-    * ```touch ./.config/git/config```
-* If you have the key decrypt gitconfig
-  * ```git-crypt unlock ../git-crypt-key```
+* If you have the key decrypt git_tokens and symlink it:
+  * read -sp "Enter passphrase: " password && echo && (head -c8 .config/git/git-crypt-key | grep -q '^Salted__' || { echo "File does not appear encrypted."; exit 1; }) && (openssl enc -d -aes-256-cbc -pbkdf2 -in .config/git/git-crypt-key -out /tmp/git-crypt-key -pass pass:"$password" && echo "Decryption complete.") && unset password
+  * ```git-crypt unlock ~/git-crypt-key && ln -s ~/.config/mylib/git_tokens ~/.config/git/git_tokens```
 * ```sudo nixos-rebuild switch --flake ~/Desktop/dotfiles/#emre```
 * ```home-manager switch --flake ~/Desktop/dotfiles/#emre```
+
+
+
+/home/emre/Desktop/dotfiles/.config/mylib/git-crypt-key
