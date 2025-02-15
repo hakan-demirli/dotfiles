@@ -187,6 +187,7 @@
     # };
     # ".local/share/quantifyself" = {
     #   source = config.lib.file.mkOutOfStoreSymlink "${gdriveDir}/archives/quantifyself";
+    #   # source = config.lib.file.mkOutOfStoreSymlink "/home/emre/Desktop/gdrive/archives/quantifyself";
     #   recursive = true;
     #   executable = false;
     # };

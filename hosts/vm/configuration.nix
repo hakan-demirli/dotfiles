@@ -1,7 +1,6 @@
 {
   inputs,
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -20,7 +19,7 @@
   ###################################################
   #                    FileSystem                   #
   ###################################################
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
+  boot.initrd.postDeviceCommands = pkgs.lib.mkAfter ''
     mkdir /btrfs_tmp
     mount /dev/root_vg/root /btrfs_tmp
     if [[ -e /btrfs_tmp/root ]]; then
@@ -115,7 +114,13 @@
   home-manager.users.emre = {
     imports = [
       inputs.impermanence.nixosModules.home-manager.impermanence
-      ../../users/emre/home.nix
+
+      (import ../../users/emre/home.nix {
+        inherit pkgs inputs config;
+        gdriveDir = /home/emre/Desktop/gdrive;
+        dotfilesDir = /home/emre/Desktop/dotfiles;
+      })
+
     ];
   };
 

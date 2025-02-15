@@ -1,7 +1,5 @@
 {
   pkgs,
-  userSettings,
-  systemSettings,
   ...
 }:
 {
@@ -219,9 +217,9 @@
   };
 
   # User account
-  users.users.${userSettings.username} = {
+  users.users.emre = {
     isNormalUser = true;
-    description = userSettings.name;
+    description = "EHD";
     extraGroups = [
       "networkmanager"
       "wheel"

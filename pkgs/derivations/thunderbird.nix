@@ -1,4 +1,4 @@
-{ pkgs, userSettings, ... }:
+{ ... }:
 {
   programs.thunderbird = {
     enable = true;

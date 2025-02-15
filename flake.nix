@@ -24,34 +24,9 @@
       nixpkgs,
       ...
     }@inputs:
-    let
-      # ---- BASE SYSTEM SETTINGS ---- #
-      baseSystemSettings = {
-        system = "x86_64-linux";
-        timezone = "Europe/Istanbul";
-        locale = "en_US.UTF-8";
-        locale_extra = "en_GB.UTF-8";
-      };
-
-      # ----- BASE USER SETTINGS ----- #
-      baseUserSettings = {
-        username = "emre";
-        name = "EHD";
-        dotfilesDir = "/home/emre/Desktop/dotfiles"; # must be an abs path
-        gdriveDir = "/home/emre/Desktop/gdrive"; # must be an abs path
-      };
-    in
     {
       nixosConfigurations = {
         "laptop" = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-
-            systemSettings = baseSystemSettings // {
-              # a_custom_var = 16;
-            };
-            userSettings = baseUserSettings;
-          };
           modules = [
             ./hosts/laptop/configuration.nix
             inputs.home-manager.nixosModules.home-manager
@@ -63,11 +38,6 @@
         "vm" = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit inputs;
-
-            systemSettings = baseSystemSettings // {
-              # a_custom_var = 16;
-            };
-            userSettings = baseUserSettings;
           };
           modules = [
             ./hosts/vm/configuration.nix
