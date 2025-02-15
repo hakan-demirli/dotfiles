@@ -21,7 +21,8 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-GexVY76pfmHalJPiCfVe9C9CXtlojG/H6JjOiA0GF1c=";
   };
 
-  cargoHash = "sha256-ABzt8PMsas9+NRvpgtZlsoYjjvwpU8f6lqhceHxq91M=";
+  cargoHash = "sha256-BKgZ3RBIP4fzIGOi82bsoTNYBWfk2uzrsMvilwGK2fs=";
+  useFetchCargoVendor = true;
 
   cargoBuildFlags =
     lib.optional gnomeSupport "--features gnome"

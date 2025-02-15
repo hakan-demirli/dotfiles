@@ -333,7 +333,7 @@ in
     marksman
     # markdown-oxide
     gnumake
-    (pkgs.callPackage ../../pkgs/derivations/texlab.nix { })
+    texlab
     sioyek
     yaml-language-server
     verible

@@ -18,7 +18,8 @@ rustPlatform.buildRustPackage rec {
     sha256 = "sha256-iJps/ytjOAv5BboU5IAo34IS7aIZ7yAydqr4ztlDhtI=";
   };
 
-  cargoHash = "sha256-jxZ4fFYECXEv1Tq1Qcn3/+gw52W6XkSi3kMBifVLJgU=";
+  cargoHash = "sha256-NWYELqB5IvLrvTVl6rpHsz3nWp8obmckfD1sVAmyTyA=";
+  useFetchCargoVendor = true;
 
   # Disable fetching and building of tree-sitter grammars in favor of the custom build process in grammars.nix
   env.HELIX_DISABLE_AUTO_GRAMMAR_BUILD = "1";

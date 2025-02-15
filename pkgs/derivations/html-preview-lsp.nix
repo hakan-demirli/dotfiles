@@ -7,8 +7,9 @@ pkgs.rustPlatform.buildRustPackage {
   version = "0.1.0";
 
   src = ../src/python/html-preview/lsp;
+  useFetchCargoVendor = true;
 
-  cargoHash = "sha256-0gQSPS+L8OOuX3gL11DPrBNrw3O01L0LNTsHYV9oT8o=";
+  cargoHash = "sha256-UTdOk/DMxTGhHbyTiIPz1V/wI6bTHDSGfO5n3b8NVBc=";
 
   propagatedBuildInputs = [
     pkgs.glibc
