@@ -15,7 +15,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/prometheus;
+  src = ../src/python/prometheus;
 
   installPhase = ''
     mkdir -p $out/bin

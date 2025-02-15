@@ -14,6 +14,6 @@ pkgs.stdenv.mkDerivation {
   dontUnpack = true;
 
   installPhase = ''
-    install -Dm755 ${../scripts/python/clipboard_tts/clipboard_tts.py} $out/bin/clipboard_tts;
+    install -Dm755 ${../src/python/clipboard_tts/clipboard_tts.py} $out/bin/clipboard_tts;
   '';
 }

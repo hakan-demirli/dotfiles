@@ -13,6 +13,6 @@ pkgs.stdenv.mkDerivation {
   dontUnpack = true;
 
   installPhase = ''
-    install -Dm755 ${../scripts/python/aw-manager.py} $out/bin/aw-manager;
+    install -Dm755 ${../src/python/aw-manager.py} $out/bin/aw-manager;
   '';
 }

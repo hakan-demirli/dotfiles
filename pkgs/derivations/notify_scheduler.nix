@@ -7,6 +7,6 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
   installPhase = ''
-    install -Dm755 ${../scripts/python/notify_scheduler.py} $out/bin/notify_scheduler;
+    install -Dm755 ${../src/python/notify_scheduler.py} $out/bin/notify_scheduler;
   '';
 }

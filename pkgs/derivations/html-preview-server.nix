@@ -16,7 +16,7 @@ pkgs.stdenv.mkDerivation {
 
   dontUnpack = true;
 
-  src = ../scripts/python/html-preview/server;
+  src = ../src/python/html-preview/server;
 
   installPhase = ''
     mkdir -p $out/bin

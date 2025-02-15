@@ -18,7 +18,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/aw-watcher;
+  src = ../src/python/aw-watcher;
 
   installPhase = ''
     mkdir -p $out/bin

@@ -12,7 +12,7 @@ pkgs.stdenv.mkDerivation {
   dontUnpack = true;
 
   installPhase = ''
-    install -Dm755 ${../scripts/python/waybar_timer.py} $out/bin/waybar_timer;
+    install -Dm755 ${../src/python/waybar_timer.py} $out/bin/waybar_timer;
   '';
 
   postFixup = ''

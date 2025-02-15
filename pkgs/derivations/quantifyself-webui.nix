@@ -16,7 +16,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/quantifyself-webui;
+  src = ../src/python/quantifyself-webui;
 
   installPhase = ''
     mkdir -p $out/bin

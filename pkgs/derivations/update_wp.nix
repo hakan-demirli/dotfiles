@@ -15,7 +15,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/update_wp;
+  src = ../src/python/update_wp;
 
   installPhase = ''
     mkdir -p $out/bin

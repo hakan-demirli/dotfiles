@@ -17,7 +17,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/gtk_indicator;
+  src = ../src/python/gtk_indicator;
 
   installPhase = ''
     mkdir -p $out/bin

@@ -18,7 +18,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/gtk_applet;
+  src = ../src/python/gtk_applet;
 
   installPhase = ''
     mkdir -p $out/bin

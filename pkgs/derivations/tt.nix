@@ -5,7 +5,7 @@ pkgs.stdenv.mkDerivation {
   propagatedBuildInputs = [ (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [ ])) ];
   dontUnpack = true;
 
-  src = ../scripts/python/tt;
+  src = ../src/python/tt;
 
   installPhase = ''
     mkdir -p $out/bin

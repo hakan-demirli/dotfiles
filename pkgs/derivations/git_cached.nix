@@ -21,7 +21,7 @@ pkgs.stdenv.mkDerivation {
 
   dontUnpack = true;
   installPhase = ''
-    install -Dm755 ${../scripts/python/git_cached.py} $out/bin/git;
+    install -Dm755 ${../src/python/git_cached.py} $out/bin/git;
     wrapProgram $out/bin/git --prefix PATH : ${pkgs.lib.makeBinPath [ git_original ]}
   '';
 }

@@ -14,6 +14,6 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
   installPhase = ''
-    install -Dm755 ${../scripts/python/auto_refresh.py} $out/bin/auto_refresh;
+    install -Dm755 ${../src/python/auto_refresh.py} $out/bin/auto_refresh;
   '';
 }

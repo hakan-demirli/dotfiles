@@ -16,7 +16,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/quantifyself;
+  src = ../src/python/quantifyself;
 
   installPhase = ''
     mkdir -p $out/bin

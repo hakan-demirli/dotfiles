@@ -11,7 +11,7 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
 
-  src = ../scripts/python/gen_typing_test;
+  src = ../src/python/gen_typing_test;
 
   installPhase = ''
     mkdir -p $out/bin

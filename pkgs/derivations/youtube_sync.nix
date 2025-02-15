@@ -6,6 +6,6 @@ pkgs.stdenv.mkDerivation {
   ];
   dontUnpack = true;
   installPhase = ''
-    install -Dm755 ${../scripts/python/youtube_sync.py} $out/bin/youtube_sync;
+    install -Dm755 ${../src/python/youtube_sync.py} $out/bin/youtube_sync;
   '';
 }

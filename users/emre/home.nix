@@ -2,15 +2,23 @@
   pkgs,
   config,
   inputs,
-  userSettings,
   ...
 }:
+let
+  username = "emre";
+in
 {
   imports = [
-    ../../system/app/firefox.nix
-    ../../system/app/thunderbird.nix
-    ../../system/app/low_battery_notify.nix
-    ../../system/app/xdg.nix
+    (import ../../pkgs/derivations/firefox.nix {
+      inherit username;
+    })
+    (import ../../pkgs/derivations/xdg.nix {
+      inherit pkgs inputs config;
+      gdriveDir = /home/${username}/Desktop/gdrive;
+      dotfilesDir = /home/${username}/Desktop/gdrive;
+    })
+    ../../pkgs/derivations/thunderbird.nix
+    ../../pkgs/derivations/low_battery_notify.nix
   ];
 
   dconf.settings = {
@@ -138,8 +146,8 @@
   #   };
   # };
 
-  home = rec {
-    inherit (userSettings) username;
+  home = {
+    inherit username;
     homeDirectory = "/home/${username}";
 
     stateVersion = "24.05"; # do not change
@@ -225,11 +233,10 @@
 
     # (pkgs.callPackage ../../system/app/prometheus-exporters.nix { })
     #
-    (pkgs.callPackage ../../system/app/quantifyself.nix { })
-    (pkgs.callPackage ../../system/app/quantifyself-webui.nix { })
-
-    (pkgs.callPackage ../../system/app/html-preview-lsp.nix { })
-    (pkgs.callPackage ../../system/app/html-preview-server.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/quantifyself.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/quantifyself-webui.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/html-preview-lsp.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/html-preview-server.nix { })
 
     bandwhich # network monitoring TUI
     cpufrequtils
@@ -326,7 +333,7 @@
     marksman
     # markdown-oxide
     gnumake
-    (pkgs.callPackage ../../system/app/texlab.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/texlab.nix { })
     sioyek
     yaml-language-server
     verible
@@ -347,27 +354,27 @@
     winetricks
     steam-run # quick runner for fsh compliant binaries
     udiskie
-    # (pkgs.callPackage ../../system/app/tt.nix {})
-    # (pkgs.callPackage ../../system/app/j4-dmenu-desktop.nix { })
-    (pkgs.callPackage ../../system/app/waybar_timer.nix { })
-    (pkgs.callPackage ../../system/app/xremap.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/tt.nix {})
+    # (pkgs.callPackage ../../pkgs/derivations/j4-dmenu-desktop.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/waybar_timer.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/xremap.nix { })
 
-    (pkgs.callPackage ../../system/app/helix.nix { })
-    (pkgs.callPackage ../../system/app/mitype.nix { })
-    # (pkgs.callPackage ../../system/app/rvc-cli.nix { })
-    (pkgs.callPackage ../../system/app/gen_typing_test.nix { })
-    (pkgs.callPackage ../../system/app/notify_scheduler.nix { })
-    # (pkgs.callPackage ../../system/app/blender.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/helix.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/mitype.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/rvc-cli.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/gen_typing_test.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/notify_scheduler.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/blender.nix { })
 
-    (pkgs.callPackage ../../system/app/veridian.nix { })
-    # (pkgs.callPackage ../../system/app/veridian.nix { withSlang = true; })
-    (pkgs.callPackage ../../system/app/update_wp.nix { })
-    (pkgs.callPackage ../../system/app/gtk_applet.nix { })
-    (pkgs.callPackage ../../system/app/gtk_indicator.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/veridian.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { withSlang = true; })
+    (pkgs.callPackage ../../pkgs/derivations/update_wp.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/gtk_applet.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/gtk_indicator.nix { })
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
-    (pkgs.callPackage ../../system/app/youtube_sync.nix { })
-    (pkgs.callPackage ../../system/app/auto_refresh.nix { })
-    (pkgs.callPackage ../../system/app/clipboard_tts.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/youtube_sync.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/auto_refresh.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/clipboard_tts.nix { })
   ];
 
   home.sessionVariables = {

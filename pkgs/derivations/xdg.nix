@@ -1,18 +1,19 @@
 {
   pkgs,
   config,
-  userSettings,
+  dotfilesDir ? throw "Set this to your dotfiles dir",
+  gdriveDir ? throw "Set this to your google drive dir",
   ...
 }:
 {
   xdg =
     let
       mutable_configs = [
-        ".bash_history"
-        "hypr"
-        "mimeapps.list"
-        "rclone"
-        "rvc-cli"
+        # ".bash_history"
+        # "hypr"
+        # "mimeapps.list"
+        # "rclone"
+        # "rvc-cli"
       ];
 
       immutable_configs = [
@@ -75,13 +76,13 @@
       ];
 
       mutable_state = [
-        "bash"
-        "gdb"
+        # "bash"
+        # "gdb"
       ];
 
       makeMutable = path: file: {
         target = file;
-        source = config.lib.file.mkOutOfStoreSymlink "${userSettings.dotfilesDir}/${path}/${file}";
+        source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/${path}/${file}";
         recursive = true;
       };
 
@@ -169,26 +170,26 @@
       recursive = true;
       executable = true;
     };
-    ".local/share/sounds" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/sounds";
-      recursive = true;
-      executable = false;
-    };
-    ".local/share/scratchpads" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/scratchpads";
-      recursive = true;
-      executable = false;
-    };
-    ".config/notify-scheduler" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/software/notify-scheduler";
-      recursive = true;
-      executable = false;
-    };
-    ".local/share/quantifyself" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${userSettings.gdriveDir}/archives/quantifyself";
-      recursive = true;
-      executable = false;
-    };
+    # ".local/share/sounds" = {
+    #   source = config.lib.file.mkOutOfStoreSymlink "${gdriveDir}/sounds";
+    #   recursive = true;
+    #   executable = false;
+    # };
+    # ".local/share/scratchpads" = {
+    #   source = config.lib.file.mkOutOfStoreSymlink "${gdriveDir}/scratchpads";
+    #   recursive = true;
+    #   executable = false;
+    # };
+    # ".config/notify-scheduler" = {
+    #   source = config.lib.file.mkOutOfStoreSymlink "${gdriveDir}/software/notify-scheduler";
+    #   recursive = true;
+    #   executable = false;
+    # };
+    # ".local/share/quantifyself" = {
+    #   source = config.lib.file.mkOutOfStoreSymlink "${gdriveDir}/archives/quantifyself";
+    #   recursive = true;
+    #   executable = false;
+    # };
     ".thunderbird/personal/ImapMail/imap.gmail-1.com/msgFilterRules.dat" = {
       source = ../../secrets/msgFilterRules.dat;
       recursive = false;
