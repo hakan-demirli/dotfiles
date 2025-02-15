@@ -34,7 +34,6 @@
         "lf"
         "mpd"
         "mpv"
-        "mylib"
         "nix"
         "npm"
         "nwg"
@@ -191,7 +190,7 @@
       executable = false;
     };
     ".thunderbird/personal/ImapMail/imap.gmail-1.com/msgFilterRules.dat" = {
-      source = ../../.config/mylib/msgFilterRules.dat;
+      source = ../../secrets/msgFilterRules.dat;
       recursive = false;
       executable = false;
     };

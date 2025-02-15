@@ -160,7 +160,7 @@
       "format": "{}",
       "tooltip": true,
       "interval": 60,
-      "exec": "print_weather -w",
+      "exec": "wttrbar --location Ankara",
       "return-type": "json"
   },
   "custom/timer": {

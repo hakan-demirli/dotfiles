@@ -1,6 +1,6 @@
 # include user config
 [include]
-    path = ./config_user
+    path = ./git_users
 
 [core]
 	fileMode = true

@@ -236,6 +236,7 @@
     hypridle
     vim # default editor
     waybar
+    wttrbar
     hyprlock
     xwaylandvideobridge
     tor-browser
@@ -355,7 +356,6 @@
     (pkgs.callPackage ../../system/app/mitype.nix { })
     # (pkgs.callPackage ../../system/app/rvc-cli.nix { })
     (pkgs.callPackage ../../system/app/gen_typing_test.nix { })
-    (pkgs.callPackage ../../system/app/print_weather.nix { })
     (pkgs.callPackage ../../system/app/notify_scheduler.nix { })
     # (pkgs.callPackage ../../system/app/blender.nix { })
 
