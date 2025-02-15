@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+git-crypt unlock /tmp/git-crypt-key && ln -s ~/Desktop/dotfiles/secrets/git_tokens ~/.config/git/git_tokens && ln -s ~/Desktop/dotfiles/secrets/git_users ~/.config/git/git_users

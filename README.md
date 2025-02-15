@@ -30,10 +30,11 @@
 ```
 
 # Install
-* ```mkdir -p ~/Desktop```
+* ```mkdir -p ~/Desktop && cd ~/Desktop```
 * ```git clone https://github.com/hakan-demirli/dotfiles```
 * ```nix-shell -p git git-crypt home-manager helix```
 * Enable flakes and commands:
+  * ```mkdir -p ~/.config/nix```
   * ```cp ~/Desktop/dotfiles/.config/nix/nix.conf ~/.config/nix/nix.conf```
 * If you have the key decrypt git_tokens and symlink it:
   * ```nix-shell -p openssl```
