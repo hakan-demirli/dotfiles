@@ -6,18 +6,16 @@
 }:
 {
   imports = [
-    ../../system/hardware/asustuf/hardware-configuration.nix
-    ../../system/hardware/asustuf/nvidia.nix
-    ../../system/hardware/battery.nix
-    ../../system/hardware/virtualisation.nix
-    ../../system/hardware/locale.nix
-    ../../system/hardware/bootloader.nix
-    ../../system/hardware/bluetooth.nix
-    ../../system/hardware/network.nix
-    ../../system/hardware/automount.nix
-    ../../system/hardware/sound.nix
-    # ../../system/app/grafana.nix
-    # ../../system/hardware/ydotool.nix
+    ./hardware/hardware-configuration.nix
+    ./hardware/nvidia.nix
+    ./system/battery.nix
+    ./system/virtualisation.nix
+    ./system/locale.nix
+    ./system/bootloader.nix
+    ./system/bluetooth.nix
+    ./system/network.nix
+    ./system/automount.nix
+    ./system/sound.nix
   ];
 
   # nix
@@ -61,8 +59,8 @@
         "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE="
       ];
 
-      max-jobs = systemSettings.threads;
-      cores = systemSettings.threads;
+      max-jobs = 16;
+      cores = 16;
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
       # use-xdg-base-directories = true; # https://github.com/nix-community/home-manager/issues/5805
@@ -111,12 +109,9 @@
       wget
       neovim # default editor
 
-      (pkgs.callPackage ../../system/app/sddm-astronaut.nix {
+      (pkgs.callPackage ../../pkgs/derivations/sddm-astronaut.nix {
         # theme = "pixel_sakura";
       })
-
-      # libsForQt5.qt5.qtgraphicaleffects # sddm theme dependency
-      # (libsForQt5.callPackage ../../system/app/sddm-astronaut.nix { })
     ];
   };
   # services

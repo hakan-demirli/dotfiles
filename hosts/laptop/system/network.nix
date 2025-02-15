@@ -1,11 +1,10 @@
 {
-  systemSettings,
   ...
 }:
 {
   # Enable networking
   networking = {
-    hostName = systemSettings.hostname; # Define your hostname.
+    hostName = "laptop"; # Define your hostname.
 
     networkmanager = {
       enable = true;

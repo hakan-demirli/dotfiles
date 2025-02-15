@@ -1,18 +1,27 @@
 {
-  description = "My NixOS home-manager config";
+  description = "dots";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    impermanence = {
+      url = "github:nix-community/impermanence";
     };
   };
 
   outputs =
     {
       nixpkgs,
-      home-manager,
       ...
     }@inputs:
     let
@@ -28,101 +37,46 @@
       baseUserSettings = {
         username = "emre";
         name = "EHD";
-        dotfilesDir = "/home/emre/Desktop/dotfiles";
-        gdriveDir = "/home/emre/Desktop/gdrive";
+        dotfilesDir = "/home/emre/Desktop/dotfiles"; # must be an abs path
+        gdriveDir = "/home/emre/Desktop/gdrive"; # must be an abs path
       };
     in
     {
-      # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#emre
-      nixosConfigurations."emre" = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          systemSettings = baseSystemSettings // {
-            profile = "personal";
-            hostname = "nixos";
-            threads = 16;
+      nixosConfigurations = {
+        "laptop" = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs;
+
+            systemSettings = baseSystemSettings // {
+              # a_custom_var = 16;
+            };
+            userSettings = baseUserSettings;
           };
-          userSettings = baseUserSettings;
+          modules = [
+            ./hosts/laptop/configuration.nix
+            inputs.home-manager.nixosModules.home-manager
+            inputs.disko.nixosModules.default
+            inputs.impermanence.nixosModules.impermanence
+            ./overlay.nix
+          ];
         };
+        "vm" = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs;
 
-        modules = [
-          ./profiles/personal/configuration.nix
-          ./overlay.nix
-        ];
-      };
-
-      # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#server
-      nixosConfigurations."server" = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          systemSettings = baseSystemSettings // {
-            profile = "server";
-            threads = 16;
-            hostname = "nixos-server";
+            systemSettings = baseSystemSettings // {
+              # a_custom_var = 16;
+            };
+            userSettings = baseUserSettings;
           };
-          userSettings = baseUserSettings;
+          modules = [
+            ./hosts/vm/configuration.nix
+            inputs.home-manager.nixosModules.home-manager
+            inputs.disko.nixosModules.default
+            inputs.impermanence.nixosModules.impermanence
+            ./overlay.nix
+          ];
         };
-
-        modules = [
-          ./profiles/server/configuration.nix
-          ./overlay.nix
-        ];
-      };
-
-      # sudo nix-rebuild switch --flake ~/Desktop/dotfiles/#vm
-      nixosConfigurations."vm" = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          systemSettings = baseSystemSettings // {
-            profile = "vm";
-            threads = 16;
-            hostname = "nixos-vm";
-          };
-          userSettings = baseUserSettings;
-        };
-
-        modules = [
-          ./profiles/vm/configuration.nix
-          ./overlay.nix
-        ];
-      };
-
-      # home-manager switch --flake ~/Desktop/dotfiles/#emre
-      homeConfigurations."emre" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs {
-          system = baseSystemSettings.system;
-          config.allowUnfree = true;
-        };
-        extraSpecialArgs = {
-          inherit inputs;
-          systemSettings = baseSystemSettings // {
-            profile = "personal";
-            threads = 16;
-          };
-          userSettings = baseUserSettings;
-        };
-
-        modules = [
-          ./profiles/personal/home.nix
-          ./overlay.nix
-        ];
-      };
-      # home-manager switch --flake ~/Desktop/dotfiles/#vm
-      homeConfigurations."vm" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs {
-          system = baseSystemSettings.system;
-          config.allowUnfree = true;
-        };
-        extraSpecialArgs = {
-          inherit inputs;
-          systemSettings = baseSystemSettings // {
-            profile = "vm";
-            threads = 16;
-          };
-          userSettings = baseUserSettings;
-        };
-
-        modules = [
-          ./profiles/vm/home.nix
-          ./overlay.nix
-        ];
       };
     };
 }
