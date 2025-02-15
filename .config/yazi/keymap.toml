@@ -46,8 +46,8 @@ keymap = [
 	# { on = [ "<Space>", "d" ], run = ['''shell 'ripdrag "$@" -x 2>/dev/null &' --confirm''',"escape"],desc = "Show files in drag and drop menu" },
 	{ on = [ "<Space>", "d" ], run = ['''shell 'dragon "$@" -x 2>/dev/null &' --confirm''',"escape"],desc = "Show files in drag and drop menu" },
 	# Goto
-	{ on = [ "g", "g" ], run = "arrow -99999999", desc = "Move cursor to the top" },
-	{ on = [ "g", "e" ], run = "arrow  99999999", desc = "Move cursor to the end" },
+	{ on = [ "g", "g" ], run = "arrow top", desc = "Move cursor to the top" },
+	{ on = [ "g", "e" ], run = "arrow bot", desc = "Move cursor to the end" },
 	{ on = [ "g", "h" ],       run = "cd ~",             desc = "Go to the home directory" },
 	{ on = [ "g", "c" ],       run = "cd ~/.config",     desc = "Go to the config directory" },
 	{ on = [ "g", "d" ],       run = "cd ~/Downloads",   desc = "Go to the downloads directory" },

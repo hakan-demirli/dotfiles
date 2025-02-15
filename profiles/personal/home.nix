@@ -56,6 +56,9 @@
           fi
           rm -f -- "$tmp"
         }
+        gcmp() {
+          git commit -m "$1" && git push
+        }
       '';
     };
     fzf = {
