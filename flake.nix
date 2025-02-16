@@ -20,33 +20,29 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      ...
-    }@inputs:
-    {
-      nixosConfigurations = {
-        "laptop" = nixpkgs.lib.nixosSystem {
-          modules = [
-            ./hosts/laptop/configuration.nix
-            inputs.home-manager.nixosModules.home-manager
-            inputs.disko.nixosModules.default
-            inputs.impermanence.nixosModules.impermanence
-            ./overlay.nix
-          ];
-        };
-        "vm" = nixpkgs.lib.nixosSystem {
+    { nixpkgs, ... }@inputs:
+    let
+      # Helper function to reduce repetition for each system configuration.
+      mkSystem =
+        hostConfig:
+        nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit inputs;
           };
           modules = [
-            ./hosts/vm/configuration.nix
+            hostConfig
             inputs.home-manager.nixosModules.home-manager
             inputs.disko.nixosModules.default
             inputs.impermanence.nixosModules.impermanence
             ./overlay.nix
           ];
         };
+    in
+    {
+      nixosConfigurations = {
+        laptop = mkSystem ./hosts/laptop/configuration.nix;
+        vm = mkSystem ./hosts/vm/configuration.nix;
+        server_1 = mkSystem ./hosts/server_1/configuration.nix;
       };
     };
 }
