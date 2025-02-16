@@ -72,20 +72,7 @@
   nixpkgs.config = {
     allowUnfree = true;
     rocmSupport = false;
-    cudaSupport = true; # ok with cachix
-    # cudaSupport = false; # takes hours to compile, dont touch
-    allowUnfreePredicate =
-      p:
-      builtins.all (
-        license:
-        license.free
-        || builtins.elem license.shortName [
-          "CUDA EULA"
-          "cuDNN EULA"
-          "cuTENSOR EULA"
-          "NVidia OptiX EULA"
-        ]
-      ) (if builtins.isList p.meta.license then p.meta.license else [ p.meta.license ]);
+    cudaSupport = false;
   };
   nix = {
     gc = {
@@ -235,7 +222,7 @@
       home-manager
       git
 
-      (btop.override { cudaSupport = true; })
+      btop
       fzf
       kitty
       foot # BACKUP TERMINAL
