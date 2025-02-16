@@ -26,7 +26,7 @@
 ├── secrets: Tokens and certificates.
 ├── overlay.nix: Custom Nix package overlays.
 └── users
-    └── emre: # User-specific configurations.
+    └── emre: User-specific configurations.
 ```
 
 # Install

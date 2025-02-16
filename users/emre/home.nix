@@ -133,6 +133,17 @@ in
       size = 10;
     };
 
+    persistence."/persist/home" = {
+      directories = [
+        "Desktop"
+        "Documents"
+        "Downloads"
+        "Videos"
+        ".ssh"
+        ".local/share/keyrings"
+      ];
+      allowOther = true;
+    };
   };
   home.packages = with pkgs; [
     # awatcher
