@@ -73,8 +73,13 @@
     };
   };
 
-  programs.hyprland.enable = true;
-  programs.gnome-disks.enable = true;
+  programs = {
+    hyprland = {
+      enable = true;
+      withUWSM = true;
+    };
+    gnome-disks.enable = true;
+  };
 
   fonts = {
     packages = [
@@ -127,6 +132,12 @@
         kdePackages.qtsvg
         kdePackages.qtvirtualkeyboard
       ];
+      # https://github.com/NixOS/nixpkgs/issues/355912#issuecomment-2480923686
+      settings = {
+        General = {
+          DefaultSession = "hyprland.desktop";
+        };
+      };
     };
     xserver = {
       enable = true;
