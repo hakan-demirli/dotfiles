@@ -267,20 +267,20 @@
 
     gnome.gnome-keyring.enable = true; # NOTE: Required for mysql-workbench
 
-    open-webui = {
-      enable = true;
-      host = "127.0.0.1";
-      port = 8081;
-      environment = {
-        # OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
-        # Disable authentication
-        #
-        SCARF_NO_ANALYTICS = "True";
-        DO_NOT_TRACK = "True";
-        ANONYMIZED_TELEMETRY = "False";
-        WEBUI_AUTH = "False";
-      };
-    };
+    # open-webui = {
+    #   enable = true;
+    #   host = "127.0.0.1";
+    #   port = 8081;
+    #   environment = {
+    #     # OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
+    #     # Disable authentication
+    #     #
+    #     SCARF_NO_ANALYTICS = "True";
+    #     DO_NOT_TRACK = "True";
+    #     ANONYMIZED_TELEMETRY = "False";
+    #     WEBUI_AUTH = "False";
+    #   };
+    # };
   };
 
   ###################################################
