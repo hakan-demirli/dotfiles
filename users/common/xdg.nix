@@ -9,7 +9,6 @@
   xdg =
     let
       mutable_configs = [
-        ".bash_history"
         "hypr"
         "mimeapps.list"
         "rclone"
@@ -80,14 +79,18 @@
         "gdb"
       ];
       # no such attribute file: config.lib.file.mkOutOfStoreSymlink
+      #
       makeMutable = path: file: {
         target = file;
-        source = pkgs.linkFarm "${file}-dotfiles" [
-          {
-            name = file;
-            path = "${dotfilesDir}/${path}/${file}";
-          }
-        ];
+        source = pkgs.runCommand "${file}-dotfiles" { } ''
+          ln -s "${dotfilesDir}/${path}/${file}" $out
+        '';
+        # source = pkgs.linkFarm "${file}-dotfiles" [
+        #   {
+        #     name = file;
+        #     path = "${dotfilesDir}/${path}/${file}";
+        #   }
+        # ];
         recursive = true;
       };
 
