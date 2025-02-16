@@ -24,18 +24,6 @@
   };
 
   fileSystems = {
-    "/" = {
-      device = "/dev/disk/by-uuid/3b02a7db-5ed5-47c5-ba4c-0feb7876c7b7";
-      fsType = "ext4";
-    };
-    "/boot" = {
-      device = "/dev/disk/by-uuid/3617-EB8F";
-      fsType = "vfat";
-      options = [
-        "fmask=0077"
-        "dmask=0077"
-      ];
-    };
     "/mnt/second" = {
       device = "/dev/disk/by-uuid/120CC7A90CC785E7";
       fsType = "ntfs-3g";

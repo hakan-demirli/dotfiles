@@ -4,6 +4,7 @@
 }:
 {
   imports = [
+    (import ./hardware/disko.nix { device = "/dev/nvme1n1"; })
     ./hardware/hardware-configuration.nix
     ./hardware/nvidia.nix
     ./system/battery.nix
