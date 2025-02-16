@@ -17,8 +17,8 @@ in
 
     (import ../common/xdg.nix {
       inherit pkgs inputs config;
-      gdriveDir = /home/${username}/Desktop/gdrive;
-      dotfilesDir = /home/${username}/Desktop/dotfiles;
+      gdriveDir = "/home/${username}/Desktop/gdrive";
+      dotfilesDir = "/home/${username}/Desktop/dotfiles";
     })
     ../common/sessionVariables.nix
     ../common/shellAliases.nix
