@@ -219,7 +219,9 @@
   # User account
   users.users.emre = {
     isNormalUser = true;
-    description = "EHD";
+    # mkpasswd -m sha-512 "my_super_secret_pass"
+    hashedPassword = "$6$dxLcMi321Rg6B7Nu$tRRLCU/7AEFKg7HW56XIKkbtowfyX4uSOq0M8.pKRZIgg6FrdF9o19yAf1mEov.C.SnhSlXG48rmVbVFqtbEn1";
+    uid = 1000;
     extraGroups = [
       "networkmanager"
       "wheel"
@@ -229,9 +231,51 @@
       "input"
       "libvirtd"
     ];
-    packages = with pkgs; [ ];
-    # uid = 1000;
   };
+
+  ###################################################
+  #                    FileSystem                   #
+  ###################################################
+  boot.initrd.postDeviceCommands = pkgs.lib.mkAfter ''
+    mkdir /btrfs_tmp
+    mount /dev/root_vg/root /btrfs_tmp
+    if [[ -e /btrfs_tmp/root ]]; then
+        mkdir -p /btrfs_tmp/old_roots
+        timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+        mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+    fi
+
+    delete_subvolume_recursively() {
+        IFS=$'\n'
+        for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+            delete_subvolume_recursively "/btrfs_tmp/$i"
+        done
+        btrfs subvolume delete "$1"
+    }
+
+    for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+        delete_subvolume_recursively "$i"
+    done
+
+    btrfs subvolume create /btrfs_tmp/root
+    umount /btrfs_tmp
+  '';
+
+  fileSystems."/persist".neededForBoot = true;
+  environment.persistence."/persist/system" = {
+    hideMounts = true;
+    directories = [
+      "/var/log"
+      "/var/lib/bluetooth"
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
+      "/etc/NetworkManager/system-connections"
+    ];
+  };
+  systemd.tmpfiles.rules = [
+    "d /persist/home/ 0777 root root -" # create /persist/home owned by root
+    "d /persist/home/emre 0700 emre users -" # /persist/home/emre owned by that user
+  ];
 
   security.pam.services.swaylock = { }; # without this swaylock is broken
 

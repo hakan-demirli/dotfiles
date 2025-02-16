@@ -66,10 +66,92 @@
   networking.networkmanager.enable = true;
 
   ###################################################
+  #                     Nix                         #
+  ###################################################
+  documentation.nixos.enable = false; # .desktop
+  nixpkgs.config = {
+    allowUnfree = true;
+    rocmSupport = false;
+    cudaSupport = true; # ok with cachix
+    # cudaSupport = false; # takes hours to compile, dont touch
+    allowUnfreePredicate =
+      p:
+      builtins.all (
+        license:
+        license.free
+        || builtins.elem license.shortName [
+          "CUDA EULA"
+          "cuDNN EULA"
+          "cuTENSOR EULA"
+          "NVidia OptiX EULA"
+        ]
+      ) (if builtins.isList p.meta.license then p.meta.license else [ p.meta.license ]);
+  };
+  nix = {
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+    };
+
+    settings = {
+      substituters = [
+        "https://ai.cachix.org"
+        "https://nix-community.cachix.org"
+        "https://cuda-maintainers.cachix.org"
+        "https://numtide.cachix.org"
+      ];
+      trusted-public-keys = [
+        "ai.cachix.org-1:N9dzRK+alWwoKXQlnn0H6aUx0lU/mspIoz8hMvGvbbc="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+        "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE="
+      ];
+
+      max-jobs = 16;
+      cores = 16;
+      experimental-features = "nix-command flakes";
+      auto-optimise-store = true;
+      # use-xdg-base-directories = true; # https://github.com/nix-community/home-manager/issues/5805
+
+      # Prevent garbage collection from altering nix-shells managed by nix-direnv
+      # https://github.com/nix-community/nix-direnv#installation
+      keep-outputs = true;
+      keep-derivations = true;
+      # perf
+      max-substitution-jobs = 256;
+    };
+  };
+
+  ###################################################
   #                    Security                     #
   ###################################################
 
   security.polkit.enable = true;
+  systemd = {
+    user.services.polkit-gnome-authentication-agent-1 = {
+      description = "polkit-gnome-authentication-agent-1";
+      wantedBy = [ "graphical-session.target" ];
+      wants = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        Restart = "on-failure";
+        RestartSec = 1;
+        TimeoutStopSec = 10;
+      };
+    };
+  };
+  # https://github.com/NixOS/nixpkgs/issues/189851
+  systemd.user.extraConfig = ''
+    DefaultEnvironment="PATH=/run/current-system/sw/bin"
+  '';
+
+  hardware = {
+    keyboard.qmk.enable = true;
+    uinput.enable = true; # xremap dep
+  };
 
   ###################################################
   #                    Location                     #
@@ -104,6 +186,11 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "audio"
+      "video"
+      "uinput"
+      "input"
+      "libvirtd"
     ];
   };
   programs.fuse.userAllowOther = true;
@@ -123,44 +210,94 @@
 
     ];
   };
+  security.pam.services.swaylock = { }; # without this swaylock is broken
 
   ###################################################
   #                    Packages                     #
   ###################################################
-  nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = with pkgs; [
-    vim
-    wget
-    git
-    wl-clipboard
-    nix-index
-    kitty # required for the default Hyprland config
-  ];
+  fonts = {
+    packages = [
+      pkgs.nerd-fonts.jetbrains-mono
+    ];
+  };
+
+  environment = {
+    localBinInPath = true;
+
+    sessionVariables = {
+      # If your cursor becomes invisible
+      WLR_NO_HARDWARE_CURSORS = "1";
+      # Hint electron apps to use wayland
+      NIXOS_OZONE_WL = "1";
+    };
+
+    systemPackages = with pkgs; [
+      home-manager
+      git
+
+      (btop.override { cudaSupport = true; })
+      fzf
+      kitty
+      foot # BACKUP TERMINAL
+      xterm # BACKUP TERMINAL
+
+      tofi
+
+      git-crypt
+      wget
+      neovim # default editor
+
+      (pkgs.callPackage ../../pkgs/derivations/sddm-astronaut.nix {
+        # theme = "pixel_sakura";
+      })
+    ];
+  };
 
   programs.hyprland.enable = true; # enable Hyprland
+  programs.gnome-disks.enable = true;
 
   ###################################################
   #                   Keymapping                    #
   ###################################################
-  # Configure keymap in X11
-  services.xserver = {
-    xkb.layout = "us";
-    xkb.variant = "";
+  services = {
+    dbus.enable = true;
+    # services.asusd.enable = true;
+    # services.asusd.enableUserService = true;
+    displayManager.sddm = {
+      enable = true;
+      package = pkgs.kdePackages.sddm;
+      theme = "sddm-astronaut-theme";
+      extraPackages = with pkgs; [
+        kdePackages.qtmultimedia
+        kdePackages.qtsvg
+        kdePackages.qtvirtualkeyboard
+      ];
+    };
+    xserver = {
+      enable = true;
+      excludePackages = [ pkgs.xterm ];
+    };
+
+    gnome.gnome-keyring.enable = true; # NOTE: Required for mysql-workbench
+
+    open-webui = {
+      enable = true;
+      host = "127.0.0.1";
+      port = 8081;
+      environment = {
+        # OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
+        # Disable authentication
+        #
+        SCARF_NO_ANALYTICS = "True";
+        DO_NOT_TRACK = "True";
+        ANONYMIZED_TELEMETRY = "False";
+        WEBUI_AUTH = "False";
+      };
+    };
   };
 
   ###################################################
   #                     NixOS                       #
   ###################################################
-
-  nix.settings = {
-    substituters = [ ];
-    trusted-public-keys = [ ];
-  };
-
   system.stateVersion = "23.11"; # Did you read the comment?
-
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
 }
