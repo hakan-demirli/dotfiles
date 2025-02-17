@@ -12,7 +12,7 @@ in
     (import ../../pkgs/derivations/firefox.nix {
       inherit username;
     })
-    ../../pkgs/derivations/thunderbird.nix
+    # ../../pkgs/derivations/thunderbird.nix
     ../../pkgs/derivations/low_battery_notify.nix
 
     (import ../common/xdg.nix {
@@ -155,10 +155,10 @@ in
 
     # (pkgs.callPackage ../../system/app/prometheus-exporters.nix { })
     #
-    (pkgs.callPackage ../../pkgs/derivations/quantifyself.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/quantifyself-webui.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/html-preview-lsp.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/html-preview-server.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/quantifyself.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/quantifyself-webui.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/html-preview-lsp.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/html-preview-server.nix { })
 
     bandwhich # network monitoring TUI
     cpufrequtils
@@ -168,7 +168,7 @@ in
     wttrbar
     hyprlock
     xwaylandvideobridge
-    tor-browser
+    # tor-browser
     qalculate-qt
     libqalculate
     # (lf.overrideAttrs (oldAttrs: {
@@ -179,8 +179,8 @@ in
     wl-clip-persist
     pulseaudio
     tree
-    anki-bin
-    piper-tts
+    # anki-bin
+    # piper-tts
 
     python3
 
@@ -272,23 +272,24 @@ in
     # timewarrior
 
     adb-sync
-    wineWowPackages.waylandFull
-    winetricks
-    steam-run # quick runner for fsh compliant binaries
+    # wineWowPackages.waylandFull
+    # winetricks
+    # steam-run # quick runner for fsh compliant binaries
     udiskie
     # (pkgs.callPackage ../../pkgs/derivations/tt.nix {})
     # (pkgs.callPackage ../../pkgs/derivations/j4-dmenu-desktop.nix { })
     (pkgs.callPackage ../../pkgs/derivations/waybar_timer.nix { })
     (pkgs.callPackage ../../pkgs/derivations/xremap.nix { })
 
-    (pkgs.callPackage ../../pkgs/derivations/helix.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/mitype.nix { })
+    helix
+    # (pkgs.callPackage ../../pkgs/derivations/helix.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/mitype.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/rvc-cli.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/gen_typing_test.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/gen_typing_test.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/notify_scheduler.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/blender.nix { })
 
-    (pkgs.callPackage ../../pkgs/derivations/veridian.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { withSlang = true; })
     (pkgs.callPackage ../../pkgs/derivations/update_wp.nix { })
     (pkgs.callPackage ../../pkgs/derivations/gtk_applet.nix { })
@@ -296,6 +297,6 @@ in
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
     (pkgs.callPackage ../../pkgs/derivations/youtube_sync.nix { })
     (pkgs.callPackage ../../pkgs/derivations/auto_refresh.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/clipboard_tts.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/clipboard_tts.nix { })
   ];
 }

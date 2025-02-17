@@ -9,13 +9,14 @@
   xdg =
     let
       mutable_configs = [
-        "hypr"
+        # "hypr"
         "mimeapps.list"
         "rclone"
         "rvc-cli"
       ];
 
       immutable_configs = [
+      "hypr"
         "activitywatch"
         "anyrun"
         "awatcher"

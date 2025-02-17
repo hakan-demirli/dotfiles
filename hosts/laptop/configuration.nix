@@ -1,4 +1,7 @@
 {
+
+  inputs,
+  config,
   pkgs,
   ...
 }:
@@ -22,7 +25,7 @@
   nixpkgs.config = {
     allowUnfree = true;
     rocmSupport = false;
-    cudaSupport = true; # ok with cachix
+    cudaSupport = false; # ok with cachix
     # cudaSupport = false; # takes hours to compile, dont touch
     allowUnfreePredicate =
       p:
@@ -101,7 +104,7 @@
       home-manager
       git
 
-      (btop.override { cudaSupport = true; })
+      (btop.override { cudaSupport = false; })
       fzf
       kitty
       foot # BACKUP TERMINAL
@@ -146,20 +149,20 @@
 
     gnome.gnome-keyring.enable = true; # NOTE: Required for mysql-workbench
 
-    open-webui = {
-      enable = true;
-      host = "127.0.0.1";
-      port = 8081;
-      environment = {
-        # OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
-        # Disable authentication
-        #
-        SCARF_NO_ANALYTICS = "True";
-        DO_NOT_TRACK = "True";
-        ANONYMIZED_TELEMETRY = "False";
-        WEBUI_AUTH = "False";
-      };
-    };
+    # open-webui = {
+    #   enable = true;
+    #   host = "127.0.0.1";
+    #   port = 8081;
+    #   environment = {
+    #     # OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
+    #     # Disable authentication
+    #     #
+    #     SCARF_NO_ANALYTICS = "True";
+    #     DO_NOT_TRACK = "True";
+    #     ANONYMIZED_TELEMETRY = "False";
+    #     WEBUI_AUTH = "False";
+    #   };
+    # };
 
   };
 
@@ -289,6 +292,24 @@
     "d /persist/home/emre 0700 emre users -" # /persist/home/emre owned by that user
   ];
 
+  programs.fuse.userAllowOther = true;
+  home-manager.extraSpecialArgs = {
+    inherit inputs;
+    inherit pkgs;
+  };
+  home-manager.backupFileExtension = "backup";
+  home-manager.users.emre = {
+    imports = [
+      inputs.impermanence.nixosModules.home-manager.impermanence
+
+      (import ../../users/emre/home.nix {
+        inherit pkgs inputs config;
+        gdriveDir = /home/emre/Desktop/gdrive;
+        dotfilesDir = /home/emre/Desktop/dotfiles;
+      })
+
+    ];
+  };
   security.pam.services.swaylock = { }; # without this swaylock is broken
 
   # List packages installed in system profile. To search, run:
