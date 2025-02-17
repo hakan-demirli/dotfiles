@@ -135,7 +135,12 @@ in
 
     persistence."/persist/home" = {
       directories = [
-        ".config/pulse" # pulseaudio cookie, remember volume levels
+        # volume levels
+        ".config/pulse"
+        ".local/state/pipewire"
+        ".local/state/wireplumber"
+
+        # generic
         ".cache"
         ".mozilla"
         ".thunderbird"
