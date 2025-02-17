@@ -287,8 +287,8 @@ in
     (pkgs.callPackage ../../pkgs/derivations/waybar_timer.nix { })
     (pkgs.callPackage ../../pkgs/derivations/xremap.nix { })
 
-    helix
-    # (pkgs.callPackage ../../pkgs/derivations/helix.nix { })
+    # helix
+    (pkgs.callPackage ../../pkgs/derivations/helix.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/mitype.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/rvc-cli.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/gen_typing_test.nix { })
