@@ -135,12 +135,17 @@ in
 
     persistence."/persist/home" = {
       directories = [
+        ".cache"
+        ".mozilla"
+        ".thunderbird"
+        # ".local/share/keyrings"
+        ".local/share"
+        # ".local/state"
+
         "Desktop"
         "Documents"
         "Downloads"
         "Videos"
-        ".ssh"
-        ".local/share/keyrings"
       ];
       allowOther = true;
     };
