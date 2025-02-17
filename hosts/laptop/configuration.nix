@@ -18,6 +18,7 @@
     ./system/network.nix
     ./system/automount.nix
     ./system/sound.nix
+    # ./system/printing.nix # fck printers
   ];
 
   # nix

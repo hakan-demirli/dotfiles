@@ -34,7 +34,7 @@ in
   targets.genericLinux.enable = true;
 
   programs = {
-    gpg.homedir = "${config.xdg.dataHome}/gnupg";
+    gpg.homedir = "$HOME/.local/share/gnupg";
     home-manager.enable = true; # Let Home Manager install and manage itself.
     starship.enable = true;
     direnv = {
@@ -44,7 +44,7 @@ in
     };
     bash = {
       enable = true;
-      # historyFile = "${config.home.sessionVariables.XDG_STATE_HOME}/bash/history";
+      historyFile = "$HOME/.local/state/bash/history";
       historyFileSize = -1;
       historySize = -1;
       historyControl = [
@@ -135,6 +135,7 @@ in
 
     persistence."/persist/home" = {
       directories = [
+        ".config/pulse" # pulseaudio cookie, remember volume levels
         ".cache"
         ".mozilla"
         ".thunderbird"
