@@ -219,11 +219,11 @@
       recursive = true;
       executable = false;
     };
-    ".thunderbird/personal/ImapMail/imap.gmail-1.com/msgFilterRules.dat" = {
-      source = ../../secrets/msgFilterRules.dat;
-      recursive = false;
-      executable = false;
-    };
+    # ".thunderbird/personal/ImapMail/imap.gmail-1.com/msgFilterRules.dat" = {
+    #   source = ../../secrets/msgFilterRules.dat;
+    #   recursive = false;
+    #   executable = false;
+    # };
     ".config/rvc-cli/rvc/models/embedders/contentvec/pytorch_model.bin".source = "${pkgs.fetchurl {
       url = "https://huggingface.co/IAHispano/Applio/resolve/main/Resources/embedders/contentvec/pytorch_model.bin";
       sha256 = "sha256-2N1ADgVN305r512rWiVJ23SMyZ51agl8SWwJn2WkhU4=";
