@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-rec {
+_: rec {
   home.sessionVariables = {
     OPENER = "xdg-open";
     EDITOR = "hx";

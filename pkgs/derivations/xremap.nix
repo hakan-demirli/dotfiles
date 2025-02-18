@@ -3,7 +3,6 @@
   rustPlatform,
   fetchFromGitHub,
   pkg-config,
-  stdenv,
   gnomeSupport ? false,
   kdeSupport ? false,
   wlrootsSupport ? false,

@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-{
+_: {
 
   home.shellAliases = {
     ":q" = "exit";

@@ -1,6 +1,5 @@
 {
   pkgs,
-  config,
   dotfilesDir ? throw "Set this to your dotfiles dir",
   gdriveDir ? throw "Set this to your google drive dir",
   ...

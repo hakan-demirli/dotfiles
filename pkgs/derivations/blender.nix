@@ -2,7 +2,7 @@
 let
   py-slvs =
     pythonPkgs:
-    pythonPkgs.buildPythonPackage rec {
+    pythonPkgs.buildPythonPackage {
       pname = "py-slvs";
       version = "1.0.6";
 
@@ -32,7 +32,7 @@ let
     };
 
   blenderWithPySlvs = pkgs.blender.withPackages (p: [ (py-slvs p) ]);
-  blender = blenderWithPySlvs.overrideAttrs (oldAttrs: {
+  blender = blenderWithPySlvs.overrideAttrs (_: {
     pname = "blender";
   });
 in

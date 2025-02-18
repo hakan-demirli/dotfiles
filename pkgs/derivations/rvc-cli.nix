@@ -1,8 +1,6 @@
 {
-  config,
   pkgs,
   fetchFromGitHub,
-  enableCuda ? config.cudaSupport,
 }:
 
 let

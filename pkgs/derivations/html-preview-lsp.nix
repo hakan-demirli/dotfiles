@@ -1,6 +1,5 @@
 {
   pkgs,
-  fetchFromGitHub,
 }:
 pkgs.rustPlatform.buildRustPackage {
   pname = "html-preview-lsp";

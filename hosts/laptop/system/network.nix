@@ -1,7 +1,4 @@
-{
-  ...
-}:
-{
+_: {
   # Enable networking
   networking = {
     hostName = "laptop"; # Define your hostname.

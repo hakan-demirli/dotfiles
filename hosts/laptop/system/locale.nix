@@ -1,7 +1,4 @@
-{
-  ...
-}:
-{
+_: {
   time = {
     hardwareClockInLocalTime = false; # messes clock on windows
     timeZone = "Europe/Istanbul";

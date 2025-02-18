@@ -294,23 +294,26 @@
   ];
 
   programs.fuse.userAllowOther = true;
-  home-manager.extraSpecialArgs = {
-    inherit inputs;
-    inherit pkgs;
-  };
-  home-manager.backupFileExtension = "backup";
-  home-manager.users.emre = {
-    imports = [
-      inputs.impermanence.nixosModules.home-manager.impermanence
+  home-manager = {
+    extraSpecialArgs = {
+      inherit inputs;
+      inherit pkgs;
+    };
+    backupFileExtension = "backup";
+    users.emre = {
+      imports = [
+        inputs.impermanence.nixosModules.home-manager.impermanence
 
-      (import ../../users/emre/home.nix {
-        inherit pkgs inputs config;
-        gdriveDir = /home/emre/Desktop/gdrive;
-        dotfilesDir = /home/emre/Desktop/dotfiles;
-      })
+        (import ../../users/emre/home.nix {
+          inherit pkgs inputs config;
+          gdriveDir = /home/emre/Desktop/gdrive;
+          dotfilesDir = /home/emre/Desktop/dotfiles;
+        })
 
-    ];
+      ];
+    };
   };
+
   security.pam.services.swaylock = { }; # without this swaylock is broken
 
   # List packages installed in system profile. To search, run:
