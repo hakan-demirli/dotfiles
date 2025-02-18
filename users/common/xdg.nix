@@ -178,38 +178,20 @@
       recursive = true;
       executable = true;
     };
-    ".local/share/sounds" = {
-      source = pkgs.linkFarm "sounds-link" [
+    ".local/share" = {
+      source = pkgs.linkFarm "gdrive-links" [
         {
-          name = "quantifyself";
+          name = "sounds";
           path = "${gdriveDir}/sounds";
         }
-      ];
-      recursive = true;
-      executable = false;
-    };
-    ".local/share/scratchpads" = {
-      source = pkgs.linkFarm "scratchpads-link" [
         {
-          name = "quantifyself";
+          name = "scratchpads";
           path = "${gdriveDir}/scratchpads";
         }
-      ];
-      recursive = true;
-      executable = false;
-    };
-    ".config/notify-scheduler" = {
-      source = pkgs.linkFarm "notify-scheduler-link" [
         {
-          name = "quantifyself";
+          name = "notify-scheduler";
           path = "${gdriveDir}/software/notify-scheduler";
         }
-      ];
-      recursive = true;
-      executable = false;
-    };
-    ".local/share/quantifyself" = {
-      source = pkgs.linkFarm "quantifyself-link" [
         {
           name = "quantifyself";
           path = "${gdriveDir}/archives/quantifyself";
