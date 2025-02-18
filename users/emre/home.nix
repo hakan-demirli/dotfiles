@@ -235,6 +235,7 @@ in
     zip
     ghostscript
     drawio
+    yek
 
     rclone
     # citrix_workspace

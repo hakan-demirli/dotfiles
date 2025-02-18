@@ -69,7 +69,7 @@ keymap = [
 	{ on = [ "b", "d" ],       run = "cd ~/Desktop/dotfiles", desc = "cd dotfiles" },
 	{ on = [ "b", "n" ],       run = "cd ~/Desktop/notes", desc = "cd notes" },
 	{ on = [ "b", "p" ],       run = "cd /mnt/second/rep/personal_repo", desc = "cd personal_repo" },
-	{ on = [ "b", "s" ],       run = "cd /mnt/second/rep/tobb_master/s1/", desc = "cd school" },
+	{ on = [ "b", "s" ],       run = "cd ~/Desktop/tobb_master/s1/", desc = "cd school" },
 
 	# XXXXXXXXXXXXXXXXXXXXXX
 	# Default bindings below
