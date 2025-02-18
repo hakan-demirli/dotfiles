@@ -43,7 +43,7 @@ formatter = { command = 'prettier', args = ["--parser", "css"] }
 name = "java"
 language-servers =[
   "jdtls",
-  "lsp-ai"
+  # "lsp-ai"
 ]
 auto-format = true
 
@@ -199,68 +199,68 @@ args = [
 ]
 
 
-[language-server.lsp-ai]
-command = "lsp-ai"
-timeout = 60
-[language-server.lsp-ai.config]
-memory.file_store = {}
-models.model1.type = "ollama"
-models.model1.chat_endpoint = "http://127.0.0.1:11434/api/chat"
-models.model1.generate_endpoint = "http://127.0.0.1:11434/api/generate"
-# models.model1.model = "starcoder2:15b" # not enough ram
-# models.model1.model = "deepseek-r1:1.5b" # trash
-# models.model1.model = "deepseek-r1:7b" # thinking takes time
-# models.model1.model = "deepseek-r1:8b" # thinking takes time
-# models.model1.model = "opencoder:8b" # ok
-# models.model1.model = "codellama:7b" # ok
-# models.model1.model = "codegemma:7b" # ok
-models.model1.model = "yi-coder:9b" # good
-# models.model1.model = "qwen2.5-coder:14b-instruct-q6_K" # great, but slow
-# models.model1.model = "deepseek-coder:6.7b" # not tested
-# models.model1.model = "qwen2.5-coder:7b" # not tested
+# [language-server.lsp-ai]
+# command = "lsp-ai"
+# timeout = 60
+# [language-server.lsp-ai.config]
+# memory.file_store = {}
+# models.model1.type = "ollama"
+# models.model1.chat_endpoint = "http://127.0.0.1:11434/api/chat"
+# models.model1.generate_endpoint = "http://127.0.0.1:11434/api/generate"
+# # models.model1.model = "starcoder2:15b" # not enough ram
+# # models.model1.model = "deepseek-r1:1.5b" # trash
+# # models.model1.model = "deepseek-r1:7b" # thinking takes time
+# # models.model1.model = "deepseek-r1:8b" # thinking takes time
+# # models.model1.model = "opencoder:8b" # ok
+# # models.model1.model = "codellama:7b" # ok
+# # models.model1.model = "codegemma:7b" # ok
+# models.model1.model = "yi-coder:9b" # good
+# # models.model1.model = "qwen2.5-coder:14b-instruct-q6_K" # great, but slow
+# # models.model1.model = "deepseek-coder:6.7b" # not tested
+# # models.model1.model = "qwen2.5-coder:7b" # not tested
 
-# completion.model = "model1"
-# completion.parameters.max_context = 4096
-# completion.parameters.options.num_predict = 64
-# completion.parameters.options.stop = ["\n"]
-# [[language-server.lsp-ai.config.actions]]
-# action_display_name = "Complete"
-# model = "model1"
-# parameters.max_context = 4096
-# parameters.options.num_predict = 512
+# # completion.model = "model1"
+# # completion.parameters.max_context = 4096
+# # completion.parameters.options.num_predict = 64
+# # completion.parameters.options.stop = ["\n"]
+# # [[language-server.lsp-ai.config.actions]]
+# # action_display_name = "Complete"
+# # model = "model1"
+# # parameters.max_context = 4096
+# # parameters.options.num_predict = 512
+# # # parameters.options.stop = ["<file_sep>", "\n\n"]
+# # [[language-server.lsp-ai.config.actions]]
+# # action_display_name = "FIM Complete"
+# # model = "model1"
+# # parameters.max_context = 4096
+# # parameters.fim.start = "<｜fim▁begin｜>"
+# # parameters.fim.middle = "<｜fim▁hole｜>"
+# # parameters.fim.end = "<｜fim▁end｜>"
+# # parameters.fim.start = "<fim_prefix>"
+# # parameters.fim.middle = "<fim_middle>"
+# # parameters.fim.end = "<fim_suffix>"
+# # parameters.options.num_predict = 512
 # # parameters.options.stop = ["<file_sep>", "\n\n"]
 # [[language-server.lsp-ai.config.actions]]
-# action_display_name = "FIM Complete"
+# action_display_name = "Complete Via Prompt"
 # model = "model1"
 # parameters.max_context = 4096
-# parameters.fim.start = "<｜fim▁begin｜>"
-# parameters.fim.middle = "<｜fim▁hole｜>"
-# parameters.fim.end = "<｜fim▁end｜>"
-# parameters.fim.start = "<fim_prefix>"
-# parameters.fim.middle = "<fim_middle>"
-# parameters.fim.end = "<fim_suffix>"
 # parameters.options.num_predict = 512
-# parameters.options.stop = ["<file_sep>", "\n\n"]
-[[language-server.lsp-ai.config.actions]]
-action_display_name = "Complete Via Prompt"
-model = "model1"
-parameters.max_context = 4096
-parameters.options.num_predict = 512
-parameters.system = "Be practical. Do not explain unless asked to. Short, concise and complete answers."
-parameters.messages = [
-    { role = "user", content = "{CODE}" }
-]
-# post_process.extractor = "(?s)<answer>(.*?)</answer>"
-
-# [[language-server.lsp-ai.config.chat]]
-# trigger = "!C"
-# action_display_name = "Chat"
-# model = "model1"
-# parameters.max_context = 4096
-# parameters.max_tokens = 1024
+# parameters.system = "Be practical. Do not explain unless asked to. Short, concise and complete answers."
 # parameters.messages = [
-#   { "role" = "system", "content" = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately" }
+#     { role = "user", content = "{CODE}" }
 # ]
+# # post_process.extractor = "(?s)<answer>(.*?)</answer>"
+
+# # [[language-server.lsp-ai.config.chat]]
+# # trigger = "!C"
+# # action_display_name = "Chat"
+# # model = "model1"
+# # parameters.max_context = 4096
+# # parameters.max_tokens = 1024
+# # parameters.messages = [
+# #   { "role" = "system", "content" = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately" }
+# # ]
 
 
 # [language-server.dls]

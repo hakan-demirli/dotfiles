@@ -179,7 +179,7 @@ in
     wttrbar
     hyprlock
     xwaylandvideobridge
-    # tor-browser
+    tor-browser
     qalculate-qt
     libqalculate
     # (lf.overrideAttrs (oldAttrs: {
