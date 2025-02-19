@@ -1,3 +1,11 @@
+* **Enable Swap**
+    * No impermanence:
+        * ``` swapDevices = [ { device = "/var/lib/swapfile"; size = 30 * 1024; } ]; ```
+    * With impermance and disko:
+        * Use dedicated volume, not subvolume or swapfile.
+            * You dont want to rewrite 32GBs of data on every boot.
+        * Create a swap volume in disko.
+
 * **Using nixGL to fix OpenGL applications on non-NixOS distributions**
     * https://pmiddend.github.io/posts/nixgl-on-ubuntu/
 

@@ -1,5 +1,5 @@
 {
-  device ? "/dev/vda",
+  device ? throw "Set this to your disk device, e.g. /dev/vda",
   ...
 }:
 {
@@ -23,6 +23,13 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
+            };
+          };
+          swap = {
+            size = "8G";
+            content = {
+              type = "swap";
+              resumeDevice = true;
             };
           };
           root = {
