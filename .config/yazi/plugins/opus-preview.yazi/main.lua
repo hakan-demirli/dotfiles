@@ -1,9 +1,13 @@
 local M = {}
 
-
 function M:peek(job)
 	local start, cache = os.clock(), ya.file_cache(job)
-	if not cache or self:preload(job) ~= 1 then
+	if not cache then
+		return
+	end
+
+	local ok, err = self:preload(job)
+	if not ok or err then
 		return
 	end
 
@@ -26,20 +30,20 @@ function M:preload(job)
 	local percent = 5 + job.skip
 	if percent > 95 then
 		ya.manager_emit("peek", { 90, only_if = job.file.url, upper_bound = true })
-		return 2
+		return false, nil -- Previously 2, continue
 	end
 
 	local cache = ya.file_cache(job)
 	if not cache then
-		return 1
+		return true, nil -- Previously 1, don't continue
 	end
 
 	local cha = fs.cha(cache)
 	if cha and cha.len > 0 then
-		return 1
+		return true, nil -- Previously 1, don't continue
 	end
 
-	local child, code = Command("ffmpegthumbnailer"):args({
+	local child, err = Command("ffmpegthumbnailer"):args({
 		"-q",
 		"6",
 		"-c",
@@ -55,12 +59,16 @@ function M:preload(job)
 	}):spawn()
 
 	if not child then
-		ya.err("spawn `ffmpegthumbnailer` command returns " .. tostring(code))
-		return 0
+		ya.err("spawn `ffmpegthumbnailer` command returns " .. tostring(err))
+		return true, Err("spawn `ffmpegthumbnailer` command returns " .. tostring(err)) -- Convert the message to an error
 	end
 
 	local status = child:wait()
-	return status and status.success and 1 or 2
+	if status and status.success then
+		return true, nil -- Previously 1, don't continue
+	else
+		return false, nil -- Previously 2, continue
+	end
 end
 
 function M:spot(job) require("file"):spot(job) end
