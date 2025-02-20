@@ -291,7 +291,7 @@ in
     # (pkgs.callPackage ../../pkgs/derivations/tt.nix {})
     # (pkgs.callPackage ../../pkgs/derivations/j4-dmenu-desktop.nix { })
     (pkgs.callPackage ../../pkgs/derivations/waybar_timer.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/xremap.nix { })
+    (pkgs.callPackage ../../pkgs/derivations/xremap.nix { wlrootsSupport = true; })
 
     # helix
     (pkgs.callPackage ../../pkgs/derivations/helix.nix { })

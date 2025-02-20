@@ -3,43 +3,46 @@
   rustPlatform,
   fetchFromGitHub,
   pkg-config,
+  x11Support ? false,
   gnomeSupport ? false,
   kdeSupport ? false,
   wlrootsSupport ? false,
-  x11Support ? false,
+  hyprlandSupport ? false,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "xremap";
-  version = "0.8.14";
+  version = "0.10.5";
 
   src = fetchFromGitHub {
     owner = "k0kubun";
     repo = "xremap";
-    rev = "v${version}";
-    hash = "sha256-GexVY76pfmHalJPiCfVe9C9CXtlojG/H6JjOiA0GF1c=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-cd1VLwP2/tBi8tmqnuTY5PVcMfSE5u6y7QI4F53otlY=";
   };
 
-  cargoHash = "sha256-BKgZ3RBIP4fzIGOi82bsoTNYBWfk2uzrsMvilwGK2fs=";
+  cargoHash = "sha256-wvOGyvgi6X9vWAYIHOQyEB9B0oeSdUpi/3LYPB262vI=";
   useFetchCargoVendor = true;
 
-  cargoBuildFlags =
-    lib.optional gnomeSupport "--features gnome"
-    ++ lib.optional kdeSupport "--features kde"
-    ++ lib.optional wlrootsSupport "--features wlroots"
-    ++ lib.optional x11Support "--features x11";
+  buildNoDefaultFeatures = true;
+  buildFeatures =
+    (lib.optionals x11Support [ "x11" ])
+    ++ (lib.optionals gnomeSupport [ "gnome" ])
+    ++ (lib.optionals kdeSupport [ "kde" ])
+    ++ (lib.optionals wlrootsSupport [ "wlroots" ])
+    ++ (lib.optionals hyprlandSupport [ "hypr" ]);
 
   nativeBuildInputs = [
     pkg-config
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Key remapper for X11 and Wayland";
     homepage = "https://github.com/k0kubun/xremap";
     changelog = "https://github.com/k0kubun/xremap/blob/${src.rev}/CHANGELOG.md";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     mainProgram = "xremap";
-    maintainers = with maintainers; [ _0x4A6F ];
-    platforms = platforms.linux;
+    maintainers = [ lib.maintainers.hakan-demirli ];
+    platforms = lib.platforms.linux;
   };
 }

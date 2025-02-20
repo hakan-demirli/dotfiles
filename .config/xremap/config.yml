@@ -119,6 +119,12 @@ keymap:
       KEY_MINUS: reserved
       KEY_EQUAL: reserved
 
+  - name: firefox
+    application:
+      only: [ firefox ]
+    remap:
+      CTRL-i: KEY_F6
+
   - name: helix
     application:
       only: helix
