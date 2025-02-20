@@ -7,6 +7,7 @@
 **/__pycache__
 **/venv_*
 **/venv
+**/log.txt
 **/.direnv
 *fuse_hidden*
 .config/git/config_user
