@@ -1,5 +1,6 @@
 {
   device ? throw "Set this to your disk device, e.g. /dev/vda",
+  swapSize ? throw "Set a valid swap size, e.g. 32G",
   ...
 }:
 {
@@ -26,7 +27,7 @@
             };
           };
           swap = {
-            size = "32G";
+            size = swapSize;
             content = {
               type = "swap";
               resumeDevice = true;

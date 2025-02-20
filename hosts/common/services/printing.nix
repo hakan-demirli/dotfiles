@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs }:
 {
   # 1. Go to http://localhost:631
   # 2. Add the printer

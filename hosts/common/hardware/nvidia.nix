@@ -1,17 +1,17 @@
 # https://nixos.wiki/wiki/Nvidia
 { config, ... }:
 {
+
+  imports = [
+    ./graphics.nix
+  ];
+
   services.xserver.videoDrivers = [
     "nvidia"
     "displayLink"
   ];
 
   # services.xserver.videoDrivers = [ "nvidia" "displaylink" "modesetting" ];
-
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
 
   hardware.nvidia = {
     modesetting.enable = true;

@@ -1,7 +1,7 @@
 _: {
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
+  # security.rtkit.enable = true; # TODO: Remove if no sound problems
   services.pipewire = {
     enable = true;
     alsa.enable = true;
