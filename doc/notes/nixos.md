@@ -1,3 +1,15 @@
+* **Create your config as custom iso**
+    * Ensure `hardware-configuration.nix` etc. is not included in your configuration.nix
+    ```nix
+    nixosConfigurations.isoimage = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-base.nix"
+      ];
+    };
+    ```
+
 * **Enable Swap**
     * No impermanence:
         * ``` swapDevices = [ { device = "/var/lib/swapfile"; size = 30 * 1024; } ]; ```

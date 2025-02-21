@@ -17,7 +17,7 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "k0kubun";
     repo = "xremap";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-cd1VLwP2/tBi8tmqnuTY5PVcMfSE5u6y7QI4F53otlY=";
   };
 
@@ -39,7 +39,7 @@ rustPlatform.buildRustPackage rec {
   meta = {
     description = "Key remapper for X11 and Wayland";
     homepage = "https://github.com/k0kubun/xremap";
-    changelog = "https://github.com/k0kubun/xremap/blob/${src.rev}/CHANGELOG.md";
+    changelog = "https://github.com/k0kubun/xremap/blob/${src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
     mainProgram = "xremap";
     maintainers = [ lib.maintainers.hakan-demirli ];
