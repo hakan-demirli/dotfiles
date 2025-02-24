@@ -1,3 +1,8 @@
+* **List of linting tools for Nix**
+    * ```nix run github:nix-community/nixpkgs-lint -- ./file.nix```
+    * ```nix run nixpkgs#statix -- check```
+    * ```nix run nixpkgs#deadnix```
+
 * **Create your config as custom iso**
     * Ensure `hardware-configuration.nix` etc. is not included in your configuration.nix
     ```nix
