@@ -212,6 +212,7 @@ in
     brightnessctl
     kooha
     swaynotificationcenter
+    swayosd
 
     playerctl
     swww # for update_wp
@@ -305,7 +306,7 @@ in
     # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { withSlang = true; })
     (pkgs.callPackage ../../pkgs/derivations/update_wp.nix { })
     (pkgs.callPackage ../../pkgs/derivations/gtk_applet.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/gtk_indicator.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/gtk_indicator.nix { })
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
     (pkgs.callPackage ../../pkgs/derivations/youtube_sync.nix { })
     (pkgs.callPackage ../../pkgs/derivations/auto_refresh.nix { })
