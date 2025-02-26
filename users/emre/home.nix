@@ -304,7 +304,7 @@ in
 
     # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { withSlang = true; })
-    (pkgs.callPackage ../../pkgs/derivations/update_wp.nix { })
+    # (pkgs.callPackage ../../pkgs/derivations/update_wp.nix { })
     (pkgs.callPackage ../../pkgs/derivations/gtk_applet.nix { })
     # (pkgs.callPackage ../../pkgs/derivations/gtk_indicator.nix { })
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
