@@ -12,9 +12,8 @@ function fgb() {
 	EOF
 	)
 	local -r header=$(cat <<-EOF
-	> ALT-M to merge with current * branch | ALT-R to rebase with current * branch
+	> Ctrl-M to merge with current * branch | ALT-R to rebase with current * branch
 	> ENTER to checkout the branch
-	> ALT-D to delete the merged local branch | ALT-X to force delete the local branch
 	> Ctrl+G to open the diff with less
 	EOF
 	)
@@ -37,12 +36,8 @@ function fgb() {
 		--header="$header" \
 		--bind="enter:execute(git fetch origin \$($get_branch_name):\$($get_branch_name) && git checkout \$($get_branch_name))" \
 		--bind="enter:+reload($git_branches_local)" \
-		--bind="alt-m:execute(git merge \$($get_selected_branch))" \
-		--bind="alt-r:execute(git rebase \$($get_selected_branch))" \
-		--bind="alt-d:execute(git branch --delete \$($get_selected_branch))" \
-		--bind="alt-d:+reload($git_branches_local)" \
-		--bind="alt-x:execute(git branch --delete --force \$($get_selected_branch))" \
-		--bind="alt-x:+reload($git_branches_local)" \
+		--bind="ctrl-m:execute(git merge \$($get_selected_branch))" \
+		--bind="ctrl-r:execute(git rebase \$($get_selected_branch))" \
 		--bind="ctrl-g:execute($git_show_subshell)" \
 		--bind='ctrl-f:change-preview-label([ Diff ])' \
 		--bind="ctrl-f:+change-preview($git_diff)" \
