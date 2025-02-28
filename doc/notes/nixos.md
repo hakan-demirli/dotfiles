@@ -1,3 +1,9 @@
+* **Use local nixpkgs before PR to compile your app**
+    * Add your app to pkgs-byname etc. as ususal.
+    * Go to root of the nixpkgs.
+    * Assuming your new package is named `bonk`
+    * ```nix-build -A bonk```
+
 * **List of linting tools for Nix**
     * ```nix run github:nix-community/nixpkgs-lint -- ./file.nix```
     * ```nix run nixpkgs#statix -- check```
@@ -232,6 +238,7 @@ virtualisation.libvirtd = {
             * https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-dockerTools
         * Use flatpak / appimage
             * https://github.com/ralismark/nix-appimage 
+
 * **Remove default file associations**
     * xdgmime is already read only so look inside ```.local/share/applications/``` and remove annoying entries.
 

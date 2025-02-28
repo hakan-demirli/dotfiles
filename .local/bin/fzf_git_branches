@@ -1,54 +1,127 @@
 #!/usr/bin/env bash
 
-function fgb() {
-	local -r git_branches_local="git branch --all --color --format=$'%(HEAD) %(color:yellow)%(refname:short)\t%(color:green)%(committerdate:short)\t%(color:blue)%(subject)' | column --table --separator=$'\t'"
-	local -r git_branches_remote="git ls-remote --heads origin | awk '{print \$2}' | sed 's/refs\\/heads\\///' | grep -v '^master$' | grep -v '^veridian$' | awk '{print \"remotes/origin/\" \$1}'" # Remove the 'origin/' prefix to avoid duplication
-	local -r get_selected_branch='echo {} | sed "s/^[* ]*//" | awk "{print \$1}"'
-    local get_branch_name='echo {} | sed "s/^[* ]*//" | awk "{print \$1}" | sed "s|remotes/origin/||g"'
-	local -r git_log="git log \$($get_selected_branch) --graph --color --format='%C(white)%h - %C(green)%cs - %C(blue)%s%C(red)%d'"
-	local -r git_diff='git diff --color $(git branch --show-current)..$(echo {} | sed "s/^[* ]*//" | awk "{print \$1}")'
-	local -r git_show_subshell=$(cat <<-EOF
-		[[ \$($get_selected_branch) != '' ]] && sh -c "git show --color \$($get_selected_branch) | less -R"
-	EOF
-	)
-	local -r header=$(cat <<-EOF
-	> Ctrl-M to merge with current * branch | ALT-R to rebase with current * branch
-	> ENTER to checkout the branch
-	> Ctrl+G to open the diff with less
-	EOF
-	)
+fgb() {
+  # 1) Commands to list branches:
+  local -r LIST_LOCAL_CMD="git branch --all --color --format=\$'%(HEAD) %(color:yellow)%(refname:short)\t%(color:green)%(committerdate:short)\t%(color:blue)%(subject)' | column --table --separator=\$'\t'"
+  local -r LIST_REMOTE_CMD="git ls-remote --heads origin | awk '{print \$2}' | sed 's|refs/heads/||' \
+    | grep -v '^master\$' \
+    | grep -v '^veridian\$' \
+    | awk '{print \"remotes/origin/\"\$1}'"
 
-	(
-		eval "$git_branches_local"
-		eval "$git_branches_remote" | while read branch; do
-            if ! git show-ref --quiet "refs/heads/${branch##*/}"; then
-                printf '%s\n' "$branch";
-            fi
-        done
-	) \
-	| fzf \
-		--ansi \
-		--reverse \
-		--no-sort \
-		--preview-label '[ Commits ]' \
-		--preview "$git_log" \
-		--header-first \
-		--header="$header" \
-		--bind="enter:execute(git fetch origin \$($get_branch_name):\$($get_branch_name) && git checkout \$($get_branch_name))" \
-		--bind="enter:+reload($git_branches_local)" \
-		--bind="ctrl-m:execute(git merge \$($get_selected_branch))" \
-		--bind="ctrl-r:execute(git rebase \$($get_selected_branch))" \
-		--bind="ctrl-g:execute($git_show_subshell)" \
-		--bind='ctrl-f:change-preview-label([ Diff ])' \
-		--bind="ctrl-f:+change-preview($git_diff)" \
-		--bind='ctrl-i:change-preview-label([ Commits ])' \
-		--bind="ctrl-i:+change-preview($git_log)" \
-		--bind='f1:toggle-header' \
-		--bind='f2:toggle-preview' \
-		--bind='ctrl-y:preview-up' \
-		--bind='ctrl-e:preview-down' \
-		--bind='ctrl-u:preview-half-page-up' \
-		--bind='ctrl-d:preview-half-page-down'
+  # 2) Helper to extract the selected branch reference.
+  #    This version strips any leading '*' or spaces then prints the first field.
+  local -r GET_SELECTED_REF=$(cat <<'EOF'
+sed 's/^[* ]\+//' | awk '{print $1}'
+EOF
+)
+
+  # 3) Preview for commits: show the commit graph for the selected branch.
+  local -r PREVIEW_COMMITS=$(cat <<'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+if [ -n "$raw_ref" ]; then
+  git log "$raw_ref" --graph --color --format='%C(white)%h - %C(green)%cs - %C(blue)%s %C(red)%d'
+else
+  echo "No branch selected."
+fi
+EOF
+)
+
+  # 4) Preview for diff: show a diff between the current branch and the selected branch.
+  local -r PREVIEW_DIFF=$(cat <<'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+if [ -n "$raw_ref" ]; then
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  git diff --color "$current_branch..$raw_ref"
+else
+  echo "No branch selected."
+fi
+EOF
+)
+
+  # 5) A helper to run "git show" on the selected branch in a pager.
+  local -r SHOW_SUBSHELL=$(cat <<'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+if [ -n "$raw_ref" ]; then
+  git show --color "$raw_ref" | less -R
+fi
+EOF
+)
+
+  # 6) Checkout logic: if it's a remote branch, fetch and create a local branch before checking out.
+  local -r CHECKOUT_BRANCH=$(cat <<'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
+if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
+  git fetch origin "$local_branch":"$local_branch"
+fi
+git checkout "$local_branch"
+EOF
+)
+
+  # 7) Merge logic: merge the selected branch into the current branch.
+  local -r MERGE_BRANCH=$(cat <<'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
+if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
+  git fetch origin "$local_branch":"$local_branch"
+fi
+git merge "$local_branch"
+EOF
+)
+
+  # 8) Rebase logic: rebase the current branch onto the selected branch.
+  local -r REBASE_BRANCH=$(cat <<'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
+if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
+  git fetch origin "$local_branch":"$local_branch"
+fi
+git rebase "$local_branch"
+EOF
+)
+
+  # 9) A small header with instructions.
+  local -r HEADER=$(cat <<'EOF'
+> [Enter]         Checkout branch (auto-fetch if remote)
+> [Ctrl-P]        Merge selected branch into current
+> [Ctrl-R]        Rebase current onto selected
+> [Ctrl-F]        Show diff vs current
+> [Ctrl-G]        Show HEAD commit of selected in less
+> [Ctrl-I]        Switch preview back to commits
+EOF
+)
+
+  # 10) Build the branch list (local then remote if not already local) and run fzf.
+  (
+    eval "$LIST_LOCAL_CMD"
+    eval "$LIST_REMOTE_CMD" | while read -r branch; do
+      local_name="${branch#remotes/origin/}"
+      if ! git show-ref --quiet "refs/heads/$local_name"; then
+        echo "$branch"
+      fi
+    done
+  ) | fzf \
+      --ansi \
+      --reverse \
+      --no-sort \
+      --header-first \
+      --header="$HEADER" \
+      --preview-label '[Commits]' \
+      --preview "$PREVIEW_COMMITS" \
+      --bind "enter:execute($CHECKOUT_BRANCH)+reload($LIST_LOCAL_CMD)" \
+      --bind "ctrl-p:execute($MERGE_BRANCH)+reload($LIST_LOCAL_CMD)" \
+      --bind "ctrl-r:execute($REBASE_BRANCH)+reload($LIST_LOCAL_CMD)" \
+      --bind "ctrl-g:execute($SHOW_SUBSHELL)" \
+      --bind "ctrl-f:change-preview-label([Diff])" \
+      --bind "ctrl-f:+change-preview($PREVIEW_DIFF)" \
+      --bind "ctrl-i:change-preview-label([Commits])" \
+      --bind "ctrl-i:+change-preview($PREVIEW_COMMITS)" \
+      --bind 'f1:toggle-header' \
+      --bind 'f2:toggle-preview' \
+      --bind 'ctrl-y:preview-up' \
+      --bind 'ctrl-e:preview-down' \
+      --bind 'ctrl-u:preview-half-page-up' \
+      --bind 'ctrl-d:preview-half-page-down'
 }
 
 fgb
