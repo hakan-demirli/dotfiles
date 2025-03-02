@@ -18,3 +18,6 @@ swww img "$selected"
 
 # Update Firefox's wallpaper
 rm -f "$HOME/.mozilla/firefox/emre/chrome/wp.png" && cp "$selected" "$HOME/.mozilla/firefox/emre/chrome/wp.png"
+
+# Update tmp wallpaper
+cp "$selected" "/tmp/wp.png"
