@@ -140,7 +140,7 @@ in
     waybar
     wttrbar
     hyprlock
-    xwaylandvideobridge
+    kdePackages.xwaylandvideobridge
     tor-browser
     qalculate-qt
     libqalculate

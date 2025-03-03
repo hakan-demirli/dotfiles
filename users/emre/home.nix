@@ -143,7 +143,7 @@ in
         # generic
         ".cache"
         ".mozilla"
-        ".thunderbird"
+        # ".thunderbird" # not used anymore
         # ".local/share/keyrings"
         ".local/share"
         # ".local/state"
@@ -178,7 +178,7 @@ in
     waybar
     wttrbar
     hyprlock
-    xwaylandvideobridge
+    kdePackages.xwaylandvideobridge
     tor-browser
     qalculate-qt
     libqalculate
