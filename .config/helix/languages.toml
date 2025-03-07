@@ -45,6 +45,7 @@ language-servers =[
   "jdtls",
   # "lsp-ai"
 ]
+formatter = { command = "google-java-format", args = ["-"] }
 auto-format = true
 
 [[language]]
@@ -190,13 +191,34 @@ config = { markdown.preview.serveStatic = true, markdown.preview.codeTheme = "gi
 [language-server.html-preview-lsp]
 command = "html-preview-lsp"
 
-
 [language-server.jdtls]
 command = "jdtls"
 args = [
   "-data", "/home/emre/.cache/jdtls/workspace", # WARNING: abs path
   "-configuration", "/home/emre/.cache/jdtls/config", # WARNING: abs path
 ]
+
+[language-server.jdtls.config.java]
+"jdt.ls.vmargs" = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx8G -Xms1G -XX:+UseG1GC -XX:+UseStringDeduplication"
+"contentProvider.preferred" = "fernflower"
+"signatureHelp.enabled" = true
+"completion.favoriteStaticMembers" = [
+  "org.junit.Assert.*",
+  "org.junit.Assume.*",
+  "org.junit.jupiter.api.Assertions.*",
+  "org.junit.jupiter.api.Assumptions.*",
+  "org.junit.jupiter.api.DynamicContainer.*",
+  "org.junit.jupiter.api.DynamicTest.*",
+]
+"completion.importOrder" = ["java", "javax", "com", "org"]
+"sources.organizeImports.starThreshold" = 9999
+"sources.organizeImports.staticStarThreshold" = 9999
+"codeGeneration.useBlocks" = true
+"codeGeneration.generateComments" = false
+"server.launchMode" = "Standard"
+
+
+
 
 
 # [language-server.lsp-ai]
