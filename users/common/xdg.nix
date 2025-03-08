@@ -68,7 +68,6 @@
 
       immutable_data = [
         "applications"
-        "fonts"
       ];
 
       mutable_data = [
@@ -197,6 +196,16 @@
           path = "${gdriveDir}/archives/quantifyself";
         }
       ];
+      recursive = true;
+      executable = false;
+    };
+    ".local/share/fonts" = {
+      source = pkgs.fetchFromGitHub {
+        owner = "dv-anomaly";
+        repo = "ttf-wps-fonts";
+        rev = "8c980c24289cb08e03f72915970ce1bd6767e45a";
+        sha256 = "sha256-x+grMnpEGLkrGVud0XXE8Wh6KT5DoqE6OHR+TS6TagI=";
+      };
       recursive = true;
       executable = false;
     };
