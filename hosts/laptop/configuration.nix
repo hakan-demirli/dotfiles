@@ -88,6 +88,7 @@
   fonts = {
     packages = [
       pkgs.nerd-fonts.jetbrains-mono
+      pkgs.corefonts # microsoft fonts for pptx/word/excell
     ];
   };
 
