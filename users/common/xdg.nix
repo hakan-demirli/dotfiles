@@ -14,8 +14,6 @@
       ];
 
       immutable_configs = [
-        "mimeapps.list"
-        "hypr"
         "activitywatch"
         "anyrun"
         "awatcher"
@@ -29,9 +27,11 @@
         "gnome-extensions"
         "gtk_indicator"
         "helix"
+        "hypr"
         "input-remapper-2"
         "kitty"
         "lf"
+        "mimeapps.list"
         "mpd"
         "mpv"
         "nix"
@@ -53,6 +53,7 @@
         "tmux"
         "tmuxp"
         "tofi"
+        "transmission"
         "udiskie"
         "vim"
         "wavemon"
