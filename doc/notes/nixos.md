@@ -134,6 +134,10 @@
         };
     ```
 
+* **Add VM to virt-manager via cli**
+    * ```sudo virsh net-start default```
+    * ```sudo virt-install   --name win11   --memory 9999   --vcpus 16   --disk path=./win11.qcow2,size=80   --cdrom ./windows10.iso   --os-variant win11   --network network=default   --graphics spice   --boot cdrom,hd --noreboot --noautoconsole```
+
 * **Virtiofs not working**
     * Proper way:
 ```nix

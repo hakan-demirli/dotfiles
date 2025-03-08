@@ -246,6 +246,8 @@
       "uinput"
       "input"
       "libvirtd"
+      "libvirt"
+      "kvm"
     ];
   };
 
