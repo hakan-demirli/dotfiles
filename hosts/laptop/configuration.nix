@@ -249,6 +249,7 @@
       "libvirtd"
       "libvirt"
       "kvm"
+      "docker"
     ];
   };
 
@@ -290,6 +291,7 @@
       "/var/lib/systemd/coredump"
       "/var/lib/libvirt"
       "/etc/NetworkManager/system-connections"
+      "/var/lib/docker"
     ];
   };
   systemd.tmpfiles.rules = [

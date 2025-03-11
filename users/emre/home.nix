@@ -284,6 +284,9 @@ in
     # taskwarrior
     # timewarrior
 
+    # https://github.com/NixOS/nixpkgs/issues/47201#issuecomment-2379635080
+    # colima
+
     adb-sync
     # wineWowPackages.waylandFull
     # winetricks

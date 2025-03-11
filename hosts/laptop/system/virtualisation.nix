@@ -15,5 +15,14 @@
   };
   environment.systemPackages = with pkgs; [ virtiofsd ];
 
+  virtualisation.docker.enable = true;
+  virtualisation.docker.storageDriver = "btrfs";
+
+  # Problematic. Permission issues.
+  # virtualisation.docker.rootless = {
+  #   enable = true;
+  #   setSocketVariable = true;
+  # };
+
   # boot.extraModulePackages = with config.boot.kernelPackages; [virtualbox];
 }
