@@ -40,7 +40,7 @@ if [[ "$tmux_command" == *"$editor_command"* ]]; then
     # if not create a window, switch to it and open hx inside then send keys
     # shorten the path. tmux send-keys is slow
     relative_path=$(realpath --relative-to="$tmux_pane_path" "$path")
-    tmux new-window -t "$tmux_session:$tmux_window" 2>/dev/null
+    tmux new-window -t "$tmux_session:$tmux_window" -c "$tmux_pane_path" 2>/dev/null
     tmux send-keys -t "$tmux_session:$tmux_window" "hx $relative_path:$col:$row" C-m
   fi
 else
@@ -57,12 +57,12 @@ else
   else
     # Check if terminal_command is in tmux_command
     if [[ "$tmux_command" == *"$terminal_command"* ]]; then
-      tmux new-window -t "$tmux_session:$tmux_window" 2>/dev/null
+      tmux new-window -t "$tmux_session:$tmux_window" -c "$tmux_pane_path" 2>/dev/null
     else
-      tmux new-window -t "$tmux_session:$tmux_window" 2>/dev/null
+      tmux new-window -t "$tmux_session:$tmux_window" -c "$tmux_pane_path" 2>/dev/null
       tmux send-keys -t "$tmux_session:$tmux_window" "$tmux_command" C-m
     fi
-    tmux new-window -t "$tmux_session:$tmux_window" 2>/dev/null || tmux select-window -t "$tmux_session:$tmux_window"
+    tmux new-window -t "$tmux_session:$tmux_window" -c "$tmux_pane_path" 2>/dev/null || tmux select-window -t "$tmux_session:$tmux_window"
   fi
 fi
 
