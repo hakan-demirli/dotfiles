@@ -27,5 +27,8 @@
 [include]
     path = ./git_tokens
 
+[include]
+    path = ./git_keys
+
 [http]
 	postBuffer = 1048576000
