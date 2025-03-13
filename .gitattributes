@@ -1,4 +1,4 @@
-secrets/* filter=git-crypt diff=git-crypt
+secrets/** filter=git-crypt diff=git-crypt
 # required for bootstrapping secrets
 secrets/git-crypt-key -filter -diff
 
