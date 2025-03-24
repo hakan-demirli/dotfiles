@@ -244,7 +244,7 @@ in
     # helix-gpt
     # (koboldcpp.override { cublasSupport = true; })
     # (pkgs.llama-cpp.override { cudaSupport = true; })
-    ollama-cuda
+    # ollama-cuda
     lsp-ai
     asm-lsp
     nixd
