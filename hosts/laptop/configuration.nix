@@ -170,7 +170,7 @@
 
   # test: `cpupower frequency-info`
   boot = {
-    kernel.sysctl."fs.file-max" = 100000; # https://github.com/NixOS/nix/issues/8684
+    kernel.sysctl."fs.file-max" = 9223372036854775807; # https://github.com/NixOS/nix/issues/8684
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       # "amd_iommu=off"
