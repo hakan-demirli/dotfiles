@@ -66,11 +66,16 @@ keymap = [
 	{ on = [ "/" ], run = "filter --smart", desc = "Filter the files" },
 
 	# Bookmarks
-	{ on = [ "b", "d" ],       run = "cd ~/Desktop/dotfiles", desc = "cd dotfiles" },
-	{ on = [ "b", "n" ],       run = "cd ~/Desktop/notes", desc = "cd notes" },
-	{ on = [ "b", "p" ],       run = "cd /mnt/second/rep/personal_repo", desc = "cd personal_repo" },
-	{ on = [ "b", "r" ],       run = "cd ~/Desktop/research/", desc = "cd research" },
-	{ on = [ "b", "s" ],       run = "cd ~/Desktop/research/education/master/", desc = "cd master" },
+	{ on = [ "b", "1" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 2  | tail -n 1)"' ''', desc = "cd personal repo" },
+	{ on = [ "b", "2" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 3  | tail -n 1)"' ''', desc = "cd notes"        },
+	{ on = [ "b", "3" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 4  | tail -n 1)"' ''', desc = "cd dotfiles"     },
+	{ on = [ "b", "4" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 5  | tail -n 1)"' ''', desc = "cd bookmark 4"   },
+	{ on = [ "b", "5" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 6  | tail -n 1)"' ''', desc = "cd bookmark 5"   },
+	{ on = [ "b", "6" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 7  | tail -n 1)"' ''', desc = "cd bookmark 6"   },
+	{ on = [ "b", "7" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 8  | tail -n 1)"' ''', desc = "cd bookmark 7"   },
+	{ on = [ "b", "8" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 9  | tail -n 1)"' ''', desc = "cd bookmark 8"   },
+	{ on = [ "b", "9" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 10 | tail -n 1)"' ''', desc = "cd bookmark 9"   },
+	{ on = [ "b", "0" ], run = '''shell 'ya emit cd "$(cat ~/.cache/yazi_bookmark/bookmarks.yaml | head -n 1  | tail -n 1)"' ''', desc = "cd bookmark 0"   },
 
 	# XXXXXXXXXXXXXXXXXXXXXX
 	# Default bindings below
