@@ -292,6 +292,7 @@
       "/var/lib/libvirt"
       "/etc/NetworkManager/system-connections"
       "/var/lib/docker"
+      "/var/lib/cloudflare-warp"
     ];
   };
   systemd.tmpfiles.rules = [
