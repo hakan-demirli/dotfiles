@@ -10,6 +10,8 @@
     ./hardware/hardware-configuration.nix
     ./system/graphics.nix
     ./system/bootloader.nix
+    ../../pkgs/derivations/reverse_ssh.nix
+    ../../pkgs/derivations/symlink_gitconfig.nix
     (import ./hardware/disko.nix { device = "/dev/nvme0n1"; })
   ];
 
@@ -50,6 +52,11 @@
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/etc/NetworkManager/system-connections"
+      "/var/lib/cloudflare-warp"
+      # allow linger
+      "/var/lib/systemd/timesync/clock"
+      "/var/lib/systemd/linger"
+      "/var/lib/systemd/timers"
     ];
   };
   systemd.tmpfiles.rules = [
@@ -164,6 +171,7 @@
   # ---------------emre--------------
   users.users.emre = {
     isNormalUser = true;
+    linger = true;
     # mkpasswd -m sha-512 "my_super_secret_pass"
     hashedPassword = "$6$dxLcMi321Rg6B7Nu$tRRLCU/7AEFKg7HW56XIKkbtowfyX4uSOq0M8.pKRZIgg6FrdF9o19yAf1mEov.C.SnhSlXG48rmVbVFqtbEn1";
     uid = 1000;
@@ -252,6 +260,11 @@
   };
 
   services.openssh.enable = true;
+
+  services.cloudflare-warp = {
+    enable = true;
+    package = pkgs.cloudflare-warp;
+  };
 
   ###################################################
   #                   Keymapping                    #
