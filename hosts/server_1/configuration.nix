@@ -9,12 +9,9 @@
   imports = [
     ./hardware/hardware-configuration.nix
     ./system/graphics.nix
+    ./system/bootloader.nix
     (import ./hardware/disko.nix { device = "/dev/nvme0n1"; })
   ];
-
-  boot.loader.grub.enable = true;
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.device = "/dev/nvme0n1";
 
   ###################################################
   #                    FileSystem                   #
