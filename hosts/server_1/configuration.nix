@@ -185,17 +185,19 @@
     inherit inputs;
     inherit pkgs;
   };
-  home-manager.users.emre = {
-    imports = [
-      inputs.impermanence.nixosModules.home-manager.impermanence
 
-      (import ../../users/emre-server/home.nix {
-        inherit pkgs inputs config;
-        gdriveDir = /home/emre/Desktop/gdrive;
-        dotfilesDir = /home/emre/Desktop/dotfiles;
-      })
-
-    ];
+  home-manager = {
+    backupFileExtension = "backup";
+    users.emre = {
+      imports = [
+        inputs.impermanence.nixosModules.home-manager.impermanence
+        (import ../../users/emre-server/home.nix {
+          inherit pkgs inputs config;
+          gdriveDir = /home/emre/Desktop/gdrive;
+          dotfilesDir = /home/emre/Desktop/dotfiles;
+        })
+      ];
+    };
   };
   security.pam.services.swaylock = { }; # without this swaylock is broken
 
