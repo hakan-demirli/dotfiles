@@ -60,6 +60,7 @@
         "waybar"
         "wgetrc"
         "wofi"
+        "xdg-desktop-portal-termfilechooser"
         "xilinx"
         "xremap"
         "yazi"
@@ -156,15 +157,16 @@
             #   "termfilechooser"
             # ]; # not working
           };
-          hyprland.default = [
-            "hyprland"
-            "gtk"
-          ];
-          # hyprland.default = ["hyprland" "termfilechooser" "gtk"]; # not working
+          hyprland = {
+            "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
+            default = [
+              "hyprland"
+              "gtk"
+            ];
+          };
         };
-
         extraPortals = [
-          # (pkgs.callPackage ../../system/app/xdg-desktop-portal-termfilechooser.nix {}) # not working
+          pkgs.xdg-desktop-portal-termfilechooser
           pkgs.xdg-desktop-portal-gtk
           pkgs.xdg-desktop-portal-wlr
           pkgs.xdg-desktop-portal-hyprland
