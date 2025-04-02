@@ -75,7 +75,10 @@
 
 * **Copy File over ssh**
     * ```scp <source> <destination>```
-    * ```scp  D:\ssh\camera_in.tar root@192.168.137.237:~/```
+    * Send to ssh server:
+        * ```scp ~/test.zip root@192.168.137.237:~/```
+    * Receive from ssh server:
+        * ```scp root@192.168.137.237:/home/root/test.zip ./```
 
 * **Install OpenCV**
     * Precompiled binaries, but they are old
