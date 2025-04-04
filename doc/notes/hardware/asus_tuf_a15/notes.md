@@ -5,3 +5,4 @@
     * However, [Smokeless_UMAF](https://github.com/DavidS95/Smokeless_UMAF) can enable CPPC.
       * It works.
       * ```cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_driver```
+      * But its buggy, max freq is 1.7 GHz. So, dont.
