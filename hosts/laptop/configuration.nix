@@ -177,7 +177,7 @@
       # "idle=nomwait"
       # "amdgpu.gpu_recovery=1"
 
-      "amd_pstate=guided"
+      # "amd_pstate=guided" # buggy on asus tuf
 
       # ''acpi_osi="Windows 2020"''
 
