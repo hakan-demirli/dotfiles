@@ -6,8 +6,8 @@
 set -ex
 
 logfile="$HOME/yazi-chooser.log"
-echo "--- $(date) ---" >> "$logfile"
-echo "Args: $@" >> "$logfile"
+# echo "--- $(date) ---" >> "$logfile"
+# echo "Args: $@" >> "$logfile"
 
 multiple="$1"
 directory="$2"
@@ -32,7 +32,7 @@ else
     [ -n "$path" ] && set -- "$@" "$path"
 fi
 
-echo "Processed args: $@" >> "$logfile"
+# echo "Processed args: $@" >> "$logfile"
 
 command="$termcmd $cmd"
 for arg in "$@"; do
@@ -40,5 +40,5 @@ for arg in "$@"; do
     command="$command \"$escaped\""
 done
 
-echo "Final command: $command" >> "$logfile"
+# echo "Final command: $command" >> "$logfile"
 sh -c "$command"
