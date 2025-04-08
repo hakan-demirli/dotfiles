@@ -24,6 +24,7 @@
     "battery",
     "custom/left-arrow-dark",
     "custom/timer",
+    "custom/left-arrow-dark",
     "custom/weather",
     "custom/left-arrow-dark",
     "custom/notification",
@@ -109,7 +110,7 @@
     "reverse-scrolling": 1
   },
   "battery": { // 6 space max size preoccupied
-    "format": "\n{capacity}% {icon}\n{time}",
+    "format": "{capacity}% {icon}\n{time}",
     "format-icons": {
       "default": [
         "",
