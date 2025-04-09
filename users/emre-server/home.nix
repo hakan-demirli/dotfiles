@@ -219,8 +219,8 @@ in
     winetricks
     steam-run # quick runner for fsh compliant binaries
     udiskie
-    # (pkgs.callPackage ../../pkgs/derivations/xremap.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/helix.nix { })
+    # (pkgs.callPackage ../../pkgs/xremap.nix { })
+    # (pkgs.callPackage ../../pkgs/helix.nix { })
     helix # no need for the patches
   ];
 }

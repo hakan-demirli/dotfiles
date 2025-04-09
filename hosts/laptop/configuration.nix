@@ -118,7 +118,7 @@
       wget
       neovim # default editor
 
-      (pkgs.callPackage ../../pkgs/derivations/sddm-astronaut.nix {
+      (pkgs.callPackage ../../pkgs/sddm-astronaut.nix {
         # theme = "pixel_sakura";
       })
     ];

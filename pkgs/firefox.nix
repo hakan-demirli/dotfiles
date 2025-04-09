@@ -12,8 +12,8 @@
       search.force = true;
       isDefault = true;
 
-      userChrome = builtins.readFile ../../.config/firefoxcss/userChrome.css;
-      userContent = builtins.readFile ../../.config/firefoxcss/userContent.css;
+      userChrome = builtins.readFile ../.config/firefoxcss/userChrome.css;
+      userContent = builtins.readFile ../.config/firefoxcss/userContent.css;
       settings = {
         # Prevent tabbing on the "3 dot menu" on Firefox Suggest drop down items
         # https://connect.mozilla.org/t5/discussions/how-to-remove-the-3-dot-menu-on-firefox-suggest-drop-down-items/td-p/28339

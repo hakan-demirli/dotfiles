@@ -9,11 +9,11 @@ let
 in
 {
   imports = [
-    (import ../../pkgs/derivations/firefox.nix {
+    (import ../../pkgs/firefox.nix {
       inherit username;
     })
     # ../../pkgs/derivations/thunderbird.nix
-    ../../pkgs/derivations/low_battery_notify.nix
+    ../../pkgs/low_battery_notify.nix
 
     (import ../common/xdg.nix {
       inherit pkgs inputs config;
@@ -157,20 +157,6 @@ in
     };
   };
   home.packages = with pkgs; [
-    # awatcher
-    # aw-watcher-afk
-    # aw-watcher-window
-    # aw-server-rust
-    # (pkgs.callPackage ../../system/app/aw-manager.nix { })
-    # (pkgs.callPackage ../../system/app/aw-watchers-mine.nix { })
-
-    # (pkgs.callPackage ../../system/app/prometheus-exporters.nix { })
-    #
-    # (pkgs.callPackage ../../pkgs/derivations/quantifyself.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/quantifyself-webui.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/html-preview-lsp.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/html-preview-server.nix { })
-
     bandwhich # network monitoring TUI
     cpufrequtils
     hypridle
@@ -287,32 +273,31 @@ in
     # https://github.com/NixOS/nixpkgs/issues/47201#issuecomment-2379635080
     # colima
 
+    udiskie
     adb-sync
     # wineWowPackages.waylandFull
     # winetricks
     # steam-run # quick runner for fsh compliant binaries
-    udiskie
-    # (pkgs.callPackage ../../pkgs/derivations/tt.nix {})
-    # (pkgs.callPackage ../../pkgs/derivations/j4-dmenu-desktop.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/waybar_timer.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/xremap.nix { wlrootsSupport = true; })
 
-    # helix
-    (pkgs.callPackage ../../pkgs/derivations/helix.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/mitype.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/rvc-cli.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/gen_typing_test.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/notify_scheduler.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/blender.nix { })
+    inputs.small-apps.packages.${pkgs.system}.waybar_timer
+    inputs.small-apps.packages.${pkgs.system}.gtk_applet
+    inputs.small-apps.packages.${pkgs.system}.auto_refresh
+    inputs.small-apps.packages.${pkgs.system}.youtube_sync
+    # inputs.small-apps.packages.${pkgs.system}.tt
+    # inputs.small-apps.packages.${pkgs.system}.clipboard_tts
+    # inputs.small-apps.packages.${pkgs.system}.gtk_indicator
+    # inputs.small-apps.packages.${pkgs.system}.update_wp
+    # inputs.small-apps.packages.${pkgs.system}.notify_scheduler
+    # inputs.small-apps.packages.${pkgs.system}.gen_typing_test
 
-    # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/veridian.nix { withSlang = true; })
-    # (pkgs.callPackage ../../pkgs/derivations/update_wp.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/gtk_applet.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/gtk_indicator.nix { })
+    (pkgs.callPackage ../../pkgs/xremap.nix { wlrootsSupport = true; })
+    (pkgs.callPackage ../../pkgs/helix.nix { })
+    # (pkgs.callPackage ../../pkgs/mitype.nix { })
+    # (pkgs.callPackage ../../pkgs/rvc-cli.nix { })
+    # (pkgs.callPackage ../../pkgs/blender.nix { })
+    # (pkgs.callPackage ../../pkgs/veridian.nix { })
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
-    (pkgs.callPackage ../../pkgs/derivations/youtube_sync.nix { })
-    (pkgs.callPackage ../../pkgs/derivations/auto_refresh.nix { })
-    # (pkgs.callPackage ../../pkgs/derivations/clipboard_tts.nix { })
+    # (pkgs.callPackage ../../pkgs/veridian.nix { withSlang = true; })
+    # (pkgs.callPackage ../../pkgs/j4-dmenu-desktop.nix { })
   ];
 }
