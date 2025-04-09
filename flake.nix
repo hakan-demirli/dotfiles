@@ -17,6 +17,11 @@
     impermanence = {
       url = "github:nix-community/impermanence";
     };
+
+    small-apps = {
+      url = "github:hakan-demirli/small-apps";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
