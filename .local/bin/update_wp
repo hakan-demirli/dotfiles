@@ -21,3 +21,6 @@ rm -f "$HOME/.mozilla/firefox/emre/chrome/wp.png" && cp "$selected" "$HOME/.mozi
 
 # Update tmp wallpaper
 cp "$selected" "/tmp/wp.webp"
+
+# Update tmp wallpaper small
+ffmpeg -i /tmp/wp.webp -vf "scale='if(gte(a,1920/1080),-1,1920)':'if(gte(a,1920/1080),1080,-1)',crop=1920:1080" /tmp/wp.png
