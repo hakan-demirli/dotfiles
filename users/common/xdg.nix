@@ -188,7 +188,7 @@
         }
         {
           name = "scratchpads";
-          path = "${gdriveDir}/scratchpads";
+          path = "${gdriveDir}/software/scratchpads";
         }
         {
           name = "notify-scheduler";
@@ -197,6 +197,10 @@
         {
           name = "quantifyself";
           path = "${gdriveDir}/archives/quantifyself";
+        }
+        {
+          name = "homepage";
+          path = "${gdriveDir}/software/homepage";
         }
       ];
       recursive = true;
