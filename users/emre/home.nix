@@ -176,7 +176,7 @@ in
     wl-clip-persist
     pulseaudio
     tree
-    # anki-bin
+    anki-bin
     # piper-tts
 
     python3
