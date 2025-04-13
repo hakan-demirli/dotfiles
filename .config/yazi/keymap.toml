@@ -44,7 +44,7 @@ keymap = [
 	{ on = [ "<Space>", "c" ], run = ["shell --block --confirm 'yazi_zip $@'","escape"], desc = "Zip selected" },
 	# ripdrag fails when nvidia gpu is enabled. Use dragon as alternative
 	# { on = [ "<Space>", "d" ], run = ['''shell 'ripdrag "$@" -x 2>/dev/null &' --confirm''',"escape"],desc = "Show files in drag and drop menu" },
-	{ on = [ "<Space>", "d" ], run = ['''shell 'xdragon "$@" -x 2>/dev/null &' --confirm''',"escape"],desc = "Show files in drag and drop menu" },
+	{ on = [ "<Space>", "d" ], run = ['''shell 'xdragon "$@" --all -x 2>/dev/null &' --confirm''',"escape"],desc = "Show files in drag and drop menu" },
 	# Goto
 	{ on = [ "g", "g" ], run = "arrow top", desc = "Move cursor to the top" },
 	{ on = [ "g", "e" ], run = "arrow bot", desc = "Move cursor to the end" },
