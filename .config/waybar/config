@@ -68,7 +68,7 @@
     "on-click": "btop_my"
   },
   "pulseaudio": {
-    "format": "\n{volume}% {icon}\n",
+    "format": "{volume}% {icon}",
     "format-bluetooth": "{volume}% {icon}",
     "format-muted": "",
     "format-icons": {
