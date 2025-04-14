@@ -202,7 +202,7 @@ in
 
     playerctl
     swww # for update_wp
-    activate-linux # for update_wp
+    # activate-linux # for update_wp
     mpv
     # (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     # nerd-fonts.jetbrains-mono
