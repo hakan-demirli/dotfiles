@@ -174,12 +174,6 @@ tooltip {
   border-radius: 8px 0px 0px 8px;
 }
 
-#clock {
-  margin-left: 0px;
-  border-radius: 0px 8px 8px 0px;
-  background: alpha(@background, 0.6);
-}
-
 #custom-timer.active {
   background-color: shade(@red, 0.7);
 }
