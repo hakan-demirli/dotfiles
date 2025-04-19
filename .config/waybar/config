@@ -65,7 +65,7 @@
   },
   "memory": {
     "format": "{}% ",
-    "on-click": "btop_my"
+    "on-click": "todo_my"
   },
   "pulseaudio": {
     "format": "{volume}% {icon}",
