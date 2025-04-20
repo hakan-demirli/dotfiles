@@ -70,6 +70,9 @@ in
         gcmp() {
           git commit -m "$1" && git push
         }
+
+        # kitty SSH issue workaround: https://wiki.archlinux.org/title/Kitty#Terminal_issues_with_SSH
+        [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
       '';
     };
     fzf = {
