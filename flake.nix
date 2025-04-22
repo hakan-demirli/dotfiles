@@ -46,7 +46,8 @@
     {
       nixosConfigurations = {
         laptop = mkSystem ./hosts/laptop/configuration.nix;
-        vm = mkSystem ./hosts/vm/configuration.nix;
+        vm_local = mkSystem ./hosts/vm_local/configuration.nix;
+        vm_oracle = mkSystem ./hosts/vm_oracle/configuration.nix;
         server_1 = mkSystem ./hosts/server_1/configuration.nix;
       };
     };
