@@ -10,8 +10,8 @@
     ./hardware/hardware-configuration.nix
     ./system/graphics.nix
     ./system/bootloader.nix
-    ../../pkgs/derivations/reverse_ssh.nix
-    ../../pkgs/derivations/symlink_gitconfig.nix
+    ../../pkgs/reverse_ssh.nix
+    ../../pkgs/symlink_gitconfig.nix
     (import ./hardware/disko.nix { device = "/dev/nvme0n1"; })
   ];
 
