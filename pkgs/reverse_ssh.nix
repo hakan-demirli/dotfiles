@@ -5,8 +5,8 @@ let
   scriptHome = "/home/${scriptUser}";
   gitRepoPath = "${scriptHome}/Desktop/serveo";
 
-  reverseSshScript = ../../.local/bin/create_reverse_ssh;
-  warpConnectScript = ../../.local/bin/connect_warp;
+  reverseSshScript = ../.local/bin/create_reverse_ssh;
+  warpConnectScript = ../.local/bin/connect_warp;
 
 in
 {
