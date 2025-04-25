@@ -29,10 +29,11 @@
     let
       # Helper function to reduce repetition for each system configuration.
       mkSystem =
-        hostConfig:
+        { hostConfig, system }:
         nixpkgs.lib.nixosSystem {
+          inherit system;
           specialArgs = {
-            inherit inputs;
+            inherit inputs system;
           };
           modules = [
             hostConfig
@@ -45,10 +46,26 @@
     in
     {
       nixosConfigurations = {
-        laptop = mkSystem ./hosts/laptop/configuration.nix;
-        vm_local = mkSystem ./hosts/vm_local/configuration.nix;
-        vm_oracle = mkSystem ./hosts/vm_oracle/configuration.nix;
-        server_1 = mkSystem ./hosts/server_1/configuration.nix;
+        laptop = mkSystem {
+          hostConfig = ./hosts/laptop/configuration.nix;
+          system = "x86_64-linux";
+        };
+        vm_local = mkSystem {
+          hostConfig = ./hosts/vm_local/configuration.nix;
+          system = "x86_64-linux";
+        };
+        vm_oracle_x86 = mkSystem {
+          hostConfig = ./hosts/vm_oracle_x86/configuration.nix;
+          system = "x86_64-linux";
+        };
+        server_1 = mkSystem {
+          hostConfig = ./hosts/server_1/configuration.nix;
+          system = "x86_64-linux";
+        };
+        vm_oracle_aarch64 = mkSystem {
+          hostConfig = ./hosts/vm_oracle_aarch64/configuration.nix;
+          system = "aarch64-linux";
+        };
       };
     };
 }
