@@ -96,7 +96,7 @@
 
       keep-outputs = true;
       keep-derivations = true;
-      max-substitution-jobs = 256;
+      max-substitution-jobs = 1;
     };
   };
 
