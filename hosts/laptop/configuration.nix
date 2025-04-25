@@ -186,6 +186,9 @@
     ];
     supportedFilesystems = [ "ntfs" ];
     tmp.cleanOnBoot = true;
+
+    # to cross compile aarch64 images on my x86 laptop
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
 
   # systemctl status --user polkit-gnome-authentication-agent-1
