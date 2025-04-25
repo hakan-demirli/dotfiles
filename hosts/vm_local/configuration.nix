@@ -168,7 +168,7 @@
   users.users.emre = {
     isNormalUser = true;
     # mkpasswd -m sha-512 "my_super_secret_pass"
-    hashedPassword = "$6$dxLcMi321Rg6B7Nu$tRRLCU/7AEFKg7HW56XIKkbtowfyX4uSOq0M8.pKRZIgg6FrdF9o19yAf1mEov.C.SnhSlXG48rmVbVFqtbEn1";
+    hashedPassword = "$6$hjsD4y4Iy/9ql6dC$WYxNpnvlx9r6TbGwWcXMqzzsyzh6IvftawYlyvwB4/Zr21UNO5eyj87WB2JqcH.EoO3rmP10P5X/d0b6tNcSh/";
     uid = 1000;
     extraGroups = [
       "networkmanager"
@@ -255,6 +255,14 @@
   };
 
   services.openssh.enable = true;
+
+  users.users.root.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZuf6oNuOd8+zyXt8Idh0Wx3irSx6IwcgxrEMfBgevV ehdemirli@proton.me"
+  ];
+
+  users.users.emre.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZuf6oNuOd8+zyXt8Idh0Wx3irSx6IwcgxrEMfBgevV ehdemirli@proton.me"
+  ];
 
   ###################################################
   #                   Keymapping                    #
