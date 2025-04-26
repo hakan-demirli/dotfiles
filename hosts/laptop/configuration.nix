@@ -28,7 +28,7 @@ let
 
     useHomeManager = true;
     homeManagerImports = [
-      ../../users/${username}-server-headless/home.nix
+      ../../users/${username}/home.nix
     ];
     homeManagerArgs = {
       gdriveDir = "/home/${username}/Desktop/gdrive";
@@ -99,7 +99,10 @@ in
     ];
   };
 
-  fonts.packages = [ pkgs.corefonts ];
+  fonts.packages = [
+    pkgs.nerd-fonts.jetbrains-mono
+    pkgs.corefonts
+  ];
 
   environment.systemPackages = with pkgs; [
     home-manager
