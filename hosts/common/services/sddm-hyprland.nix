@@ -38,8 +38,9 @@
   };
 
   imports = [ ../system/polkit-agent.nix ];
-
-  fonts.packages = [
-    pkgs.nerd-fonts.jetbrains-mono
+  environment.systemPackages = [
+    (pkgs.callPackage ../../../pkgs/sddm-astronaut.nix {
+      # theme = "pixel_sakura";
+    })
   ];
 }

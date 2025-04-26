@@ -10,7 +10,7 @@
     nixos.enable = false;
   };
 
-  fonts.fontconfig.enable = false;
+  fonts.fontconfig.enable = true;
 
   programs = {
     bash.completion.enable = true;
