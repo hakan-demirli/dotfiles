@@ -127,7 +127,7 @@ in
     inherit username;
     homeDirectory = "/home/${username}";
 
-    stateVersion = "24.05"; # do not change
+    stateVersion = "25.05";
 
     pointerCursor = {
       gtk.enable = true;

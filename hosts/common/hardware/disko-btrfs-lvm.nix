@@ -1,11 +1,13 @@
 {
-  device ? throw "Set this to your disk device, e.g. /dev/vda",
+  diskDevice,
+  swapSize ? "8G",
   ...
 }:
+
 {
   disko.devices = {
     disk.main = {
-      inherit device;
+      device = diskDevice;
       type = "disk";
       content = {
         type = "gpt";
@@ -26,7 +28,7 @@
             };
           };
           swap = {
-            size = "32G";
+            size = swapSize;
             content = {
               type = "swap";
               resumeDevice = true;
@@ -56,23 +58,26 @@
               subvolumes = {
                 "/root" = {
                   mountpoint = "/";
-                };
-
-                "/persist" = {
                   mountOptions = [
-                    "subvol=persist"
+                    "compress=zstd"
                     "noatime"
                   ];
-                  mountpoint = "/persist";
                 };
-
                 "/nix" = {
+                  mountpoint = "/nix";
                   mountOptions = [
-                    "subvol=nix"
+                    "compress=zstd"
                     "noatime"
                   ];
-                  mountpoint = "/nix";
                 };
+                "/persist" = {
+                  mountpoint = "/persist";
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
+                };
+
               };
             };
           };

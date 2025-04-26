@@ -1,5 +1,5 @@
 _: {
-  # $ nix search wget
+
   powerManagement = {
     enable = true;
     cpuFreqGovernor = "schedutil";

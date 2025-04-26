@@ -31,7 +31,7 @@ in
     };
     bash = {
       enable = true;
-      # historyFile = # dont
+      historyFile = "$HOME/Desktop/history"; # persist hist in Desktop
       historyFileSize = -1;
       historySize = -1;
       historyControl = [
@@ -78,7 +78,7 @@ in
   home = {
     inherit username;
     homeDirectory = "/home/${username}";
-    stateVersion = "24.05"; # do not change
+    stateVersion = "25.05";
 
     persistence."/persist/home" = {
       directories = [
