@@ -47,6 +47,14 @@ let
     canTouchEfiVariables = false;
     efiInstallAsRemovable = true;
     useOSProber = false;
+
+    reverseSshSessionName = "reverse-tunnel";
+    reverseSshRemoteBindAddress = "localhost";
+    reverseSshMonitoringPort = 0;
+
+    reverseSshLocalTargetPort = 22;
+    reverseSshLocalTargetHost = "localhost";
+    reverseSshPrivateKeyPath = throw "reverseSshPrivateKeyPath must be set for the client";
   };
 in
 {
