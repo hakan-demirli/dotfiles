@@ -29,6 +29,14 @@
 
       common_ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZuf6oNuOd8+zyXt8Idh0Wx3irSx6IwcgxrEMfBgevV ehdemirli@proton.me";
 
+      # Generate with: ssh-keygen -t ed25519 -f reverse_tunnel_key -N ""
+      reverseTunnelClientPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHcqNP7qRzWp0X+B8ij4+gePR/ldkLi5kFKid/c7sLz/ emre@vmqemux86";
+      reverseTunnelClientPrivateKeyPath = "/persist/home/Desktop/dotfiles/secrets/.ssh/reverse_tunnel_key"; # Path on reverse-ssh-client
+
+      reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
+      reverseSshBounceServerPort = 42069;
+      reverseSshBounceServerUser = "emre";
+
       mkSystem =
         {
           baseConfigPath,
@@ -77,6 +85,13 @@
             maxSubstitutionJobs = 256;
             swapSize = "32G";
             diskDevice = "/dev/nvme0n1";
+
+            reverseSshRemoteHost = reverseSshBounceServerHost;
+            reverseSshRemotePort = reverseSshBounceServerPort;
+            reverseSshRemoteUser = reverseSshBounceServerUser;
+            reverseSshPrivateKeyPath = reverseTunnelClientPrivateKeyPath;
+
+            extraImports = [ ./hosts/common/services/reverse-ssh-client.nix ];
           };
         };
 
@@ -86,15 +101,21 @@
           system = "aarch64-linux";
           argOverrides = {
             hashedPassword = hashedServerPassword;
-            authorizedKeys = [ common_ssh_key ];
+            authorizedKeys = [
+              common_ssh_key
+              reverseTunnelClientPublicKey
+            ];
             rootSshKeys = [ common_ssh_key ];
             hostName = "vm-oracle-aarch64";
             efiInstallAsRemovable = true;
             maxJobs = 4;
             nixCores = 4;
             maxSubstitutionJobs = 4;
-            swapSize = "1G"; # dont need much, just in case
+            swapSize = "1G";
             diskDevice = "/dev/sda";
+
+            extraImports = [ ./hosts/common/services/reverse-ssh-server.nix ];
+            allowedPorts = [ reverseSshBounceServerPort ];
           };
         };
 
