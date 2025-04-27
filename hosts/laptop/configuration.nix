@@ -23,7 +23,6 @@ let
     persistentDirs = [
       "/var/lib/libvirt"
       "/var/lib/docker"
-      "/var/lib/cloudflare-warp"
     ];
 
     useHomeManager = true;
@@ -81,6 +80,7 @@ in
     # ../common/services/ssh.nix # no ssh on laptop
     ../common/services/sddm-hyprland.nix
     ../common/services/base-desktop.nix
+    ../common/services/warp.nix
 
     ./hardware-configuration.nix
     ./nvidia.nix
@@ -138,13 +138,9 @@ in
     neovim
   ];
 
-  services.cloudflare-warp = {
-    enable = true;
-    package = pkgs.cloudflare-warp;
-  };
-
   hardware.keyboard.qmk.enable = true;
 
+  # allow cross compile
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   system.stateVersion = "25.05";
