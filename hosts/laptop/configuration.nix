@@ -49,8 +49,8 @@ let
 
     grubDevice = "nodev";
     useOSProber = true;
-    efiInstallAsRemovable = true;
-    canTouchEfiVariables = false;
+    efiInstallAsRemovable = false;
+    canTouchEfiVariables = true;
 
   };
 in
@@ -81,7 +81,18 @@ in
 
   ];
 
-  networking.hostName = commonArgs.hostName;
+  networking = {
+    hostName = commonArgs.hostName;
+    networkmanager.enable = true;
+  };
+
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1; # required to share your internet
+    # "net.ipv6.conf.all.forwarding" = 1;
+  };
+
+  systemd.services.NetworkManager-wait-online.enable = false;
+  systemd.network.wait-online.enable = false;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
