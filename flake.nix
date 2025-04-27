@@ -85,6 +85,7 @@
             maxSubstitutionJobs = 256;
             swapSize = "32G";
             diskDevice = "/dev/nvme0n1";
+            grubDevice = "nodev";
 
             reverseSshRemoteHost = reverseSshBounceServerHost;
             reverseSshRemotePort = reverseSshBounceServerPort;
@@ -113,6 +114,7 @@
             maxSubstitutionJobs = 4;
             swapSize = "1G";
             diskDevice = "/dev/sda";
+            grubDevice = "/dev/sda";
 
             extraImports = [ ./hosts/common/services/reverse-ssh-server.nix ];
             allowedPorts = [ reverseSshBounceServerPort ];
@@ -133,6 +135,7 @@
             nixCores = 1;
             maxSubstitutionJobs = 1;
             diskDevice = "/dev/sda";
+            grubDevice = "/dev/sda";
             swapSize = "4G";
           };
         };
