@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-tmux_harpoon_update &
+tmux_harpoon_update.sh &
 
 idx=$1
 editor_command=${EDITOR:-hx}

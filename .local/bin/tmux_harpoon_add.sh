@@ -51,7 +51,7 @@ fi
 if [[ "$buffer_path" != *"/default_path"* ]]; then
   # Check if the buffer_path already exists in the data_file
   if grep -q "^$buffer_path:" "$data_file"; then
-    tmux_harpoon_update
+    tmux_harpoon_update.sh
   else
     new_line="$buffer_path:$cursor_row:$cursor_col,$tmux_window,$tmux_session,$tmux_command,$tmux_pane_path"
     if [[ ! -s "$data_file" ]]; then
