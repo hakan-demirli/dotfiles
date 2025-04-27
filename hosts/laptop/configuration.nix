@@ -1,10 +1,10 @@
 {
   pkgs,
   ...
-}:
+}@specialArgsFromFlake:
 
 let
-  commonArgs = rec {
+  defaultArgs = rec {
     hostName = "laptop";
     diskDevice = "/dev/nvme1n1";
     swapSize = "32G";
@@ -51,12 +51,22 @@ let
     useOSProber = true;
     efiInstallAsRemovable = false;
     canTouchEfiVariables = true;
-
   };
+
+  finalArgs = defaultArgs // specialArgsFromFlake;
 in
 {
 
-  _module.args = commonArgs;
+  _module.args = builtins.removeAttrs finalArgs [
+    # Prevent Recursion
+    "pkgs"
+    "lib"
+    "inputs"
+    "system"
+    # "config"
+    # "options"
+    # "_module"
+  ];
 
   imports = [
 
@@ -82,7 +92,7 @@ in
   ];
 
   networking = {
-    hostName = commonArgs.hostName;
+    hostName = finalArgs.hostName;
     networkmanager.enable = true;
   };
 
@@ -106,7 +116,7 @@ in
     fsType = "ntfs-3g";
     options = [
       "rw"
-      "uid=${toString commonArgs.uid}"
+      "uid=${toString finalArgs.uid}"
     ];
   };
 
