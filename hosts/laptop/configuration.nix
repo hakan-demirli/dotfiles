@@ -35,6 +35,7 @@ let
       dotfilesDir = "/home/${username}/Desktop/dotfiles";
     };
 
+    extraImports = [ ];
     extraGroups = [ ];
     extraSubstituters = [ ];
     extraTrustedPublicKeys = [ ];
@@ -69,7 +70,6 @@ in
   ];
 
   imports = [
-
     ../common/system/base.nix
     ../common/system/locale.nix
 
@@ -88,8 +88,7 @@ in
 
     ./virtualisation.nix
     ./ydotool.nix
-
-  ];
+  ] ++ finalArgs.extraImports;
 
   networking = {
     hostName = finalArgs.hostName;
