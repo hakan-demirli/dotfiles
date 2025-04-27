@@ -108,6 +108,9 @@
 # Build without switch
 * ```sudo nixos-rebuild build --flake ~/Desktop/dotfiles/#laptop```
 
+# Build an iso or qcow2
+* ```nix run github:nix-community/nixos-generators -- --flake .#vm_oracle_aarch64 --format iso```
+
 # Deploy Secrets
 * ```nix-shell -p openssl```
 * ```read -sp "Enter passphrase: " password && echo && (head -c8 ~/Desktop/dotfiles/secrets/git-crypt-key | grep -q '^Salted__' || { echo "File does not appear encrypted."; exit 1; }) && (openssl enc -d -aes-256-cbc -pbkdf2 -in ~/Desktop/dotfiles/secrets/git-crypt-key -out /tmp/git-crypt-key -pass pass:"$password" && echo "Decryption complete.") && unset password```
