@@ -67,6 +67,7 @@
           system = "x86_64-linux";
           argOverrides = {
             hashedPassword = hashedPassword;
+            emulatedSystems = [ "aarch64-linux" ];
           };
         };
 
@@ -163,6 +164,7 @@
             authorizedKeys = [ common_ssh_key ];
             rootSshKeys = [ common_ssh_key ];
             hostName = "vm-qemu-aarch64";
+            emulatedSystems = [ "x86_64-linux" ];
           };
         };
       };

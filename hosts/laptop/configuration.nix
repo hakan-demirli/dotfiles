@@ -13,6 +13,7 @@ let
     extraLocaleSettings = { };
     username = "emre";
     uid = 1000;
+    emulatedSystems = [ ];
 
     hashedPassword = throw "You must specify a hashedPassword";
     authorizedKeys = [ ];
@@ -140,8 +141,7 @@ in
 
   hardware.keyboard.qmk.enable = true;
 
-  # allow cross compile
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  boot.binfmt.emulatedSystems = finalArgs.emulatedSystems;
 
   system.stateVersion = "25.05";
 }

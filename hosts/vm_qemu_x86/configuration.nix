@@ -13,6 +13,7 @@ let
     extraLocaleSettings = { };
     username = "emre";
     uid = 1000;
+    emulatedSystems = [ ];
 
     hashedPassword = throw "You must specify a hashedPassword";
     authorizedKeys = [ ];
@@ -101,6 +102,8 @@ in
     wget
     neovim
   ];
+
+  boot.binfmt.emulatedSystems = finalArgs.emulatedSystems;
 
   system.stateVersion = "25.05";
 }
