@@ -31,6 +31,7 @@ let
       dotfilesDir = "/home/${username}/Desktop/dotfiles";
     };
 
+    extraImports = [ ];
     extraGroups = [ ];
     extraSubstituters = [ ];
     extraTrustedPublicKeys = [ ];
@@ -82,8 +83,7 @@ in
     ../common/nix/settings.nix
     ../common/system/bootloader-grub-efi.nix
     ../common/services/ssh.nix
-    # No GUI services needed
-  ];
+  ] ++ finalArgs.extraImports;
 
   networking.hostName = finalArgs.hostName;
   networking.networkmanager.enable = true;
