@@ -1,4 +1,5 @@
 {
+  lib,
   grubDevice ? "nodev",
   efiInstallAsRemovable ? false,
   canTouchEfiVariables ? false,
@@ -8,7 +9,7 @@
 {
   boot.loader = {
     grub = {
-      enable = true;
+      enable = lib.mkDefault true;
       device = grubDevice;
       efiSupport = true;
       inherit efiInstallAsRemovable useOSProber;
