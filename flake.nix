@@ -29,9 +29,8 @@
 
       common_ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZuf6oNuOd8+zyXt8Idh0Wx3irSx6IwcgxrEMfBgevV ehdemirli@proton.me";
 
-      # Generate with: ssh-keygen -t ed25519 -f reverse_tunnel_key -N ""
-      reverseTunnelClientPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHcqNP7qRzWp0X+B8ij4+gePR/ldkLi5kFKid/c7sLz/ emre@vmqemux86";
-      reverseTunnelClientPrivateKeyPath = "/persist/home/Desktop/dotfiles/secrets/.ssh/reverse_tunnel_key"; # Path on reverse-ssh-client
+      reverseTunnelClientPublicKey = common_ssh_key; # i feel lazy
+      reverseTunnelClientPrivateKeyPath = "/persist/home/Desktop/dotfiles/secrets/.ssh/id_ed25519_proton"; # Path on reverse-ssh-client
 
       reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
       reverseSshBounceServerPort = 42069;
