@@ -5,7 +5,7 @@
 
 let
   commonArgs = rec {
-    hostName = "vm_qemu_x86";
+    hostName = throw "You must specify a hostName";
     diskDevice = "/dev/vda";
     swapSize = "8G";
     timeZone = "Europe/Istanbul";

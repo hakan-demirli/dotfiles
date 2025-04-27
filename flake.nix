@@ -148,6 +148,7 @@
             hashedPassword = hashedServerPassword;
             authorizedKeys = [ common_ssh_key ];
             rootSshKeys = [ common_ssh_key ];
+            hostName = "vm-qemu-x86";
           };
         };
 
@@ -159,6 +160,7 @@
             hashedPassword = hashedServerPassword;
             authorizedKeys = [ common_ssh_key ];
             rootSshKeys = [ common_ssh_key ];
+            hostName = "vm-qemu-aarch64";
           };
         };
       };
