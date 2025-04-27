@@ -1,10 +1,10 @@
 {
   pkgs,
   ...
-}:
+}@specialArgsFromFlake:
 
 let
-  commonArgs = rec {
+  defaultArgs = rec {
     hostName = throw "You must specify a hostName";
     diskDevice = "/dev/vda";
     swapSize = "8G";
@@ -56,9 +56,20 @@ let
     reverseSshLocalTargetHost = "localhost";
     reverseSshPrivateKeyPath = throw "reverseSshPrivateKeyPath must be set for the client";
   };
+
+  finalArgs = defaultArgs // specialArgsFromFlake;
 in
 {
-  _module.args = commonArgs;
+  _module.args = builtins.removeAttrs finalArgs [
+    # Prevent Recursion
+    "pkgs"
+    "lib"
+    "inputs"
+    "system"
+    # "config"
+    # "options"
+    # "_module"
+  ];
 
   imports = [
     # Common Modules
@@ -74,10 +85,8 @@ in
     # No GUI services needed
   ];
 
-  # == Host Specific Configuration ==
-
-  networking.hostName = commonArgs.hostName;
-  networking.networkmanager.enable = true; # Enable NetworkManager for VM networking
+  networking.hostName = finalArgs.hostName;
+  networking.networkmanager.enable = true;
 
   # System target (headless server)
   systemd.defaultUnit = "multi-user.target";
