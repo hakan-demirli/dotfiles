@@ -92,7 +92,10 @@
             reverseSshRemoteUser = reverseSshBounceServerUser;
             reverseSshPrivateKeyPath = reverseTunnelClientPrivateKeyPath;
 
-            extraImports = [ ./hosts/common/services/reverse-ssh-client.nix ];
+            extraImports = [
+              ./hosts/common/services/warp.nix
+              ./hosts/common/services/reverse-ssh-client.nix
+            ];
           };
         };
 
