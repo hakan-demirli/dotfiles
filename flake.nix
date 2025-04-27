@@ -111,6 +111,7 @@
             ];
             rootSshKeys = [ common_ssh_key ];
             hostName = "vm-oracle-aarch64";
+            emulatedSystems = [ "x86_64-linux" ];
             efiInstallAsRemovable = true;
             maxJobs = 4;
             nixCores = 4;
@@ -164,7 +165,6 @@
             authorizedKeys = [ common_ssh_key ];
             rootSshKeys = [ common_ssh_key ];
             hostName = "vm-qemu-aarch64";
-            emulatedSystems = [ "x86_64-linux" ];
           };
         };
       };
