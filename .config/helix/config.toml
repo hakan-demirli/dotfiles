@@ -19,10 +19,10 @@ C-d = ["page_cursor_half_down","align_view_center"]
 # "A-n" = "expand_selection"
 # "A-b" = "shrink_selection"
 
-"A-u" = ':open %sh{tmux_harpoon_echo 1}'
-"A-i" = ':open %sh{tmux_harpoon_echo 2}'
-"A-o" = ':open %sh{tmux_harpoon_echo 3}'
-"A-p" = ':open %sh{tmux_harpoon_echo 4}'
+"A-u" = ':open %sh{tmux_harpoon_echo.sh 1}'
+"A-i" = ':open %sh{tmux_harpoon_echo.sh 2}'
+"A-o" = ':open %sh{tmux_harpoon_echo.sh 3}'
+"A-p" = ':open %sh{tmux_harpoon_echo.sh 4}'
 
 "+" = 'expand_selection'
 "-" = 'shrink_selection'
@@ -33,11 +33,11 @@ C-d = ["page_cursor_half_down","align_view_center"]
 # ")" = "switch_to_uppercase"
 
 [keys.normal.space]
-"/" = [":pipe-to tmux_harpoon_update",":pipe-to live-grep-in-split-tmux"]
-"f" = [":pipe-to tmux_harpoon_update","file_picker"]
-"F" = [":pipe-to tmux_harpoon_update","file_picker_in_current_directory"]
-"b" = [":pipe-to tmux_harpoon_update","buffer_picker"]
-"6" = [":pipe-to tmux_harpoon_update", ":open %sh{tmux display-popup -w 80%% -E 'yazi --chooser-file /tmp/yazi-chooser-file' && cat /tmp/yazi-chooser-file}"]
+"/" = [":pipe-to tmux_harpoon_update.sh",":pipe-to live-grep-in-split-tmux"]
+"f" = [":pipe-to tmux_harpoon_update.sh","file_picker"]
+"F" = [":pipe-to tmux_harpoon_update.sh","file_picker_in_current_directory"]
+"b" = [":pipe-to tmux_harpoon_update.sh","buffer_picker"]
+"6" = [":pipe-to tmux_harpoon_update.sh", ":open %sh{tmux display-popup -w 80%% -E 'yazi --chooser-file /tmp/yazi-chooser-file' && cat /tmp/yazi-chooser-file}"]
 "e" = [
   ':sh rm -f /tmp/unique-file',
   ':insert-output yazi %{buffer_name} --chooser-file=/tmp/unique-file',
@@ -62,11 +62,11 @@ s = [
 # k = ["jump_backward"]
 
 # Harpoon
-"n" = [":pipe-to tmux_harpoon_update","goto_next_buffer"]
-"p" = [":pipe-to tmux_harpoon_update","goto_previous_buffer"]
-"d" = [":pipe-to tmux_harpoon_update","goto_definition"]
-"y" = [":pipe-to tmux_harpoon_update","goto_type_definition"]
-"r" = [":pipe-to tmux_harpoon_update","goto_reference"]
+"n" = [":pipe-to tmux_harpoon_update.sh","goto_next_buffer"]
+"p" = [":pipe-to tmux_harpoon_update.sh","goto_previous_buffer"]
+"d" = [":pipe-to tmux_harpoon_update.sh","goto_definition"]
+"y" = [":pipe-to tmux_harpoon_update.sh","goto_type_definition"]
+"r" = [":pipe-to tmux_harpoon_update.sh","goto_reference"]
 
 [keys.normal.m]
 s.a = "surround_add"
