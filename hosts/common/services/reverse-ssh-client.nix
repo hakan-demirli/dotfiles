@@ -1,6 +1,8 @@
 {
   pkgs,
 
+  username ? throw "You must specify a username",
+
   reverseSshRemoteHost ? throw "reverseSshRemoteHost must be set for the client",
   reverseSshRemotePort ? throw "reverseSshRemotePort must be set for the client",
   reverseSshRemoteUser ? "emre",
@@ -16,16 +18,18 @@
   ...
 }:
 let
-  reverseSshUser = "autossh";
+  reverseSshUser = username; # "autossh"
 in
 {
   environment.systemPackages = [ pkgs.autossh ];
 
   users.users.${reverseSshUser} = {
-    isSystemUser = true;
     group = reverseSshUser;
-    home = "/var/lib/${reverseSshUser}";
-    createHome = true;
+
+    # uncomment if username is not the same as reverseSshUser
+    # home = "/var/lib/${reverseSshUser}";
+    # createHome = true;
+    # isSystemUser = true;
   };
   users.groups.${reverseSshUser} = { };
 
