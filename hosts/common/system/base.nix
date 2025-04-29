@@ -6,8 +6,8 @@
 {
 
   documentation = {
-    enable = false;
-    nixos.enable = false;
+    enable = lib.mkDefault false;
+    nixos.enable = lib.mkDefault false;
   };
 
   fonts.fontconfig.enable = true;
