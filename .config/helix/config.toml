@@ -19,10 +19,10 @@ C-d = ["page_cursor_half_down","align_view_center"]
 # "A-n" = "expand_selection"
 # "A-b" = "shrink_selection"
 
-"A-u" = ':open %sh{tmux_harpoon_echo.sh 1}'
-"A-i" = ':open %sh{tmux_harpoon_echo.sh 2}'
-"A-o" = ':open %sh{tmux_harpoon_echo.sh 3}'
-"A-p" = ':open %sh{tmux_harpoon_echo.sh 4}'
+"A-u" = [":pipe-to tmux_harpoon_update.sh",":open %sh{tmux_harpoon_echo.sh 1}"]
+"A-i" = [":pipe-to tmux_harpoon_update.sh",":open %sh{tmux_harpoon_echo.sh 2}"]
+"A-o" = [":pipe-to tmux_harpoon_update.sh",":open %sh{tmux_harpoon_echo.sh 3}"]
+"A-p" = [":pipe-to tmux_harpoon_update.sh",":open %sh{tmux_harpoon_echo.sh 4}"]
 
 "+" = 'expand_selection'
 "-" = 'shrink_selection'
