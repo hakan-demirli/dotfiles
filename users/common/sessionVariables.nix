@@ -4,7 +4,8 @@ _: rec {
     EDITOR = "hx";
     TERMINAL = "kitty";
     TERM = "kitty";
-
+    MANPAGER = "less -R --use-color -Dd+r -Du+b";
+    MANROFFOPT = "-P -c";
     GTK_THEME = "Dracula"; # config.gtk.theme.name;
 
     # export PATH="${config.home.sessionVariables.XDG_DATA_HOME}:${XDG_CONFIG_HOME}:$XDG_STATE_HOME:$XDG_CACHE_HOME:$PATH"
