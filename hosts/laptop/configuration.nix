@@ -99,6 +99,12 @@ in
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1; # required to share your internet
     # "net.ipv6.conf.all.forwarding" = 1;
+
+    # fix too many files open
+    "fs.file-max" = "20480000";
+    "fs.inotify.max_user_watches" = "20480000";
+    "fs.inotify.max_user_instances" = "20480000";
+    "fs.inotify.max_queued_events" = "20480000";
   };
 
   systemd.services.NetworkManager-wait-online.enable = false;

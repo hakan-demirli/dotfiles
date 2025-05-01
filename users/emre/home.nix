@@ -240,7 +240,6 @@ in
     # alejandra
     nixfmt-rfc-style
     ruff
-    ruff-lsp
     pyright
     # rustup component add rust-analyzer
     rust-analyzer

@@ -17,6 +17,7 @@ _: {
     da = "direnv allow";
     # tt = ''tt --window_state=list'';
     # tl = ''task list'';
+    ch = "cheat_sheet.sh";
 
     git = "git_cached";
     "ga." = "git add .";
