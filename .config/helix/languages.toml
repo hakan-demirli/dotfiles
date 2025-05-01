@@ -166,7 +166,8 @@ onEdit = true
 command = "veridian"
 
 [language-server.ruff]
-command = "ruff server"
+command = "ruff"
+args = ["server"]
 
 [language-server.nixd]
 command = "nixd"
