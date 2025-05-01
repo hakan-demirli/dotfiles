@@ -12,4 +12,6 @@
       "/var/lib/cloudflare-warp"
     ];
   };
+  # https://github.com/NixOS/nixpkgs/issues/336280#issuecomment-2303888524
+  systemd.user.services.warp-taskbar.wantedBy = [ "graphical.target" ];
 }
