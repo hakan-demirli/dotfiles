@@ -1,7 +1,7 @@
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
-language-servers = [ "pyright","ruff-lsp"]
+language-servers = [ "pyright","ruff"]
 auto-format = true
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
@@ -165,8 +165,8 @@ onEdit = true
 [language-server.veridian]
 command = "veridian"
 
-[language-server.ruff-lsp]
-command = "ruff-lsp"
+[language-server.ruff]
+command = "ruff server"
 
 [language-server.nixd]
 command = "nixd"
