@@ -42,10 +42,11 @@ else
   buffer_path=$(realpath "$buffer_path")
 fi
 
-# Create the data file if it doesn't exist
+populated=1
 if [[ ! -f "$data_file" ]]; then
-    mkdir -p "$cache_dir"
-    touch "$data_file"
+  populated=0
+  mkdir -p "$cache_dir"
+  touch "$data_file"
 fi
 
 if [[ "$buffer_path" != *"/default_path"* ]]; then
@@ -72,3 +73,14 @@ else
       sed -i "1i$new_line" "$data_file"
   fi
 fi
+
+# Auto popullate the rest of it
+if [[ "$populated" -eq 0 ]]; then
+    default_entry_path="$tmux_pane_path/default_path"
+
+    for i in {1..3}; do
+        default_line="$default_entry_path:1:1,$i,$tmux_session,$tmux_command,$tmux_pane_path"
+        echo "$default_line" >> "$data_file"
+    done
+fi
+
