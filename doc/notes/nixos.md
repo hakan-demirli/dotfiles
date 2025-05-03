@@ -251,3 +251,7 @@ virtualisation.libvirtd = {
     * Network manager > add new connection > ipv4 > shared to other computers
     * To add static IP:
         * Addresses(optional) > Add > "Address=192.168.2.100 Netmask:24 Gateaway:192.168.2.1"
+
+* **Lock a terminal session**
+    * Add console lock screen to headless server nixos: ❯ nix run nixpkgs#vlock
+
