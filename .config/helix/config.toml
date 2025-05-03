@@ -100,7 +100,7 @@ newline = "none"
 hidden = true
 
 [editor.soft-wrap]
-enable = true
+enable = false
 
 [editor.statusline]
 # left = ["mode", "spinner"]
