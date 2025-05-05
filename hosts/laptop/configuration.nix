@@ -24,6 +24,12 @@ let
     persistentDirs = [
       "/var/lib/libvirt"
       "/var/lib/docker"
+
+      "/var/log"
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
+      "/etc/NetworkManager/system-connections"
+      "/var/lib/bluetooth"
     ];
 
     useHomeManager = true;
