@@ -151,6 +151,8 @@ in
     neovim
   ];
 
+  programs.gnome-disks.enable = true;
+
   hardware.keyboard.qmk.enable = true;
 
   boot.binfmt.emulatedSystems = finalArgs.emulatedSystems;
