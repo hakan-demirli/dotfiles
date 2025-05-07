@@ -293,7 +293,8 @@ in
     # inputs.small-apps.packages.${pkgs.system}.notify_scheduler
     # inputs.small-apps.packages.${pkgs.system}.gen_typing_test
 
-    (pkgs.callPackage ../../pkgs/xremap.nix { wlrootsSupport = true; })
+    # (pkgs.callPackage ../../pkgs/xremap.nix { wlrootsSupport = true; })
+    xremap
     (pkgs.callPackage ../../pkgs/helix.nix { })
     # (pkgs.callPackage ../../pkgs/mitype.nix { })
     # (pkgs.callPackage ../../pkgs/rvc-cli.nix { })
