@@ -15,6 +15,10 @@ read -r tmux_window_current tmux_command_current tmux_pane_path_current <<< "$(t
 
 # echo "editor_status: $editor_status" >> test.dd
 
+if [[ "$tmux_command_current" != "hx" ]]; then
+    exit
+fi
+
 found_line_number=0
 current_line_number=0
 while IFS=':,' read -r tmux_window_e tmux_command_e buffer_name_e cursor_row_e cursor_col_e buffer_dir_e tmux_pane_path_e; do
