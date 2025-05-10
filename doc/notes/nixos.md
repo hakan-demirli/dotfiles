@@ -255,3 +255,6 @@ virtualisation.libvirtd = {
 * **Lock a terminal session**
     * Add console lock screen to headless server nixos: ❯ nix run nixpkgs#vlock
 
+* **Nix package versions**
+    * Find all versions of a package that were available in a channel and the revision you can download it from.
+    * https://lazamar.co.uk/nix-versions/?channel=nixpkgs-unstable&package=helix
