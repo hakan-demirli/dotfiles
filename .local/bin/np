@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 
-import os
-import random
 import shutil
-import string
 import subprocess
+import sys
 from pathlib import Path
 
-# Check if git_cached exists in the path or in ~/.local/bin/
-git_cached = shutil.which("git_cached")
-if git_cached is None:
-    git_cached = os.path.expanduser("~/.local/bin/git_cached")
-    if not os.path.exists(git_cached):
-        git_cached = None
-GIT = "git" if git_cached is None else git_cached
+REPO_URL = "https://github.com/hakan-demirli/code_templates"
+CACHE_DIR = Path.home() / ".cache" / "np_templates"
+GIT = shutil.which("git") or "git"
 
 """
 np: new project
@@ -21,37 +15,47 @@ copy a template project to current dir.
 """
 
 
-def run_fzf_inside_cache_and_copy(tmp_dir):
-    tmp_dir = Path(tmp_dir)
+def clone_repo():
+    CACHE_DIR.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run([GIT, "clone", "--depth", "1", REPO_URL, str(CACHE_DIR)], check=True)
+
+
+def pull_repo():
+    if CACHE_DIR.exists():
+        try:
+            subprocess.run([GIT, "-C", str(CACHE_DIR), "pull"], check=True)
+            print("Cache updated.")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to update cache: {e}")
+    else:
+        print("Cache not found. Cloning...")
+        clone_repo()
+
+
+def run_fzf_inside_cache_and_copy():
+    if not CACHE_DIR.exists():
+        print("Cache not found. Run `np pull` first.")
+        sys.exit(1)
 
     try:
-        cmd = f"find -L {tmp_dir} -maxdepth 1 -name .git -prune -o -type d -print | fzf"
+        cmd = f"find -L {CACHE_DIR} -mindepth 1 -maxdepth 1 -type d -print | fzf"
         result = subprocess.run(cmd, stdout=subprocess.PIPE, shell=True)
         selected_directory = result.stdout.decode().strip()
 
         if selected_directory:
             selected_path = Path(selected_directory)
-            print(f"Selected directory: {selected_path}")
-
-            # Copy the selected directory to the current working directory
-            destination = Path.cwd() / selected_path.name
-            shutil.copytree(selected_path, destination)
-            print(f"Directory copied to: {destination}")
-
+            dest = Path.cwd() / selected_path.name
+            shutil.copytree(selected_path, dest)
+            print(f"Project copied to: {dest}")
         else:
             print("No directory selected.")
 
     except subprocess.CalledProcessError as e:
-        print(f"Error while running fzf: {e}")
+        print(f"fzf failed: {e}")
 
 
 if __name__ == "__main__":
-    repo_url = "https://github.com/hakan-demirli/code_templates"
-
-    random_string = "".join(
-        random.choice(string.ascii_letters + string.digits) for _ in range(32)
-    )
-    dir_name = "np_" + random_string
-    tmp_dir = os.path.join("/tmp", dir_name)
-    subprocess.run([GIT, "clone", "--depth", "1", repo_url, tmp_dir])
-    run_fzf_inside_cache_and_copy(tmp_dir)
+    if len(sys.argv) > 1 and sys.argv[1] == "pull":
+        pull_repo()
+    else:
+        run_fzf_inside_cache_and_copy()
