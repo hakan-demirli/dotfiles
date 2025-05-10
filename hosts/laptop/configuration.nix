@@ -151,6 +151,11 @@ in
     neovim
   ];
 
+  documentation = {
+    enable = true;
+    nixos.enable = true;
+  };
+
   programs.gnome-disks.enable = true;
 
   hardware.keyboard.qmk.enable = true;
