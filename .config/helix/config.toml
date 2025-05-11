@@ -87,6 +87,7 @@ bufferline = "always"
 rulers = [80]
 idle-timeout = 0
 completion-trigger-len = 1
+scrolloff = 8
 
 [editor.cursor-shape]
 insert = "bar"
@@ -94,7 +95,13 @@ insert = "bar"
 [editor.whitespace.render]
 space = "all"
 tab = "all"
-newline = "none"
+newline = "all"
+
+[editor.indent-guides]
+render = true
+character = "╎"
+skip-levels = 1
+
 
 [editor.file-picker]
 hidden = true
