@@ -23,10 +23,10 @@ else
 
   dir_list=""
   if command -v fd &>/dev/null; then
-    mapfile -d '' dir_array < <(fd --type d --max-depth 1 --exclude ".*" . "${valid_search_dirs[@]}" --print0)
+    mapfile -d '' dir_array < <(fd --follow --type d --max-depth 1 --exclude ".*" . "${valid_search_dirs[@]}" --print0)
     dir_list=$(printf "%s\n" "${dir_array[@]}")
   else
-    mapfile -d '' dir_array < <(find "${valid_search_dirs[@]}" -mindepth 1 -maxdepth 1 -type d ! -name ".*" -print0)
+    mapfile -d '' dir_array < <(find -L "${valid_search_dirs[@]}" -mindepth 1 -maxdepth 1 -type d ! -name ".*" -print0)
     dir_list=$(printf "%s\n" "${dir_array[@]}")
   fi
 
