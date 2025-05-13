@@ -48,10 +48,12 @@ fi
 
 
 populated=1
-if [[ ! -f "$data_file" ]]; then
+if [[ ! -f "$data_file" ]]; then # File does not exist
   populated=0
   mkdir -p "$cache_dir"
   touch "$data_file"
+elif [[ ! -s "$data_file" ]]; then # File is empty
+  populated=0
 fi
 
 if [[ "$buffer_path" != *"/default_path"* ]]; then
