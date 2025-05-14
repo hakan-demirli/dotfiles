@@ -95,6 +95,7 @@ in
 
     ./virtualisation.nix
     ./ydotool.nix
+    ../../pkgs/symlink_secrets.nix
   ] ++ finalArgs.extraImports;
 
   networking = {
