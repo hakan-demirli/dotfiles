@@ -21,7 +21,11 @@ let
     allowPasswordAuth = true;
 
     userExtraGroups = [ ];
-    persistentDirs = [ ];
+    persistentDirs = [
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
+      "/etc/NetworkManager/system-connections"
+    ];
 
     useHomeManager = true;
     homeManagerImports = [
