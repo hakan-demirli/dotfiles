@@ -76,8 +76,9 @@
       ];
 
       mutable_state = [
-        "bash"
-        "gdb"
+        # link from gdriveDir
+        # "bash"
+        # "gdb"
       ];
       # no such attribute file: config.lib.file.mkOutOfStoreSymlink
       #
@@ -179,6 +180,20 @@
       source = ../../.local/bin;
       recursive = true;
       executable = true;
+    };
+    ".local/state" = {
+      source = pkgs.linkFarm "gdrive-links" [
+        {
+          name = "bash";
+          path = "${gdriveDir}/.local/state/bash";
+        }
+        {
+          name = "gdb";
+          path = "${gdriveDir}/.local/state/gdb";
+        }
+      ];
+      recursive = true;
+      executable = false;
     };
     ".local/share" = {
       source = pkgs.linkFarm "gdrive-links" [
