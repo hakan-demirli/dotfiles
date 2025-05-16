@@ -130,7 +130,18 @@ command = "clippy"
 
 [language-server.clangd]
 command = "clangd"
-args = ['--fallback-style=Webkit']
+# args = ['--fallback-style=Webkit', '--clang-tidy']
+args = [
+  "--background-index",
+  "--clang-tidy",
+  "--all-scopes-completion",
+  "--completion-style=detailed",
+  "--header-insertion=iwyu",
+  "--function-arg-placeholders",
+  "--pch-storage=memory",
+  "--offset-encoding=utf-8",
+  "--fallback-style=LLVM",
+  "--compile-commands-dir=build"]
 
 [language-server.texlab]
 command = "texlab"
@@ -217,9 +228,6 @@ args = [
 "codeGeneration.useBlocks" = true
 "codeGeneration.generateComments" = false
 "server.launchMode" = "Standard"
-
-
-
 
 
 # [language-server.lsp-ai]
