@@ -193,7 +193,7 @@ in
     libsForQt5.kolourpaint
     libsForQt5.qt5.qtimageformats # webp support for kolourpaint
     libsForQt5.breeze-icons
-    ventoy
+    # ventoy
     nwg-displays
     wlr-randr # nwg-displays dependency
     hyprshot
