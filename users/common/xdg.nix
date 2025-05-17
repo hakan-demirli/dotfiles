@@ -20,6 +20,7 @@
         "bat"
         "btop"
         "cargo"
+        "clangd"
         "firefoxcss"
         "gdb"
         "git"
