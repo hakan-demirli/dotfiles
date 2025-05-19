@@ -1,3 +1,6 @@
+* **virt-manager copy paste clipboard functionality to the windows vm**
+    * Install spice-guest-tools on Windows guest; https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe
+
 * **Use local nixpkgs before PR to compile your app**
     * Add your app to pkgs-byname etc. as ususal.
     * Go to root of the nixpkgs.
