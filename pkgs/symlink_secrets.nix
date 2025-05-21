@@ -54,7 +54,6 @@ in
     description = "Deploy secrets for ${username} if/when they are decrypted (retries until file exists)";
     wantedBy = [ "multi-user.target" ];
     after = [
-      "network-online.target"
       "time-sync.target"
     ];
 
