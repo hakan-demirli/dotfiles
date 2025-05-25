@@ -26,7 +26,8 @@
         "extensions.webextensions.restrictedDomains" = "";
         "privacy.resistFingerprinting.block_mozAddonManager" = true;
         "browser.translations.select.enable" = false;
-
+        "browser.gesture.swipe.left" = ""; # bullshit
+        "browser.gesture.swipe.right" = ""; # bullshit2
         # This allows firefox devs changing options for a small amount of users to test out stuff.
         # Not with me please ...
         "app.normandy.enabled" = false;
