@@ -13,7 +13,10 @@
       remember_owner = 0
     '';
   };
-  environment.systemPackages = with pkgs; [ virtiofsd ];
+  environment.systemPackages = with pkgs; [
+    virtiofsd
+    virt-viewer # multimonitor setup, ❯ remote-viewer spice://localhost:5900
+  ];
 
   virtualisation.docker.enable = true;
   virtualisation.docker.storageDriver = "btrfs";
