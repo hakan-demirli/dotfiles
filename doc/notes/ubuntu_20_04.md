@@ -936,6 +936,9 @@
         * `sudo add-apt-repository ppa:jonmagon/kdiskmark`
         * `sudo apt install kdiskmark`
 
+* **QEMU/KVM Virtual Machine Windows Guest Laggy/Stuttery Mouse**
+* Change video device from virtio to qxl
+
 * **Install QEMU/KVM Virtual Machine**
     * Run the command and be sure it is not zero.
         * `egrep -c '(vmx|svm)' /proc/cpuinfo`
