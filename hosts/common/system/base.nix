@@ -29,6 +29,9 @@
     DefaultEnvironment="PATH=${config.system.path}/bin"
   '';
 
+  # increase open file limit, workaround https://discourse.nixos.org/t/unable-to-fix-too-many-open-files-error/27094/9
+  systemd.extraConfig = "DefaultLimitNOFILE=1048576";
+
   hardware.uinput.enable = true;
 
   boot.kernelParams = [
@@ -48,7 +51,19 @@
   };
 
   security = {
-    pam.services.swaylock = { };
+    pam = {
+      services.swaylock = { };
+      # increase open file limit, workaround https://discourse.nixos.org/t/unable-to-fix-too-many-open-files-error/27094/9
+      loginLimits = [
+        {
+          domain = "*";
+          type = "hard";
+          item = "nofile";
+          value = "1048576";
+        }
+      ];
+    };
+
     rtkit.enable = lib.mkDefault false;
   };
 }
