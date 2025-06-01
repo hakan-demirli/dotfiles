@@ -937,7 +937,12 @@
         * `sudo apt install kdiskmark`
 
 * **QEMU/KVM Virtual Machine Windows Guest Laggy/Stuttery Mouse**
-* Change video device from virtio to qxl
+    * Change video device from virtio to qxl
+
+* **QEMU/KVM Virtual Machine Windows Guest Add multiple monitors**
+    * Under the VM configuration:
+        * Click the "Add Hardware" button and add 2 more Video-QXL devices.
+    * ```remote-viewer spice://localhost:5900```
 
 * **Install QEMU/KVM Virtual Machine**
     * Run the command and be sure it is not zero.
