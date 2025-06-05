@@ -1,4 +1,4 @@
-[manager]
+[mgr]
 layout         = [ 3, 3, 4 ]
 sort_by        = "alphabetical"
 sort_sensitive = true

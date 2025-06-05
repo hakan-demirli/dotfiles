@@ -43,7 +43,7 @@ function M:preload(job)
 		return true, nil -- Previously 1, don't continue
 	end
 
-	local child, err = Command("ffmpegthumbnailer"):args({
+	local child, err = Command("ffmpegthumbnailer"):arg({
 		"-q",
 		"6",
 		"-c",
