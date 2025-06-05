@@ -98,7 +98,7 @@ auto-format = true
 
 [[language]]
 name = "rust"
-auto-format = true
+auto-format = false
 [language.formatter]
 command = "rustfmt"
 
