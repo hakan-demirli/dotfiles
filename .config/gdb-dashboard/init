@@ -20,3 +20,6 @@ dashboard source -style height 0
 
 dashboard assembly -style height 0
 
+# dashboard -style max_value_length 0
+
+# dashboard -style compact_values False

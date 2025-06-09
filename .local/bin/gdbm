@@ -1,50 +1,65 @@
 #!/usr/bin/env bash
-#
-# gdbm - A wrapper to set up a tmux environment for GDB.
-#
 
-# Ensure there are arguments to pass to GDB
 if [ "$#" -eq 0 ]; then
-    echo "Usage: mygdb <program> [gdb-arguments...]"
+    echo "Usage: gdbm <program> [program-arguments...]"
     exit 1
 fi
 
-# Quote all arguments to pass them safely to GDB later
-GDB_ARGS=$(printf "'%s' " "$@")
 GDB_LAYOUT_SCRIPT="$HOME/.config/gdb/gdb-tmux-layout.sh"
 
-# Check if we are inside a tmux session
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed. Please install it to use this script." >&2
+    exit 1
+fi
+
+if [ ! -f "$GDB_LAYOUT_SCRIPT" ]; then
+    echo "Error: Layout script not found at $GDB_LAYOUT_SCRIPT" >&2
+    exit 1
+fi
+
+
+EXECUTABLE="$1"
+# Remove the executable from the list of arguments.
+shift
+# Now, "$@" contains only the arguments for the program.
+
+EXECUTABLE_QUOTED=$(printf "%q" "$EXECUTABLE")
+PROGRAM_ARGS_QUOTED=$(printf "%q " "$@")
+
+# Construct the final, correct GDB command string.
+GDB_COMMAND="gdb --args $EXECUTABLE_QUOTED $PROGRAM_ARGS_QUOTED"
+
+
 if [ -z "$TMUX" ]; then
-    # --- We are OUTSIDE a tmux session ---
     echo "No tmux session found. Creating a new one for GDB..."
     SESSION_NAME="gdb-session-$$"
 
-    # Create a new, detached session and get the ID of its first window
     tmux new-session -d -s "$SESSION_NAME"
     WINDOW_ID=$(tmux list-windows -t "$SESSION_NAME" -F '#{window_id}')
 
-    # Run the layout script on the new window to create panes
-    # The script will output the main GDB pane ID
     GDB_PANE_ID=$("$GDB_LAYOUT_SCRIPT" "$WINDOW_ID")
+    if [ -z "$GDB_PANE_ID" ]; then
+        echo "Error: Layout script did not return a GDB pane ID. Aborting." >&2
+        tmux kill-session -t "$SESSION_NAME"
+        exit 1
+    fi
 
-    # Launch GDB in the designated main pane
-    tmux send-keys -t "$GDB_PANE_ID" "gdb ${GDB_ARGS}" C-m
+    tmux send-keys -t "$GDB_PANE_ID" "$GDB_COMMAND" C-m
 
-    # Attach to the fully prepared session
     tmux attach-session -t "$SESSION_NAME"
 else
-    # --- We are INSIDE a tmux session ---
     echo "Creating new GDB window in current session..."
 
-    # Create a new window and get its ID
     WINDOW_ID=$(tmux new-window -d -P -n "gdb")
 
-    # Run the layout script on the new window
     GDB_PANE_ID=$("$GDB_LAYOUT_SCRIPT" "$WINDOW_ID")
+    if [ -z "$GDB_PANE_ID" ]; then
+        echo "Error: Layout script did not return a GDB pane ID. Aborting." >&2
+        tmux kill-window -t "$WINDOW_ID"
+        exit 1
+    fi
 
-    # Launch GDB in the designated main pane
-    tmux send-keys -t "$GDB_PANE_ID" "gdb ${GDB_ARGS}" C-m
+    tmux send-keys -t "$GDB_PANE_ID" "$GDB_COMMAND" C-m
 
-    # Switch focus to the new GDB window
     tmux select-window -t "$WINDOW_ID"
 fi
