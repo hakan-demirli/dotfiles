@@ -1,0 +1,27 @@
+{
+  "all_panes": [
+    "source",
+    "assembly",
+    "stack",
+    "threads",
+    "variables",
+    "output",
+    "expressions",
+    "breakpoints",
+    "gdb_prompt"
+  ],
+  "layout_commands": [
+    "name_current variables",
+    "split h 70",
+    "name_current source",
+    "select_pane variables",
+    "split v 40",
+    "name_current output",
+    "select_pane source",
+    "split v 40",
+    "name_current gdb_prompt",
+    "split h 50",
+    "name_current breakpoints",
+    "select_pane gdb_prompt"
+  ]
+}

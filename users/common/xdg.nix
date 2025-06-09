@@ -23,6 +23,7 @@
         "clangd"
         "firefoxcss"
         "gdb"
+        "gdb-dashboard"
         "git"
         "gnome3-keybind-backup"
         "gnome-extensions"
