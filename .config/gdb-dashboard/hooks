@@ -1,0 +1,71 @@
+define hookpost-up
+    dashboard
+end
+
+define hookpost-down
+    dashboard
+end
+
+define hookpost-frame
+    dashboard
+end
+
+define hookpost-finish
+    dashboard
+end
+
+define hookpost-return
+    dashboard
+end
+
+define hook-quit
+    set confirm off
+end
+
+define hookpost-enable
+    dashboard
+end
+
+define hookpost-disable
+    dashboard
+end
+
+define hookpost-break
+    dashboard
+end
+
+define hookpost-tbreak
+    dashboard
+end
+
+define hookpost-delete
+    dashboard
+end
+
+define hookpost-watch
+    dashboard
+end
+
+define hookpost-rwatch
+    dashboard
+end
+
+define hookpost-awatch
+    dashboard
+end
+
+define hookpost-condition
+    dashboard
+end
+
+define hookpost-core-file
+    dashboard
+end
+
+define hookpost-thread
+    dashboard
+end
+
+define hookpost-clear
+    dashboard
+end

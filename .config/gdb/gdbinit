@@ -1,5 +1,4 @@
 # Better GDB defaults ----------------------------------------------------------
-
 set history save
 set verbose off
 set print pretty on
@@ -7,20 +6,20 @@ set print array off
 set print array-indexes on
 set python print-stack full
 
-
-
 # Sources ----------------------------------------------------------------------
-
+# Load your custom integrations first
 source ~/.config/gdb/gdb-fzf.py
+
+# Load the original dashboard to make its commands available
 source ~/.config/gdb/gdb-dashboard.py
 
-# Start ------------------------------------------------------------------------
+# Load our tmux integration script, which depends on the original dashboard
+source ~/.config/gdb/gdb-tmux-integration.py
 
-python Dashboard.start()
+# --- We no longer start the dashboard automatically ---
+# python Dashboard.start()
 
-# File variables ---------------------------------------------------------------
-
-# vim: filetype=python
-# Local Variables:
-# mode: python
-# End:
+# Instructions for the user
+python
+print(">>> GDB initialized. Run 'dashboard-tmux' to start the session. <<<")
+end
