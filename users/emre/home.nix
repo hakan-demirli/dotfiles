@@ -262,6 +262,7 @@ in
     verible
     nodePackages.diagnostic-languageserver
     verilator
+    veridian
 
     lua-language-server
     # vale-ls
@@ -299,7 +300,6 @@ in
     # (pkgs.callPackage ../../pkgs/mitype.nix { })
     # (pkgs.callPackage ../../pkgs/rvc-cli.nix { })
     # (pkgs.callPackage ../../pkgs/blender.nix { })
-    # (pkgs.callPackage ../../pkgs/veridian.nix { })
     # (pkgs.callPackage ../../system/app/svlangserver.nix {})
     # (pkgs.callPackage ../../pkgs/veridian.nix { withSlang = true; })
     # (pkgs.callPackage ../../pkgs/j4-dmenu-desktop.nix { })
