@@ -7,6 +7,8 @@
   #root {
     background-image: url("/home/emre/.mozilla/firefox/emre/chrome/wp.png") !important; /* TODO */
     background-size: cover !important;
+    background-attachment: fixed !important;
+    background-position: right !important;
   }
   /* Hide the ugly logo & wordmark sorry Mozilla */
   .logo-and-wordmark {
