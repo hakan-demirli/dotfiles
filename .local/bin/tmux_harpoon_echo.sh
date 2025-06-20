@@ -19,6 +19,6 @@ tmux_session_target="${tmux_session_line#*: }"
 
 tmux new-window -t "$tmux_session_target:$tmux_window_target" -c "$tmux_pane_path_target" 2>/dev/null
 
-echo "$buffer_dir_target/$buffer_name_target:$cursor_col_target:$cursor_row_target"
+echo "$buffer_dir_target/$buffer_name_target:$cursor_row_target:$cursor_col_target"
 
 exit 0
