@@ -25,6 +25,8 @@ let
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/etc/NetworkManager/system-connections"
+
+      "/root/.cache/nix" # persist nix eval cache
     ];
 
     useHomeManager = true;
