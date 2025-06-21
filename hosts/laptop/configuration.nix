@@ -30,6 +30,8 @@ let
       "/var/lib/systemd/coredump"
       "/etc/NetworkManager/system-connections"
       "/var/lib/bluetooth"
+
+      "/root/.cache/nix" # persist nix eval cache
     ];
 
     useHomeManager = true;
