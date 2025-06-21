@@ -53,7 +53,7 @@ in
       ];
       enableCompletion = true;
       bashrcExtra = ''
-        PROMPT_COMMAND="history -a; history -r"
+        PROMPT_COMMAND="history -a; history -n"
       '';
       initExtra = ''
         lf_cd () {
