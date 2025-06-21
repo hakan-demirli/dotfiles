@@ -89,6 +89,6 @@ if [[ "$populated" -eq 0 ]]; then
   done
   echo >> "$data_file"
   echo "# session_name: $tmux_session" >> "$data_file"
-  echo "# pane_id , command , file_name , file_path:r:c , workspace_dir" >> "$data_file"
+  echo "# pane_id , command , file_name:r:c , file_path , workspace_dir" >> "$data_file"
 fi
 
