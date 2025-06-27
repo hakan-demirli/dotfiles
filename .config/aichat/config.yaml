@@ -1,5 +1,5 @@
-repl_prelude: "role:terse"
-cmd_prelude: "role:terse"
+repl_prelude: "temp:terse"
+cmd_prelude: "temp:terse"
 model: gemini:gemini-2.5-flash-lite-preview-06-17
 clients:
   - type: gemini
