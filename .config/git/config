@@ -8,6 +8,7 @@
 	eol = lf
 	sshCommand = ssh -i ~/.ssh/id_ed25519 -F /dev/null
 	editor = hx
+    excludesfile = ~/.config/git/ignore
 [safe]
 	directory = *
 	directory = ///wsl$/Ubuntu-22.04/home/*
