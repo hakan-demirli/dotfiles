@@ -2,11 +2,21 @@
   pkgs,
   config,
   inputs,
+  lib,
   ...
 }:
 let
   username = "emre";
+
+  koohaDocsPath = "${config.home.homeDirectory}/Documents";
   privateEnvFile = "${config.home.homeDirectory}/Desktop/dotfiles/secrets/environment";
+
+  mkRawGVariant = rawString: {
+    _type = "gvariant";
+    type = "s";
+    value = rawString;
+    __toString = self: self.value;
+  };
 in
 {
   imports = [
@@ -25,10 +35,23 @@ in
     ../common/shellAliases.nix
   ];
 
+  # dconf dump / | dconf2nix > dconf.nix
   dconf.settings = {
     "org/virt-manager/virt-manager/connections" = {
       autoconnect = [ "qemu:///system" ];
       uris = [ "qemu:///system" ];
+    };
+
+    "io/github/seadve/Kooha" = {
+      capture-mode = "monitor-window";
+      framerate = lib.hm.gvariant.mkTuple [
+        20
+        1
+      ];
+      profile-id = "matroska-h264";
+      record-delay = lib.hm.gvariant.mkUint32 3;
+      saving-location = mkRawGVariant "b'${koohaDocsPath}'";
+      screencast-restore-token = "";
     };
   };
 
