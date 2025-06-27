@@ -15,6 +15,7 @@
 
       immutable_configs = [
         "activitywatch"
+        "aichat"
         "aider"
         "anyrun"
         "awatcher"
