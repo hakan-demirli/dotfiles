@@ -15,6 +15,7 @@
 
       immutable_configs = [
         "activitywatch"
+        "aider"
         "anyrun"
         "awatcher"
         "bat"
@@ -182,6 +183,9 @@
       source = ../../.local/bin;
       recursive = true;
       executable = true;
+    };
+    ".aider.conf.yml" = {
+      source = ../../.config/aider/.aider.conf.yml;
     };
     ".local/state" = {
       source = pkgs.linkFarm "gdrive-links" [

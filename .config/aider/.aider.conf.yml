@@ -1,0 +1,8 @@
+cache-prompts: true
+dark-mode: true
+git: false
+auto-commits: false
+dirty-commits: false
+analytics-disable: true
+check-update: false
+show-release-notes: false
