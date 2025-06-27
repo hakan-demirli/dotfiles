@@ -244,6 +244,7 @@ in
     # ollama-cuda
     lsp-ai
     aider-chat
+    aichat
     asm-lsp
     nixd
     # alejandra
