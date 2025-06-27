@@ -1,3 +1,4 @@
+model: gemini-2.5-pro
 cache-prompts: true
 dark-mode: true
 git: false
