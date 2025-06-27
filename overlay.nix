@@ -17,6 +17,14 @@ _: {
         };
       };
       python312Packages = final.python312.pkgs;
+
+      # https://github.com/NixOS/nixpkgs/issues/409755#issuecomment-2931205330
+      kooha = prev.kooha.overrideAttrs (oldAttrs: {
+        buildInputs = oldAttrs.buildInputs ++ [
+          prev.gst_all_1.gst-plugins-bad
+          prev.gst_all_1.gst-vaapi
+        ];
+      });
     })
   ];
 }
