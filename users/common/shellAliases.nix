@@ -36,6 +36,8 @@ _: {
     gca = "git commit --amend";
     gl = "fzf_git_commits";
 
+    bell = "source $HOME/.local/bin/prompt-bell";
+
     # ascp = "asusctl profile -p";
     # ascl = "asusctl profile -l";
     # ascsp = "asusctl profile -P Performance";
