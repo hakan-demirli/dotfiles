@@ -8,7 +8,8 @@
     profiles."${username}" = {
       # extensions = with pkgs.nur.repos.rycee.firefox-addons; []; # handled by firefox account
 
-      search.default = "google";
+      # search.default = "google";
+      search.default = "DuckDuckGo";
       search.force = true;
       isDefault = true;
 
