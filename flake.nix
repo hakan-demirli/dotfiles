@@ -121,7 +121,10 @@
             grubDevice = "/dev/sda";
 
             extraImports = [ ./hosts/common/services/reverse-ssh-server.nix ];
-            allowedPorts = [ reverseSshBounceServerPort ];
+            allowedPorts = [
+              22
+              reverseSshBounceServerPort
+            ];
           };
         };
 
