@@ -19,6 +19,14 @@
 }:
 let
   reverseSshUser = username; # "autossh"
+  # # Usage
+  # ❯ ssh -J emre@sshr.polarbearvuzi.com emre@localhost -p 42069
+  #
+  # # Debugging
+  # ❯ sudo systemctl restart autossh-reverse-tunnel.service
+  # ❯ systemctl status autossh-reverse-tunnel.service
+  # ❯ chmod 700 /persist/home/Desktop/dotfiles/secrets/.ssh
+  # ❯ sudo chmod  400 /persist/home/Desktop/dotfiles/secrets/.ssh/id_ed25519*
 in
 {
   environment.systemPackages = [ pkgs.autossh ];
