@@ -58,7 +58,7 @@ let
 
     reverseSshSessionName = "reverse-tunnel";
     reverseSshRemoteBindAddress = "localhost";
-    reverseSshMonitoringPort = 0;
+    reverseSshRemotePort = 0;
 
     reverseSshLocalTargetPort = 22;
     reverseSshLocalTargetHost = "localhost";

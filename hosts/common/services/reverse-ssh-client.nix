@@ -13,7 +13,6 @@
 
   reverseSshSessionName ? "reverse-tunnel",
   reverseSshRemoteBindAddress ? "localhost", # 0.0.0.0
-  reverseSshMonitoringPort ? 0,
 
   ...
 }:
@@ -45,7 +44,7 @@ in
     {
       name = reverseSshSessionName;
       user = reverseSshUser;
-      monitoringPort = reverseSshMonitoringPort;
+      monitoringPort = 0;
 
       extraArguments = toString (
         [

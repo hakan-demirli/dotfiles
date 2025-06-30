@@ -33,8 +33,64 @@
       reverseTunnelClientPrivateKeyPath = "/persist/home/Desktop/dotfiles/secrets/.ssh/id_ed25519_proton"; # Path on reverse-ssh-client
 
       reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
-      reverseSshBounceServerPort = 42069;
       reverseSshBounceServerUser = "emre";
+
+      reverseSshBasePort = 42000;
+      localX86Servers = [
+        {
+          id = 1;
+          name = "s01";
+          disk = "/dev/nvme0n1";
+        }
+        {
+          id = 2;
+          name = "s02";
+          disk = "/dev/sda";
+        }
+      ];
+
+      mkLocalX86Server =
+        {
+          id,
+          name,
+          disk,
+        }:
+        mkSystem {
+          baseConfigPath = ./hosts/vm_qemu_x86/configuration.nix;
+          hardwareConfigPath = ./hosts/server_local_x86/hardware-configuration.nix;
+          system = "x86_64-linux";
+          argOverrides = {
+            hashedPassword = hashedServerPassword;
+            authorizedKeys = [ common_ssh_key ];
+            rootSshKeys = [ common_ssh_key ];
+
+            hostName = name;
+            diskDevice = disk;
+            reverseSshRemotePort = reverseSshBasePort + id; # 42001, 42002, etc.
+
+            maxJobs = 16;
+            nixCores = 16;
+            maxSubstitutionJobs = 256;
+            swapSize = "32G";
+            grubDevice = "nodev";
+
+            reverseSshRemoteHost = reverseSshBounceServerHost;
+            reverseSshRemoteUser = reverseSshBounceServerUser;
+            reverseSshPrivateKeyPath = reverseTunnelClientPrivateKeyPath;
+
+            extraImports = [
+              ./hosts/common/services/warp.nix
+              ./hosts/common/services/reverse-ssh-client.nix
+            ];
+          };
+        };
+
+      generatedLocalX86Configs = nixpkgs.lib.listToAttrs (
+        map (server: {
+          name = "${server.name}";
+          value = mkLocalX86Server server;
+        }) localX86Servers
+      );
 
       mkSystem =
         {
@@ -71,34 +127,6 @@
           };
         };
 
-        server_local_x86 = mkSystem {
-          baseConfigPath = ./hosts/vm_qemu_x86/configuration.nix;
-          hardwareConfigPath = ./hosts/server_local_x86/hardware-configuration.nix;
-          system = "x86_64-linux";
-          argOverrides = {
-            hashedPassword = hashedServerPassword;
-            authorizedKeys = [ common_ssh_key ];
-            rootSshKeys = [ common_ssh_key ];
-            hostName = "server-local-x86";
-            maxJobs = 16;
-            nixCores = 16;
-            maxSubstitutionJobs = 256;
-            swapSize = "32G";
-            diskDevice = "/dev/nvme0n1";
-            grubDevice = "nodev";
-
-            reverseSshRemoteHost = reverseSshBounceServerHost;
-            reverseSshRemotePort = reverseSshBounceServerPort;
-            reverseSshRemoteUser = reverseSshBounceServerUser;
-            reverseSshPrivateKeyPath = reverseTunnelClientPrivateKeyPath;
-
-            extraImports = [
-              ./hosts/common/services/warp.nix
-              ./hosts/common/services/reverse-ssh-client.nix
-            ];
-          };
-        };
-
         vm_oracle_aarch64 = mkSystem {
           baseConfigPath = ./hosts/vm_qemu_x86/configuration.nix;
           hardwareConfigPath = ./hosts/vm_oracle_aarch64/hardware-configuration.nix;
@@ -123,8 +151,7 @@
             extraImports = [ ./hosts/common/services/reverse-ssh-server.nix ];
             allowedPorts = [
               22
-              reverseSshBounceServerPort
-            ];
+            ] ++ (nixpkgs.lib.genList (n: reverseSshBasePort + n + 1) (builtins.length localX86Servers));
           };
         };
 
@@ -170,6 +197,6 @@
             hostName = "vm-qemu-aarch64";
           };
         };
-      };
+      } // generatedLocalX86Configs;
     };
 }
