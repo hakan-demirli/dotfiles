@@ -1,4 +1,11 @@
-model: gemini-2.5-pro
+alias:
+# - "seer:No LLM fits the bill"
+- "sage:claude-opus-4-20250514"
+- "adept:gemini/gemini-2.5-pro"
+- "scribe:gemini/gemini-2.5-flash"
+- "imp:gemini/gemini-2.5-flash-lite-preview-06-17"
+
+model: adept
 cache-prompts: true
 dark-mode: true
 git: false
