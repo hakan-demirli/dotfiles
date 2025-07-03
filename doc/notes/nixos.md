@@ -188,6 +188,23 @@ virtualisation.libvirtd = {
 * **Nix PR Tracker**
     * https://nixpk.gs/pr-tracker.html
 
+* **QEMU: Huge Pages**
+    * To boot.kernelParams:
+    ```nix
+     "transparent_hugepage=never"
+     "hugepagesz=1G"
+     "hugepages=8"
+    ```
+    * Then follow: https://github.com/coolguy1842/dotfiles/blob/afe4c0db337186a04c3bcb27d18809c1f73bcceb/hosts/desktop/vm.nix#L2
+    * Ensure memory size is THE SAME as huge page size. E.g. for 8GB:
+    ```xml
+      <memory unit='KiB'>8388608</memory>
+      <currentMemory unit='KiB'>8388608</currentMemory>
+      <memoryBacking>
+        <hugepages/>
+      </memoryBacking>
+    ```
+
 * **QEMU: Windows Guest can ping host, but host cannot ping guest on a NATed network**
     * Disable windows firewall.
 
