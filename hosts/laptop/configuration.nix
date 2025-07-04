@@ -143,7 +143,14 @@ in
   environment.systemPackages = with pkgs; [
     home-manager
     git
-    (btop.override { cudaSupport = false; })
+    (
+      if finalArgs.rocmSupport then
+        btop-rocm
+      else if finalArgs.cudaSupport then
+        btop-cuda
+      else
+        btop
+    )
     fzf
     kitty
     foot
