@@ -37,8 +37,8 @@ tooltip {
 #tray {
   background: alpha(@background, 0.8);
   border-radius: 8px;
-  padding: 2px;
-  margin-right: 4px;
+  padding: 1px;
+  margin-right: 1px;
 }
 
 #tray {
