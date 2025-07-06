@@ -98,6 +98,7 @@ in
     ./virtualisation.nix
     ./ydotool.nix
     ../../pkgs/symlink_secrets.nix
+    ../../pkgs/state_autocommit.nix
   ] ++ finalArgs.extraImports;
 
   networking = {
