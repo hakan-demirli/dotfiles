@@ -30,6 +30,7 @@ in
       inherit pkgs inputs config;
       gdriveDir = "/home/${username}/Desktop/gdrive";
       dotfilesDir = "/home/${username}/Desktop/dotfiles";
+      stateDir = "/home/${username}/Desktop/state";
     })
     ../common/sessionVariables.nix
     ../common/shellAliases.nix

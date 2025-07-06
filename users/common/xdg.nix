@@ -1,6 +1,7 @@
 {
   pkgs,
   dotfilesDir ? throw "Set this to your dotfiles dir",
+  stateDir ? throw "Set this to your state dir",
   gdriveDir ? throw "Set this to your google drive dir",
   ...
 }:
@@ -192,11 +193,11 @@
       source = pkgs.linkFarm "gdrive-links" [
         {
           name = "bash";
-          path = "${gdriveDir}/.local/state/bash";
+          path = "${stateDir}/.local/state/bash";
         }
         {
           name = "gdb";
-          path = "${gdriveDir}/.local/state/gdb";
+          path = "${stateDir}/.local/state/gdb";
         }
       ];
       recursive = true;
@@ -210,7 +211,7 @@
         }
         {
           name = "scratchpads";
-          path = "${gdriveDir}/software/scratchpads";
+          path = "${stateDir}/scratchpads";
         }
         {
           name = "notify-scheduler";

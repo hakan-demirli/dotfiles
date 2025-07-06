@@ -18,7 +18,7 @@ else
         tmux break-pane -d -s "${TODO_PANE}" -n "todo-hidden"
     else
         # No todo pane or window exists, create new one
-        tmux split-window -h -l 30% -c "#{pane_current_path}" "hx ~/Desktop/gdrive/software/scratchpads/todo.md"
+        tmux split-window -h -l 30% -c "#{pane_current_path}" "hx ~/Desktop/state/scratchpads/todo.md"
         tmux select-pane -T "todo-sidebar"
         # tmux select-pane -L  # Return focus to main pane
     fi
