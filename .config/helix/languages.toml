@@ -63,6 +63,7 @@ name = "markdown"
 formatter = { command = 'prettier', args = ["--parser", "markdown"] }
 language-servers = [
   "marksman",
+"markdown-countdown-lsp"
   # "mdpls",
   # "markdown-oxide",
   # "typos",
@@ -172,6 +173,9 @@ args = [
 [language-server.texlab.config.texlab.chktex]
 onEdit = true
 
+
+[language-server.markdown-countdown-lsp]
+command = "markdown-countdown-lsp"
 
 [language-server.veridian]
 command = "veridian"

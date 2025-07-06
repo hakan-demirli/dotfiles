@@ -297,6 +297,8 @@ in
     verilator
     veridian
 
+    inputs.small-apps.packages.${pkgs.system}.markdown-countdown-lsp
+
     lua-language-server
     # vale-ls
     # typos-lsp

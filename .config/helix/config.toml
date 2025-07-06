@@ -121,3 +121,6 @@ enable = false
 # left = ["mode", "spinner"]
 center = ["primary-selection-length"]
 # right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
+
+[editor.lsp]
+display-inlay-hints = true
