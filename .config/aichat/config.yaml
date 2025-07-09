@@ -1,5 +1,11 @@
 repl_prelude: "temp:terse"
 cmd_prelude: "temp:terse"
-model: gemini:gemini-2.5-flash-lite-preview-06-17
+model: gemini:imp
 clients:
   - type: gemini
+    name: gemini
+    models:
+      - name: imp
+        real_name: gemini-2.5-flash-lite-preview-06-17
+      - name: adept
+        real_name: gemini-2.5-pro
