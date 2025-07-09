@@ -1,5 +1,8 @@
 repl_prelude: "temp:terse"
 cmd_prelude: "temp:terse"
+
+compress_threshold: 10000000
+
 model: gemini:imp
 clients:
   - type: gemini
