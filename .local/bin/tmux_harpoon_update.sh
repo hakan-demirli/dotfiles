@@ -13,13 +13,6 @@ read -r tmux_window_current tmux_command_current tmux_pane_path_current <<< "$(t
 
 # echo "editor_status: $editor_status" >> test.dd
 
-if [[ "$tmux_command_current" != "hx" ]]; then
-    exit
-fi
-
-
-
-
 # Get helix information
 status_line=$(tmux capture-pane -pS -3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
 read -r buffer_path cursor_row_current cursor_col_current <<< "$status_line"
@@ -27,6 +20,33 @@ read -r buffer_path cursor_row_current cursor_col_current <<< "$status_line"
 # Get tmux information
 read -r tmux_session tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name} #{window_index} #{pane_current_command} #{pane_current_path}')"
 tmux_window=${tmux_window//@/}
+
+# If the pane command is 'yazi', check if Helix is the active foreground process.
+if [[ "$tmux_command_current" == "yazi" ]]; then
+  if [[ -n "$status_line" ]]; then
+    # Validate the captured info.
+    temp_full_path="$buffer_path"
+    if [[ "$temp_full_path" == ~* ]]; then
+      temp_full_path="${temp_full_path/#\~/$HOME}"
+    fi
+    if [[ "$temp_full_path" != /* ]]; then
+      temp_full_path="$tmux_pane_path_current/$temp_full_path"
+    fi
+    # Use realpath to resolve symlinks and '..'
+    temp_full_path=$(realpath "$temp_full_path" 2>/dev/null || echo "")
+
+    # The path is a valid file and if row/col are numbers.
+    if [[ -f "$temp_full_path" ]] && \
+       [[ "$cursor_row_current" =~ ^[0-9]+$ ]] && \
+       [[ "$cursor_col_current" =~ ^[0-9]+$ ]]; then
+      tmux_command_current="hx"
+    fi
+  fi
+fi
+
+if [[ "$tmux_command_current" != "hx" ]]; then
+    exit
+fi
 
 # # debug
 # log_file="$cache_dir/$tmux_cwd_hash.log"
