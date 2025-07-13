@@ -58,6 +58,11 @@ in
         gcmp() {
           git commit -m "$1" && git push
         }
+
+        _copy_readline_to_clipboard() {
+          echo -n "$READLINE_LINE" | wl-copy
+        }
+        bind -x '"\C-y": _copy_readline_to_clipboard'
       '';
     };
     fzf = {

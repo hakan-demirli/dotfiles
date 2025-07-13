@@ -105,6 +105,11 @@ in
 
         # kitty SSH issue workaround: https://wiki.archlinux.org/title/Kitty#Terminal_issues_with_SSH
         [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
+
+        _copy_readline_to_clipboard() {
+          echo -n "$READLINE_LINE" | wl-copy
+        }
+        bind -x '"\C-y": _copy_readline_to_clipboard'
       '';
     };
     fzf = {
