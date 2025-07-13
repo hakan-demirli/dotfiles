@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# txf: Tmux + Yazi/Finder
+# Launches yazi to let you find a directory, then creates or attaches to
+# a tmux session for that directory.
+
+# --- Pre-flight Checks ---
+if ! command -v yazi &> /dev/null; then
+    echo "Error: yazi is not installed or not in your PATH." >&2
+    exit 1
+fi
+if ! command -v tmux &> /dev/null; then
+    echo "Error: tmux is not installed or not in your PATH." >&2
+    exit 1
+fi
+
+# --- Capture Final Directory from Yazi ---
+# Create a temporary file to store yazi's last directory
+# The `trap` command ensures this file is cleaned up on script exit
+tmp_file=$(mktemp)
+trap 'rm -f "$tmp_file"' EXIT
+
+# Launch yazi, telling it to write its last directory to our temp file
+yazi --cwd-file="$tmp_file"
+
+# After yazi exits, read the target directory from the temp file
+target_dir=$(cat "$tmp_file")
+
+# --- Validate the Result ---
+# Exit if yazi was cancelled or didn't return a valid directory
+if [[ -z "$target_dir" || ! -d "$target_dir" ]]; then
+    echo "No valid directory selected from yazi."
+    exit 0
+fi
+
+# The 'selected' directory is the one we got from yazi
+selected="$target_dir"
+
+# Adopt the exact same naming convention as txh.sh and tmux_sessionizer.sh
+selected_base_name=$(basename "$selected" | tr --complement --squeeze '[:alnum:]' '_')
+selected_base_name=${selected_base_name#_}
+selected_base_name=${selected_base_name%_}
+selected_path_hash=$(echo -n "$selected" | md5sum | awk '{ print $1 }')
+session_name="${selected_base_name}_${selected_path_hash}"
+
+if ! tmux info &>/dev/null; then
+  echo "No tmux server found. Starting new session '$session_name'..."
+  exec tmux new-session -s "$session_name" -c "$selected"
+else
+  echo "Tmux server found."
+  if ! tmux has-session -t="$session_name" 2>/dev/null; then
+    echo "Session '$session_name' not found. Creating detached session..."
+    tmux new-session -ds "$session_name" -c "$selected"
+    if [[ $? -ne 0 ]]; then
+      echo "Error: Failed to create tmux session '$session_name'." >&2
+      exit 1
+    fi
+  fi
+
+  if [[ -n "$TMUX" ]]; then
+    echo "Already inside tmux. Switching client to session '$session_name'..."
+    tmux switch-client -t "$session_name"
+  else
+    echo "Outside tmux. Attaching to session '$session_name'..."
+    exec tmux attach-session -t "$session_name"
+  fi
+fi
