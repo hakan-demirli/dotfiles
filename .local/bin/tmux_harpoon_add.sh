@@ -25,6 +25,28 @@ tmux_window=${tmux_window//@/}
 #   echo "ppath: $tmux_pane_path";
 # } > "$log_file"
 
+# If the pane command is 'yazi', check if Helix is the active foreground process.
+if [[ "$tmux_command" == "yazi" ]]; then
+  if [[ -n "$status_line" ]]; then
+    # Validate the captured info.
+    temp_full_path="$buffer_path"
+    if [[ "$temp_full_path" == ~* ]]; then
+      temp_full_path="${temp_full_path/#\~/$HOME}"
+    fi
+    if [[ "$temp_full_path" != /* ]]; then
+      temp_full_path="$tmux_pane_path/$temp_full_path"
+    fi
+    # Use realpath to resolve symlinks and '..'
+    temp_full_path=$(realpath "$temp_full_path" 2>/dev/null || echo "")
+
+    # the path is a valid file and if row/col are numbers.
+    if [[ -f "$temp_full_path" ]] && \
+       [[ "$cursor_row" =~ ^[0-9]+$ ]] && \
+       [[ "$cursor_col" =~ ^[0-9]+$ ]]; then
+      tmux_command="hx"
+    fi
+  fi
+fi
 
 if [[ "$buffer_path" == ~* ]]; then
   buffer_path="${buffer_path/#\~/$HOME}"
