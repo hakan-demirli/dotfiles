@@ -183,6 +183,8 @@
             authorizedKeys = [ common_ssh_key ];
             rootSshKeys = [ common_ssh_key ];
             hostName = "vm-qemu-x86";
+            diskDevice = "/dev/vda";
+            grubDevice = "/dev/vda";
           };
         };
 
@@ -195,6 +197,8 @@
             authorizedKeys = [ common_ssh_key ];
             rootSshKeys = [ common_ssh_key ];
             hostName = "vm-qemu-aarch64";
+            diskDevice = "/dev/vda";
+            grubDevice = "/dev/vda";
           };
         };
       } // generatedLocalX86Configs;
