@@ -5,6 +5,6 @@ Name=terminal
 Comment=Launches the terminal with tmux
 Icon=utilities-terminal
 Terminal=false
-Exec=terminal_with_tmux
+Exec=kitty tmux_sessionizer.sh
 Categories=ConsoleOnly;System;FileTools;FileManager
 MimeType=inode/directory;
