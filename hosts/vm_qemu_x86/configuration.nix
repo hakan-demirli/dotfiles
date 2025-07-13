@@ -92,6 +92,19 @@ in
     ../common/services/ssh.nix
   ] ++ finalArgs.extraImports;
 
+  environment.persistence."/persist" = {
+    users.${finalArgs.username} = {
+      directories = [
+        "Desktop"
+        "Documents"
+        "Downloads"
+        "Videos"
+        ".ssh"
+        ".local/share/keyrings"
+      ];
+    };
+  };
+
   networking.hostName = finalArgs.hostName;
   networking.networkmanager.enable = true;
 

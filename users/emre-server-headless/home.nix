@@ -85,18 +85,6 @@ in
     inherit username;
     homeDirectory = "/home/${username}";
     stateVersion = "25.05";
-
-    persistence."/persist/home" = {
-      directories = [
-        "Desktop"
-        "Documents"
-        "Downloads"
-        "Videos"
-        ".ssh"
-        ".local/share/keyrings"
-      ];
-      allowOther = true;
-    };
   };
 
   home.packages = with pkgs; [

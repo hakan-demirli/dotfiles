@@ -172,29 +172,6 @@ in
       package = pkgs.dracula-theme;
       size = 10;
     };
-
-    persistence."/persist/home" = {
-      directories = [
-        # volume levels
-        ".config/pulse"
-        ".local/state/pipewire"
-        ".local/state/wireplumber"
-
-        # generic
-        ".cache"
-        ".mozilla"
-        # ".thunderbird" # not used anymore
-        # ".local/share/keyrings"
-        ".local/share"
-        # ".local/state"
-
-        "Desktop"
-        "Documents"
-        "Downloads"
-        "Videos"
-      ];
-      allowOther = true;
-    };
   };
   home.packages = with pkgs; [
     bandwhich # network monitoring TUI

@@ -101,6 +101,23 @@ in
     ../../pkgs/state_autocommit.nix
   ] ++ finalArgs.extraImports;
 
+  environment.persistence."/persist" = {
+    users.${finalArgs.username} = {
+      directories = [
+        ".config/pulse"
+        ".local/state/pipewire"
+        ".local/state/wireplumber"
+        ".cache"
+        ".mozilla"
+        ".local/share"
+        "Desktop"
+        "Documents"
+        "Downloads"
+        "Videos"
+      ];
+    };
+  };
+
   networking = {
     hostName = finalArgs.hostName;
     networkmanager.enable = true;
