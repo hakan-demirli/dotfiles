@@ -42,9 +42,7 @@ in
     } // homeManagerArgs;
     backupFileExtension = "backup";
     users.${username} = {
-      imports = [
-        inputs.impermanence.nixosModules.home-manager.impermanence
-      ] ++ homeManagerImports;
+      imports = homeManagerImports;
     };
   };
 
