@@ -14,5 +14,6 @@ dirty-commits: false
 analytics-disable: true
 check-update: false
 show-release-notes: false
+auto-lint: false
 notifications: true # to deal with +1 min latency on average
 notifications-command: "ffplay -autoexit -nodisp -af 'volume=2.0' $HOME/.local/share/sounds/effects/nier_enter.mp3 &>/dev/null 2>&1"
