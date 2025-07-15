@@ -42,7 +42,7 @@
     * Get all layouts in this repo.
       * ```git clone https://github.com/hakan-demirli/dotfiles```
   * Format the disk using disko:
-    * ```sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./dotfiles/hosts/common/hardware/disko-btrfs-lvm.nix --arg diskDevice '"/dev/vda"'```
+    * ```sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./dotfiles/hosts/common/hardware/disko-btrfs-lvm.nix --arg diskDevice '"/dev/vda"' --arg swapSize '"8G"'```
   * Obtain a new hardware-configuration.nix for your device
     * Generate nixos config:
       * ```sudo nixos-generate-config --no-filesystems --root .```
