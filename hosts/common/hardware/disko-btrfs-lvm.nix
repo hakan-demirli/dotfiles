@@ -1,6 +1,6 @@
 {
   diskDevice,
-  swapSize ? "8G",
+  swapSize,
   ...
 }:
 
