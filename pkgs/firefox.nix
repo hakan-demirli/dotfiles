@@ -20,6 +20,12 @@
         # https://connect.mozilla.org/t5/discussions/how-to-remove-the-3-dot-menu-on-firefox-suggest-drop-down-items/td-p/28339
         "browser.urlbar.suggest.trending" = false;
         "browser.urlbar.trimURLs" = false;
+
+        "full-screen-api.transition-duration.enter" = "0 0";
+        "full-screen-api.transition-duration.leave" = "0 0";
+        "full-screen-api.warning.delay" = -1;
+        "full-screen-api.warning.timeout" = 0;
+
         "browser.newtabpage.introShown" = false;
         "browser.urlbar.resultMenu.keyboardAccessible" = false;
         "widget.use-xdg-desktop-portal.file-picker" = 1;
