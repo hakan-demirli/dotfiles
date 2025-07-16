@@ -185,6 +185,10 @@
             hostName = "vm-qemu-x86";
             diskDevice = "/dev/vda";
             grubDevice = "/dev/vda";
+            extraImports = [
+              ./pkgs/github-runner.nix
+              ./hosts/common/services/github-runner.nix
+            ];
           };
         };
 
