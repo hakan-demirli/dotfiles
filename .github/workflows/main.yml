@@ -18,40 +18,31 @@ jobs:
 
   build-systems:
     needs: [flake-check]
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           - host: laptop
-            arch: x86_64
-          - host: vm_oracle_aarch64
-            arch: aarch64
+            runner: ubuntu-latest
           - host: vm_oracle_x86
-            arch: x86_64
+            runner: ubuntu-latest
           - host: vm_qemu_x86
-            arch: x86_64
-          - host: vm_qemu_aarch64
-            arch: aarch64
+            runner: ubuntu-latest
           - host: s01
-            arch: x86_64
+            runner: ubuntu-latest
           - host: s02
-            arch: x86_64
+            runner: ubuntu-latest
+          - host: vm_oracle_aarch64
+            runner: ubuntu-22.04-arm
+          - host: vm_qemu_aarch64
+            runner: ubuntu-22.04-arm
+
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: DeterminateSystems/nix-installer-action@v11
-        with:
-          extra_nix_config: |
-            system = ${{ matrix.arch }}-linux
-            extra-platforms = aarch64-linux x86_64-linux
-
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Enable Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v7
-
       - name: Build system for ${{ matrix.host }}
         run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
