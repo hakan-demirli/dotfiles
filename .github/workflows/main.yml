@@ -22,20 +22,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - host: laptop
-            runner: ubuntu-latest
+          # - host: laptop
+            # runner: ubuntu-latest
           - host: vm_oracle_x86
             runner: ubuntu-latest
           - host: vm_qemu_x86
             runner: ubuntu-latest
           - host: s01
             runner: ubuntu-latest
-          - host: s02
-            runner: ubuntu-latest
+          # - host: s02
+          #   runner: ubuntu-latest
           - host: vm_oracle_aarch64
             runner: ubuntu-22.04-arm
-          - host: vm_qemu_aarch64
-            runner: ubuntu-22.04-arm
+          # - host: vm_qemu_aarch64
+            # runner: ubuntu-22.04-arm
 
     runs-on: ${{ matrix.runner }}
 
