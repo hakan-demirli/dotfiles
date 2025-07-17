@@ -22,14 +22,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        host:
-          - laptop
-          - vm_oracle_aarch64
-          - vm_oracle_x86
-          - vm_qemu_x86
-          - vm_qemu_aarch64
-          - s01
-          - s02
+        include:
+          - host: laptop
+            arch: x86_64
+          - host: vm_oracle_aarch64
+            arch: aarch64
+          - host: vm_oracle_x86
+            arch: x86_64
+          - host: vm_qemu_x86
+            arch: x86_64
+          - host: vm_qemu_aarch64
+            arch: aarch64
+          - host: s01
+            arch: x86_64
+          - host: s02
+            arch: x86_64
 
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +44,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v11
         with:
           extra_nix_config: |
+            system = ${{ matrix.arch }}-linux
             extra-platforms = aarch64-linux x86_64-linux
 
       - name: Setup QEMU
