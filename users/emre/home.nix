@@ -243,7 +243,7 @@ in
 
     rclone
     # citrix_workspace
-    # helix
+    helix
     # helix-gpt
     # (koboldcpp.override { cublasSupport = true; })
     # (pkgs.llama-cpp.override { cudaSupport = true; })
@@ -314,7 +314,7 @@ in
 
     # (pkgs.callPackage ../../pkgs/xremap.nix { wlrootsSupport = true; })
     xremap
-    (pkgs.callPackage ../../pkgs/helix.nix { })
+    # (pkgs.callPackage ../../pkgs/helix.nix { })
     # (pkgs.callPackage ../../pkgs/mitype.nix { })
     # (pkgs.callPackage ../../pkgs/rvc-cli.nix { })
     # (pkgs.callPackage ../../pkgs/blender.nix { })
