@@ -17,8 +17,26 @@ fi
 
 # Parse the hook_to_switch to get path, col, row, tmux_session, tmux_window
 IFS=':,' read -r tmux_window_target tmux_command_target buffer_name_target cursor_row_target cursor_col_target buffer_dir_target tmux_pane_path_target <<<"$hook_to_switch"
-tmux_session_line=$(tail -n 2 "$hook_to_switch" | head -n 1)
+tmux_session_line=$(tail -n 2 "$data_file" | head -n 1)
 tmux_session_target="${tmux_session_line#*: }"
+
+# # debug
+# log_file="$cache_dir/$tmux_cwd_hash.log"
+# {
+#   echo "hook_to_switch: $hook_to_switch"
+#   echo "tmux_session_line: $tmux_session_line"
+#   echo "tmux_session_target: $tmux_session_target"
+#   echo " "
+#   echo "tmux_window_target: $tmux_window_target"
+#   echo "tmux_command_target: $tmux_command_target"
+#   echo "buffer_name_target: $buffer_name_target"
+#   echo "cursor_row_target: $cursor_row_target"
+#   echo "cursor_col_target: $cursor_col_target"
+#   echo "buffer_dir_target: $buffer_dir_target"
+#   echo "tmux_pane_path_target: $tmux_pane_path_target"
+#   echo "editor_command: $editor_command"
+#   echo "idx: $idx"
+# } >> "$log_file"
 
 # Check if editor_command is in tmux_command
 if [[ "$tmux_command_target" == *"$editor_command"* ]]; then
