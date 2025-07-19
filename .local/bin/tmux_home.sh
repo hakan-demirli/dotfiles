@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 TARGET_DIR="$HOME"
+USERNAME="$(whoami)"
 
-SESSION_NAME="home_$(echo -n "$TARGET_DIR" | md5sum | cut -d' ' -f1)"
+SESSION_NAME="${USERNAME}_$(echo -n "$TARGET_DIR" | md5sum | cut -d' ' -f1)"
 
 if [ -n "$TMUX" ]; then
     if ! tmux has-session -t="$SESSION_NAME" 2>/dev/null; then

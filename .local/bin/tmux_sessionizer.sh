@@ -4,7 +4,10 @@ if [[ -z "$TMUX" ]]; then
   # NOT in tmux: Force a selection.
   while true; do
     raw_input=$(
-      find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*" |
+      {
+        echo "$HOME"
+        find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
+      } |
       sed "s|^${HOME}|~|" |
       fzf --prompt="Select project: "
     )
@@ -12,7 +15,10 @@ if [[ -z "$TMUX" ]]; then
   done
 else
   raw_input=$(
-    find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*" |
+    {
+      echo "$HOME"
+      find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
+    } |
     sed "s|^${HOME}|~|" |
     fzf --prompt="Select project: "
   )
