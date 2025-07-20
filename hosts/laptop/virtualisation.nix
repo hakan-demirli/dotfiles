@@ -2,6 +2,7 @@
 {
   # environment.systemPackages = with pkgs; [virt-manager virtualbox distrobox];
   programs.virt-manager.enable = true;
+  networking.firewall.trustedInterfaces = [ "virbr0" ];
 
   virtualisation.libvirtd = {
     enable = true;
