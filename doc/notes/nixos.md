@@ -141,6 +141,10 @@
     * ```sudo virsh net-start default```
     * ```sudo virt-install   --name win11   --memory 9999   --vcpus 16   --disk path=./win11.qcow2,size=80   --cdrom ./windows10.iso   --os-variant win11   --network network=default   --graphics spice   --boot cdrom,hd --noreboot --noautoconsole```
     * ```sudo virt-install   --name ubuntu24   --memory 9999   --vcpus 16   --disk path=./ubuntu24.qcow2,size=80   --cdrom ./ubuntu.iso   --os-variant ubuntu24.10   --network network=default   --graphics spice   --boot cdrom,hd --noreboot --noautoconsole```
+    * Virtio Win11
+        * ```sudo virt-install   --name win11   --memory 8240   --vcpus sockets=1,cores=8,threads=2   --cpu host-passthrough   --os-variant win11   --disk path=/mnt/second/software/vms/win11.qcow2,size=80,format=qcow2,bus=virtio,cache=none,discard=unmap   --cdrom /mnt/second/software/isos/windows11notpm.iso   --disk path=/mnt/second/software/isos/virtio-win-0.1.271.iso,device=cdrom   --network network=default,model=virtio   --machine q35   --boot uefi   --graphics spice,listen=0.0.0.0   --video qxl   --memballoon model=none   --features smm=on   --noreboot --noautoconsole```
+    * Virtio Win10
+        * ```sudo virt-install   --name win10   --memory 8240   --vcpus sockets=1,cores=8,threads=2   --cpu host-passthrough   --os-variant win10   --disk path=/mnt/second/software/vms/win10.qcow2,size=80,format=qcow2,bus=virtio,cache=none,discard=unmap   --cdrom /mnt/second/software/isos/windows10.iso   --disk path=/mnt/second/software/isos/virtio-win-0.1.271.iso,device=cdrom   --network network=default,model=virtio   --machine q35   --boot uefi   --graphics spice,listen=0.0.0.0   --video qxl   --memballoon model=none   --features smm=on   --noreboot --noautoconsole```
 
 * **Virtiofs not working**
     * Proper way:
