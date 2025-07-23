@@ -1,0 +1,40 @@
+autoinstall:
+  version: 1
+
+  source:
+    id: ubuntu-desktop
+
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+
+  identity:
+    hostname: emre
+    username: emre
+    password: '$6$hjsD4y4Iy/9ql6dC$WYxNpnvlx9r6TbGwWcXMqzzsyzh6IvftawYlyvwB4/Zr21UNO5eyj87WB2JqcH.EoO3rmP10P5X/d0b6tNcSh/'
+
+  network:
+    version: 2
+    ethernets:
+      enp1s0:
+        dhcp4: true
+
+  storage:
+    layout:
+      name: direct
+      match:
+        path: /dev/vda
+
+  packages:
+    - build-essential
+    - git
+    - vim
+    - curl
+    - wget
+    - openssh-server
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  shutdown: reboot
