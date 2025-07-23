@@ -3,26 +3,21 @@ set -euo pipefail
 
 # open file path in first hx
 
-OPEN_IN_SPLIT=0
-if [[ "${1:-}" == "-s" ]]; then
-  OPEN_IN_SPLIT=1
-fi
-
 input_path=$(xargs) # trim whitespace
-[ -z "$input_path" ] && exit 0 # Exit if no path was selected
+[ -z "$input_path" ] \
+&& tmux display-message "input_path is empty or wrong: $input_path" \
+&& exit 0 # Exit if no path was selected
 
-pane_path=$(tmux display-message -p '#{pane_current_path}')
-
-cd "$pane_path"
 absolute_path=$(realpath -m -- "$input_path")
 # The '-m' flag allows the path to not exist, so we can open new files.
 
-tmux_cwd_hash=$(echo -n "$pane_path" | md5sum | awk '{ print $1 }')
+tmux_cwd=$(tmux display-message -p '#{session_path}')
+tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
 
 if [[ ! -f "$data_file" ]]; then
-  tmux display-message "Harpoon file not found for this directory."
+  tmux display-message "Harpoon file not found for this directory: $tmux_cwd"
   exit 1
 fi
 
@@ -43,7 +38,7 @@ while IFS= read -r line; do
 done < "$data_file"
 
 if [[ $found_hook -eq 0 ]]; then
-  tmux display-message "No 'hx' harpoon hook found."
+  tmux display-message "No 'hx' harpoon hook found for this directory: $tmux_cwd and datafile: $data_file"
   # tmux send-keys "hx '${absolute_path}'" Enter
   exit 1
 fi
@@ -58,11 +53,6 @@ fi
 
 tmux select-window -t "$target_session:$target_window"
 
-helix_command=":open '${absolute_path}'"
+helix_command=":o '${absolute_path}'"
 
-if [[ $OPEN_IN_SPLIT -eq 1 ]]; then
-  tmux send-keys -t "$target_session:$target_window" ":split" Enter
-  tmux send-keys -t "$target_session:$target_window" "$helix_command" Enter
-else
-  tmux send-keys -t "$target_session:$target_window" "$helix_command" Enter
-fi
+tmux send-keys -t "$target_session:$target_window" "$helix_command" Enter
