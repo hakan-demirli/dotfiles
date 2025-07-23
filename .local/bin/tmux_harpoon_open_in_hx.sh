@@ -8,13 +8,16 @@ input_path=$(xargs) # trim whitespace
 && tmux display-message "input_path is empty or wrong: $input_path" \
 && exit 0 # Exit if no path was selected
 
-absolute_path=$(realpath -m -- "$input_path")
-# The '-m' flag allows the path to not exist, so we can open new files.
-
 tmux_cwd=$(tmux display-message -p '#{session_path}')
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
+
+if [[ "$input_path" == /* || "$input_path" == ~* ]]; then
+  absolute_path=$(realpath -m -- "$input_path")
+else
+  absolute_path=$(realpath -m -- "$tmux_cwd/$input_path")
+fi
 
 if [[ ! -f "$data_file" ]]; then
   tmux display-message "Harpoon file not found for this directory: $tmux_cwd"
