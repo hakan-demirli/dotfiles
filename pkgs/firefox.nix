@@ -8,9 +8,97 @@
     profiles."${username}" = {
       # extensions = with pkgs.nur.repos.rycee.firefox-addons; []; # handled by firefox account
 
-      # search.default = "google";
-      search.default = "ddg";
-      search.force = true;
+      search = {
+        # default = "google";
+        default = "ddg";
+        force = true;
+        engines = {
+          "amazondotcom-us".metaData.hidden = true;
+          "bing".metaData.hidden = true;
+          "ebay".metaData.hidden = true;
+          "wikipedia".metaData.hidden = true;
+
+          "ddg" = {
+            urls = [
+              {
+                template = "https://duckduckgo.com";
+                params = [
+                  {
+                    name = "q";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            definedAliases = [ ",d" ];
+          };
+          "google" = {
+            urls = [
+              {
+                template = "https://google.com/search";
+                params = [
+                  {
+                    name = "q";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            definedAliases = [ ",g" ];
+          };
+          "Nix Packages" = {
+            urls = [
+              {
+                template = "https://search.nixos.org/packages";
+                params = [
+                  {
+                    name = "type";
+                    value = "packages";
+                  }
+                  {
+                    name = "unstable";
+                    value = "channel";
+                  }
+                  {
+                    name = "query";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            definedAliases = [ ",np" ];
+          };
+          "youtube" = {
+            urls = [
+              {
+                template = "https://www.youtube.com/results";
+                params = [
+                  {
+                    name = "search_query";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            definedAliases = [ ",yt" ];
+          };
+          "GitHub" = {
+            urls = [
+              {
+                template = "https://github.com/search";
+                params = [
+                  {
+                    name = "q";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            definedAliases = [ ",gh" ];
+          };
+        };
+      };
+
       isDefault = true;
 
       userChrome = builtins.readFile ../.config/firefoxcss/userChrome.css;
@@ -41,6 +129,8 @@
         # Not with me please ...
         "app.normandy.enabled" = false;
         "app.shield.optoutstudies.enabled" = false;
+        "browser.protections_panel.infoMessage.seen" = true; # disable tracking protection info
+        "dom.private-attribution.submission.enabled" = false; # stop doing dumb stuff mozilla
 
         "beacon.enabled" = false; # No bluetooth location BS in my webbrowser please
         "device.sensors.enabled" = false; # This isn't a phone
