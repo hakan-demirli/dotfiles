@@ -37,6 +37,7 @@ _: {
     gl = "fzf_git_commits";
 
     bell = "source $HOME/.local/bin/prompt-bell";
+    tbell = "source $HOME/.local/bin/prompt-tnotify.sh";
 
     # ascp = "asusctl profile -p";
     # ascl = "asusctl profile -l";
