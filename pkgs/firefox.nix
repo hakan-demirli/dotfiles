@@ -44,7 +44,7 @@
                 ];
               }
             ];
-            definedAliases = [ ",g" ];
+            definedAliases = [ ",go" ];
           };
           "Nix Packages" = {
             urls = [
@@ -94,7 +94,7 @@
                 ];
               }
             ];
-            definedAliases = [ ",gh" ];
+            definedAliases = [ ",gi" ];
           };
         };
       };
