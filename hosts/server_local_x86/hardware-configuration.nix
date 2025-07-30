@@ -26,6 +26,33 @@
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
+  fileSystems."/mnt/hdd1" = {
+    device = "/dev/disk/by-uuid/bc61c6f2-683e-4d24-9ad7-f76debff7d90";
+    fsType = "btrfs";
+    options = [
+      "compress=zstd"
+      "autodefrag"
+      "noatime"
+      "nofail"
+    ];
+  };
+
+  fileSystems."/mnt/hdd2" = {
+    device = "/dev/disk/by-uuid/27feb42b-4406-4e68-ba6f-b29cb9d12d75";
+    fsType = "btrfs";
+    options = [
+      "compress=zstd"
+      "autodefrag"
+      "noatime"
+      "nofail"
+    ];
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /mnt/hdd1 0775 emre users -"
+    "d /mnt/hdd2 0775 emre users -"
+  ];
+
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
