@@ -24,8 +24,8 @@ let
   # # Debugging
   # ❯ sudo systemctl restart autossh-reverse-tunnel.service
   # ❯ systemctl status autossh-reverse-tunnel.service
-  # ❯ chmod 700 /persist/home/Desktop/dotfiles/secrets/.ssh
-  # ❯ sudo chmod  400 /persist/home/Desktop/dotfiles/secrets/.ssh/id_ed25519*
+  # ❯ chmod 700 /persist/home/emre/Desktop/dotfiles/secrets/.ssh
+  # ❯ sudo chmod  400 /persist/home/emre/Desktop/dotfiles/secrets/.ssh/id_ed25519*
 in
 {
   environment.systemPackages = [ pkgs.autossh ];
