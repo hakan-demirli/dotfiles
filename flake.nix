@@ -30,7 +30,7 @@
       common_ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZuf6oNuOd8+zyXt8Idh0Wx3irSx6IwcgxrEMfBgevV ehdemirli@proton.me";
 
       reverseTunnelClientPublicKey = common_ssh_key; # i feel lazy
-      reverseTunnelClientPrivateKeyPath = "/persist/home/Desktop/dotfiles/secrets/.ssh/id_ed25519_proton"; # Path on reverse-ssh-client
+      reverseTunnelClientPrivateKeyPath = "/persist/home/emre/Desktop/dotfiles/secrets/.ssh/id_ed25519_proton"; # Path on reverse-ssh-client
 
       reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
       reverseSshBounceServerUser = "emre";
@@ -103,7 +103,8 @@
           inherit system;
           specialArgs = {
             inherit inputs system;
-          } // argOverrides;
+          }
+          // argOverrides;
           modules = [
             baseConfigPath
             hardwareConfigPath
@@ -151,7 +152,8 @@
             extraImports = [ ./hosts/common/services/reverse-ssh-server.nix ];
             allowedPorts = [
               22
-            ] ++ (nixpkgs.lib.genList (n: reverseSshBasePort + n + 1) (builtins.length localX86Servers));
+            ]
+            ++ (nixpkgs.lib.genList (n: reverseSshBasePort + n + 1) (builtins.length localX86Servers));
           };
         };
 
@@ -201,6 +203,7 @@
             grubDevice = "/dev/vda";
           };
         };
-      } // generatedLocalX86Configs;
+      }
+      // generatedLocalX86Configs;
     };
 }
