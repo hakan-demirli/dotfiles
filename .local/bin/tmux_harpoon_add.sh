@@ -6,7 +6,7 @@ cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
 
 # Get helix information
-status_line=$(tmux capture-pane -pS -3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
+status_line=$(tmux capture-pane -pS -3 | tail -n 3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
 read -r buffer_path cursor_row cursor_col <<< "$status_line"
 
 # Get tmux information
