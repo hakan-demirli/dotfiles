@@ -7,7 +7,7 @@ alias:
 
 model: adept
 cache-prompts: true
-dark-mode: true
+# dark-mode: true
 git: false
 auto-commits: false
 dirty-commits: false
@@ -17,3 +17,15 @@ show-release-notes: false
 auto-lint: false
 notifications: true # to deal with +1 min latency on average
 notifications-command: "ffplay -autoexit -nodisp -af 'volume=2.0' $HOME/.local/share/sounds/effects/nier_enter.mp3 &>/dev/null 2>&1"
+
+# Theme
+code-theme                      : dracula
+user-input-color                : "#bd93f9"
+tool-output-color               : "#8be9fd"
+tool-error-color                : "#ff5555"
+tool-warning-color              : "#f1fa8c"
+assistant-output-color          : "#50fa7b"
+completion-menu-color           : "#f8f8f2"
+completion-menu-bg-color        : "#282a36"
+completion-menu-current-color   : "#44475a"
+completion-menu-current-bg-color: "#ff79c6"
