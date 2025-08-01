@@ -42,6 +42,7 @@
         "nix"
         "npm"
         "nwg"
+        "opencode"
         "parallel"
         # "piper" # not working, workaround below
         "qalculate"
