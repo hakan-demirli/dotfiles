@@ -38,6 +38,7 @@ _: {
 
     bell = "source $HOME/.local/bin/prompt-bell";
     tbell = "source $HOME/.local/bin/prompt-tnotify.sh";
+    tbell-fg = "source $HOME/.local/bin/prompt-tnotify-fg.sh";
 
     # ascp = "asusctl profile -p";
     # ascl = "asusctl profile -l";
