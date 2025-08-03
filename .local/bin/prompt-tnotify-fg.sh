@@ -25,7 +25,7 @@ _telegram_notify_on_completion() {
 
     # --- The rest of the notification logic is identical ---
     local status_icon status_text tags hostname_tag command_tag
-    hostname_tag=$(hostname | tr -d '.-_')
+    hostname_tag=$(hostname | tr -d '._-')
     command_tag=$(echo "$last_cmd" | awk '{print $1}' | tr -cd '[:alnum:]')
     if [ $exit_code -eq 0 ]; then
         status_icon="✅"; status_text="Succeeded"; tags="#success #${hostname_tag} #${command_tag} #command"

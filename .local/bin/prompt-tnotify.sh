@@ -12,7 +12,7 @@ _telegram_notify_on_completion() {
     local status_icon status_text tags
     local hostname_tag command_tag
 
-    hostname_tag=$(hostname | tr -d '.-_')
+    hostname_tag=$(hostname | tr -d '._-')
 
     command_tag=$(echo "$last_cmd" | awk '{print $1}' | tr -cd '[:alnum:]')
 
