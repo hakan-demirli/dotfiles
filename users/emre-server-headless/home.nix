@@ -6,6 +6,7 @@
 }:
 let
   username = "emre";
+  privateEnvFile = "${config.home.homeDirectory}/Desktop/dotfiles/secrets/environment";
 in
 {
   imports = [
@@ -44,6 +45,14 @@ in
         PROMPT_COMMAND="history -a; history -r"
       '';
       initExtra = ''
+        # Source private environment variables if the file exists and is decrypted
+        if [ -f "${privateEnvFile}" ]; then
+          if ! head -c 10 "${privateEnvFile}" | grep -q "GITCRYPT"; then
+            source "${privateEnvFile}"
+          fi
+        fi
+
+
         lf_cd () {
             cd "$(command lf -print-last-dir "$@")"
         }
