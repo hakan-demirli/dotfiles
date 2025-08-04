@@ -125,6 +125,7 @@ keymap:
     remap:
       CTRL-i: KEY_F6  # focus on address bar
       CTRL-o: Ctrl-t  # open new tab
+      CTRL-b: reserved # duck the bookmark bar, i never use it
       CTRL-k: Ctrl-Shift-KEY_TAB  # open previous tab
       CTRL-j: Ctrl-KEY_TAB        # open next tab
 
