@@ -27,7 +27,7 @@
       hashedPassword = "$6$dxLcMi321Rg6B7Nu$tRRLCU/7AEFKg7HW56XIKkbtowfyX4uSOq0M8.pKRZIgg6FrdF9o19yAf1mEov.C.SnhSlXG48rmVbVFqtbEn1";
       hashedServerPassword = "$6$hjsD4y4Iy/9ql6dC$WYxNpnvlx9r6TbGwWcXMqzzsyzh6IvftawYlyvwB4/Zr21UNO5eyj87WB2JqcH.EoO3rmP10P5X/d0b6tNcSh/";
 
-      common_ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZuf6oNuOd8+zyXt8Idh0Wx3irSx6IwcgxrEMfBgevV ehdemirli@proton.me";
+      common_ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICDDPkxYuzRBqtndEoRNx/ua5P0KCG9gMsCe77qf+2ie ehdemirli@proton.me";
 
       reverseTunnelClientPublicKey = common_ssh_key; # i feel lazy
       reverseTunnelClientPrivateKeyPath = "/persist/home/emre/Desktop/dotfiles/secrets/.ssh/id_ed25519_proton"; # Path on reverse-ssh-client
