@@ -10,7 +10,7 @@
     let
       mutable_configs = [
         # "hypr"
-        "rclone"
+        # "rclone"
         "rvc-cli"
       ];
 
@@ -48,7 +48,7 @@
         "qalculate"
         "qmk"
         "quantifyself"
-        "quantifyself-webui"
+        # "quantifyself-webui"
         "qutebrowser"
         "rmpc"
         "sioyek"
