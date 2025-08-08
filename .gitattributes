@@ -1,0 +1,16 @@
+secrets/** filter=git-crypt diff=git-crypt
+# required for bootstrapping secrets
+secrets/git-crypt-key -filter -diff
+
+.config/rclone/* filter=git-crypt diff=git-crypt
+.config/task/** filter=git-crypt diff=git-crypt
+.config/timewarrior/** filter=git-crypt diff=git-crypt
+.config/yarr/* filter=git-crypt diff=git-crypt
+.config/quantifyself-webui/window_categories.json filter=git-crypt diff=git-crypt
+.local/share/mytask/** filter=git-crypt diff=git-crypt
+.local/share/task/** filter=git-crypt diff=git-crypt
+.local/share/timewarrior/** filter=git-crypt diff=git-crypt
+.local/share/sounds/** filter=git-crypt diff=git-crypt
+.local/state/** filter=git-crypt diff=git-crypt
+
+*.py linguist-generated
