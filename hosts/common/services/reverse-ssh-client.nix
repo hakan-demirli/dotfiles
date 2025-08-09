@@ -61,7 +61,9 @@ in
           "-o"
           "ExitOnForwardFailure=yes"
           "-o"
-          "StrictHostKeyChecking=accept-new"
+          "UserKnownHostsFile=/dev/null" # Ignore the known_hosts file
+          "-o"
+          "StrictHostKeyChecking=no" # Disable strict host key checks
         ]
         ++ [
           "${reverseSshRemoteUser}@${reverseSshRemoteHost}"
