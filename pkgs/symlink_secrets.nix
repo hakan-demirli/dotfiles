@@ -11,50 +11,64 @@ let
   gitcryptMagic = "GITCRYPT";
   sleepInterval = 20;
 
+  # --- New: A separate script for user-specific actions ---
+  userActionsScript = pkgs.writeShellScriptBin "setup-user-symlinks" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
+    echo "Running as user: $(id -un)"
+
+    # Create git config directory and symlinks
+    mkdir -p "${gitConfigDir}"
+    ln -sfn "${secretsDir}/git_tokens" "${gitConfigDir}/git_tokens"
+    ln -sfn "${secretsDir}/git_users" "${gitConfigDir}/git_users"
+    ln -sfn "${secretsDir}/git_keys" "${gitConfigDir}/git_keys"
+    echo "Git config symlinks created successfully."
+
+    # Create .ssh symlink ONLY if it doesn't already exist
+    if [ ! -e "${scriptHome}/.ssh" ]; then
+      ln -sfnT "${secretsDir}/.ssh" "${scriptHome}/.ssh"
+      echo ".ssh symlink created."
+    fi
+  '';
+
+  # --- The main script, now simplified ---
   setupScriptContent = ''
     #!${pkgs.bash}/bin/bash
     set -euo pipefail
 
     echo "Starting setup-git-symlinks script for ${username}..."
 
+    # Check if secrets are decrypted (runs as root)
     while true; do
-      echo "Checking for existence and non-emptiness of ${checkFile}..."
-      if [ -f "${checkFile}" ] && [ -s "${checkFile}" ]; then
-        echo "File ${checkFile} found and is not empty. Proceeding."
-        break
-      else
-        echo "File ${checkFile} not found or is empty. Retrying in ${toString sleepInterval} seconds..."
-        ${pkgs.coreutils}/bin/sleep ${toString sleepInterval}
-      fi
+      if [ -f "${checkFile}" ] && [ -s "${checkFile}" ]; then break; fi
+      echo "Secrets not ready, retrying in ${toString sleepInterval}s..."
+      ${pkgs.coreutils}/bin/sleep ${toString sleepInterval}
     done
 
-    echo "Checking encryption status of ${checkFile}..."
-    if ! (${pkgs.coreutils}/bin/head -c ${toString (builtins.stringLength gitcryptMagic)} "${checkFile}" | ${pkgs.gnugrep}/bin/grep -q -F "${gitcryptMagic}"); then
-      echo "Secrets file ${checkFile} appears decrypted. Creating symlinks in ${gitConfigDir}..."
-      ${pkgs.coreutils}/bin/mkdir -p "${gitConfigDir}"
-      ${pkgs.coreutils}/bin/ln -sfn "${secretsDir}/git_tokens" "${gitConfigDir}/git_tokens"
-      ${pkgs.coreutils}/bin/ln -sfn "${secretsDir}/git_users" "${gitConfigDir}/git_users"
-      ${pkgs.coreutils}/bin/ln -sfn "${secretsDir}/git_keys" "${gitConfigDir}/git_keys"
+    if (${pkgs.coreutils}/bin/head -c ${toString (builtins.stringLength gitcryptMagic)} "${checkFile}" | ${pkgs.gnugrep}/bin/grep -q -F "${gitcryptMagic}"); then
+      echo "Secrets file appears encrypted. Skipping."
+      exit 0
+    fi
+    
+    echo "Secrets appear decrypted. Executing user-level setup."
 
-      if [ -d "${scriptHome}/.ssh" ]; then
-        ${pkgs.util-linux}/bin/mount --bind "${secretsDir}/.ssh" "${scriptHome}/.ssh"
-        ${pkgs.coreutils}/bin/chown -R ${username}:${username} "${scriptHome}/.ssh" 2>/dev/null || true
-        ${pkgs.coreutils}/bin/chmod 700 "${scriptHome}/.ssh"
-        echo "Mounted ${secretsDir}/.ssh over ${scriptHome}/.ssh"
-        exit 0
-      fi
-      ${pkgs.coreutils}/bin/ln -sfnT "${secretsDir}/.ssh" "${scriptHome}/.ssh"
-      ${pkgs.coreutils}/bin/chmod 700 "${scriptHome}/.ssh"
+    # Execute the user-specific script as the user
+    ${pkgs.sudo}/bin/sudo -u ${username} ${userActionsScript}/bin/setup-user-symlinks
 
-      ${pkgs.coreutils}/bin/chmod 400 "${scriptHome}/.ssh/id_ed25519" 2>/dev/null || true
-      ${pkgs.coreutils}/bin/chmod 400 "${scriptHome}/.ssh/id_ed25519.pub" 2>/dev/null || true
-      echo "Symlinks created and permissions set."
-    else
-      echo "Secrets file ${checkFile} appears encrypted (contains '${gitcryptMagic}') or grep check failed. Skipping symlink creation."
+    # Handle the case where .ssh is an existing DIRECTORY that needs to be mounted over
+    if [ -d "${scriptHome}/.ssh" ] && [ ! -L "${scriptHome}/.ssh" ]; then
+      echo "Existing .ssh directory found. Binding secrets over it."
+      ${pkgs.util-linux}/bin/mount --bind "${secretsDir}/.ssh" "${scriptHome}/.ssh"
+      ${pkgs.coreutils}/bin/chown -R ${username}:${username} "${scriptHome}/.ssh" 2>/dev/null || true
+      echo "Mounted ${secretsDir}/.ssh over ${scriptHome}/.ssh"
     fi
 
-    echo "setup-git-symlinks script finished."
-    exit 0
+    # Set final permissions (always safe for root to do)
+    ${pkgs.coreutils}/bin/chmod 700 "${scriptHome}/.ssh"
+    ${pkgs.coreutils}/bin/chmod 400 "${scriptHome}/.ssh/id_ed25519" 2>/dev/null || true
+    ${pkgs.coreutils}/bin/chmod 644 "${scriptHome}/.ssh/id_ed25519.pub" 2>/dev/null || true
+    echo "SSH permissions finalized."
   '';
 
   setupScript = pkgs.writeShellScriptBin "setup-git-symlinks-script-${username}" setupScriptContent;
@@ -63,10 +77,8 @@ in
   systemd.services."setup-git-symlinks-${username}" = {
     description = "Deploy secrets for ${username} if/when they are decrypted (retries until file exists)";
     wantedBy = [ "multi-user.target" ];
-    after = [
-      "time-sync.target"
-    ];
-
+    after = [ "time-sync.target" ];
+    restartTriggers = [ setupScript ]; # Keeps this service up-to-date on rebuild
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -81,7 +93,6 @@ in
   systemd.paths."setup-git-symlinks-${username}" = {
     description = "Path unit to watch for decrypted git secrets for ${username}";
     wantedBy = [ "multi-user.target" ];
-
     pathConfig = {
       PathModified = checkFile;
       Unit = "setup-git-symlinks-${username}.service";
