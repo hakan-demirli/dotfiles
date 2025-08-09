@@ -69,4 +69,13 @@ in
       );
     }
   ];
+
+  systemd.services."autossh-${reverseSshSessionName}" = {
+    serviceConfig = {
+      ExecStartPre = [
+        "${pkgs.coreutils}/bin/chmod 700 ${builtins.dirOf reverseSshPrivateKeyPath}"
+        "${pkgs.coreutils}/bin/chmod 400 ${reverseSshPrivateKeyPath}"
+      ];
+    };
+  };
 }
