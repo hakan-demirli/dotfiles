@@ -37,29 +37,11 @@ let
       ${pkgs.coreutils}/bin/ln -sfn "${secretsDir}/git_keys" "${gitConfigDir}/git_keys"
 
       if [ -d "${scriptHome}/.ssh" ]; then
-        echo "Found existing ${scriptHome}/.ssh directory. Attempting to replace it..."
-
-        # Create a temporary directory to mount over the old one
-        temp_mount=$(${pkgs.coreutils}/bin/mktemp -d)
-
-        # Bind mount an empty directory over the problematic .ssh to free any handles
-        echo "Mounting empty directory over ${scriptHome}/.ssh to release it..."
-        ${pkgs.util-linux}/bin/mount --bind "$temp_mount" "${scriptHome}/.ssh"
-
-        # Now unmount it, which should free up the original directory
-        ${pkgs.util-linux}/bin/umount "${scriptHome}/.ssh"
-
-        # Try to remove again
-        ${pkgs.coreutils}/bin/rm -rf "${scriptHome}/.ssh" 2>/dev/null || {
-          echo "Still can't remove directory. Mounting target directory over it..."
-          ${pkgs.util-linux}/bin/mount --bind "${secretsDir}/.ssh" "${scriptHome}/.ssh"
-          ${pkgs.coreutils}/bin/chown -R ${username}:${username} "${scriptHome}/.ssh" 2>/dev/null || true
-          ${pkgs.coreutils}/bin/chmod 700 "${scriptHome}/.ssh"
-          echo "Mounted ${secretsDir}/.ssh over ${scriptHome}/.ssh"
-          exit 0
-        }
-
-        ${pkgs.coreutils}/bin/rm -rf "$temp_mount"
+        ${pkgs.util-linux}/bin/mount --bind "${secretsDir}/.ssh" "${scriptHome}/.ssh"
+        ${pkgs.coreutils}/bin/chown -R ${username}:${username} "${scriptHome}/.ssh" 2>/dev/null || true
+        ${pkgs.coreutils}/bin/chmod 700 "${scriptHome}/.ssh"
+        echo "Mounted ${secretsDir}/.ssh over ${scriptHome}/.ssh"
+        exit 0
       fi
       ${pkgs.coreutils}/bin/ln -sfnT "${secretsDir}/.ssh" "${scriptHome}/.ssh"
       ${pkgs.coreutils}/bin/chmod 700 "${scriptHome}/.ssh"
