@@ -101,7 +101,6 @@ in
         "Documents"
         "Downloads"
         "Videos"
-        ".ssh"
         ".local/share/keyrings"
       ];
     };
