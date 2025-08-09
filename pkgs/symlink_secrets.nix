@@ -69,7 +69,10 @@ let
       fi
       ${pkgs.coreutils}/bin/ln -sfnT "${secretsDir}/.ssh" "${scriptHome}/.ssh"
       ${pkgs.coreutils}/bin/chmod 700 "${scriptHome}/.ssh"
-      echo "Symlinks created."
+
+      ${pkgs.coreutils}/bin/chmod 400 "${scriptHome}/.ssh/id_ed25519" 2>/dev/null || true
+      ${pkgs.coreutils}/bin/chmod 400 "${scriptHome}/.ssh/id_ed25519.pub" 2>/dev/null || true
+      echo "Symlinks created and permissions set."
     else
       echo "Secrets file ${checkFile} appears encrypted (contains '${gitcryptMagic}') or grep check failed. Skipping symlink creation."
     fi
