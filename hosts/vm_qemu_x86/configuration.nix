@@ -90,7 +90,9 @@ in
     ../common/nix/settings.nix
     ../common/system/bootloader-grub-efi.nix
     ../common/services/ssh.nix
-  ] ++ finalArgs.extraImports;
+    ../../pkgs/symlink_secrets.nix
+  ]
+  ++ finalArgs.extraImports;
 
   environment.persistence."/persist" = {
     users.${finalArgs.username} = {
