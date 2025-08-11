@@ -78,13 +78,13 @@ auto-format = false
 
 [[language]]
 name = "cpp"
-# auto-format = true
+auto-format = false
 language-servers = ["clangd"]
 indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "c"
-auto-format = true
+auto-format = false
 language-servers = ["clangd"]
 indent = { tab-width = 4, unit = "    " }
 # Diagnostics:
