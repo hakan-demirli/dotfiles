@@ -2,7 +2,7 @@
 name = "python"
 roots = ["pyproject.toml", "."]
 language-servers = [ "pyright","ruff"]
-auto-format = true
+auto-format = false
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
 # extraPaths = ["./test"]
