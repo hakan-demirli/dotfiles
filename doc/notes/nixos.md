@@ -35,6 +35,10 @@
 * **Using nixGL to fix OpenGL applications on non-NixOS distributions**
     * https://pmiddend.github.io/posts/nixgl-on-ubuntu/
 
+* **Get nix without root/sudo**
+    * ```curl -L https://hydra.nixos.org/job/nix/master/buildStatic.x86_64-linux/latest/download-by-type/file/binary-dist > nix```
+    * ```nix run 'nixpkgs/release-22.11#hello'```
+
 * **Get home-manager generated files/outputs without activating**
     * `home-manager build --flake ~/Desktop/dotfiles/#emre`
 
