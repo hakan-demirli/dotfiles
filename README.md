@@ -1,6 +1,6 @@
 # Dotfiles
 
-![de](doc/assets/de.png)
+<img width="1921" height="1081" alt="Image" src="https://github.com/user-attachments/assets/5ecc9adf-455b-4941-8cb3-29e410a525b1" />
 
 |   |   |
 |---|---|
