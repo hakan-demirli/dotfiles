@@ -281,6 +281,7 @@ in
     nodePackages.diagnostic-languageserver
     verilator
     veridian
+    mutagen
 
     inputs.small-apps.packages.${pkgs.system}.markdown-countdown-lsp
 
