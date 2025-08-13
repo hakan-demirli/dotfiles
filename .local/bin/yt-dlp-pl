@@ -16,3 +16,24 @@ playlist_link=$1
 nix run nixpkgs#yt-dlp -- --flat-playlist --get-id "$playlist_link" | while read -r video_id; do
     echo "https://www.youtube.com/watch?v=$video_id"
 done | xargs -P "$THREADS" -I {} nix run nixpkgs#yt-dlp -- --embed-metadata --format 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720][ext=mp4]/best[ext=mp4]' --output '%(playlist_index)s. %(title)s.%(ext)s' {}
+
+nix run nixpkgs#yt-dlp -- --flat-playlist --get-id "$playlist_link" | while read -r video_id; do
+    echo "https://www.youtube.com/watch?v=$video_id"
+done | xargs -P "$THREADS" -I {} bash -c "
+  video_url=\"\$1\"
+  base_filename=\$(nix run nixpkgs#yt-dlp -- --get-filename -o \"%(playlist_index)s. %(title)s\" \"\$video_url\")
+
+  if [ -z \"\$base_filename\" ]; then
+    echo \"Could not retrieve metadata for \$video_url. Skipping subtitle.\"
+    exit
+  fi
+
+  # Escaped quotes inside the jq command
+  sub_url=\$(nix run nixpkgs#yt-dlp -- --dump-json \"\$video_url\" | jq -r \".subtitles.en[] | select(.ext == \\\"vtt\\\") | .url\")
+
+  if [ -n \"\$sub_url\" ]; then
+    curl -s -L -o \"\${base_filename}.en.vtt\" \"\$sub_url\"
+  else
+    echo \"  -> No English (en) subtitle found for this video.\"
+  fi
+" _ {}
