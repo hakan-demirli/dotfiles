@@ -10,6 +10,8 @@
     ./lsp.nix
     ./nvim-cmp.nix
     ./gitsigns.nix
+    ./visuals.nix # <-- Add this line
+    ./web-devicons.nix
   ];
 
   colorschemes.dracula.enable = true;
@@ -48,6 +50,18 @@
       key = "<leader>/";
       action.__raw = "fuzzyFindFiles()";
       options.desc = "Fuzzy Find files";
+    }
+    {
+      mode = "n";
+      key = "gp";
+      action = "<cmd>bprevious<cr>";
+      options.desc = "Go to [p]revious buffer";
+    }
+    {
+      mode = "n";
+      key = "gn";
+      action = "<cmd>bnext<cr>";
+      options.desc = "Go to [n]ext buffer";
     }
   ];
 

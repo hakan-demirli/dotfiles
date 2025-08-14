@@ -4,7 +4,15 @@
     folding = false;
     nixvimInjections = true;
     settings = {
-      incremental_selection.enable = true;
+      incremental_selection = {
+        enable = true;
+        keymaps = {
+          # init_selection = "<cr>"; # Press <Enter> to start selecting the node under the cursor
+          node_incremental = "+";
+          scope_incremental = "g;";
+          node_decremental = "-";
+        };
+      };
       indent.enable = true;
     };
   };
