@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
 privateEnvFile="$HOME/Desktop/dotfiles/secrets/environment"
-if [ -f "${privateEnvFile}" ]; then
-  if ! head -c 8 "${privateEnvFile}" | grep -q "GITCRYPT"; then
-    # shellcheck disable=SC1090
-    source "${privateEnvFile}"
-  fi
+if [ -f "${privateEnvFile}" ] && [[ "$(file -b --mime-type "${privateEnvFile}")" == "text/plain" ]]; then
+  # shellcheck disable=SC1090
+  source "${privateEnvFile}"
 fi
 
 lf_cd() {
