@@ -121,6 +121,7 @@ in
     git-crypt
     wget
     neovim
+    file
   ];
 
   boot.binfmt.emulatedSystems = finalArgs.emulatedSystems;

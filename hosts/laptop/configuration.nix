@@ -99,7 +99,8 @@ in
     ./ydotool.nix
     ../../pkgs/symlink_secrets.nix
     ../../pkgs/state_autocommit.nix
-  ] ++ finalArgs.extraImports;
+  ]
+  ++ finalArgs.extraImports;
 
   environment.persistence."/persist" = {
     users.${finalArgs.username} = {
@@ -177,6 +178,7 @@ in
     git-crypt
     wget
     neovim
+    file
   ];
 
   documentation = {
