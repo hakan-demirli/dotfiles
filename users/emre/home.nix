@@ -179,7 +179,9 @@ in
     libsForQt5.qt5.qtimageformats # webp support for kolourpaint
     libsForQt5.breeze-icons
     # ventoy
-    nwg-displays
+    (nwg-displays.overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [ ] ++ [ ../../pkgs/nwg-displays-filepermission.patch ];
+    }))
     wlr-randr # nwg-displays dependency
     hyprshot
     networkmanagerapplet
