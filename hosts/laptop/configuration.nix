@@ -30,7 +30,6 @@ let
       "/var/lib/systemd/coredump"
       "/etc/NetworkManager/system-connections"
       "/var/lib/bluetooth"
-      "/var/lib/tailscale"
 
       "/root/.cache/nix" # persist nix eval cache
     ];
