@@ -10,4 +10,8 @@
       "--login-server=https://${reverseSshRemoteHost}"
     ];
   };
+
+  environment.persistence."/persist/system".directories = [
+    "/var/lib/tailscale"
+  ];
 }
