@@ -1,4 +1,3 @@
-# hosts/common/services/headscale.nix
 {
   reverseSshRemoteHost ? throw "You must specify a reverseSshRemoteHost",
   allowedUDPPorts ? [ ],

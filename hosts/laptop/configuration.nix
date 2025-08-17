@@ -91,6 +91,7 @@ in
     ../common/services/sddm-hyprland.nix
     ../common/services/base-desktop.nix
     ../common/services/warp.nix
+    ../common/services/tailscale.nix
 
     ./hardware-configuration.nix
     ./nvidia.nix
@@ -138,14 +139,6 @@ in
 
   systemd.services.NetworkManager-wait-online.enable = false;
   systemd.network.wait-online.enable = false;
-
-  services.tailscale = {
-    enable = true;
-    authKeyFile = "/persist/home/emre/Desktop/dotfiles/secrets/tailscale-key";
-    extraUpFlags = [
-      "--login-server=https://${finalArgs.reverseSshRemoteHost}"
-    ];
-  };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
