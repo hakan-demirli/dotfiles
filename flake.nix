@@ -80,6 +80,7 @@
 
             extraImports = [
               ./hosts/common/services/warp.nix
+              ./hosts/common/services/tailscale.nix
               ./hosts/common/services/reverse-ssh-client.nix
             ];
           };
