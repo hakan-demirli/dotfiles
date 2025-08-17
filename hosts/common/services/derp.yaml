@@ -1,0 +1,11 @@
+regions:
+  999:
+    regionid: 999
+    regioncode: oracle-vps
+    regionname: Oracle Cloud VPS
+    nodes:
+      - name: oracle-vps-1
+        regionid: 999
+        hostname: sshr.polarbearvuzi.com
+        stunport: 3478
+        stunonly: false

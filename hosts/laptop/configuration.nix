@@ -30,6 +30,7 @@ let
       "/var/lib/systemd/coredump"
       "/etc/NetworkManager/system-connections"
       "/var/lib/bluetooth"
+      "/var/lib/tailscale"
 
       "/root/.cache/nix" # persist nix eval cache
     ];
@@ -137,6 +138,8 @@ in
 
   systemd.services.NetworkManager-wait-online.enable = false;
   systemd.network.wait-online.enable = false;
+
+  services.tailscale.enable = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
