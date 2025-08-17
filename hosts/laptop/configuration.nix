@@ -139,7 +139,10 @@ in
   systemd.services.NetworkManager-wait-online.enable = false;
   systemd.network.wait-online.enable = false;
 
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    authKeyFile = "/persist/home/emre/Desktop/dotfiles/secrets/tailscale-key";
+  };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
