@@ -125,6 +125,7 @@
           argOverrides = {
             hashedPassword = hashedPassword;
             emulatedSystems = [ "aarch64-linux" ];
+            reverseSshRemoteHost = reverseSshBounceServerHost;
           };
         };
 
