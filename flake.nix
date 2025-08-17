@@ -148,10 +148,20 @@
             swapSize = "1G";
             diskDevice = "/dev/sda";
             grubDevice = "/dev/sda";
+            reverseSshRemoteHost = reverseSshBounceServerHost;
 
-            extraImports = [ ./hosts/common/services/reverse-ssh-server.nix ];
-            allowedPorts = [
-              22
+            extraImports = [
+              ./hosts/common/services/reverse-ssh-server.nix
+              ./hosts/common/services/headscale.nix
+            ];
+            allowedUDPPorts = [
+              3478 # STUN for Headscale/DERP
+              41641 # Tailscale discovery
+            ];
+            allowedTCPPorts = [
+              22 # SSH
+              80 # Caddy (HTTP for certs)
+              443 # Caddy (HTTPS for Headscale/DERP)
             ]
             ++ (nixpkgs.lib.genList (n: reverseSshBasePort + n + 1) (builtins.length localX86Servers));
           };

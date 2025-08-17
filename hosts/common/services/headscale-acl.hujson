@@ -1,0 +1,32 @@
+{
+  "groups": {
+    "group:emre": ["emre@headscale.net"]
+  },
+
+  "tagowners": {
+    "tag:server":   ["group:emre"],
+    "tag:laptop":   ["group:emre"],
+    "tag:phone":    ["group:emre"],
+    "tag:exitnode": ["group:emre"]
+  },
+
+  "autoApprovers": {
+    "exitNode": ["tag:exitnode"]
+  },
+
+  "acls": [
+    {
+      "action": "accept",
+      "src": ["*"],
+      "dst": ["*:*"]
+    }
+  ],
+
+  "tests": [
+    {
+      "src": "group:emre",
+      "accept": ["*:*"],
+      "deny": []
+    }
+  ]
+}

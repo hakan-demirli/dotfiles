@@ -1,5 +1,5 @@
 {
-  allowedPorts ? [ ],
+  allowedTCPPorts ? [ ],
   ...
 }:
 {
@@ -10,6 +10,6 @@
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = allowedPorts;
+    inherit allowedTCPPorts;
   };
 }

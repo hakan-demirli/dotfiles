@@ -190,6 +190,8 @@ in
     swaynotificationcenter
     swayosd
 
+    tailscale-systray
+
     playerctl
     swww # for update_wp
     # activate-linux # for update_wp
