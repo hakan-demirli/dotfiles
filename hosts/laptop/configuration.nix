@@ -142,6 +142,9 @@ in
   services.tailscale = {
     enable = true;
     authKeyFile = "/persist/home/emre/Desktop/dotfiles/secrets/tailscale-key";
+    extraUpFlags = [
+      "--login-server=https://${finalArgs.reverseSshRemoteHost}"
+    ];
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
