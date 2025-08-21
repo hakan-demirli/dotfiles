@@ -3,12 +3,14 @@ cmd_prelude: "temp:terse"
 
 compress_threshold: 10000000
 
-model: gemini:imp
+model: gemini:scribe
 clients:
   - type: gemini
     name: gemini
     models:
       - name: imp
         real_name: gemini-2.5-flash-lite-preview-06-17
+      - name: scribe
+        real_name: gemini-2.5-flash
       - name: adept
         real_name: gemini-2.5-pro
