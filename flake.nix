@@ -155,6 +155,7 @@
             extraImports = [
               ./hosts/common/services/reverse-ssh-server.nix
               ./hosts/common/services/headscale.nix
+              ./hosts/common/services/fail2ban.nix
             ];
             allowedUDPPorts = [
               3478 # STUN for Headscale/DERP
