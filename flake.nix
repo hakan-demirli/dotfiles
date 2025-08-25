@@ -141,6 +141,7 @@
               reverseTunnelClientPublicKey
             ];
             rootSshKeys = [ common_ssh_key ];
+            allowPasswordAuth = false;
             hostName = "vm-oracle-aarch64";
             emulatedSystems = [ "x86_64-linux" ];
             efiInstallAsRemovable = true;
