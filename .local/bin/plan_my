@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+is_running=$(pgrep -f "my_plan")
+echo "$is_running"
+
+if [ -n "$is_running" ]; then
+  echo "just togglespecialworkspace"
+  hyprctl dispatch togglespecialworkspace plan
+else
+  echo "just plan"
+  cd /home/emre/Desktop/state/ &&  kitty --title "my_plan" txh &
+fi
+

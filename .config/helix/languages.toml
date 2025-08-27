@@ -63,7 +63,7 @@ name = "markdown"
 formatter = { command = 'prettier', args = ["--parser", "markdown"] }
 language-servers = [
   "marksman",
-"markdown-countdown-lsp"
+  "markdown-countdown-lsp"
   # "mdpls",
   # "markdown-oxide",
   # "typos",
