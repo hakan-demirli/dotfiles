@@ -19,7 +19,7 @@
     initrd.kernelModules = [ ];
     kernelModules = [ "kvm-amd" ];
     extraModulePackages = [
-      config.boot.kernelPackages.evdi
+      # config.boot.kernelPackages.evdi
     ];
   };
 

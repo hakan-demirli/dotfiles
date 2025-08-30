@@ -175,9 +175,9 @@ in
     pavucontrol
     android-tools # adb
     transmission_4-qt
-    libsForQt5.kolourpaint
-    libsForQt5.qt5.qtimageformats # webp support for kolourpaint
-    libsForQt5.breeze-icons
+    kdePackages.kolourpaint
+    kdePackages.qtimageformats # webp support for kolourpaint
+    kdePackages.breeze-icons
     # ventoy
     (nwg-displays.overrideAttrs (oldAttrs: {
       patches = oldAttrs.patches or [ ] ++ [ ../../pkgs/nwg-displays-filepermission.patch ];
