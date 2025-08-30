@@ -2,6 +2,21 @@ _: {
   nixpkgs.overlays = [
     # https://github.com/NixOS/nixpkgs/issues/351717
     (final: prev: {
+      # https://github.com/NixOS/nixpkgs/issues/437058
+      pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+        (python-final: python-prev: {
+          i3ipc = python-prev.i3ipc.overridePythonAttrs (oldAttrs: {
+            doCheck = false;
+            checkPhase = ''
+              echo "Skipping pytest in Nix build"
+            '';
+            installCheckPhase = ''
+              echo "Skipping install checks in Nix build"
+            '';
+          });
+        })
+      ];
+
       python312 = prev.python312.override {
         packageOverrides = _: prevPy: {
 
