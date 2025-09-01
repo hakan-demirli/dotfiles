@@ -39,11 +39,18 @@ gcmp() {
   git commit -m "$1" && git push
 }
 
-if command -v wl-copy &>/dev/null; then
-  _copy_readline_to_clipboard() {
-    echo -n "$READLINE_LINE" | wl-copy
-  }
-  bind -x '"\C-y": _copy_readline_to_clipboard'
+_copy_readline_to_clipboard_local() {
+  echo -n "$READLINE_LINE" | wl-copy
+}
+
+_copy_readline_to_clipboard_remote() {
+  printf '\e]52;c;%s\a' "$(echo -n "$READLINE_LINE" | base64 -w0)"
+}
+
+if [[ -z "$SSH_CONNECTION" ]] && command -v wl-copy &>/dev/null; then
+  bind -x '"\C-y": _copy_readline_to_clipboard_local'
+elif [[ -n "$SSH_CONNECTION" || -n "$TMUX" ]]; then
+  bind -x '"\C-y": _copy_readline_to_clipboard_remote'
 fi
 
 # kitty SSH issue workaround: https://wiki.archlinux.org/title/Kitty#Terminal_issues_with_SSH
