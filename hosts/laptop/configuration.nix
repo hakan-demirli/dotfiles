@@ -83,6 +83,7 @@ in
 
     ../common/hardware/disko-btrfs-lvm.nix
     ../common/system/impermanence-btrfs.nix
+    ../common/system/v4l2loopback.nix
     ../common/users/user-base.nix
     ../common/nix/settings.nix
     ../common/system/bootloader-grub-efi.nix
