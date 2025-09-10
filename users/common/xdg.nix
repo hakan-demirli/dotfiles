@@ -47,6 +47,7 @@
         # "piper" # not working, workaround below
         "qalculate"
         "qmk"
+        "QtProject"
         "quantifyself"
         # "quantifyself-webui"
         "qutebrowser"
