@@ -92,6 +92,7 @@ in
     ../common/services/base-desktop.nix
     ../common/services/warp.nix
     ../common/services/tailscale.nix
+    ../common/services/fwupd.nix
 
     ./hardware-configuration.nix
     ./nvidia.nix
