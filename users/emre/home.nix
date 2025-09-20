@@ -27,9 +27,7 @@ in
 
     (import ../common/xdg.nix {
       inherit pkgs inputs config;
-      gdriveDir = "/home/${username}/Desktop/gdrive";
-      dotfilesDir = "/home/${username}/Desktop/dotfiles";
-      stateDir = "/home/${username}/Desktop/state";
+      desktopDir = "/home/${username}/Desktop/";
     })
   ];
 
