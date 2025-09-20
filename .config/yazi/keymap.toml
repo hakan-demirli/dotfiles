@@ -41,7 +41,7 @@ keymap = [
 	{ on = [ "<Space>", "D" ], run = "create",     desc = "Create a file or directory (ends with / for directories)" },
 	{ on = [ "<Space>", "y" ], run = "copy path",  desc = "Copy the absolute path" },
 	# { on = [ "<Space>", "x" ], run = "extract",    desc = "Extract archive" },
-	{ on = [ "<Space>", "c" ], run = ["shell --block --confirm 'yazi_zip $@'","escape"], desc = "Zip selected" },
+	{ on = [ "<Space>", "c" ], run = [''' shell --block --confirm 'yazi_zip "$@"' ''',"escape"], desc = "Zip selected" },
 	# ripdrag fails when nvidia gpu is enabled. Use dragon as alternative
 	# { on = [ "<Space>", "d" ], run = ['''shell 'ripdrag "$@" -x 2>/dev/null &' --confirm''',"escape"],desc = "Show files in drag and drop menu" },
 	{ on = [ "<Space>", "d" ], run = ['''shell 'xdragon "$@" --all -x 2>/dev/null &' --confirm''',"escape"],desc = "Show files in drag and drop menu" },
