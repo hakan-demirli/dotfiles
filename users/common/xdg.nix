@@ -1,8 +1,6 @@
 {
   pkgs,
-  dotfilesDir ? throw "Set this to your dotfiles dir",
-  stateDir ? throw "Set this to your state dir",
-  gdriveDir ? throw "Set this to your google drive dir",
+  desktopDir ? throw "Set this to your state dir",
   ...
 }:
 {
@@ -92,7 +90,7 @@
       makeMutable = path: file: {
         target = file;
         source = pkgs.runCommand "${file}-dotfiles" { } ''
-          ln -s "${dotfilesDir}/${path}/${file}" $out
+          ln -s "${desktopDir}/dotfiles/${path}/${file}" $out
         '';
         # source = pkgs.linkFarm "${file}-dotfiles" [
         #   {
@@ -195,11 +193,11 @@
       source = pkgs.linkFarm "gdrive-links" [
         {
           name = "bash";
-          path = "${stateDir}/.local/state/bash";
+          path = "${desktopDir}/state/.local/state/bash";
         }
         {
           name = "gdb";
-          path = "${stateDir}/.local/state/gdb";
+          path = "${desktopDir}/state/.local/state/gdb";
         }
       ];
       recursive = true;
@@ -209,23 +207,23 @@
       source = pkgs.linkFarm "gdrive-links" [
         {
           name = "sounds";
-          path = "${gdriveDir}/sounds";
+          path = "${desktopDir}/sounds";
         }
         {
           name = "scratchpads";
-          path = "${stateDir}/scratchpads";
+          path = "${desktopDir}/state/scratchpads";
         }
         {
           name = "notify-scheduler";
-          path = "${gdriveDir}/software/notify-scheduler";
+          path = "${desktopDir}/gdrive/software/notify-scheduler";
         }
         {
           name = "quantifyself";
-          path = "${gdriveDir}/archives/quantifyself";
+          path = "${desktopDir}/gdrive/archives/quantifyself";
         }
         {
           name = "homepage";
-          path = "${gdriveDir}/software/homepage";
+          path = "${desktopDir}/gdrive/software/homepage";
         }
       ];
       recursive = true;

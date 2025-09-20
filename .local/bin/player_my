@@ -8,7 +8,7 @@ if [ -n "$is_running" ]; then
   hyprctl dispatch togglespecialworkspace
 else
   echo "just kitty"
-  kitty --title "my_player" yazi /home/emre/.local/share/sounds/music &
+  kitty --title "my_player" yazi /home/emre/.local/share/sounds_deployed/music &
   # hyprctl dispatch focuswindow title:my_player
 fi
 
