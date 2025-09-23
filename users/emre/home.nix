@@ -177,9 +177,7 @@ in
     kdePackages.qtimageformats # webp support for kolourpaint
     kdePackages.breeze-icons
     # ventoy
-    (nwg-displays.overrideAttrs (oldAttrs: {
-      patches = oldAttrs.patches or [ ] ++ [ ../../pkgs/nwg-displays-filepermission.patch ];
-    }))
+    nwg-displays
     wlr-randr # nwg-displays dependency
     hyprshot
     networkmanagerapplet
