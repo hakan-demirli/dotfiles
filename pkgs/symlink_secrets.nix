@@ -7,6 +7,7 @@ let
   scriptHome = "/home/${username}";
   secretsDir = "${scriptHome}/Desktop/dotfiles/secrets";
   gitConfigDir = "${scriptHome}/.config/git";
+  nixConfigDir = "${scriptHome}/.config/nix";
   checkFile = "${secretsDir}/git_keys";
   gitcryptMagic = "GITCRYPT";
   sleepInterval = 20;
@@ -24,6 +25,10 @@ let
     ln -sfn "${secretsDir}/git_users" "${gitConfigDir}/git_users"
     ln -sfn "${secretsDir}/git_keys" "${gitConfigDir}/git_keys"
     echo "Git config symlinks created successfully."
+
+    mkdir -p "${nixConfigDir}" 
+    ln -sfn "${secretsDir}/nixauth" "${nixConfigDir}/nixauth"
+    echo "Nix auth token symlinks created successfully."
 
     # Create .ssh symlink ONLY if it doesn't already exist
     if [ ! -e "${scriptHome}/.ssh" ]; then
@@ -50,7 +55,7 @@ let
       echo "Secrets file appears encrypted. Skipping."
       exit 0
     fi
-    
+
     echo "Secrets appear decrypted. Executing user-level setup."
 
     # Execute the user-specific script as the user
