@@ -276,6 +276,7 @@ in
     inputs.small-apps.packages.${pkgs.system}.gtk_applet
     inputs.small-apps.packages.${pkgs.system}.auto_refresh
     inputs.small-apps.packages.${pkgs.system}.youtube_sync
+    inputs.small-apps.packages.${pkgs.system}.difffenced
     # inputs.small-apps.packages.${pkgs.system}.homepage
     # inputs.small-apps.packages.${pkgs.system}.tt
     # inputs.small-apps.packages.${pkgs.system}.clipboard_tts
