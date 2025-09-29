@@ -1,7 +1,8 @@
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "."]
-language-servers = [ "pyright","ruff"]
+language-servers = [ "pyright","ruff",{ name = "uwu_colors" }]
+
 auto-format = false
 # Add this to pyproject.toml in root directory of project to add extra paths.
 # [tool.pyright]
@@ -38,6 +39,9 @@ formatter = { command = 'prettier', args = ["--parser", "json"] }
 [[language]]
 name = "css"
 formatter = { command = 'prettier', args = ["--parser", "css"] }
+language-servers = [
+  { name = "uwu_colors" },
+]
 
 [[language]]
 name = "java"
@@ -75,6 +79,9 @@ language-servers = [
 [[language]]
 name = "toml"
 auto-format = false
+language-servers = [
+  { name = "uwu_colors" },
+]
 
 [[language]]
 name = "cpp"
@@ -124,7 +131,8 @@ language-servers = [
 
 
 
-
+[language-server.uwu_colors]
+command = "uwu_colors"
 
 [language-server.rust-analyzer.config.check]
 command = "clippy"

@@ -251,6 +251,7 @@ in
     verilator
     veridian
     mutagen
+    uwu-colors
 
     inputs.small-apps.packages.${pkgs.system}.markdown-countdown-lsp
 
