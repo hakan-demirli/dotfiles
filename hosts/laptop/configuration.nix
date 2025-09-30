@@ -16,9 +16,13 @@ let
     emulatedSystems = [ ];
 
     hashedPassword = throw "You must specify a hashedPassword";
+    hardwareConfiguration = throw "You must specify a hardwareConfiguration";
     authorizedKeys = [ ];
     rootSshKeys = [ ];
     allowPasswordAuth = false;
+
+    slurmMaster = false;
+    slurmNode = false;
 
     userExtraGroups = [ "kvm" ];
     persistentDirs = [
