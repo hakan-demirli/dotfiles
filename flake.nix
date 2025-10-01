@@ -34,6 +34,7 @@
             hashedPassword = hashedPassword;
             emulatedSystems = [ "aarch64-linux" ];
             reverseSshRemoteHost = reverseSshBounceServerHost;
+            slurmClient = true;
             hardwareConfiguration = {
               cores = 16;
               ram_mb = 32768;
@@ -246,6 +247,9 @@
       nixosConfigurations = lib.mapAttrs (
         hostname: args:
         let
+          isSlurmParticipant =
+            (args.argOverrides.slurmNode or false) || (args.argOverrides.slurmMaster or false);
+          isSlurmClientOnly = (args.argOverrides.slurmClient or false) && !isSlurmParticipant;
           finalArgs = args // {
             argOverrides = (args.argOverrides or { }) // {
               inherit slurmClusterHardware;
@@ -256,7 +260,8 @@
 
               extraImports =
                 (args.argOverrides.extraImports or [ ])
-                ++ (lib.optional (args.argOverrides.slurmNode or false) ./hosts/common/services/slurm.nix);
+                ++ (lib.optional isSlurmParticipant ./hosts/common/services/slurm.nix)
+                ++ (lib.optional isSlurmClientOnly ./hosts/common/services/slurm-client.nix);
             };
           };
         in
