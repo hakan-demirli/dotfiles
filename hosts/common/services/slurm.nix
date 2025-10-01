@@ -19,14 +19,18 @@ let
     name: node:
     "${node.hostName} CPUs=${toString node.cores} RealMemory=${toString node.ram_mb} State=UNKNOWN"
   ) slurmClusterHardware;
-  allNodeNamesForPartition = lib.concatStringsSep "," (
-    map (node: node.hostName) (lib.attrValues slurmClusterHardware)
+  computeNodesHardware = lib.filterAttrs (
+    name: node: !(node.isSlurmMaster or false)
+  ) slurmClusterHardware;
+  computeNodeNamesForPartition = lib.concatStringsSep "," (
+    map (node: node.hostName) (lib.attrValues computeNodesHardware)
   );
   tracedNodeNameList = builtins.trace ''
     --- SLURM DEBUG ---
     slurmClusterHardware: ${builtins.toJSON slurmClusterHardware}
     masterNodeName: ${masterNodeName}
     isMaster: ${toString isMaster}
+    computeNodeNamesForPartition: ${computeNodeNamesForPartition}
     Generated nodeNameList: ${builtins.toJSON nodeNameList}
     ---------------------
   '' nodeNameList;
@@ -49,18 +53,16 @@ in
 
   services.slurm = {
     server.enable = isMaster;
-
     client.enable = true;
-
     controlMachine = masterNodeName;
-
     clusterName = "nixos-slurm";
     procTrackType = "proctrack/pgid";
 
     nodeName = tracedNodeNameList;
 
     partitionName = [
-      "debug Nodes=${allNodeNamesForPartition} Default=YES MaxTime=INFINITE State=UP"
+      "master Nodes=${masterNodeName} MaxTime=INFINITE State=UP"
+      "compute Nodes=${computeNodeNamesForPartition} Default=YES MaxTime=INFINITE State=UP"
     ];
 
     extraConfig = ''
