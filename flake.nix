@@ -75,13 +75,13 @@
               ./hosts/common/services/docker-registry.nix
             ];
             allowedUDPPorts = [
-              3478
-              41641
+              3478 # STUN for Headscale/DERP
+              41641 # Tailscale discovery
             ];
             allowedTCPPorts = [
-              22
-              80
-              443
+              22 # SSH
+              80 # Caddy (HTTP for certs)
+              443 # Caddy (HTTPS for Headscale/DERP)
             ]
             ++ (lib.genList (n: reverseSshBasePort + n + 1) (builtins.length localX86Servers));
           };
