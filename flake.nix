@@ -37,7 +37,7 @@
             slurmClient = true;
             hardwareConfiguration = {
               cores = 16;
-              ram_mb = 32768;
+              ram_mb = 24007;
             };
           };
         };
@@ -64,7 +64,7 @@
 
             hardwareConfiguration = {
               cores = 4;
-              ram_mb = 24576;
+              ram_mb = 24007;
             };
             slurmMaster = true;
             slurmNode = true;
@@ -74,6 +74,7 @@
               ./hosts/common/services/headscale.nix
               ./hosts/common/services/fail2ban.nix
               ./hosts/common/services/docker-registry.nix
+              ./pkgs/sshfs-mount.nix
             ];
             allowedUDPPorts = [
               3478 # STUN for Headscale/DERP
@@ -103,8 +104,8 @@
             swapSize = "4G";
 
             hardwareConfiguration = {
-              cores = 1;
-              ram_mb = 1024;
+              cores = 8;
+              ram_mb = 8192;
             };
           };
         };
@@ -157,7 +158,7 @@
           slurmNode = true;
           hardwareConfiguration = {
             cores = 16;
-            ram_mb = 32768;
+            ram_mb = 81631;
           };
         }
         {
@@ -219,7 +220,8 @@
                 ./hosts/common/services/warp.nix
                 ./hosts/common/services/tailscale.nix
                 ./hosts/common/services/reverse-ssh-client.nix
-              ];
+              ]
+              ++ lib.optional (server.name != "s01") ./pkgs/sshfs-mount.nix;
             };
           };
         }) localX86Servers
