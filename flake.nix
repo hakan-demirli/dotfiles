@@ -37,8 +37,11 @@
             slurmClient = true;
             hardwareConfiguration = {
               cores = 16;
-              ram_mb = 24007;
+              ram_mb = 21000;
             };
+            extraImports = [
+              ./pkgs/sshfs-mount.nix
+            ];
           };
         };
 
@@ -64,7 +67,7 @@
 
             hardwareConfiguration = {
               cores = 4;
-              ram_mb = 24007;
+              ram_mb = 21000;
             };
             slurmMaster = true;
             slurmNode = true;
@@ -158,7 +161,7 @@
           slurmNode = true;
           hardwareConfiguration = {
             cores = 16;
-            ram_mb = 81631;
+            ram_mb = 77000;
           };
         }
         {
@@ -168,7 +171,7 @@
           slurmNode = true;
           hardwareConfiguration = {
             cores = 8;
-            ram_mb = 16348;
+            ram_mb = 14500;
           };
         }
       ];
