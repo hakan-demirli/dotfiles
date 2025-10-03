@@ -223,7 +223,6 @@
                 ./hosts/common/services/warp.nix
                 ./hosts/common/services/tailscale.nix
                 ./hosts/common/services/reverse-ssh-client.nix
-                ./hosts/common/services/docker.nix
               ]
               ++ lib.optional (server.name != "s01") ./pkgs/sshfs-mount.nix;
             };
