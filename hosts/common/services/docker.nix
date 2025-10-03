@@ -7,4 +7,9 @@ _: {
   #   enable = true;
   #   setSocketVariable = true;
   # };
+  environment.persistence."/persist/system" = {
+    directories = [
+      "/var/lib/docker"
+    ];
+  };
 }

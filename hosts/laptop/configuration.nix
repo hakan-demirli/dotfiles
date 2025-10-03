@@ -27,7 +27,6 @@ let
     userExtraGroups = [ "kvm" ];
     persistentDirs = [
       "/var/lib/libvirt"
-      "/var/lib/docker"
 
       "/var/log"
       "/var/lib/nixos"
