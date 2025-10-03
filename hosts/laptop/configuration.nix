@@ -102,6 +102,7 @@ in
     ./battery.nix
 
     ./virtualisation.nix
+    ../common/services/docker.nix
     # ./ydotool.nix
     ../../pkgs/symlink_secrets.nix
     ../../pkgs/state_autocommit.nix
