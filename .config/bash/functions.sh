@@ -48,9 +48,13 @@ _copy_readline_to_clipboard_remote() {
 }
 
 if [[ -z "$SSH_CONNECTION" ]] && command -v wl-copy &>/dev/null; then
-  bind -x '"\C-y": _copy_readline_to_clipboard_local'
+  if [[ $- == *i* ]]; then
+    bind -x '"\C-y": _copy_readline_to_clipboard_local'
+  fi
 elif [[ -n "$SSH_CONNECTION" || -n "$TMUX" ]]; then
-  bind -x '"\C-y": _copy_readline_to_clipboard_remote'
+  if [[ $- == *i* ]]; then
+    bind -x '"\C-y": _copy_readline_to_clipboard_remote'
+  fi
 fi
 
 # kitty SSH issue workaround: https://wiki.archlinux.org/title/Kitty#Terminal_issues_with_SSH
