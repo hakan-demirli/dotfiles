@@ -19,14 +19,5 @@
     virt-viewer # multimonitor setup, ❯ remote-viewer spice://localhost:5900
   ];
 
-  virtualisation.docker.enable = true;
-  virtualisation.docker.storageDriver = "btrfs";
-
-  # Problematic. Permission issues.
-  # virtualisation.docker.rootless = {
-  #   enable = true;
-  #   setSocketVariable = true;
-  # };
-
   # boot.extraModulePackages = with config.boot.kernelPackages; [virtualbox];
 }
