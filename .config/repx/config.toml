@@ -1,0 +1,15 @@
+theme = "default"
+submission_target = "local"
+
+[targets]
+
+  [targets.local]
+  base_path = "~/Desktop/repx-store"
+
+  [targets.tailscale-vm-oracle-aarch64]
+  base_path = "~/Desktop/repx-store"
+  address = "tailscale-vm-oracle-aarch64"
+
+  [targets.safari]
+  base_path = "/mnt/galactica/demirlie/Desktop/repx-store"
+  address = "safari"

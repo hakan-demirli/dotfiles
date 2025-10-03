@@ -49,6 +49,7 @@
         "quantifyself"
         # "quantifyself-webui"
         "qutebrowser"
+        "repx"
         "rmpc"
         "sioyek"
         "starship.toml"
