@@ -1,0 +1,72 @@
+name = "Dracula"
+
+[palette]
+background = "#282a36"
+comment = "#6272a4"
+current_line = "#44475a"
+cyan = "#8be9fd"
+foreground = "#f8f8f2"
+green = "#50fa7b"
+orange = "#ffb86c"
+pink = "#ff79c6"
+purple = "#bd93f9"
+red = "#ff5555"
+selection = "#44475a"
+yellow = "#f1fa8c"
+
+[elements.job_status.succeeded]
+color = "green"
+styles = []
+
+[elements.job_status.failed]
+color = "red"
+styles = []
+
+[elements.job_status.pending]
+color = "yellow"
+styles = []
+
+[elements.job_status.queued]
+color = "purple"
+styles = []
+
+[elements.job_status.blocked]
+color = "orange"
+styles = []
+
+[elements.job_status.running]
+color = "cyan"
+styles = []
+
+[elements.identifiers.run_id]
+color = "foreground"
+styles = []
+
+[elements.identifiers.job_hash]
+color = "cyan"
+styles = []
+
+[elements.identifiers.job_name]
+color = "foreground"
+styles = []
+
+[elements.structure.tree_branch]
+color = "comment"
+styles = ["dimmed"]
+
+[elements.structure.labels]
+color = "foreground"
+styles = ["bold"]
+
+[elements.summary.success]
+color = "green"
+styles = []
+
+[elements.summary.info]
+color = "foreground"
+styles = []
+
+[symbols]
+tree_vertical = "│"
+tree_junction = "├───"
+tree_end = "└───"
