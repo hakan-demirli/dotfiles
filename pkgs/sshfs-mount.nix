@@ -49,7 +49,7 @@ in
       ExecStart = ''
         ${pkgs.sshfs-fuse}/bin/sshfs \
           -f \
-          -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 \
+          -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,allow_other \
           -o IdentityFile=${userHome}/.ssh/id_ed25519 \
           -o StrictHostKeyChecking=no \
           -o UserKnownHostsFile=/dev/null \
