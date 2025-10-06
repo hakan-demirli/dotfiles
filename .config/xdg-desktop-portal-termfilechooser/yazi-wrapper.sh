@@ -3,11 +3,11 @@
 #
 # For more information about input/output arguments read `xdg-desktop-portal-termfilechooser(5)`
 
-set -ex
+set -e
 
-logfile="$HOME/yazi-chooser.log"
-# echo "--- $(date) ---" >> "$logfile"
-# echo "Args: $@" >> "$logfile"
+if [ "$6" -ge 4 ]; then
+    set -x
+fi
 
 multiple="$1"
 directory="$2"
@@ -19,26 +19,34 @@ cmd="yazi"
 termcmd="${TERMCMD:-kitty --title 'termfilechooser'}"
 
 if [ "$save" = "1" ]; then
-    set -- --chooser-file="$out"
-    [ -n "$path" ] && set -- "$@" "$path"
+    # save a file
+    set -- --chooser-file="$out" "$path"
 elif [ "$directory" = "1" ]; then
-    set -- --chooser-file="$out" --cwd-file="$out"
-    [ -n "$path" ] && set -- "$@" "$path"
+    # upload files from a directory
+    set -- --chooser-file="$out" --cwd-file="$out"".1" "$path"
 elif [ "$multiple" = "1" ]; then
-    set -- --chooser-file="$out"
-    [ -n "$path" ] && set -- "$@" "$path"
+    # upload multiple files
+    set -- --chooser-file="$out" "$path"
 else
-    set -- --chooser-file="$out"
-    [ -n "$path" ] && set -- "$@" "$path"
+    # upload only 1 file
+    set -- --chooser-file="$out" "$path"
 fi
-
-# echo "Processed args: $@" >> "$logfile"
 
 command="$termcmd $cmd"
 for arg in "$@"; do
+    # escape double quotes
     escaped=$(printf "%s" "$arg" | sed 's/"/\\"/g')
+    # escape special
     command="$command \"$escaped\""
 done
 
-# echo "Final command: $command" >> "$logfile"
 sh -c "$command"
+
+if [ "$directory" = "1" ]; then
+    if [ ! -s "$out" ] && [ -s "$out"".1" ]; then
+        cat "$out"".1" > "$out"
+        rm "$out"".1"
+    else
+        rm "$out"".1"
+    fi
+fi
