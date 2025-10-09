@@ -119,6 +119,18 @@ keymap:
       KEY_MINUS: reserved
       KEY_EQUAL: reserved
 
+  - name: .virt-manager-wrapped
+    application:
+      only: [ .virt-manager-wrapped ]
+    remap:
+      CapsLock: esc
+      Shift-KEY_LEFTALT-j: KEY_KPLEFTPAREN
+      Shift-KEY_LEFTALT-k: KEY_KPRIGHTPAREN
+      Shift-KEY_LEFTALT: reserved
+      Shift-KEY_RIGHTALT-j: KEY_KPLEFTPAREN
+      Shift-KEY_RIGHTALT-k: KEY_KPRIGHTPAREN
+      Shift-KEY_RIGHTALT: reserved
+
   - name: firefox
     application:
       only: [ firefox ]
