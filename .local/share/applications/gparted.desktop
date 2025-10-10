@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=GParted
+GenericName=Partition Editor
+Comment=Create, reorganize, and delete disk partitions
+Icon=gparted
+Terminal=false
+Exec=gparted
+Categories=System;Filesystem;GNOME;GTK;
+Keywords=partition;disk;filesystem;

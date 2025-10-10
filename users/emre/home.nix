@@ -297,7 +297,7 @@ in
 
     # (pkgs.callPackage ../../pkgs/xremap.nix { wlrootsSupport = true; })
     xremap
-    # (pkgs.callPackage ../../pkgs/helix.nix { })
+    (pkgs.callPackage ../../pkgs/gparted.nix { })
     # (pkgs.callPackage ../../pkgs/mitype.nix { })
     # (pkgs.callPackage ../../pkgs/rvc-cli.nix { })
     # (pkgs.callPackage ../../pkgs/blender.nix { })
