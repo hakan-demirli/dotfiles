@@ -12,6 +12,7 @@ pkgs.stdenv.mkDerivation {
     cat > $out/bin/gparted <<'EOF'
     #!${pkgs.bash}/bin/bash
     pkexec env \
+      PATH="$PATH" \
       DISPLAY="$DISPLAY" \
       XAUTHORITY="$XAUTHORITY" \
       WAYLAND_DISPLAY="$WAYLAND_DISPLAY" \

@@ -298,6 +298,7 @@ in
     # (pkgs.callPackage ../../pkgs/xremap.nix { wlrootsSupport = true; })
     xremap
     (pkgs.callPackage ../../pkgs/gparted.nix { })
+    exfatprogs # exfat support for gparted
     # (pkgs.callPackage ../../pkgs/mitype.nix { })
     # (pkgs.callPackage ../../pkgs/rvc-cli.nix { })
     # (pkgs.callPackage ../../pkgs/blender.nix { })
