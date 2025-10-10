@@ -98,7 +98,16 @@ in
       ];
     };
   };
-  services.udiskie.enable = true;
+  services.udiskie = {
+    enable = true;
+    automount = true;
+    settings = {
+      program_options = {
+        # file_manager = "${pkgs.xdg-utils}/bin/xdg-open";
+        file_manager = "${pkgs.kitty}/bin/kitty -e ${pkgs.yazi}/bin/yazi";
+      };
+    };
+  };
   # https://github.com/nix-community/home-manager/issues/2064
   systemd.user.targets.tray.Unit.Requires = [ "graphical-session.target" ];
 
