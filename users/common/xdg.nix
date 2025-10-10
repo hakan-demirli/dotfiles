@@ -60,7 +60,6 @@
         "tmuxp"
         "tofi"
         "transmission"
-        "udiskie"
         "vim"
         "wavemon"
         "waybar"
