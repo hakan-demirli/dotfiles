@@ -2,7 +2,7 @@
 
 * {
   background: transparent;
-  font-family: "JetBrainsMono Nerd Font";
+  font-family: "JetBrainsMono Nerd Font Propo";
   font-size: 12px;
   color: white;
   margin: 0px 0px 0px 0px;
@@ -42,7 +42,7 @@ tooltip {
 }
 
 #tray {
-  padding: 0px 8px 0px 8px;
+  padding: 0px 4px 0px 4px;
 }
 
 #workspaces button {
@@ -83,7 +83,7 @@ tooltip {
 #pulseaudio,
 #pulseaudio.mic,
 #backlight {
-  padding: 0px 6px 0px 6px;
+  padding: 0px 5px 0px 5px;
 }
 
 #idle_inhibitor,
@@ -176,4 +176,11 @@ tooltip {
 
 #custom-timer.active {
   background-color: shade(@red, 0.7);
+}
+
+#clock.h-m {
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding-left: 0px;
+  padding-right: 0px;
 }

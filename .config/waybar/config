@@ -1,16 +1,19 @@
 {
   "layer": "top",
-  "output": "eDP-1",
+  // "output": "eDP-1", 
   "position": "right",
   "modules-left": [
     "hyprland/workspaces"
   ],
   "modules-center": [
-    "clock",
+    "clock#h-m",
     "custom/left-arrow-dark",
-    "clock#2",
+    "clock#day",
     "custom/left-arrow-dark",
-    "clock#3"
+    "clock#day-month",
+    "custom/left-arrow-dark",
+    "custom/left-arrow-dark",
+    "custom/left-arrow-dark"
   ],
   "modules-right": [
     "memory",
@@ -23,8 +26,6 @@
     "custom/left-arrow-dark",
     "battery",
     "custom/left-arrow-dark",
-    "custom/timer",
-    "custom/left-arrow-dark",
     "custom/weather",
     "custom/left-arrow-dark",
     "custom/notification",
@@ -33,7 +34,8 @@
   ],
   "custom/left-arrow-dark": {
     "format": " ",
-    "tooltip": false
+    "tooltip": false,
+    "justify": "center"
   },
   "custom/right-arrow-dark": {
     "format": " ",
@@ -45,31 +47,37 @@
     "on-scroll-down": "hyprctl dispatch workspace r+1",
     "on-click": "activate",
     "disable-scroll-wraparound": true,
+    "justify": "center",
     //"persistent_workspaces": {
     //  "1": [],
     //  "2": [],
     //  "3": []
     //}
   },
-  "clock": {
-    "format": "{:%H:%M}",
+  "clock#h-m": {
+    "justify": "center",
+    "format": "{:%H\n%M}",
     "tooltip": false
   },
-  "clock#2": {
+  "clock#day": {
+    "justify": "center",
     "format": "{:%a}",
     "tooltip": false
   },
-  "clock#3": {
+  "clock#day-month": {
+    "justify": "center",
     "format": "{:%d-%m}",
     "tooltip": false
   },
   "memory": {
-    "format": "{}% ",
+    "justify": "center",
+    "format": "\n{}%",
     "on-click": "todo_my"
   },
   "pulseaudio": {
-    "format": "{volume}% {icon}",
-    "format-bluetooth": "{volume}% {icon}",
+    "justify": "center",
+    "format": "{icon}\n{volume}%",
+    "format-bluetooth": "{icon}\n{volume}%",
     "format-muted": "",
     "format-icons": {
       "headphone": "",
@@ -92,8 +100,9 @@
     "reverse-scrolling": 1
   },
   "pulseaudio#mic": {
+    "justify": "center",
     "format": "{format_source}",
-    "format-source": "{volume}% ",
+    "format-source": "\n{volume}%",
     "format-source-muted": "",
     "on-click": "pavucontrol",
     "on-click-right": "pactl set-source-mute 0 toggle",
@@ -102,15 +111,17 @@
     "reverse-scrolling": 1
   },
   "backlight": {
+    "justify": "center",
     "device": "amdgpu_bl2", // cd /var/lib/systemd/backlight
-    "format": "{percent}% {icon}",
+    "format": "{icon}\n{percent}%",
     "format-icons": ["", ""],
     "on-scroll-up": "exec brightnessctl s 5%+",
     "on-scroll-down": "exec brightnessctl s 5%-",
     "reverse-scrolling": 1
   },
   "battery": { // 6 space max size preoccupied
-    "format": "{capacity}% {icon}\n{time}",
+    "justify": "center",
+    "format": "{icon}\n {capacity}%\n{time}",
     "format-icons": {
       "default": [
         "",
@@ -121,7 +132,7 @@
       "plugged": " "
     },
     "format-time": "{H}h{M}m",
-    "format-charging": "{capacity}%  {icon}\n{time}",
+    "format-charging": " {icon}\n {capacity}%\n{time}",
     "format-full": " {icon}",
     "interval": 5,
     "states": {
@@ -132,6 +143,7 @@
     "on-click": "gnome-power-statistics",
   },
   "custom/notification": {
+    "justify": "center",
     "tooltip": false,
     "format": "{icon}",
     "format-icons": {
@@ -153,18 +165,21 @@
     "escape": true
   },
   "tray": {
+    "justify": "center",
     "icon-size": 21,
     "spacing": 5,
     "reverse-direction": true
   },
   "custom/weather": {
-      "format": "{}",
-      "tooltip": true,
-      "interval": 60,
-      "exec": "wttrbar --location Ankara",
-      "return-type": "json"
+    "justify": "center",
+    "format": "{}",
+    "tooltip": true,
+    "interval": 60,
+    "exec": "wttrbar --location Ankara",
+    "return-type": "json"
   },
   "custom/timer": {
+    "justify": "center",
     "tooltip": true,
     "return-type": "json",
     "exec": "waybar_timer -r",
