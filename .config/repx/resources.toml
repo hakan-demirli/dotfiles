@@ -1,0 +1,9 @@
+[defaults]
+partition = "compute"
+cpus-per-task = 1
+mem = "1G"
+time = "23:59:00"
+
+[[rules]]
+target = "safari"
+partition = "cpu_part"
