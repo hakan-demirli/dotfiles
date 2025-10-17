@@ -4,15 +4,15 @@ submission_target = "local"
 [targets]
 
   [targets.local]
-  base_path = "~/Desktop/repx-store"
+  base_path = "~/.local/share/repx-store"
   execution_type = "docker"
 
   [targets.tailscale-vm-oracle-aarch64]
-  base_path = "~/Desktop/repx-store"
+  base_path = "~/.local/share/repx-store"
   address = "tailscale-vm-oracle-aarch64"
   execution_type = "docker"
 
   [targets.safari]
-  base_path = "/mnt/galactica/demirlie/Desktop/repx-store"
+  base_path = "/mnt/galactica/demirlie/.local/share/repx-store"
   address = "safari"
   execution_type = "podman"
