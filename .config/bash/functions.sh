@@ -59,3 +59,11 @@ fi
 
 # kitty SSH issue workaround: https://wiki.archlinux.org/title/Kitty#Terminal_issues_with_SSH
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
+
+ensure_prompt_symbol() {
+  if [[ "$PS1" != *❯* ]]; then
+    PS1="${PS1}❯ "
+  fi
+}
+
+ensure_prompt_symbol
