@@ -215,7 +215,7 @@ in
 
     imhex
     trash-cli
-    unar
+    ouch
     zip
     ghostscript
     drawio
