@@ -62,7 +62,7 @@ fi
 
 ensure_prompt_symbol() {
   if [[ "$PS1" != *❯* ]]; then
-    PS1="${PS1}❯ "
+    PS1="${PS1}\n❯ "
   fi
 }
 
