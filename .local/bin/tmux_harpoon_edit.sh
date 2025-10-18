@@ -10,7 +10,6 @@ touch "$data_file"
 
 tmux display-popup -w 80% -E "hx $data_file"
 
-# Remove empty lines from the data_file
 sed -i '/^$/d' "$data_file"
 
 
