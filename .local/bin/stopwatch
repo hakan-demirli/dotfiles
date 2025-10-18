@@ -15,7 +15,6 @@ function finish {
 
 trap finish EXIT
 
-# Use GNU date if possible as it's most likely to have nanoseconds available.
 if hash gdate 2>/dev/null; then
     GNU_DATE=gdate
 elif date --version | grep 'GNU coreutils' >/dev/null; then
@@ -30,7 +29,6 @@ function datef {
     fi
 }
 
-# Display nanoseconsd only if supported
 if datef +%N | grep -q N 2>/dev/null; then
     DATE_FORMAT="+%H:%M:%S"
 else
@@ -40,7 +38,6 @@ fi
 
 tput civis # hide cursor
 
-# If -r is passed, use saved start time from ~/.config/.sw
 if [[ "$1" == "-r" || "$1" == "--resume" ]]; then
     if [[ ! -f $HOME/.config/.sw ]]; then
         datef +%s > $HOME/.config/.sw
@@ -51,7 +48,6 @@ else
     echo -n $START_TIME > $HOME/.config/.sw
 fi
 
-# GNU date accepts the input date differently than BSD
 if [[ -z "$GNU_DATE" ]]; then
     DATE_INPUT="-v-${START_TIME}S"
 else

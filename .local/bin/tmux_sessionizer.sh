@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 if [[ -z "$TMUX" ]]; then
-  # NOT in tmux: Force a selection.
   while true; do
     raw_input=$(
       {
@@ -47,7 +46,6 @@ if [[ $? -ne 0 || ! -d "$selected" ]]; then
   exit 1
 fi
 
-# Adopt the exact same naming convention as txh.sh
 selected_base_name=$(basename "$selected" | tr --complement --squeeze '[:alnum:]' '_')
 selected_base_name=${selected_base_name#_}
 selected_base_name=${selected_base_name%_}

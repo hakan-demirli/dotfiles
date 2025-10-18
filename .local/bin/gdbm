@@ -19,14 +19,11 @@ fi
 
 
 EXECUTABLE="$1"
-# Remove the executable from the list of arguments.
 shift
-# Now, "$@" contains only the arguments for the program.
 
 EXECUTABLE_QUOTED=$(printf "%q" "$EXECUTABLE")
 PROGRAM_ARGS_QUOTED=$(printf "%q " "$@")
 
-# Construct the final, correct GDB command string.
 GDB_COMMAND="gdb --args $EXECUTABLE_QUOTED $PROGRAM_ARGS_QUOTED"
 
 

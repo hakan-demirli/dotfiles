@@ -30,10 +30,8 @@ fi
 
 # The input path is relative to the pane's current directory.
 if [[ "$input_path" == /* || "$input_path" == ~* ]]; then
-  # Use realpath to resolve any '..' and symlinks for consistency.
   absolute_path=$(realpath -m -- "$input_path")
 else
-  # Construct the absolute path using the pane's CWD.
   absolute_path=$(realpath -m -- "$pane_cwd/$input_path")
 fi
 
@@ -54,7 +52,6 @@ done < "$data_file"
 
 if [[ $found_hook -eq 0 ]]; then
   tmux display-message "No 'hx' harpoon hook found for session: $session_cwd"
-  # Fallback: open the file in the pane where the key was pressed.
   tmux send-keys -t "{last}" "hx '${absolute_path}'" Enter
   exit 1
 fi
