@@ -78,13 +78,15 @@ let
     inputs.small-apps.packages.${pkgs.system}.difffenced
   ];
 
-  server-cli = with pkgs; [
-    android-tools
-    bandwhich
-    cpufrequtils
-    usbutils
-    adb-sync
-  ];
+  server-cli =
+    with pkgs;
+    [
+      android-tools
+      bandwhich
+      usbutils
+      adb-sync
+    ]
+    ++ lib.optional pkgs.stdenv.hostPlatform.isx86_64 cpufrequtils;
 
   desktop-cli = with pkgs; [
     pavucontrol
