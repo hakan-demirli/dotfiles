@@ -16,6 +16,7 @@ let
     value = rawString;
     __toString = self: self.value;
   };
+  common-packages = import ../common/packages.nix { inherit pkgs inputs; };
 in
 {
   imports = [
@@ -151,159 +152,13 @@ in
       size = 10;
     };
   };
-  home.packages = with pkgs; [
-    bandwhich # network monitoring TUI
-    cpufrequtils
-    hypridle
-    vim # default editor
-    waybar
-    wttrbar
-    hyprlock
-    kdePackages.xwaylandvideobridge
-    tor-browser
-    qalculate-qt
-    libqalculate
-    # (lf.overrideAttrs (oldAttrs: {
-    #   patches = oldAttrs.patches or [] ++ [../../system/app/lf.patch];
-    # }))
-    yazi
-    wl-clipboard
-    wl-clip-persist
-    pulseaudio
-    tree
-    anki-bin
-    # piper-tts
-
-    python3
-
-    difftastic
-    jq # to parse hyprctl
-    usbutils
-    pavucontrol
-    android-tools # adb
-    transmission_4-qt
-    kdePackages.kolourpaint
-    kdePackages.qtimageformats # webp support for kolourpaint
-    kdePackages.breeze-icons
-    # ventoy
-    nwg-displays
-    wlr-randr # nwg-displays dependency
-    hyprshot
-    networkmanagerapplet
-    brightnessctl
-    kooha
-    swaynotificationcenter
-    swayosd
-
-    tailscale-systray
-
-    playerctl
-    swww # for update_wp
-    # activate-linux # for update_wp
-    mpv
-    # (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-    # nerd-fonts.jetbrains-mono
-    ripgrep
-    # ripdrag # started to fail when nvidia gpu is enabled
-    xdragon
-    tmux
-    ffmpeg-full
-    ffmpegthumbnailer # for yazi opus plugin
-    bat
-    libnotify
-    parallel-full
-
-    imhex
-    trash-cli
-    ouch
-    zip
-    ghostscript
-    drawio
-    yek
-
-    rclone
-    # citrix_workspace
-    helix
-    # helix-gpt
-    # (koboldcpp.override { cublasSupport = true; })
-    # (pkgs.llama-cpp.override { cudaSupport = true; })
-    # ollama-cuda
-    lsp-ai
-    aider-chat
-    aichat
-    asm-lsp
-    nixd
-    # alejandra
-    nixfmt-rfc-style
-    ruff
-    pyright
-    # rustup component add rust-analyzer
-    rust-analyzer
-    rustfmt
-    clippy
-    taplo
-    nodePackages_latest.vscode-json-languageserver
-    nodePackages_latest.bash-language-server
-    shfmt
-    nodePackages_latest.prettier
-    clang-tools
-    lldb
-    cmake-language-server
-    marksman
-    # markdown-oxide
-    gnumake
-    texlab
-    sioyek
-    yaml-language-server
-    verible
-    nodePackages.diagnostic-languageserver
-    verilator
-    veridian
-    mutagen
-    uwu-colors
-
-    inputs.small-apps.packages.${pkgs.system}.markdown-countdown-lsp
-
-    lua-language-server
-    # vale-ls
-    # typos-lsp
-    # ltex-ls
-
-    neovim
-    # taskwarrior
-    # timewarrior
-
-    # https://github.com/NixOS/nixpkgs/issues/47201#issuecomment-2379635080
-    # colima
-
-    udiskie
-    adb-sync
-    # wineWowPackages.waylandFull
-    # winetricks
-    # steam-run # quick runner for fsh compliant binaries
-
-    inputs.small-apps.packages.${pkgs.system}.waybar_timer
-    inputs.small-apps.packages.${pkgs.system}.gtk_applet
-    inputs.small-apps.packages.${pkgs.system}.auto_refresh
-    inputs.small-apps.packages.${pkgs.system}.youtube_sync
-    inputs.small-apps.packages.${pkgs.system}.difffenced
-    # inputs.small-apps.packages.${pkgs.system}.homepage
-    # inputs.small-apps.packages.${pkgs.system}.tt
-    # inputs.small-apps.packages.${pkgs.system}.clipboard_tts
-    # inputs.small-apps.packages.${pkgs.system}.gtk_indicator
-    # inputs.small-apps.packages.${pkgs.system}.update_wp
-    # inputs.small-apps.packages.${pkgs.system}.notify_scheduler
-    # inputs.small-apps.packages.${pkgs.system}.gen_typing_test
-
-    # (pkgs.callPackage ../../pkgs/xremap.nix { wlrootsSupport = true; })
-    xremap
-    (pkgs.callPackage ../../pkgs/gparted.nix { })
-    exfatprogs # exfat support for gparted
-    # (pkgs.callPackage ../../pkgs/mitype.nix { })
-    # (pkgs.callPackage ../../pkgs/rvc-cli.nix { })
-    # (pkgs.callPackage ../../pkgs/blender.nix { })
-    # (pkgs.callPackage ../../system/app/svlangserver.nix {})
-    # (pkgs.callPackage ../../pkgs/veridian.nix { withSlang = true; })
-    # (pkgs.callPackage ../../pkgs/j4-dmenu-desktop.nix { })
-  ];
+  home.packages =
+    common-packages.dev-essentials
+    ++ common-packages.editors
+    ++ common-packages.lsp
+    ++ common-packages.server-cli
+    ++ common-packages.desktop-cli
+    ++ common-packages.ai
+    ++ common-packages.gui
+    ++ common-packages.tools-cli;
 }

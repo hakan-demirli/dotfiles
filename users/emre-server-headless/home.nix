@@ -7,6 +7,7 @@
 let
   username = "emre";
   bashConfigDir = ../../.config/bash;
+  common-packages = import ../common/packages.nix { inherit pkgs inputs; };
 in
 {
   imports = [
@@ -68,49 +69,11 @@ in
     stateVersion = "25.05";
   };
 
-  home.packages = with pkgs; [
-    bandwhich
-    vim
-    yazi
-    tree
-    jq
-    usbutils
-    android-tools
-    ripgrep
-    tmux
-    bat
-    parallel-full
-    trash-cli
-    unar
-    zip
-    git
-    fd
-    fzf
-    htop
-
-    python3
-    difftastic
-    ffmpeg-full
-    ghostscript
-    # asm-lsp
-    nixd
-    nixfmt-rfc-style
-    # ruff
-    # ruff-lsp
-    pyright
-    clippy
-    taplo
-    nodePackages_latest.vscode-json-languageserver
-    nodePackages_latest.bash-language-server
-    shfmt
-    nodePackages_latest.prettier
-    clang-tools
-    lldb
-    cmake-language-server
-    marksman
-    gnumake
-    yaml-language-server
-    neovim
-    helix
-  ];
+  home.packages =
+    common-packages.dev-essentials
+    ++ common-packages.editors
+    ++ common-packages.ai
+    ++ common-packages.lsp
+    ++ common-packages.tools-cli
+    ++ common-packages.server-cli;
 }
