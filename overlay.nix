@@ -1,6 +1,5 @@
 _: {
   nixpkgs.overlays = [
-    # https://github.com/NixOS/nixpkgs/issues/351717
     (final: prev: {
       # https://github.com/NixOS/nixpkgs/issues/437058
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
@@ -17,9 +16,9 @@ _: {
         })
       ];
 
+      # https://github.com/NixOS/nixpkgs/issues/351717
       python312 = prev.python312.override {
         packageOverrides = _: prevPy: {
-
           triton-bin = prevPy.triton-bin.overridePythonAttrs (_: {
             postFixup = ''
               chmod +x "$out/${prev.python312.sitePackages}/triton/backends/nvidia/bin/ptxas"
