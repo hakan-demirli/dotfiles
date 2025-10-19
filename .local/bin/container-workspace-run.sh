@@ -101,12 +101,13 @@ $CONTAINER_RUNTIME run --rm -it \
     echo "Setting up workspace..."
     cp /persistent/workspace.tar.zst /tmp/ && tar -I "zstd -d -T0" -xf /tmp/workspace.tar.zst -C /workspace && rm /tmp/workspace.tar.zst
 
+    mkdir -p /root/.config
     mkdir -p /root/.local/bin
     mkdir -p /root/.local/share
 
     ln -sf /workspace/Desktop /root/Desktop
     ln -sf /workspace/.bashrc /root/.bashrc
-    ln -sf /workspace/Desktop/dotfiles/.config /root/.config
+    ln -sf /workspace/Desktop/dotfiles/.config/* /root/.config
     ln -sf /workspace/Desktop/dotfiles/.local/bin/* /root/.local/bin
 
     echo "Workspace loaded. Executing into main Nix environment..."

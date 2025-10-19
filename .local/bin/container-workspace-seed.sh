@@ -91,9 +91,9 @@ EOF
 
     echo "Creating workspace archive..."
     tar -I "zstd -1 -T0" \
-      --transform="s,^root,workspace," \
-      -cf /persistent/workspace.tar.zst \
-      /root/Desktop /root/.bashrc
+      -cpf /persistent/workspace.tar.zst \
+      -C /root \
+      Desktop .bashrc
 
     echo "Seeding complete!"
   '
