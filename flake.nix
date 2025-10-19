@@ -286,7 +286,11 @@
         {
           barebone = pkgs.mkShell {
             packages =
-              my-packages.dev-essentials ++ my-packages.editors ++ my-packages.lsp ++ my-packages.tools-cli;
+              my-packages.dev-essentials
+              ++ my-packages.editors
+              ++ my-packages.lsp
+              ++ my-packages.tools-cli
+              ++ [ pkgs.openssl ];
           };
         }
       );
