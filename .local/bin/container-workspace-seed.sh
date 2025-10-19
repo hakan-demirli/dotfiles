@@ -84,6 +84,7 @@ shopt -s globstar
 shopt -s checkjobs
 
 eval "$(fzf --bash)"
+eval "$(direnv hook bash)"
 EOF
 )
 
