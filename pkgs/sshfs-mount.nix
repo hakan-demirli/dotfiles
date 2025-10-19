@@ -3,9 +3,9 @@
 let
   username = "emre";
   userHome = "/home/${username}";
-  mountPoint = "${userHome}/Desktop/repx-store";
+  mountPoint = "${userHome}/.local/share/repx-store";
   remoteHost = "tailscale-s01";
-  remotePath = "/home/emre/Desktop/repx-store";
+  remotePath = "/home/emre/.local/share/repx-store";
 
   binPath = pkgs.lib.makeBinPath [
     pkgs.sshfs-fuse
