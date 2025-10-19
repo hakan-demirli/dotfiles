@@ -290,7 +290,10 @@
               ++ my-packages.editors
               ++ my-packages.lsp
               ++ my-packages.tools-cli
-              ++ [ pkgs.openssl ];
+              ++ [
+                pkgs.openssl
+                pkgs.toybox
+              ];
           };
         }
       );

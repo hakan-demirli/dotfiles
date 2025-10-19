@@ -2,8 +2,8 @@
 
 persist-workspace() {
   echo "Saving workspace to persistent archives..."
-  tar -I "zstd -1 -T0" -cpf /persistent/nix.tar.zst -C /nix . && echo "nix.tar.zst saved." &
-  tar -I "zstd -1 -T0" -cpf /persistent/workspace.tar.zst -C /workspace . && echo "workspace.tar.zst saved." &
+  tar -cf - -C /nix . | zstd -1 -T0 > /persistent/nix.tar.zst && echo "nix.tar.zst saved." &
+  tar -cf - -C /workspace . | zstd -1 -T0 > /persistent/workspace.tar.zst && echo "workspace.tar.zst saved." &
   wait
   echo "All archives saved!"
 }
@@ -12,7 +12,7 @@ persist-workspace() {
 # openssl enc -d -aes-256-cbc -pbkdf2 -in ./secrets.tar -out ./secrets_decrypted.tar
 unlock-secrets() {
   local secrets_archive="/workspace/secrets.tar"
-  local destination_dir="/root/.config/git/"
+  local destination_dir="/root/.config/git"
 
   if [ ! -f "$secrets_archive" ]; then
     echo "Secrets archive not found at $secrets_archive"
