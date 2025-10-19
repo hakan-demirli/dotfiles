@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 CONTAINER_RUNTIME="docker"
-NIX_TMPFS_SIZE="50g"
-WORKSPACE_TMPFS_SIZE="15g"
+TOTAL_TMPFS_SIZE="100g"
 HOST_HOME="$HOME"
 
 usage() {
@@ -13,17 +12,15 @@ usage() {
   echo "Options:"
   echo "  -r, --runtime <name>         Container runtime to use (e.g., docker, podman)."
   echo "                               Default: ${CONTAINER_RUNTIME}"
-  echo "  -n, --nix-size <size>        Size for the /nix tmpfs (e.g., 50g, 100g)."
-  echo "                               Default: ${NIX_TMPFS_SIZE}"
-  echo "  -w, --workspace-size <size>  Size for the /workspace tmpfs (e.g., 15g, 20g)."
-  echo "                               Default: ${WORKSPACE_TMPFS_SIZE}"
+  echo "  -s, --size <size>            Total size for the shared in-memory tmpfs (e.g., 120g)."
+  echo "                               Default: ${TOTAL_TMPFS_SIZE}"
   echo "  -H, --host-home <path>       Path on the host for persistent storage."
   echo "                               Default: ${HOST_HOME}"
   echo "  -h, --help                   Display this help message and exit."
 }
 
-SHORT_OPTS="r:n:w:H:h"
-LONG_OPTS="runtime:,nix-size:,workspace-size:,host-home:,help"
+SHORT_OPTS="r:s:H:h"
+LONG_OPTS="runtime:,size:,host-home:,help"
 
 PARSED=$(getopt --options "${SHORT_OPTS}" --longoptions "${LONG_OPTS}" --name "$0" -- "$@")
 if [[ $? -ne 0 ]]; then
@@ -38,12 +35,8 @@ while true; do
       CONTAINER_RUNTIME="$2"
       shift 2
       ;;
-    -n|--nix-size)
-      NIX_TMPFS_SIZE="$2"
-      shift 2
-      ;;
-    -w|--workspace-size)
-      WORKSPACE_TMPFS_SIZE="$2"
+    -s|--size)
+      TOTAL_TMPFS_SIZE="$2"
       shift 2
       ;;
     -H|--host-home)
@@ -66,15 +59,14 @@ while true; do
 done
 
 echo "--- Launching Environment ---"
-echo "Container Runtime: ${CONTAINER_RUNTIME}"
-echo "Nix Tmpfs Size:    ${NIX_TMPFS_SIZE}"
-echo "Workspace Tmpfs:   ${WORKSPACE_TMPFS_SIZE}"
-echo "Persistent Home:   ${HOST_HOME}"
+echo "Container Runtime:   ${CONTAINER_RUNTIME}"
+echo "Shared Tmpfs Size:   ${TOTAL_TMPFS_SIZE}"
+echo "Persistent Home:     ${HOST_HOME}"
 echo "---------------------------"
 
 $CONTAINER_RUNTIME run --rm -it \
   --cap-add SYS_ADMIN \
-  --tmpfs /workspace:rw,size="$WORKSPACE_TMPFS_SIZE",exec \
+  --tmpfs /mem:rw,size="$TOTAL_TMPFS_SIZE",exec \
   -v "$HOST_HOME":/persistent:rw,z \
   -v "$HOST_HOME"/.local/share/repx-store:/mnt/demirlie/.local/share/repx-store:z \
   -v "$HOST_HOME"/Desktop:/host-desktop:z \
@@ -83,21 +75,27 @@ $CONTAINER_RUNTIME run --rm -it \
   nix-shell -p zstd gnutar util-linux coreutils rsync nix --run '
     set -e
 
+    mkdir -p /mem/nix /mem/workspace /mem/tmp
+
+    rsync -a /tmp/ /mem/tmp/
+    mount --bind /mem/tmp /tmp
+
+    mkdir -p /workspace
+    mount --bind /mem/workspace /workspace
+
     echo "Preparing in-memory Nix environment..."
-    mkdir -p /nix-ram
-    mount -t tmpfs -o rw,size='"${NIX_TMPFS_SIZE}"',exec tmpfs /nix-ram
 
     echo "Populating in-memory store from archive..."
     # cp /persistent/nix.tar.zst /tmp/
-    # tar -I "zstd -d -T0" -xf /tmp/nix.tar.zst -C /nix-ram
+    # tar -I "zstd -d -T0" -xf /tmp/nix.tar.zst -C /mem/nix
     # rm /tmp/nix.tar.zst
-    tar -I "zstd -d -T0" -xf /persistent/nix.tar.zst -C /nix-ram
+    tar -I "zstd -d -T0" -xf /persistent/nix.tar.zst -C /mem/nix
 
     echo "Syncing bootstrap tools to in-memory store..."
-    rsync -a /nix/store/ /nix-ram/store/
+    rsync -a /nix/store/ /mem/nix/store/
 
     echo "Activating in-memory Nix environment..."
-    mount --move /nix-ram /nix
+    mount --bind /mem/nix /nix
 
     echo "Setting up workspace..."
     # cp /persistent/workspace.tar.zst /tmp/
