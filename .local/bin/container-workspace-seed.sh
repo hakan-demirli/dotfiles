@@ -87,7 +87,7 @@ fi
 EOF
 
     echo "Creating Nix store archive..."
-    tar -I "zstd -1 -T0" -cf /persistent/nix.tar.zst -C /nix ./store
+    tar -I "zstd -1 -T0" -cpf /persistent/nix.tar.zst -C /nix .
 
     echo "Creating workspace archive..."
     tar -I "zstd -1 -T0" \

@@ -87,9 +87,6 @@ $CONTAINER_RUNTIME run --rm -it \
     mkdir -p /nix-ram
     mount -t tmpfs -o rw,size='"${NIX_TMPFS_SIZE}"',exec tmpfs /nix-ram
 
-    echo "Preserving container Nix state..."
-    rsync -a /nix/var/ /nix-ram/var/
-
     echo "Populating in-memory store from archive..."
     cp /persistent/nix.tar.zst /tmp/
     tar -I "zstd -d -T0" -xf /tmp/nix.tar.zst -C /nix-ram
@@ -102,7 +99,7 @@ $CONTAINER_RUNTIME run --rm -it \
     mount --move /nix-ram /nix
 
     echo "Setting up workspace..."
-    cp /persistent/workspace.tar.zst /tmp/ && tar -I "zstd -d -T0" -xf /tmp/workspace.tar.zst -C / && rm /tmp/workspace.tar.zst
+    cp /persistent/workspace.tar.zst /tmp/ && tar -I "zstd -d -T0" -xf /tmp/workspace.tar.zst -C /workspace && rm /tmp/workspace.tar.zst
 
     mkdir -p /root/.local/bin
     mkdir -p /root/.local/share
