@@ -274,6 +274,20 @@
       ) systemArgs;
 
       forEachSystem = systems: f: lib.genAttrs systems (system: f system);
+      barebonePackages =
+        pkgs:
+        let
+          userPackages = import ./users/common/packages.nix { inherit pkgs inputs; };
+        in
+        userPackages.dev-essentials
+        ++ userPackages.editors
+        ++ userPackages.lsp
+        ++ userPackages.tools-cli
+        ++ [
+          pkgs.openssl
+          pkgs.ncurses
+        ];
+
       devShells = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
         system:
         let
@@ -281,19 +295,26 @@
             inherit system;
             overlays = (import ./overlay.nix { }).nixpkgs.overlays;
           };
-          my-packages = import ./users/common/packages.nix { inherit pkgs inputs; };
         in
         {
           barebone = pkgs.mkShell {
-            packages =
-              my-packages.dev-essentials
-              ++ my-packages.editors
-              ++ my-packages.lsp
-              ++ my-packages.tools-cli
-              ++ [
-                pkgs.openssl
-                pkgs.toybox
-              ];
+            packages = barebonePackages pkgs;
+          };
+        }
+      );
+
+      packages = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = (import ./overlay.nix { }).nixpkgs.overlays;
+          };
+        in
+        {
+          barebone = pkgs.buildEnv {
+            name = "barebone";
+            paths = barebonePackages pkgs;
           };
         }
       );
@@ -301,5 +322,6 @@
     {
       inherit nixosConfigurations;
       inherit devShells;
+      inherit packages;
     };
 }

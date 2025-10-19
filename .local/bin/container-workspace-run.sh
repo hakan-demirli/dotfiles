@@ -112,5 +112,6 @@ $CONTAINER_RUNTIME run --rm -it \
 
     echo "Workspace loaded. Executing into main Nix environment..."
     cd /root/Desktop/dotfiles
-    exec nix develop .#barebone --extra-experimental-features "nix-command flakes"
+    nix profile install .#barebone --extra-experimental-features "nix-command flakes"
+    exec bash -l
   '
