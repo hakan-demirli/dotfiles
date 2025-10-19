@@ -286,6 +286,7 @@
         ++ [
           pkgs.openssl
           pkgs.ncurses
+          pkgs.direnv
         ];
 
       devShells = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
