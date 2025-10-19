@@ -58,33 +58,51 @@ while true; do
   esac
 done
 
-echo "--- Seeding Environment ---"
-echo "Container Runtime: ${CONTAINER_RUNTIME}"
-echo "Persistent Home:   ${HOST_HOME}"
-echo "Dotfiles Repo:     ${DOTFILES_REPO}"
-echo "---------------------------"
 
-$CONTAINER_RUNTIME run --rm -it \
-  -v "$HOST_HOME":/persistent:z \
-  -e DOTFILES_REPO="$DOTFILES_REPO" \
-  docker.io/nixos/nix \
-  nix-shell -p zstd gnutar git openssl coreutils --run '
-    set -e
-
-    mkdir -p /root/Desktop
-
-    echo "Cloning dotfiles from ${DOTFILES_REPO}..."
-    git clone "${DOTFILES_REPO}" /root/Desktop/dotfiles
-
-    echo "Creating .bashrc..."
-    cat <<'"EOF"' > /root/.bashrc
+BASHRC_CONTENT=$(cat <<'EOF'
 if [ -f "$HOME/Desktop/dotfiles/.config/bash/main.sh" ]; then
   source "$HOME/Desktop/dotfiles/.config/bash/main.sh"
 fi
 if [ -f "$HOME/Desktop/dotfiles/.config/bash/container_helpers.sh" ]; then
   source "$HOME/Desktop/dotfiles/.config/bash/container_helpers.sh"
 fi
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/share/python/bin:$PATH"
+
+PROMPT_COMMAND="history -a; history -n"
+
+HISTCONTROL=ignoredups:erasedups
+HISTFILE="$HOME/Desktop/history"
+HISTFILESIZE=-1
+HISTSIZE=-1
+mkdir -p "$(dirname "$HISTFILE")"
+
+shopt -s histappend
+shopt -s checkwinsize
+shopt -s extglob
+shopt -s globstar
+shopt -s checkjobs
+
+eval "$(fzf --bash)"
 EOF
+)
+
+echo "--- Seeding Environment ---"
+
+$CONTAINER_RUNTIME run --rm -it \
+  -v "$HOST_HOME":/persistent:z \
+  -e DOTFILES_REPO="$DOTFILES_REPO" \
+  -e BASHRC_CONTENT="$BASHRC_CONTENT" \
+  docker.io/nixos/nix \
+  nix-shell -p zstd gnutar git openssl coreutils --run '
+    set -e
+    mkdir -p /root/Desktop
+
+    echo "Cloning dotfiles from ${DOTFILES_REPO}..."
+    git clone "${DOTFILES_REPO}" /root/Desktop/dotfiles
+
+    echo "Creating .bashrc from environment variable..."
+    echo "$BASHRC_CONTENT" > /root/.bashrc
 
     echo "Creating Nix store archive..."
     tar -I "zstd -1 -T0" -cpf /persistent/nix.tar.zst -C /nix .
