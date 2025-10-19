@@ -85,6 +85,10 @@ shopt -s checkjobs
 
 eval "$(fzf --bash)"
 eval "$(direnv hook bash)"
+
+if [[ $TERM != "dumb" ]]; then
+  eval "$(starship init bash --print-full-init)"
+fi
 EOF
 )
 
