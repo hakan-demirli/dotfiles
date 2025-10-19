@@ -76,7 +76,7 @@ $CONTAINER_RUNTIME run --rm -it \
   --cap-add SYS_ADMIN \
   --tmpfs /workspace:rw,size="$WORKSPACE_TMPFS_SIZE",exec \
   -v "$HOST_HOME":/persistent:rw,z \
-  -v "$HOST_HOME"/.local/repx/repx-store:/mnt/demirlie/.local/share/repx-store:z \
+  -v "$HOST_HOME"/.local/share/repx-store:/mnt/demirlie/.local/share/repx-store:z \
   -v "$HOST_HOME"/Desktop:/host-desktop:z \
   -v "$HOST_HOME"/Downloads:/host-downloads:z \
   docker.io/nixos/nix \
