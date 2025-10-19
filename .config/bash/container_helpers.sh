@@ -8,10 +8,19 @@ persist-workspace() {
   echo "All archives saved!"
 }
 
+# openssl enc -aes-256-cbc -pbkdf2 -in ./secrets_raw.tar -out ./secrets.tar
+# openssl enc -d -aes-256-cbc -pbkdf2 -in ./secrets.tar -out ./secrets_decrypted.tar
 unlock-secrets() {
-  local secrets_archive="/root/Desktop/dotfiles/secrets.tar"
+  local secrets_archive="/workspace/secrets.tar"
+  local destination_dir="/root/.config/git/"
+
   if [ ! -f "$secrets_archive" ]; then
     echo "Secrets archive not found at $secrets_archive"
+    return 1
+  fi
+
+  if ! command -v openssl &> /dev/null; then
+    echo "openssl is NOT in PATH"
     return 1
   fi
 
@@ -24,10 +33,20 @@ unlock-secrets() {
     return 1
   fi
 
-  if openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<<"$password" | tar -xf - -C /root/Desktop/dotfiles; then
+  if ! openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<<"$password" >/dev/null 2>&1; then
+    echo "Decryption failed. Incorrect passphrase?"
+    unset password
+    return 1
+  fi
+
+  echo "Passphrase correct. Deploying secrets..."
+  rm -rf "$destination_dir"
+  mkdir -p "$destination_dir"
+
+  if openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<<"$password" | tar -xf - -C "$destination_dir"; then
     echo "Decryption and deployment complete."
   else
-    echo "Decryption failed. Incorrect passphrase?"
+    echo "An unexpected error occurred during final extraction."
   fi
 
   unset password
