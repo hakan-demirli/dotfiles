@@ -287,6 +287,7 @@
           pkgs.openssl
           pkgs.ncurses
           pkgs.direnv
+          pkgs.starship
         ];
 
       devShells = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
