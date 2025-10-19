@@ -22,13 +22,13 @@ yazi_cd() {
 
   tmp="$(mktemp -t "yazi-cwd.XXXXX")"
 
-  trap 'rm -f -- "$tmp"' EXIT
-
   yazi --cwd-file="$tmp"
 
   if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
     cd -- "$cwd" || exit
   fi
+
+  rm -f -- "$tmp"
 }
 
 gcmp() {

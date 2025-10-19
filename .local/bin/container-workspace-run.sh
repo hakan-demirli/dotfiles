@@ -88,9 +88,10 @@ $CONTAINER_RUNTIME run --rm -it \
     mount -t tmpfs -o rw,size='"${NIX_TMPFS_SIZE}"',exec tmpfs /nix-ram
 
     echo "Populating in-memory store from archive..."
-    cp /persistent/nix.tar.zst /tmp/
-    tar -I "zstd -d -T0" -xf /tmp/nix.tar.zst -C /nix-ram
-    rm /tmp/nix.tar.zst
+    # cp /persistent/nix.tar.zst /tmp/
+    # tar -I "zstd -d -T0" -xf /tmp/nix.tar.zst -C /nix-ram
+    # rm /tmp/nix.tar.zst
+    tar -I "zstd -d -T0" -xf /persistent/nix.tar.zst -C /nix-ram
 
     echo "Syncing bootstrap tools to in-memory store..."
     rsync -a /nix/store/ /nix-ram/store/
@@ -99,7 +100,10 @@ $CONTAINER_RUNTIME run --rm -it \
     mount --move /nix-ram /nix
 
     echo "Setting up workspace..."
-    cp /persistent/workspace.tar.zst /tmp/ && tar -I "zstd -d -T0" -xf /tmp/workspace.tar.zst -C /workspace && rm /tmp/workspace.tar.zst
+    # cp /persistent/workspace.tar.zst /tmp/
+    # tar -I "zstd -d -T0" -xf /tmp/workspace.tar.zst -C /workspace
+    # rm /tmp/workspace.tar.zst
+    tar -I "zstd -d -T0" -xf /persistent/workspace.tar.zst -C /workspace
 
     mkdir -p /root/.config
     mkdir -p /root/.local/bin
@@ -112,6 +116,7 @@ $CONTAINER_RUNTIME run --rm -it \
 
     echo "Workspace loaded. Executing into main Nix environment..."
     cd /root/Desktop/dotfiles
+    rm -rf /root/.nix-profile
     nix profile install .#barebone --extra-experimental-features "nix-command flakes"
-    exec bash -l
+    exec bash -i
   '
