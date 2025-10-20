@@ -12,7 +12,9 @@ persist-workspace() {
 # openssl enc -d -aes-256-cbc -pbkdf2 -in ./secrets.tar -out ./secrets_decrypted.tar
 unlock-secrets() {
   local secrets_archive="/workspace/secrets.tar"
-  local destination_dir="/root/.config/git"
+  local secrets_tmpfs_dir="/mem/secrets"
+  local destination_dir="${secrets_tmpfs_dir}/git"
+  local symlink_target_path="/root/.config/git"
 
   if [ ! -f "$secrets_archive" ]; then
     echo "Secrets archive not found at $secrets_archive"
@@ -44,7 +46,10 @@ unlock-secrets() {
   mkdir -p "$destination_dir"
 
   if openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<<"$password" | tar -xf - -C "$destination_dir"; then
+    mkdir -p "$(dirname "$symlink_target_path")"
+    ln -sfn "$destination_dir" "$symlink_target_path"
     echo "Decryption and deployment complete."
+    echo "Symlinked ${symlink_target_path} -> ${destination_dir}"
   else
     echo "An unexpected error occurred during final extraction."
   fi
