@@ -62,7 +62,7 @@ let
     asm-lsp
     texlab
     nodePackages.diagnostic-languageserver
-    veridian
+    # veridian
     # inputs.small-apps.packages.${pkgs.system}.markdown-countdown-lsp
   ];
 
