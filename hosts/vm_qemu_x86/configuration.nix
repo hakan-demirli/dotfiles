@@ -130,6 +130,7 @@ in
   ];
 
   boot.binfmt.emulatedSystems = finalArgs.emulatedSystems;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   system.stateVersion = "25.05";
 }
