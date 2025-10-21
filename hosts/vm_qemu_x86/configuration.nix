@@ -107,6 +107,7 @@ in
         "Downloads"
         "Videos"
         ".local/share/keyrings"
+        ".local/share/repx-store"
       ];
     };
   };
