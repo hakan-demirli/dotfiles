@@ -3,7 +3,8 @@
 let
   dev-essentials = with pkgs; [
     bat
-    difftastic
+    # difftastic
+    delta
     fd
     fzf
     git
