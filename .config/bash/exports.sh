@@ -54,6 +54,8 @@ export OLLAMA_MODELS="${XDG_DATA_HOME}/ollama/models"
 export LEIN_HOME="${XDG_DATA_HOME}/lein"
 export LM_LICENSE_FILE="${XDG_CONFIG_HOME}/mylib/questa_license.dat"
 export PDK_ROOT="${XDG_DATA_HOME}/pdk"
+export IPYTHONDIR="${XDG_DATA_HOME}/ipython"
+export JUPYTER_CONFIG_DIR="${XDG_CONFIG_HOME}/jupyter"
 
 # Shell behavior
 export IGNOREEOF="4"
