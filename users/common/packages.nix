@@ -93,7 +93,8 @@ let
     pavucontrol
     libnotify
     pulseaudio
-    libqalculate
+    # libqalculate
+    (pkgs.callPackage ../../pkgs/libqalculate-fzf.nix { })
     xremap
     inputs.small-apps.packages.${pkgs.system}.auto_refresh
     inputs.small-apps.packages.${pkgs.system}.youtube_sync
