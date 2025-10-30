@@ -199,6 +199,10 @@
           name = "gdb";
           path = "${desktopDir}/state/.local/state/gdb";
         }
+        {
+          name = "qalculate";
+          path = "${desktopDir}/state/.local/state/qalculate";
+        }
       ];
       recursive = true;
       executable = false;
