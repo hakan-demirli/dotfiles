@@ -110,6 +110,7 @@ let
     kdePackages.qtimageformats
     kdePackages.xwaylandvideobridge
     kooha
+    localsend
     mpv
     networkmanagerapplet
     nwg-displays
