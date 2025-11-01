@@ -3,17 +3,17 @@
 let
   dev-essentials = with pkgs; [
     bat
-    # difftastic
     delta
+    # difftastic
     fd
     fzf
     git
     jq
+    parallel-full
     ripgrep
     tmux
     trash-cli
     tree
-    parallel-full
     yazi
     yek
   ];
@@ -30,125 +30,118 @@ let
   ];
 
   lsp = with pkgs; [
+    asm-lsp
+    clang-tools
+    clippy
+    cmake-language-server
+    gnumake
+    # inputs.small-apps.packages.${pkgs.system}.markdown-countdown-lsp
+    lldb
+    lsp-ai
+    lua-language-server
+    marksman
     nixd
     nixfmt-rfc-style
-
-    python3
-    pyright
-    ruff
-
-    rust-analyzer
-    rustfmt
-    clippy
-
-    clang-tools
-    lldb
-
+    nodePackages.diagnostic-languageserver
     nodePackages_latest.bash-language-server
     nodePackages_latest.prettier
     nodePackages_latest.vscode-json-languageserver
-    marksman
+    pyright
+    python3
+    ruff
+    rust-analyzer
+    rustfmt
     shfmt
     taplo
-    yaml-language-server
-
-    cmake-language-server
-    gnumake
-    lua-language-server
-    verible
-    verilator
-
-    uwu-colors
-    lsp-ai
-    asm-lsp
     texlab
-    nodePackages.diagnostic-languageserver
+    uwu-colors
+    verible
     # veridian
-    # inputs.small-apps.packages.${pkgs.system}.markdown-countdown-lsp
+    verilator
+    yaml-language-server
   ];
 
   tools-cli = with pkgs; [
-    rsync
     ffmpeg-full
     ffmpegthumbnailer
     ghostscript
+    inputs.small-apps.packages.${pkgs.system}.difffenced
+    mutagen
     ouch
+    rsync
     # unar
     zip
-    mutagen
-    inputs.small-apps.packages.${pkgs.system}.difffenced
   ];
 
   server-cli =
     with pkgs;
     [
+      adb-sync
       android-tools
       bandwhich
       usbutils
-      adb-sync
     ]
     ++ lib.optional pkgs.stdenv.hostPlatform.isx86_64 cpufrequtils;
 
   desktop-cli = with pkgs; [
-    pavucontrol
-    libnotify
-    pulseaudio
-    # libqalculate
-    (pkgs.callPackage ../../pkgs/libqalculate-fzf.nix { })
-    xremap
     inputs.small-apps.packages.${pkgs.system}.auto_refresh
     inputs.small-apps.packages.${pkgs.system}.youtube_sync
+    libnotify
+    # libqalculate
+    pavucontrol
+    (pkgs.callPackage ../../pkgs/libqalculate-fzf.nix { })
+    pulseaudio
+    xremap
   ];
 
   gui = with pkgs; [
-    waybar
-    wttrbar
-    hyprlock
-    hypridle
-    hyprshot
-    swww
-    wl-clipboard
-    wl-clip-persist
-    brightnessctl
-    networkmanagerapplet
-    swaynotificationcenter
-    swayosd
-    nwg-displays
-    wlr-randr
     anki-bin
+    brightnessctl
     drawio
+    exfatprogs
+    hypridle
+    hyprlock
+    hyprshot
     imhex
-    kdePackages.kolourpaint
+    inputs.small-apps.packages.${pkgs.system}.gtk_applet
+    inputs.small-apps.packages.${pkgs.system}.waybar_timer
     kdePackages.breeze-icons
+    kdePackages.kolourpaint
     kdePackages.qtimageformats
+    kdePackages.xwaylandvideobridge
     kooha
     mpv
+    networkmanagerapplet
+    nwg-displays
+    (pkgs.callPackage ../../pkgs/gparted.nix { })
     playerctl
     qalculate-qt
     sioyek
+    swaynotificationcenter
+    swayosd
+    swww
+    tailscale-systray
     tor-browser
     transmission_4-qt
     udiskie
+    waybar
+    wl-clipboard
+    wl-clip-persist
+    wlr-randr
+    wttrbar
     xdragon
-    (pkgs.callPackage ../../pkgs/gparted.nix { })
-    exfatprogs
-    tailscale-systray
-    inputs.small-apps.packages.${pkgs.system}.waybar_timer
-    inputs.small-apps.packages.${pkgs.system}.gtk_applet
-
-    kdePackages.xwaylandvideobridge
   ];
 
 in
 {
   inherit
+    ai
+    desktop-cli
     dev-essentials
     editors
+    gui
     lsp
     server-cli
-    desktop-cli
-    ai
-    gui
     tools-cli
     ;
 }
