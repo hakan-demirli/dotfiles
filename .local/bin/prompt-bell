@@ -8,10 +8,10 @@ RING_SOUND_CMD="{ for i in {1..3}; do ffplay -autoexit -nodisp -af 'volume=2.0' 
 
 HOOK_MARKER="##RINGMODE_ACTIVE##"
 
-if [[ "$PROMPT_COMMAND" == *"$HOOK_MARKER"* ]]; then
-    PROMPT_COMMAND="${PROMPT_COMMAND//$RING_SOUND_CMD; #$HOOK_MARKER/}"
-    echo "disabled"
+if [[ $PROMPT_COMMAND == *"$HOOK_MARKER"* ]]; then
+  PROMPT_COMMAND="${PROMPT_COMMAND//$RING_SOUND_CMD; #$HOOK_MARKER/}"
+  echo "disabled"
 else
-    PROMPT_COMMAND="$RING_SOUND_CMD; #$HOOK_MARKER $PROMPT_COMMAND"
-    echo "activated"
+  PROMPT_COMMAND="$RING_SOUND_CMD; #$HOOK_MARKER $PROMPT_COMMAND"
+  echo "activated"
 fi

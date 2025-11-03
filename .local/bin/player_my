@@ -11,5 +11,3 @@ else
   kitty --title "my_player" yazi /home/emre/.local/share/sounds_deployed/music &
   # hyprctl dispatch focuswindow title:my_player
 fi
-
-

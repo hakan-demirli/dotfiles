@@ -4,23 +4,23 @@
 # then launches that dir inside vscode.
 
 function code_project() {
-    selected_dir="$(find -L ~/.config /mnt/second/rep \( \
-        -name node_modules -o  \
-        -name conda        -o  \
-        -name env          -o  \
-        -name bin          -o  \
-        -name .direnv      -o  \
-        -name .git         -o  \
-        -name .github      -o  \
-        -name __pycache__  -o  \
-        -name venv         -o  \
-        -name .venv            \
+  selected_dir="$(find -L ~/.config /mnt/second/rep \( \
+    -name node_modules -o \
+    -name conda -o \
+    -name env -o \
+    -name bin -o \
+    -name .direnv -o \
+    -name .git -o \
+    -name .github -o \
+    -name __pycache__ -o \
+    -name venv -o \
+    -name .venv \
     \) -prune -o -type d -print | fzf)"
 
-    if [ -n "$selected_dir" ]; then
-        cd "$selected_dir" || return 1
-        code $selected_dir
-    fi
+  if [ -n "$selected_dir" ]; then
+    cd "$selected_dir" || return 1
+    code "$selected_dir"
+  fi
 }
 
 code_project "$@"

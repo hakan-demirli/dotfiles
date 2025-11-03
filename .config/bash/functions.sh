@@ -7,7 +7,7 @@ if [ -f "${privateEnvFile}" ] && [[ "$(file -b --mime-type "${privateEnvFile}")"
 fi
 
 lf_cd() {
-  if command -v lf &>/dev/null; then
+  if command -v lf &> /dev/null; then
     cd "$(command lf -print-last-dir "$@")" || exit
   else
     echo "Command 'lf' not found. Please install it."
@@ -15,7 +15,7 @@ lf_cd() {
 }
 
 yazi_cd() {
-  if ! command -v yazi &>/dev/null; then
+  if ! command -v yazi &> /dev/null; then
     echo "Command 'yazi' not found. Please install it."
     return 1
   fi
@@ -33,7 +33,7 @@ yazi_cd() {
 
 gcmp() {
   if [ -z "$1" ]; then
-    echo "Usage: gcmp \"Your commit message\""
+    echo 'Usage: gcmp "Your commit message"'
     return 1
   fi
   git commit -m "$1" && git push
@@ -47,11 +47,11 @@ _copy_readline_to_clipboard_remote() {
   printf '\e]52;c;%s\a' "$(echo -n "$READLINE_LINE" | base64 -w0)"
 }
 
-if [[ -z "$SSH_CONNECTION" ]] && command -v wl-copy &>/dev/null; then
+if [[ -z $SSH_CONNECTION ]] && command -v wl-copy &> /dev/null; then
   if [[ $- == *i* ]]; then
     bind -x '"\C-y": _copy_readline_to_clipboard_local'
   fi
-elif [[ -n "$SSH_CONNECTION" || -n "$TMUX" ]]; then
+elif [[ -n $SSH_CONNECTION || -n $TMUX ]]; then
   if [[ $- == *i* ]]; then
     bind -x '"\C-y": _copy_readline_to_clipboard_remote'
   fi
@@ -61,7 +61,7 @@ fi
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 
 ensure_prompt_symbol() {
-  if [[ "$PS1" != *❯* ]]; then
+  if [[ $PS1 != *❯* ]]; then
     PS1="${PS1}\n❯ "
   fi
 }

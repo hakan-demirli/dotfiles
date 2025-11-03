@@ -6,10 +6,9 @@ cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.yaml"
 session_name=$(basename "$(pwd)")_$tmux_cwd_hash
 
-
-if tmux has-session -t "$session_name" 2>/dev/null; then
-    tmux attach-session -t "$session_name"
-    exit 0
+if tmux has-session -t "$session_name" 2> /dev/null; then
+  tmux attach-session -t "$session_name"
+  exit 0
 fi
 
 # 0th window is the default window
@@ -20,14 +19,11 @@ fi
 min=9999
 max=9999999
 
-random_number=$(( RANDOM % (max - min + 1 ) + min ))
+random_number=$((RANDOM % (max - min + 1) + min))
 sed -i "s/,0,/,$random_number,/g" "$data_file"
-
 
 first_hook=$(sed -n "1p" "$data_file")
 first_window_id=$(echo "$first_hook" | awk -F',' '{ print $2 }')
 sed -i "s/,$first_window_id,/,0,/g" "$data_file"
 
-
 tmux new-session -s "$session_name" "hx ."
-

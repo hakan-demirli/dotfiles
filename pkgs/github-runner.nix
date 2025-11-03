@@ -186,7 +186,8 @@
           environment = {
             HOME = workDir;
             RUNNER_ROOT = stateDir;
-          } // cfg.extraEnvironment;
+          }
+          // cfg.extraEnvironment;
           path = [
             pkgs.bashInteractive
             pkgs.coreutils
@@ -194,7 +195,8 @@
             pkgs.gnutar
             pkgs.gzip
             config.nix.package
-          ] ++ cfg.extraPackages;
+          ]
+          ++ cfg.extraPackages;
 
           serviceConfig = lib.mkMerge [
             {
@@ -336,15 +338,14 @@
               StateDirectory = [ systemdDir ];
               StateDirectoryMode = "0700";
               WorkingDirectory = workDir;
-              InaccessiblePaths =
-                [
-                  "-${cfg.tokenFile}"
-                  "${stateDir}/${currentConfigTokenFilename}"
-                ]
-                ++ lib.optionals (cfg.urlFile != null) [
-                  "-${cfg.urlFile}"
-                  # "${stateDir}/${currentConfigUrlFilename}" # This was the problem
-                ];
+              InaccessiblePaths = [
+                "-${cfg.tokenFile}"
+                "${stateDir}/${currentConfigTokenFilename}"
+              ]
+              ++ lib.optionals (cfg.urlFile != null) [
+                "-${cfg.urlFile}"
+                # "${stateDir}/${currentConfigUrlFilename}" # This was the problem
+              ];
               KillSignal = "SIGINT";
               NoNewPrivileges = lib.mkDefault true;
               PrivateDevices = lib.mkDefault true;

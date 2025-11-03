@@ -11,5 +11,3 @@ touch "$data_file"
 tmux display-popup -w 80% -E "hx $data_file"
 
 sed -i '/^$/d' "$data_file"
-
-

@@ -35,7 +35,7 @@ unlock-secrets() {
     return 1
   fi
 
-  if ! openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<<"$password" >/dev/null 2>&1; then
+  if ! openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<< "$password" > /dev/null 2>&1; then
     echo "Decryption failed. Incorrect passphrase?"
     unset password
     return 1
@@ -45,7 +45,7 @@ unlock-secrets() {
   rm -rf "$destination_dir"
   mkdir -p "$destination_dir"
 
-  if openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<<"$password" | tar -xf - -C "$destination_dir"; then
+  if openssl enc -d -aes-256-cbc -pbkdf2 -in "$secrets_archive" -pass stdin <<< "$password" | tar -xf - -C "$destination_dir"; then
     mkdir -p "$(dirname "$symlink_target_path")"
     ln -sfn "$destination_dir" "$symlink_target_path"
     echo "Decryption and deployment complete."

@@ -11,63 +11,64 @@ mkdir -p "$cachedir"
 
 # Check if the file path contains the cache directory
 if [[ $file == *"$cachedir"* ]]; then
-    echo "Error: No preview allowed in the cache directory due to recursion problem."
-    exit 127
+  echo "Error: No preview allowed in the cache directory due to recursion problem."
+  exit 127
 fi
 
-file="$1"; shift
+file="$1"
+shift
 cachekey=$(echo -n "$file $(stat -c %Y "$file") $cache_width" | md5sum | cut -d ' ' -f 1)
 thumbnail="$cachedir/$cachekey.png"
 
 preview() {
-    kitty +kitten icat --silent --stdin no --transfer-mode memory --place "${w}x${h}@${x}x${y}" "$1" < /dev/null > /dev/tty
+  kitty +kitten icat --silent --stdin no --transfer-mode memory --place "${w}x${h}@${x}x${y}" "$1" < /dev/null > /dev/tty
 }
 
 generate_thumbnails() {
-    folder=$(dirname "$1")
-    for img in "$folder"/*.{avi,mp4,mkv,opus,jpg,jpeg,png,bmp}; do
-        img_cachekey=$(echo -n "$img $(stat -c %Y "$img") $cache_width" | md5sum | cut -d ' ' -f 1)
-        img_thumbnail="$cachedir/$img_cachekey.png"
-        if [ ! -f "$img_thumbnail" ]; then
-            # No thumbnails for ginormous images:
-            # BUG: https://video.stackexchange.com/questions/28408/how-to-fix-ffmpeg-picture-size-32768x16384-is-invalid
-            ffmpeg -y -i "$img" -vframes 1 -vf "scale=${cache_width}:-1" "$img_thumbnail" &
-            # ffmpeg -y -i "$file" -vframes 1 -vf "scale=${w}0:-1" "$thumbnail"
-        fi
-    done
-    wait
+  folder=$(dirname "$1")
+  for img in "$folder"/*.{avi,mp4,mkv,opus,jpg,jpeg,png,bmp}; do
+    img_cachekey=$(echo -n "$img $(stat -c %Y "$img") $cache_width" | md5sum | cut -d ' ' -f 1)
+    img_thumbnail="$cachedir/$img_cachekey.png"
+    if [ ! -f "$img_thumbnail" ]; then
+      # No thumbnails for ginormous images:
+      # BUG: https://video.stackexchange.com/questions/28408/how-to-fix-ffmpeg-picture-size-32768x16384-is-invalid
+      ffmpeg -y -i "$img" -vframes 1 -vf "scale=${cache_width}:-1" "$img_thumbnail" &
+      # ffmpeg -y -i "$file" -vframes 1 -vf "scale=${w}0:-1" "$thumbnail"
+    fi
+  done
+  wait
 }
 
 function draw_clear {
-    kitty +kitten icat --clear --stdin no --silent --transfer-mode file < /dev/null > /dev/tty
+  kitty +kitten icat --clear --stdin no --silent --transfer-mode file < /dev/null > /dev/tty
 }
 
 draw_clear
 
 if [ ! -f "$thumbnail" ]; then
-    case "$(basename "$file" | tr '[:upper:]' '[:lower:]')" in
+  case "$(basename "$file" | tr '[:upper:]' '[:lower:]')" in
     *.tar*) tar tf "$file" ;;
     *.zip) unzip -l "$file" ;;
     *.rar) unrar l "$file" ;;
     *.7z) 7z l "$file" ;;
-    *.avi|*.mp4|*.mkv|*.opus|*.jpg|*.jpeg|*.png|*.bmp)
-        ffmpeg -y -i "$file" -vframes 1 -vf "scale=${cache_width}:-1" "$thumbnail"
-        preview "$thumbnail"
-        generate_thumbnails "$file"
-        ;;
+    *.avi | *.mp4 | *.mkv | *.opus | *.jpg | *.jpeg | *.png | *.bmp)
+      ffmpeg -y -i "$file" -vframes 1 -vf "scale=${cache_width}:-1" "$thumbnail"
+      preview "$thumbnail"
+      generate_thumbnails "$file"
+      ;;
     *.pdf)
-        gs -o "$thumbnail" -sDEVICE=pngalpha -dLastPage=1 "$file" >/dev/null
-        preview "$thumbnail"
-        ;;
+      gs -o "$thumbnail" -sDEVICE=pngalpha -dLastPage=1 "$file" > /dev/null
+      preview "$thumbnail"
+      ;;
     *.svg)
-        convert "$file" -resize "${w}x${h}" "$thumbnail"
-        ;;
-    *.ttf|*.otf|*.woff)
-        fontpreview -i "$file" -o "$thumbnail"
-        ;;
+      convert "$file" -resize "${w}x${h}" "$thumbnail"
+      ;;
+    *.ttf | *.otf | *.woff)
+      fontpreview -i "$file" -o "$thumbnail"
+      ;;
     *) bat --terminal-width "${w}" -f "$file" --style=numbers ;;
-    esac
+  esac
 else
-    preview "$thumbnail"
+  preview "$thumbnail"
 fi
 return 127 # nonzero retcode required for lf previews to reload

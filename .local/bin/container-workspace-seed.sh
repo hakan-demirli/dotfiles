@@ -30,35 +30,35 @@ eval set -- "$PARSED"
 
 while true; do
   case "$1" in
-  -r | --runtime)
-    CONTAINER_RUNTIME="$2"
-    shift 2
-    ;;
-  -H | --host-home)
-    HOST_HOME="$2"
-    shift 2
-    ;;
-  -g | --repo)
-    DOTFILES_REPO="$2"
-    shift 2
-    ;;
-  -h | --help)
-    usage
-    exit 0
-    ;;
-  --)
-    shift
-    break
-    ;;
-  *)
-    echo "Programming error"
-    exit 3
-    ;;
+    -r | --runtime)
+      CONTAINER_RUNTIME="$2"
+      shift 2
+      ;;
+    -H | --host-home)
+      HOST_HOME="$2"
+      shift 2
+      ;;
+    -g | --repo)
+      DOTFILES_REPO="$2"
+      shift 2
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      echo "Programming error"
+      exit 3
+      ;;
   esac
 done
 
 BASHRC_CONTENT=$(
-  cat <<'EOF'
+  cat << 'EOF'
 if [ -f "$HOME/Desktop/dotfiles/.config/bash/main.sh" ]; then
   source "$HOME/Desktop/dotfiles/.config/bash/main.sh"
 fi

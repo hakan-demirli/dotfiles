@@ -1,9 +1,9 @@
+# ruff: noqa
 import base64
 import ctypes
 import os
 import subprocess
 import threading
-from typing import List, Tuple
 
 import gdb
 
@@ -81,7 +81,7 @@ def run_gdb_command(command: str) -> bytes:
 do_generate_help_file_stop = False
 
 
-def do_generate_help_file(complete_str_list: List[bytes], memfd: int):
+def do_generate_help_file(complete_str_list: list[bytes], memfd: int):
     for complete_str in complete_str_list:
         complete_str = complete_str.strip()
         complete_str = complete_str.split(b"\n")[0].split(b"|")[0]
@@ -101,7 +101,7 @@ def do_generate_help_file(complete_str_list: List[bytes], memfd: int):
             break
 
 
-def generate_help_file(complete_str_list: List[bytes]) -> Tuple[int, threading.Thread]:
+def generate_help_file(complete_str_list: list[bytes]) -> tuple[int, threading.Thread]:
     memfd = os.memfd_create("gdb-help-file", 0)
     t = threading.Thread(target=do_generate_help_file, args=(complete_str_list, memfd))
     t.start()
@@ -153,9 +153,9 @@ def make_readline_line(libreadline: ctypes.CDLL, s: bytes):
         libreadline.rl_add_undo(3, 0, 0, None)
 
 
-def get_history_list(libreadline: ctypes.CDLL) -> List[bytes]:
+def get_history_list(libreadline: ctypes.CDLL) -> list[bytes]:
     hlist = libreadline.history_list()
-    ret: List[bytes] = []
+    ret: list[bytes] = []
     if not hlist:
         return ret
     i = 0
@@ -169,7 +169,7 @@ def get_history_list(libreadline: ctypes.CDLL) -> List[bytes]:
     return ret
 
 
-def get_fzf_result(query: bytes, complete_str_list: List[bytes]) -> bytes:
+def get_fzf_result(query: bytes, complete_str_list: list[bytes]) -> bytes:
     global do_generate_help_file_stop
     do_generate_help_file_stop = False
 

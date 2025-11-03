@@ -39,7 +39,8 @@ in
   home-manager = lib.mkIf useHomeManager {
     extraSpecialArgs = {
       inherit inputs pkgs;
-    } // homeManagerArgs;
+    }
+    // homeManagerArgs;
     backupFileExtension = "backup";
     users.${username} = {
       imports = homeManagerImports;

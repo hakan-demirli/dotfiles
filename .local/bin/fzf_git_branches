@@ -14,7 +14,7 @@ fgb() {
   #   )
 
   local -r PREVIEW_COMMITS=$(
-    cat <<'EOF'
+    cat << 'EOF'
 raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
 if [ -n "$raw_ref" ]; then
   git log "$raw_ref" --graph --color --format='%C(white)%h - %C(green)%cs - %C(blue)%s %C(red)%d'
@@ -25,7 +25,7 @@ EOF
   )
 
   local -r PREVIEW_DIFF=$(
-    cat <<'EOF'
+    cat << 'EOF'
 raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
 if [ -n "$raw_ref" ]; then
   current_branch=$(git rev-parse --abbrev-ref HEAD)
@@ -37,7 +37,7 @@ EOF
   )
 
   local -r SHOW_SUBSHELL=$(
-    cat <<'EOF'
+    cat << 'EOF'
 raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
 if [ -n "$raw_ref" ]; then
   git show --color "$raw_ref" | less -R
@@ -46,7 +46,7 @@ EOF
   )
 
   local -r CHECKOUT_BRANCH=$(
-    cat <<'EOF'
+    cat << 'EOF'
 raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
 local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
 if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
@@ -57,7 +57,7 @@ EOF
   )
 
   local -r MERGE_BRANCH=$(
-    cat <<'EOF'
+    cat << 'EOF'
 raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
 local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
 if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
@@ -68,7 +68,7 @@ EOF
   )
 
   local -r REBASE_BRANCH=$(
-    cat <<'EOF'
+    cat << 'EOF'
 raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
 local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
 if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
@@ -79,7 +79,7 @@ EOF
   )
 
   local -r HEADER=$(
-    cat <<'EOF'
+    cat << 'EOF'
 > [Enter]         Checkout branch (auto-fetch if remote)
 > [Ctrl-P]        Merge selected branch into current
 > [Ctrl-R]        Rebase current onto selected

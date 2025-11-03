@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import os
-import sys
 import json
+import os
 import subprocess
+import sys
 
 """
 Docker image per directory. Like direnv.
-    
 """
 # Define the path to the JSON file
 config_dir = os.path.expanduser("~/.config/vsdp")
@@ -18,7 +17,7 @@ os.makedirs(config_dir, exist_ok=True)
 
 # Load image mapping from JSON file if it exists, or create an empty one
 if os.path.exists(config_file):
-    with open(config_file, "r") as f:
+    with open(config_file) as f:
         image_mapping = json.load(f)
 else:
     image_mapping = {}

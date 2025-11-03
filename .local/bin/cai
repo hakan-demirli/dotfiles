@@ -74,7 +74,7 @@ def process_verilog(verilog_code):
     verilog_code = re.sub(r"#\(.*?\)", "", verilog_code, flags=re.DOTALL)
 
     # remove empty lines
-    verilog_code = re.sub(r"\n\s*\n", "\n", verilog_code, re.MULTILINE)
+    verilog_code = re.sub(r"\n\s*\n", "\n", verilog_code, flags=re.MULTILINE)
     # remove multiline comments
     verilog_code = re.sub(r"/\*.*?\*/", "", verilog_code, flags=re.DOTALL)
     # remove single line comments
@@ -112,9 +112,9 @@ def test_process_verilog():
         output wire                 we_n,     // wrim,.//,,,
         output wire [  BA_BITS-1:0] ba,       // bank wire
         output wire [ADDR_BITS-1:0] addr,     // address(fuzz) input
-        inout  wire [  DQ_BITS-1:0] dq,       // 
+        inout  wire [  DQ_BITS-1:0] dq,       //
         input  wire [ DQS_BITS-1:0] tdqs_n,   // Termination
-        output                      odt       // 
+        output                      odt       //
     );
     """
     verilog_code_param = """
@@ -125,7 +125,7 @@ def test_process_verilog():
         input  wire                 clk_i,    // differential clock inputs
         input  wire                 we_i,
         output reg  [         31:0] data_o, /* // */
-        output                      odt       // 
+        output                      odt       //
     );
     """
 

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 function decrypt_git_crypt_key {
-  read -sp "Enter passphrase: " password && echo && (head -c8 ~/Desktop/dotfiles/secrets/git-crypt-key | grep -q '^Salted__' || { echo "File does not appear encrypted."; exit 1; }) && (openssl enc -d -aes-256-cbc -pbkdf2 -in ~/Desktop/dotfiles/secrets/git-crypt-key -out /tmp/git-crypt-key -pass pass:"$password" && echo "Decryption complete.") && unset password
+  read -spr "Enter passphrase: " password && echo && (head -c8 ~/Desktop/dotfiles/secrets/git-crypt-key | grep -q '^Salted__' || {
+    echo "File does not appear encrypted."
+    exit 1
+  }) && (openssl enc -d -aes-256-cbc -pbkdf2 -in ~/Desktop/dotfiles/secrets/git-crypt-key -out /tmp/git-crypt-key -pass pass:"$password" && echo "Decryption complete.") && unset password
 }
 
 function decrypt_secrets {
@@ -9,11 +12,11 @@ function decrypt_secrets {
 }
 
 function disko_format {
-    sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko /root/dotfiles_tmp/hosts/laptop/hardware/disko.nix --arg device '"/dev/vda"'
+  sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko /root/dotfiles_tmp/hosts/laptop/hardware/disko.nix --arg device '"/dev/vda"'
 }
 
 sudo su
-cd
+cd || exit 1
 
 decrypt_git_crypt_key
 

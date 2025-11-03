@@ -12,8 +12,8 @@ if [[ $1 == '--exit-on-execution' ]]; then
 fi
 
 IFS=$'\n' readarray -t selected_matches < <(
-  rg --color=always --line-number --no-heading --smart-case "${*:-}" |
-    fzf --ansi \
+  rg --color=always --line-number --no-heading --smart-case "${*:-}" \
+    | fzf --ansi \
       --border \
       --color "hl+:$CATPPUCCIN_GREEN:reverse,hl:$CATPPUCCIN_MAUVE:reverse" \
       --delimiter ':' \
