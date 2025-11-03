@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 
 function fgc() {
-	local -r git_log=$(cat <<-EOF
-		git log --graph --color --format="%C(white)%h - %C(green)%cs - %C(blue)%s%C(red)%d"
-	EOF
+	local -r git_log=$(
+		cat <<-EOF
+			git log --graph --color --format="%C(white)%h - %C(green)%cs - %C(blue)%s%C(red)%d"
+		EOF
 	)
 
-	local -r git_log_all=$(cat <<-EOF
-		git log --all --graph --color --format="%C(white)%h - %C(green)%cs - %C(blue)%s%C(red)%d"
-	EOF
+	local -r git_log_all=$(
+		cat <<-EOF
+			git log --all --graph --color --format="%C(white)%h - %C(green)%cs - %C(blue)%s%C(red)%d"
+		EOF
 	)
-
 
 	local get_hash
 	read -r -d '' get_hash <<-'EOF'
@@ -18,9 +19,10 @@ function fgc() {
 	EOF
 
 	local -r git_show="[[ \$($get_hash) != '' ]] && git show --color \$($get_hash)"
-	local -r git_show_subshell=$(cat <<-EOF
-		[[ \$($get_hash) != '' ]] && sh -c "git show --color \$($get_hash) | less -R"
-	EOF
+	local -r git_show_subshell=$(
+		cat <<-EOF
+			[[ \$($get_hash) != '' ]] && sh -c "git show --color \$($get_hash) | less -R"
+		EOF
 	)
 
 	local -r git_checkout="[[ \$($get_hash) != '' ]] && git checkout \$($get_hash)"
@@ -28,24 +30,27 @@ function fgc() {
 	local -r git_rebase_interactive="[[ \$($get_hash) != '' ]] && git rebase --interactive \$($get_hash)"
 	local -r git_cherry_pick="[[ \$($get_hash) != '' ]] && git cherry-pick \$($get_hash)"
 
-	local -r header=$(cat <<-EOF
-		> ENTER to display the diff with less
-	EOF
+	local -r header=$(
+		cat <<-EOF
+			> ENTER to display the diff with less
+		EOF
 	)
 
-	local -r header_branch=$(cat <<-EOF
-		$header
-		> CTRL-S to switch to All Commits mode
-		> ALT-C to checkout the commit | ALT-R to reset to the commit
-		> ALT-I to rebase interactively until the commit
-	EOF
+	local -r header_branch=$(
+		cat <<-EOF
+			$header
+			> CTRL-S to switch to All Commits mode
+			> ALT-C to checkout the commit | ALT-R to reset to the commit
+			> ALT-I to rebase interactively until the commit
+		EOF
 	)
 
-	local -r header_all=$(cat <<-EOF
-		$header
-		> CTRL-S to switch to Branch Commits mode
-		> ALT-P to cherry pick
-	EOF
+	local -r header_all=$(
+		cat <<-EOF
+			$header
+			> CTRL-S to switch to Branch Commits mode
+			> ALT-P to cherry pick
+		EOF
 	)
 
 	local -r branch_prompt='Branch > '
