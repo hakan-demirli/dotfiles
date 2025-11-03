@@ -22,8 +22,7 @@ usage() {
 SHORT_OPTS="r:s:H:h"
 LONG_OPTS="runtime:,size:,host-home:,help"
 
-PARSED=$(getopt --options "${SHORT_OPTS}" --longoptions "${LONG_OPTS}" --name "$0" -- "$@")
-if [[ $? -ne 0 ]]; then
+if ! PARSED=$(getopt --options "${SHORT_OPTS}" --longoptions "${LONG_OPTS}" --name "$0" -- "$@"); then
   exit 1
 fi
 
@@ -31,30 +30,30 @@ eval set -- "$PARSED"
 
 while true; do
   case "$1" in
-    -r|--runtime)
-      CONTAINER_RUNTIME="$2"
-      shift 2
-      ;;
-    -s|--size)
-      TOTAL_TMPFS_SIZE="$2"
-      shift 2
-      ;;
-    -H|--host-home)
-      HOST_HOME="$2"
-      shift 2
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    --)
-      shift
-      break
-      ;;
-    *)
-      echo "Programming error"
-      exit 3
-      ;;
+  -r | --runtime)
+    CONTAINER_RUNTIME="$2"
+    shift 2
+    ;;
+  -s | --size)
+    TOTAL_TMPFS_SIZE="$2"
+    shift 2
+    ;;
+  -H | --host-home)
+    HOST_HOME="$2"
+    shift 2
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *)
+    echo "Programming error"
+    exit 3
+    ;;
   esac
 done
 

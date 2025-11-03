@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail # Exit on error, unset variable, or pipe failure
+set -euo pipefail
 
 GIT_REPO_PATH="/home/emre/Desktop/serveo"
 TUNNEL_INFO_FILE="serveo_tunnel.url"
@@ -9,69 +9,87 @@ SSH_USER_HOST="serveo.net"
 LOCAL_SSH_PORT="22"
 REQUESTED_REMOTE_PORT="0"
 
-command -v ssh >/dev/null 2>&1 || { echo >&2 "ERROR: 'ssh' command not found."; exit 1; }
-command -v git >/dev/null 2>&1 || { echo >&2 "ERROR: 'git' command not found."; exit 1; }
-command -v grep >/dev/null 2>&1 || { echo >&2 "ERROR: 'grep' command not found."; exit 1; }
-command -v tee >/dev/null 2>&1 || { echo >&2 "ERROR: 'tee' command not found."; exit 1; }
-command -v stdbuf >/dev/null 2>&1 || { echo >&2 "ERROR: 'stdbuf' command not found."; exit 1; }
-command -v head >/dev/null 2>&1 || { echo >&2 "ERROR: 'head' command not found."; exit 1; }
+command -v ssh >/dev/null 2>&1 || {
+  echo >&2 "ERROR: 'ssh' command not found."
+  exit 1
+}
+command -v git >/dev/null 2>&1 || {
+  echo >&2 "ERROR: 'git' command not found."
+  exit 1
+}
+command -v grep >/dev/null 2>&1 || {
+  echo >&2 "ERROR: 'grep' command not found."
+  exit 1
+}
+command -v tee >/dev/null 2>&1 || {
+  echo >&2 "ERROR: 'tee' command not found."
+  exit 1
+}
+command -v stdbuf >/dev/null 2>&1 || {
+  echo >&2 "ERROR: 'stdbuf' command not found."
+  exit 1
+}
+command -v head >/dev/null 2>&1 || {
+  echo >&2 "ERROR: 'head' command not found."
+  exit 1
+}
 
 update_git() {
-    local tunnel_info="$1"
-    local filepath="$GIT_REPO_PATH/$TUNNEL_INFO_FILE"
-    echo "Attempting Git update for Tunnel Info: $tunnel_info in repo: $GIT_REPO_PATH"
+  local tunnel_info="$1"
+  local filepath="$GIT_REPO_PATH/$TUNNEL_INFO_FILE"
+  echo "Attempting Git update for Tunnel Info: $tunnel_info in repo: $GIT_REPO_PATH"
 
-    if [[ ! -d "$GIT_REPO_PATH" ]]; then
-        echo "ERROR: Git repository path '$GIT_REPO_PATH' does not exist or is not a directory."
-        return 1
-    fi
+  if [[ ! -d "$GIT_REPO_PATH" ]]; then
+    echo "ERROR: Git repository path '$GIT_REPO_PATH' does not exist or is not a directory."
+    return 1
+  fi
 
-    local original_dir
-    original_dir=$(pwd)
-    if ! cd "$GIT_REPO_PATH"; then
-        echo "ERROR: Could not change directory to '$GIT_REPO_PATH'"
-        return 1
-    fi
-    echo "Changed directory to $(pwd)"
+  local original_dir
+  original_dir=$(pwd)
+  if ! cd "$GIT_REPO_PATH"; then
+    echo "ERROR: Could not change directory to '$GIT_REPO_PATH'"
+    return 1
+  fi
+  echo "Changed directory to $(pwd)"
 
-    if [[ -f "$filepath" ]] && [[ "$(cat "$filepath")" == "$tunnel_info" ]]; then
-        echo "Tunnel Info ($tunnel_info) hasn't changed. No Git update needed."
-        cd "$original_dir"
-        return 0
-    fi
+  if [[ -f "$filepath" ]] && [[ "$(cat "$filepath")" == "$tunnel_info" ]]; then
+    echo "Tunnel Info ($tunnel_info) hasn't changed. No Git update needed."
+    cd "$original_dir"
+    return 0
+  fi
 
-    echo "Tunnel Info changed or file missing. Updating $filepath..."
-    if ! printf "%s\n" "$tunnel_info" > "$filepath"; then
-         echo "ERROR: Failed to write Tunnel Info to '$filepath'."
-         cd "$original_dir"
-         return 1
-    fi
+  echo "Tunnel Info changed or file missing. Updating $filepath..."
+  if ! printf "%s\n" "$tunnel_info" >"$filepath"; then
+    echo "ERROR: Failed to write Tunnel Info to '$filepath'."
+    cd "$original_dir"
+    return 1
+  fi
 
-    echo "Running git add..."
-    if ! git add "$TUNNEL_INFO_FILE"; then
-        echo "ERROR: git add '$TUNNEL_INFO_FILE' failed."
-        cd "$original_dir"
-        return 1
-    fi
+  echo "Running git add..."
+  if ! git add "$TUNNEL_INFO_FILE"; then
+    echo "ERROR: git add '$TUNNEL_INFO_FILE' failed."
+    cd "$original_dir"
+    return 1
+  fi
 
-    echo "Running git commit..."
+  echo "Running git commit..."
 
-    git commit -m "Update reverse tunnel info: $tunnel_info" || echo "INFO: Nothing to commit or commit failed (maybe no changes detected by git)."
+  git commit -m "Update reverse tunnel info: $tunnel_info" || echo "INFO: Nothing to commit or commit failed (maybe no changes detected by git)."
 
-    echo "Attempting git pull..."
+  echo "Attempting git pull..."
 
-    git pull --ff-only "$GIT_REMOTE" "$GIT_BRANCH" || echo "WARN: Git pull failed or not fast-forward. Continuing push attempt."
+  git pull --ff-only "$GIT_REMOTE" "$GIT_BRANCH" || echo "WARN: Git pull failed or not fast-forward. Continuing push attempt."
 
-    echo "Attempting git push..."
-    if git push "$GIT_REMOTE" "$GIT_BRANCH"; then
-        echo "Git push successful."
-        cd "$original_dir"
-        return 0
-    else
-        echo "ERROR: Git push failed! Check permissions, SSH keys, network, and remote status."
-        cd "$original_dir"
-        return 1
-    fi
+  echo "Attempting git push..."
+  if git push "$GIT_REMOTE" "$GIT_BRANCH"; then
+    echo "Git push successful."
+    cd "$original_dir"
+    return 0
+  else
+    echo "ERROR: Git push failed! Check permissions, SSH keys, network, and remote status."
+    cd "$original_dir"
+    return 1
+  fi
 }
 
 echo "Starting reverse SSH tunnel script..."
@@ -84,81 +102,73 @@ echo "!!! IMPORTANT: This script ASSUMES Cloudflare Warp (or other required netw
 echo "Launching SSH command..."
 echo "Press Ctrl+C to stop the tunnel."
 
-# Use stdbuf to ensure line buffering for immediate processing
-# Pipe stderr (2) to stdout (1) and then tee to stderr (for visibility) and the while loop
 stdbuf -oL ssh \
-    -o StrictHostKeyChecking=accept-new \
-    -o UserKnownHostsFile=/dev/null \
-    -o ExitOnForwardFailure=yes \
-    -o ServerAliveInterval=60 \
-    -o ServerAliveCountMax=3 \
-    -N -R "$REQUESTED_REMOTE_PORT:localhost:$LOCAL_SSH_PORT" \
-    "$SSH_USER_HOST" 2>&1 | tee /dev/stderr | \
-while IFS= read -r line; do
-    # Trim leading/trailing whitespace (optional but can help matching)
+  -o StrictHostKeyChecking=accept-new \
+  -o UserKnownHostsFile=/dev/null \
+  -o ExitOnForwardFailure=yes \
+  -o ServerAliveInterval=60 \
+  -o ServerAliveCountMax=3 \
+  -N -R "$REQUESTED_REMOTE_PORT:localhost:$LOCAL_SSH_PORT" \
+  "$SSH_USER_HOST" 2>&1 | tee /dev/stderr |
+  while IFS= read -r line; do
+
     line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
-    TUNNEL_INFO="" # Reset for each line
+    TUNNEL_INFO=""
 
-    # Check for the hostname-based forwarding message
     if [[ "$line" == *"Forwarding SSH from "* && "$line" == *".$SSH_USER_HOST"* ]]; then
-        # Extract the full hostname.serveo.net part
-        TUNNEL_INFO=$(echo "$line" | grep -oE '[a-zA-Z0-9.-]+\.'$(echo "$SSH_USER_HOST" | sed 's/\./\\./g')) # More robust extraction
 
-        if [[ -n "$TUNNEL_INFO" ]]; then
-            echo # Newline for clarity
-            echo ">>> Public Tunnel URL found: $TUNNEL_INFO <<<"
-            if ! update_git "$TUNNEL_INFO"; then
-                echo ">>> ERROR during git update process for $TUNNEL_INFO. Tunnel remains active. <<<"
-            fi
-            echo # Newline for clarity
-        else
-             echo # Newline for clarity
-             echo ">>> WARN: Matched 'Forwarding SSH' line but could not extract URL: $line <<<"
-             echo # Newline for clarity
+      escaped_host="${SSH_USER_HOST//./\\.}"
+      TUNNEL_INFO=$(echo "$line" | grep -oE "[a-zA-Z0-9.-]+\.${escaped_host}")
+      if [[ -n "$TUNNEL_INFO" ]]; then
+        echo
+        echo ">>> Public Tunnel URL found: $TUNNEL_INFO <<<"
+        if ! update_git "$TUNNEL_INFO"; then
+          echo ">>> ERROR during git update process for $TUNNEL_INFO. Tunnel remains active. <<<"
         fi
+        echo
+      else
+        echo
+        echo ">>> WARN: Matched 'Forwarding SSH' line but could not extract URL: $line <<<"
+        echo
+      fi
 
-    # Check for the allocated port message
     elif [[ "$line" == "Allocated port "* && "$line" == *" for remote forward to "* ]]; then
-        EXTRACTED_PORT=$(echo "$line" | grep -oE '[0-9]+' | head -n 1)
+      EXTRACTED_PORT=$(echo "$line" | grep -oE '[0-9]+' | head -n 1)
 
-        if [[ -n "$EXTRACTED_PORT" ]]; then
-            # Construct the host:port string
-            TUNNEL_INFO="$SSH_USER_HOST:$EXTRACTED_PORT"
-            echo # Newline for clarity
-            echo ">>> Public Tunnel Port found: $EXTRACTED_PORT on host $SSH_USER_HOST <<<"
-            echo ">>> Full Tunnel Info: $TUNNEL_INFO <<<"
-            if ! update_git "$TUNNEL_INFO"; then
-                 echo ">>> ERROR during git update process for $TUNNEL_INFO. Tunnel remains active. <<<"
-            fi
-            echo # Newline for clarity
-        else
-             echo # Newline for clarity
-             echo ">>> WARN: Matched 'Allocated port' line but could not extract port number: $line <<<"
-             echo # Newline for clarity
+      if [[ -n "$EXTRACTED_PORT" ]]; then
+
+        TUNNEL_INFO="$SSH_USER_HOST:$EXTRACTED_PORT"
+        echo
+        echo ">>> Public Tunnel Port found: $EXTRACTED_PORT on host $SSH_USER_HOST <<<"
+        echo ">>> Full Tunnel Info: $TUNNEL_INFO <<<"
+        if ! update_git "$TUNNEL_INFO"; then
+          echo ">>> ERROR during git update process for $TUNNEL_INFO. Tunnel remains active. <<<"
         fi
+        echo
+      else
+        echo
+        echo ">>> WARN: Matched 'Allocated port' line but could not extract port number: $line <<<"
+        echo
+      fi
 
-    # Handle lines that didn't match known patterns
     else
-        # Print unparsed lines unless they are empty
-        if [[ -n "$line" ]]; then
-             echo "UNPARSED SSH OUTPUT: $line"
-        fi
+      if [[ -n "$line" ]]; then
+        echo "UNPARSED SSH OUTPUT: $line"
+      fi
     fi
-done
+  done
 
-# Check the exit status of the ssh command (the first command in the pipe)
 SSH_EXIT_CODE=${PIPESTATUS[0]}
-echo # Newline
+echo
 echo "SSH command terminated."
 
-# Provide more context on common exit codes
 if [[ $SSH_EXIT_CODE -eq 0 ]]; then
-    echo "Exit code 0: SSH exited cleanly (likely Ctrl+C or normal termination)."
+  echo "Exit code 0: SSH exited cleanly (likely Ctrl+C or normal termination)."
 elif [[ $SSH_EXIT_CODE -eq 255 ]]; then
-    echo "Exit code 255: SSH connection failed (e.g., host unreachable, auth failure, port busy, ExitOnForwardFailure triggered)."
+  echo "Exit code 255: SSH connection failed (e.g., host unreachable, auth failure, port busy, ExitOnForwardFailure triggered)."
 else
-    echo "SSH exited with code $SSH_EXIT_CODE."
+  echo "SSH exited with code $SSH_EXIT_CODE."
 fi
 
-exit $SSH_EXIT_CODE
+exit "$SSH_EXIT_CODE"

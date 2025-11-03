@@ -22,8 +22,7 @@ usage() {
 SHORT_OPTS="r:H:g:h"
 LONG_OPTS="runtime:,host-home:,repo:,help"
 
-PARSED=$(getopt --options "${SHORT_OPTS}" --longoptions "${LONG_OPTS}" --name "$0" -- "$@")
-if [[ $? -ne 0 ]]; then
+if ! PARSED=$(getopt --options "${SHORT_OPTS}" --longoptions "${LONG_OPTS}" --name "$0" -- "$@"); then
   exit 1
 fi
 
@@ -31,35 +30,35 @@ eval set -- "$PARSED"
 
 while true; do
   case "$1" in
-    -r|--runtime)
-      CONTAINER_RUNTIME="$2"
-      shift 2
-      ;;
-    -H|--host-home)
-      HOST_HOME="$2"
-      shift 2
-      ;;
-    -g|--repo)
-      DOTFILES_REPO="$2"
-      shift 2
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    --)
-      shift
-      break
-      ;;
-    *)
-      echo "Programming error"
-      exit 3
-      ;;
+  -r | --runtime)
+    CONTAINER_RUNTIME="$2"
+    shift 2
+    ;;
+  -H | --host-home)
+    HOST_HOME="$2"
+    shift 2
+    ;;
+  -g | --repo)
+    DOTFILES_REPO="$2"
+    shift 2
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *)
+    echo "Programming error"
+    exit 3
+    ;;
   esac
 done
 
-
-BASHRC_CONTENT=$(cat <<'EOF'
+BASHRC_CONTENT=$(
+  cat <<'EOF'
 if [ -f "$HOME/Desktop/dotfiles/.config/bash/main.sh" ]; then
   source "$HOME/Desktop/dotfiles/.config/bash/main.sh"
 fi
@@ -94,6 +93,7 @@ EOF
 
 echo "--- Seeding Environment ---"
 
+# shellcheck disable=SC2016
 $CONTAINER_RUNTIME run --rm -it \
   -v "$HOST_HOME":/persistent:z \
   -e DOTFILES_REPO="$DOTFILES_REPO" \
