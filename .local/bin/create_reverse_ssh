@@ -9,27 +9,27 @@ SSH_USER_HOST="serveo.net"
 LOCAL_SSH_PORT="22"
 REQUESTED_REMOTE_PORT="0"
 
-command -v ssh >/dev/null 2>&1 || {
+command -v ssh > /dev/null 2>&1 || {
   echo >&2 "ERROR: 'ssh' command not found."
   exit 1
 }
-command -v git >/dev/null 2>&1 || {
+command -v git > /dev/null 2>&1 || {
   echo >&2 "ERROR: 'git' command not found."
   exit 1
 }
-command -v grep >/dev/null 2>&1 || {
+command -v grep > /dev/null 2>&1 || {
   echo >&2 "ERROR: 'grep' command not found."
   exit 1
 }
-command -v tee >/dev/null 2>&1 || {
+command -v tee > /dev/null 2>&1 || {
   echo >&2 "ERROR: 'tee' command not found."
   exit 1
 }
-command -v stdbuf >/dev/null 2>&1 || {
+command -v stdbuf > /dev/null 2>&1 || {
   echo >&2 "ERROR: 'stdbuf' command not found."
   exit 1
 }
-command -v head >/dev/null 2>&1 || {
+command -v head > /dev/null 2>&1 || {
   echo >&2 "ERROR: 'head' command not found."
   exit 1
 }
@@ -39,7 +39,7 @@ update_git() {
   local filepath="$GIT_REPO_PATH/$TUNNEL_INFO_FILE"
   echo "Attempting Git update for Tunnel Info: $tunnel_info in repo: $GIT_REPO_PATH"
 
-  if [[ ! -d "$GIT_REPO_PATH" ]]; then
+  if [[ ! -d $GIT_REPO_PATH ]]; then
     echo "ERROR: Git repository path '$GIT_REPO_PATH' does not exist or is not a directory."
     return 1
   fi
@@ -52,14 +52,14 @@ update_git() {
   fi
   echo "Changed directory to $(pwd)"
 
-  if [[ -f "$filepath" ]] && [[ "$(cat "$filepath")" == "$tunnel_info" ]]; then
+  if [[ -f $filepath ]] && [[ "$(cat "$filepath")" == "$tunnel_info" ]]; then
     echo "Tunnel Info ($tunnel_info) hasn't changed. No Git update needed."
     cd "$original_dir"
     return 0
   fi
 
   echo "Tunnel Info changed or file missing. Updating $filepath..."
-  if ! printf "%s\n" "$tunnel_info" >"$filepath"; then
+  if ! printf "%s\n" "$tunnel_info" > "$filepath"; then
     echo "ERROR: Failed to write Tunnel Info to '$filepath'."
     cd "$original_dir"
     return 1
@@ -109,18 +109,18 @@ stdbuf -oL ssh \
   -o ServerAliveInterval=60 \
   -o ServerAliveCountMax=3 \
   -N -R "$REQUESTED_REMOTE_PORT:localhost:$LOCAL_SSH_PORT" \
-  "$SSH_USER_HOST" 2>&1 | tee /dev/stderr |
-  while IFS= read -r line; do
+  "$SSH_USER_HOST" 2>&1 | tee /dev/stderr \
+  | while IFS= read -r line; do
 
     line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
     TUNNEL_INFO=""
 
-    if [[ "$line" == *"Forwarding SSH from "* && "$line" == *".$SSH_USER_HOST"* ]]; then
+    if [[ $line == *"Forwarding SSH from "* && $line == *".$SSH_USER_HOST"* ]]; then
 
       escaped_host="${SSH_USER_HOST//./\\.}"
       TUNNEL_INFO=$(echo "$line" | grep -oE "[a-zA-Z0-9.-]+\.${escaped_host}")
-      if [[ -n "$TUNNEL_INFO" ]]; then
+      if [[ -n $TUNNEL_INFO ]]; then
         echo
         echo ">>> Public Tunnel URL found: $TUNNEL_INFO <<<"
         if ! update_git "$TUNNEL_INFO"; then
@@ -133,10 +133,10 @@ stdbuf -oL ssh \
         echo
       fi
 
-    elif [[ "$line" == "Allocated port "* && "$line" == *" for remote forward to "* ]]; then
+    elif [[ $line == "Allocated port "* && $line == *" for remote forward to "* ]]; then
       EXTRACTED_PORT=$(echo "$line" | grep -oE '[0-9]+' | head -n 1)
 
-      if [[ -n "$EXTRACTED_PORT" ]]; then
+      if [[ -n $EXTRACTED_PORT ]]; then
 
         TUNNEL_INFO="$SSH_USER_HOST:$EXTRACTED_PORT"
         echo
@@ -153,7 +153,7 @@ stdbuf -oL ssh \
       fi
 
     else
-      if [[ -n "$line" ]]; then
+      if [[ -n $line ]]; then
         echo "UNPARSED SSH OUTPUT: $line"
       fi
     fi

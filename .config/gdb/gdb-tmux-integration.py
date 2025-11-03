@@ -81,9 +81,9 @@ def _send_editor_breakpoint_keys(location_str):
         ["tmux", "send-keys", "-t", source_pane_id, jump_cmd, "C-m"], check=True
     )
 
-    keys_to_send = [key for key in EDITOR_BREAKPOINT_KEYS]
+    keys_to_send = list(EDITOR_BREAKPOINT_KEYS)
     subprocess.run(
-        ["tmux", "send-keys", "-t", source_pane_id] + keys_to_send, check=True
+        ["tmux", "send-keys", "-t", source_pane_id, *keys_to_send], check=True
     )
 
     if last_known_editor_location:
@@ -166,7 +166,7 @@ def update_source_editor(event):
                 keys_to_send.append(EDITOR_INIT_COMMAND)
                 keys_to_send.append("C-m")
             subprocess.run(
-                ["tmux", "send-keys", "-t", source_pane_id] + keys_to_send, check=True
+                ["tmux", "send-keys", "-t", source_pane_id, *keys_to_send], check=True
             )
             source_editor_initialized = True
         else:
@@ -184,7 +184,7 @@ class DashboardTmuxCommand(gdb.Command):
     """Sets up gdb-dashboard within a custom tmux layout."""
 
     def __init__(self):
-        super(DashboardTmuxCommand, self).__init__("dashboard-tmux", gdb.COMMAND_USER)
+        super().__init__("dashboard-tmux", gdb.COMMAND_USER)
 
     def invoke(self, arg, from_tty):
         global \
@@ -203,7 +203,7 @@ class DashboardTmuxCommand(gdb.Command):
             if "dashboard" not in globals():
                 raise RuntimeError("'dashboard' object not found...")
 
-            with open(LAYOUT_FILE, "r") as f:
+            with open(LAYOUT_FILE) as f:
                 layout_config = json.load(f)
             modules_to_activate = layout_config.get("all_panes", [])
             if "gdb_prompt" not in modules_to_activate:

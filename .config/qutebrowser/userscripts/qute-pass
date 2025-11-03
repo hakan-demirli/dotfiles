@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa
 
 # SPDX-FileCopyrightText: Chris Braun (cryzed) <cryzed@googlemail.com>
 #
@@ -41,7 +42,6 @@ import enum
 import fnmatch
 import functools
 import os
-import re
 import shlex
 import subprocess
 import sys
@@ -248,8 +248,8 @@ def dmenu(items, invocation):
 def fake_key_raw(text):
     for character in text:
         # Escape all characters by default, space requires special handling
-        sequence = '" "' if character == " " else r"\{}".format(character)
-        qute_command("fake-key {}".format(sequence))
+        sequence = '" "' if character == " " else rf"\{character}"
+        qute_command(f"fake-key {sequence}")
 
 
 def extract_password(secret, pattern):
@@ -332,9 +332,7 @@ def main(arguments):
     else:
         if not candidates:
             stderr(
-                "Pizza. No pass candidates for URL {!r} found! (I tried {!r})".format(
-                    arguments.url, attempted_targets
-                )
+                f"Pizza. No pass candidates for URL {arguments.url!r} found! (I tried {attempted_targets!r})"
             )
             return ExitCodes.NO_PASS_CANDIDATES
 
@@ -377,13 +375,11 @@ def main(arguments):
             qute_command("fake-key <Tab>")
             fake_key_raw(passw)
     except CouldNotMatchPassword as e:
-        stderr("Failed to match password, target: secret, error: {}".format(e))
+        stderr(f"Failed to match password, target: secret, error: {e}")
         return ExitCodes.COULD_NOT_MATCH_PASSWORD
     except CouldNotMatchUsername as e:
         stderr(
-            "Failed to match username, target: {}, error: {}".format(
-                arguments.username_target, e
-            )
+            f"Failed to match username, target: {arguments.username_target}, error: {e}"
         )
         return ExitCodes.COULD_NOT_MATCH_USERNAME
 

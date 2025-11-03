@@ -20,7 +20,7 @@ if [ -z "$output" ]; then
   exit 0
 fi
 
-if [[ -z "$SSH_CONNECTION" ]] && command -v wl-copy &>/dev/null; then
+if [[ -z $SSH_CONNECTION ]] && command -v wl-copy &> /dev/null; then
   printf "%s" "$output" | wl-copy
 else
   tty=$(tmux display-message -p '#{client_tty}')

@@ -8,6 +8,5 @@ if [ -n "$is_running" ]; then
   hyprctl dispatch togglespecialworkspace todo
 else
   echo "just todo"
-  cd /home/emre/.local/share/scratchpads/ &&  kitty --title "my_todo" txh &
+  cd /home/emre/.local/share/scratchpads/ && kitty --title "my_todo" txh &
 fi
-

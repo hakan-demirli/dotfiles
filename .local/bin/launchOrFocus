@@ -19,12 +19,12 @@ class WindowManager(ABC):
     def find_desktop_file(desktop_path, app_title):
         desktop_files = []
         if os.path.exists(desktop_path):
-            for root, dirs, files in os.walk(desktop_path):
+            for root, _, files in os.walk(desktop_path):
                 for file in files:
                     if file.endswith(".desktop"):
                         desktop_files.append(os.path.join(root, file))
         for desktop_file in desktop_files:
-            with open(desktop_file, "r") as file:
+            with open(desktop_file) as file:
                 content = file.read()
                 if f"Name={app_title}" in content:
                     return desktop_file
@@ -33,7 +33,7 @@ class WindowManager(ABC):
     @staticmethod
     def get_exec_command_from_desktop(desktop_file_path):
         if desktop_file_path:
-            with open(desktop_file_path, "r") as file:
+            with open(desktop_file_path) as file:
                 for line in file:
                     if line.startswith("Exec="):
                         return line.strip()[5:]

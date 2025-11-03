@@ -1,3 +1,4 @@
+# ruff: noqa
 # GDB dashboard - Modular visual interface for GDB in Python.
 #
 # https://github.com/cyrus-and/gdb-dashboard
@@ -27,12 +28,12 @@
 # Imports ----------------------------------------------------------------------
 
 import ast
-import io
 import itertools
 import math
 import os
 import re
 import struct
+import sys
 import traceback
 
 import gdb
@@ -225,7 +226,7 @@ def run(command):
 
 def ansi(string, style):
     if R.ansi:
-        return "\x1b[{}m{}\x1b[0m".format(style, string)
+        return f"\x1b[{style}m{string}\x1b[0m"
     else:
         return string
 
@@ -281,7 +282,7 @@ def to_string(value):
     try:
         value_string = str(value)
     except UnicodeEncodeError:
-        value_string = unicode(value).encode("utf8")
+        value_string = str(value).encode("utf8")
     except gdb.error as e:
         value_string = ansi(e, R.style_error)
     return value_string
@@ -289,7 +290,7 @@ def to_string(value):
 
 def format_address(address):
     pointer_size = gdb.parse_and_eval("$pc").type.sizeof
-    return ("0x{{:0{}x}}").format(pointer_size * 2).format(address)
+    return (f"0x{{:0{pointer_size * 2}x}}").format(address)
 
 
 def format_value(value, compact=None):
@@ -316,7 +317,7 @@ def format_value(value, compact=None):
             formatted = to_string(value)
             out += "{} {}".format(ansi(":", R.style_low), formatted)
     # compact the value
-    if compact is not None and compact or R.compact_values:
+    if (compact is not None and compact) or R.compact_values:
         out = re.sub(r"$\s*", "", out, flags=re.MULTILINE)
     # truncate the value
     if R.max_value_length > 0 and len(out) > R.max_value_length:
@@ -587,7 +588,7 @@ class Dashboard(gdb.Command):
                 fs.write(buf)
             except Exception:
                 cause = traceback.format_exc().strip()
-                Dashboard.err("Cannot write the dashboard\n{}".format(cause))
+                Dashboard.err(f"Cannot write the dashboard\n{cause}")
             finally:
                 # don't close gdb stream
                 if fs and fs is not gdb:
@@ -746,7 +747,7 @@ class Dashboard(gdb.Command):
             self.output = None  # value from the dashboard by default
             self.instance = module()
             self.doc = self.instance.__doc__ or "(no documentation)"
-            self.prefix = "dashboard {}".format(self.name)
+            self.prefix = f"dashboard {self.name}"
             # add GDB commands
             self.add_main_command(dashboard)
             self.add_output_command(dashboard)
@@ -764,14 +765,12 @@ class Dashboard(gdb.Command):
                         dashboard.redisplay()
                     else:
                         status = "enabled" if info.enabled else "disabled"
-                        print("{} module {}".format(module.name, status))
+                        print(f"{module.name} module {status}")
                 else:
-                    Dashboard.err('Wrong argument "{}"'.format(arg))
+                    Dashboard.err(f'Wrong argument "{arg}"')
 
-            doc_brief = "Configure the {} module, with no arguments toggles its visibility.".format(
-                self.name
-            )
-            doc = "{}\n\n{}".format(doc_brief, self.doc)
+            doc_brief = f"Configure the {self.name} module, with no arguments toggles its visibility."
+            doc = f"{doc_brief}\n\n{self.doc}"
             Dashboard.create_command(self.prefix, invoke, doc, True)
 
         def add_output_command(self, dashboard):
@@ -804,7 +803,7 @@ class Dashboard(gdb.Command):
                 else:
                     Dashboard.err("Module disabled")
 
-            prefix = "{} {}".format(self.prefix, name)
+            prefix = f"{self.prefix} {name}"
             Dashboard.create_command(prefix, invoke, doc, False, complete)
 
     # GDB commands -----------------------------------------------------------------
@@ -814,7 +813,7 @@ class Dashboard(gdb.Command):
         arg = Dashboard.parse_arg(arg)
         # show messages for checks in redisplay
         if arg != "":
-            Dashboard.err('Wrong argument "{}"'.format(arg))
+            Dashboard.err(f'Wrong argument "{arg}"')
         elif not self.is_running():
             Dashboard.err("Is the target program running?")
         else:
@@ -868,7 +867,7 @@ class Dashboard(gdb.Command):
             layout = ["dashboard -layout"]
             for module in self.dashboard.modules:
                 mark = "" if module.enabled else "!"
-                layout.append("{}{}".format(mark, module.name))
+                layout.append(f"{mark}{module.name}")
             fs.write(" ".join(layout))
             fs.write("\n")
 
@@ -879,12 +878,12 @@ class Dashboard(gdb.Command):
                 default = attribute.get("default")
                 value = getattr(obj, real_name)
                 if value != default:
-                    fs.write("{} -style {} {!r}\n".format(prefix, name, value))
+                    fs.write(f"{prefix} -style {name} {value!r}\n")
 
         def dump_output(self, fs, obj, prefix="dashboard"):
-            output = getattr(obj, "output")
+            output = obj.output
             if output:
-                fs.write("{} -output {}\n".format(prefix, output))
+                fs.write(f"{prefix} -output {output}\n")
 
     class OutputCommand(gdb.Command):
         """Set the output file/TTY for the whole dashboard or single modules.
@@ -945,7 +944,7 @@ class Dashboard(gdb.Command):
             arg = Dashboard.parse_arg(arg)
             if arg == "":
                 status = "enabled" if self.dashboard.enabled else "disabled"
-                print("The dashboard is {}".format(status))
+                print(f"The dashboard is {status}")
             elif arg == "on":
                 self.dashboard.enable()
                 self.dashboard.redisplay()
@@ -1006,7 +1005,7 @@ class Dashboard(gdb.Command):
             default = "(default TTY)"
             max_name_len = max(len(module.name) for module in self.dashboard.modules)
             max_name_len = max(max_name_len, len(global_str))
-            fmt = "{{}}{{:{}s}}{{}}".format(max_name_len + 2)
+            fmt = f"{{}}{{:{max_name_len + 2}s}}{{}}"
             print(
                 (fmt + "\n").format(" ", global_str, self.dashboard.output or default)
             )
@@ -1025,10 +1024,10 @@ class Dashboard(gdb.Command):
                 enabled = directive[0] != "!"
                 name = directive[not enabled :]
                 if name in selected_modules:
-                    Dashboard.err('Module "{}" already set'.format(name))
+                    Dashboard.err(f'Module "{name}" already set')
                     return False
                 if next((False for module in modules if module.name == name), True):
-                    Dashboard.err('Cannot find module "{}"'.format(name))
+                    Dashboard.err(f'Cannot find module "{name}"')
                     return False
                 parsed_directives.append((name, enabled))
                 selected_modules.add(name)
@@ -1095,7 +1094,7 @@ class Dashboard(gdb.Command):
                     if new_value == "":
                         # print the current value
                         value = getattr(this.obj, attr_name)
-                        print("{} = {!r}".format(name, value))
+                        print(f"{name} = {value!r}")
                     else:
                         try:
                             # convert and check the new value
@@ -1118,13 +1117,13 @@ class Dashboard(gdb.Command):
         def invoke(self, arg, from_tty):
             # an argument here means that the provided attribute is invalid
             if arg:
-                Dashboard.err('Invalid argument "{}"'.format(arg))
+                Dashboard.err(f'Invalid argument "{arg}"')
                 return
             # print all the pairs
             for name, attribute in self.attributes.items():
                 attr_name = attribute.get("name", name)
                 value = getattr(self.obj, attr_name)
-                print("{} = {!r}".format(name, value))
+                print(f"{name} = {value!r}")
 
     # Base module ------------------------------------------------------------------
 
@@ -1219,7 +1218,7 @@ class Source(Dashboard.Module):
     def label(self):
         label = "Source"
         if self.show_path and self.file_name:
-            label += ": {}".format(self.file_name)
+            label += f": {self.file_name}"
         return label
 
     def lines(self, term_width, term_height, style_changed):
@@ -1250,10 +1249,10 @@ class Source(Dashboard.Module):
                 # try another or delay error check to open()
                 continue
         # style changed, different file name or file modified in the meanwhile
-        if style_changed or file_name != self.file_name or ts and ts > self.ts:
+        if style_changed or file_name != self.file_name or (ts and ts > self.ts):
             try:
                 # reload the source file if changed
-                with io.open(file_name, errors="replace") as source_file:
+                with open(file_name, errors="replace") as source_file:
                     highlighter = Beautifier(file_name, self.tab_size)
                     self.highlighted = highlighter.active
                     source = highlighter.process(source_file.read())
@@ -1262,8 +1261,8 @@ class Source(Dashboard.Module):
                 # persistent errors
                 self.file_name = file_name
                 self.ts = ts
-            except IOError:
-                msg = 'Cannot display "{}"'.format(file_name)
+            except OSError:
+                msg = f'Cannot display "{file_name}"'
                 return [ansi(msg, R.style_error)]
         # compute the line range
         height = self.height or (term_height - 1)
@@ -1284,7 +1283,7 @@ class Source(Dashboard.Module):
         # return the source code listing
         breakpoints = fetch_breakpoints()
         out = []
-        number_format = "{{:>{}}}".format(len(str(end)))
+        number_format = f"{{:>{len(str(end))}}}"
         for number, line in enumerate(self.source_lines[start:end], start + 1):
             # properly handle UTF-8 source files
             line = to_string(line)
@@ -1450,7 +1449,7 @@ class Assembly(Dashboard.Module):
                 )
                 asm = asm[-clamped_offset:]
             except gdb.error as e:
-                msg = "{}".format(e)
+                msg = f"{e}"
                 return [ansi(msg, R.style_error)]
         # fetch function start if available (e.g., not with @plt)
         func_start = None
@@ -1475,16 +1474,16 @@ class Assembly(Dashboard.Module):
             if self.show_opcodes:
                 # fetch and format opcode
                 region = inferior.read_memory(addr, length)
-                opcodes = " ".join("{:02x}".format(ord(byte)) for byte in region)
+                opcodes = " ".join(f"{ord(byte):02x}" for byte in region)
                 opcodes += (max_length - len(region)) * 3 * " " + "  "
             else:
                 opcodes = ""
             # compute the offset if available
             if self.show_function:
                 if func_start:
-                    offset = "{:+d}".format(addr - func_start)
+                    offset = f"{addr - func_start:+d}"
                     offset = offset.ljust(max_offset + 1)  # sign
-                    func_info = "{}{}".format(frame.function(), offset)
+                    func_info = f"{frame.function()}{offset}"
                 else:
                     func_info = "?"
             else:
@@ -1727,7 +1726,7 @@ class Variables(Dashboard.Module):
             if myself:
                 myself.previous_values[raw_name] = value
             style = R.style_selected_1 if changed else ""
-            lines.append("{} {} {}".format(name, equal, ansi(value, style)))
+            lines.append(f"{name} {equal} {ansi(value, style)}")
         if sort:
             lines.sort()
         return lines
@@ -1836,7 +1835,7 @@ class Stack(Dashboard.Module):
         frame_id = ansi(str(number), style)
         info = Stack.get_pc_line(frame, style)
         frame_lines = []
-        frame_lines.append("[{}] {}".format(frame_id, info))
+        frame_lines.append(f"[{frame_id}] {info}")
         # add frame arguments and locals
         variables = Variables.format_frame(
             frame,
@@ -1853,12 +1852,12 @@ class Stack(Dashboard.Module):
     @staticmethod
     def format_line(prefix, line):
         prefix = ansi(prefix, R.style_low)
-        return "{} {}".format(prefix, line)
+        return f"{prefix} {line}"
 
     @staticmethod
     def get_pc_line(frame, style):
         frame_pc = ansi(format_address(frame.pc()), style)
-        info = "from {}".format(frame_pc)
+        info = f"from {frame_pc}"
         # if a frame function symbol is available then use it to fetch the
         # current function name and address, otherwise fall back relying on the
         # frame name
@@ -1866,15 +1865,15 @@ class Stack(Dashboard.Module):
             name = ansi(frame.function(), style)
             func_start = to_unsigned(frame.function().value())
             offset = ansi(str(frame.pc() - func_start), style)
-            info += " in {}+{}".format(name, offset)
+            info += f" in {name}+{offset}"
         elif frame.name():
             name = ansi(frame.name(), style)
-            info += " in {}".format(name)
+            info += f" in {name}"
         sal = frame.find_sal()
         if sal and sal.symtab:
             file_name = ansi(sal.symtab.filename, style)
             file_line = ansi(str(sal.line), style)
-            info += " at {}:{}".format(file_name, file_line)
+            info += f" at {file_name}:{file_line}"
         return info
 
 
@@ -1892,7 +1891,7 @@ class History(Dashboard.Module):
                 value = format_value(gdb.history(i))
                 value_id = ansi("$${}", R.style_high).format(abs(i))
                 equal = ansi("=", R.style_low)
-                line = "{} {} {}".format(value_id, equal, value)
+                line = f"{value_id} {equal} {value}"
                 out.append(line)
             except gdb.error:
                 continue
@@ -1951,7 +1950,7 @@ class Memory(Dashboard.Module):
                 for j in range(len(region)):
                     rel = i + j
                     byte = memory[rel]
-                    hexa_byte = "{:02x}".format(ord(byte))
+                    hexa_byte = f"{ord(byte):02x}"
                     text_byte = self.module.format_byte(byte)
                     # differences against the latest have the highest priority
                     if self.latest and memory[rel] != self.latest[rel]:
@@ -1967,7 +1966,7 @@ class Memory(Dashboard.Module):
                     hexa.append(hexa_byte)
                     text.append(text_byte)
                 # output the formatted line
-                hexa_placeholder = " {}".format(self.module.placeholder[0] * 2)
+                hexa_placeholder = f" {self.module.placeholder[0] * 2}"
                 text_placeholder = self.module.placeholder[0]
                 out.append(
                     "{}  {}{}  {}{}".format(
@@ -2107,7 +2106,7 @@ class Registers(Dashboard.Module):
             # exclude registers with a dot '.' or parse_and_eval() will fail
             if "." in name:
                 continue
-            value = gdb.parse_and_eval("${}".format(name))
+            value = gdb.parse_and_eval(f"${name}")
             string_value = Registers.format_value(value)
             # exclude unavailable registers (see #255)
             if string_value == "<unavailable>":
@@ -2161,7 +2160,7 @@ class Registers(Dashboard.Module):
                 style = R.style_selected_1 if changed else ""
                 value = ansi(value, style) + " " * (max_value - len(value))
                 padding = " " * padding_column[i]
-                item = "{}{} {}".format(padding, name, value)
+                item = f"{padding}{name} {value}"
                 out[j] += item
         return out
 
@@ -2188,7 +2187,7 @@ architectures different from x86 setting this attribute might be mandatory.""",
         try:
             if value.type.code in [gdb.TYPE_CODE_INT, gdb.TYPE_CODE_PTR]:
                 int_value = to_unsigned(value, value.type.sizeof)
-                value_format = "0x{{:0{}x}}".format(2 * value.type.sizeof)
+                value_format = f"0x{{:0{2 * value.type.sizeof}x}}"
                 return value_format.format(int_value)
         except (gdb.error, ValueError):
             # convert to unsigned but preserve code and flags information
@@ -2237,14 +2236,14 @@ class Threads(Dashboard.Module):
             is_selected = thread.ptid == selected_thread.ptid
             style = R.style_selected_1 if is_selected else R.style_selected_2
             if self.all_inferiors:
-                number = "{}.{}".format(thread.inferior.num, thread.num)
+                number = f"{thread.inferior.num}.{thread.num}"
             else:
                 number = str(thread.num)
             number = ansi(number, style)
             tid = ansi(str(thread.ptid[1] or thread.ptid[2]), style)
-            info = "[{}] id {}".format(number, tid)
+            info = f"[{number}] id {tid}"
             if thread.name:
-                info += " name {}".format(ansi(thread.name, style))
+                info += f" name {ansi(thread.name, style)}"
             # switch thread to fetch info (unless is running in non-stop mode)
             try:
                 thread.switch()
@@ -2299,19 +2298,19 @@ class Expressions(Dashboard.Module):
             try:
                 if match:
                     radix, expression = match.groups()
-                    run("set output-radix {}".format(radix))
+                    run(f"set output-radix {radix}")
                 value = format_value(gdb.parse_and_eval(expression))
             except gdb.error as e:
                 value = ansi(e, R.style_error)
             finally:
                 if match:
-                    run("set output-radix {}".format(default_radix))
+                    run(f"set output-radix {default_radix}")
             number = ansi(str(number), R.style_selected_2)
             label = ansi(expression, R.style_high) + " " * (
                 label_width - len(expression)
             )
             equal = ansi("=", R.style_low)
-            out.append("[{}] {} {} {}".format(number, label, equal, value))
+            out.append(f"[{number}] {label} {equal} {value}")
         return out
 
     def commands(self):
@@ -2379,7 +2378,7 @@ class Expressions(Dashboard.Module):
 
 
 # XXX workaround to support BP_BREAKPOINT in older GDB versions
-setattr(gdb, "BP_CATCHPOINT", getattr(gdb, "BP_CATCHPOINT", 26))
+gdb.BP_CATCHPOINT = getattr(gdb, "BP_CATCHPOINT", 26)
 
 
 class Breakpoints(Dashboard.Module):
@@ -2410,20 +2409,20 @@ class Breakpoints(Dashboard.Module):
                 bp_type = bp_type + " {}".format(ansi("once", style))
             if not R.ansi and breakpoint["enabled"]:
                 bp_type = "disabled " + bp_type
-            line = "[{}] {}".format(number, bp_type)
+            line = f"[{number}] {bp_type}"
             if breakpoint["type"] == gdb.BP_BREAKPOINT:
                 for i, address in enumerate(breakpoint["addresses"]):
                     addr = address["address"]
                     if i == 0 and addr:
                         # this is a regular breakpoint
-                        line += " at {}".format(ansi(format_address(addr), style))
+                        line += f" at {ansi(format_address(addr), style)}"
                         # format source information
                         file_name = address.get("file_name")
                         file_line = address.get("file_line")
                         if file_name and file_line:
                             file_name = ansi(file_name, style)
                             file_line = ansi(file_line, style)
-                            line += " in {}:{}".format(file_name, file_line)
+                            line += f" in {file_name}:{file_line}"
                     elif i > 0:
                         # this is a sub breakpoint
                         sub_style = (
@@ -2434,32 +2433,30 @@ class Breakpoints(Dashboard.Module):
                         sub_number = ansi(
                             "{}.{}".format(breakpoint["number"], i), sub_style
                         )
-                        sub_line = "[{}]".format(sub_number)
-                        sub_line += " at {}".format(
-                            ansi(format_address(addr), sub_style)
-                        )
+                        sub_line = f"[{sub_number}]"
+                        sub_line += f" at {ansi(format_address(addr), sub_style)}"
                         # format source information
                         file_name = address.get("file_name")
                         file_line = address.get("file_line")
                         if file_name and file_line:
                             file_name = ansi(file_name, sub_style)
                             file_line = ansi(file_line, sub_style)
-                            sub_line += " in {}:{}".format(file_name, file_line)
+                            sub_line += f" in {file_name}:{file_line}"
                         sub_lines += [sub_line]
                 # format user location
                 location = breakpoint["location"]
-                line += " for {}".format(ansi(location, style))
+                line += f" for {ansi(location, style)}"
             elif breakpoint["type"] == gdb.BP_CATCHPOINT:
                 what = breakpoint["what"]
-                line += " {}".format(ansi(what, style))
+                line += f" {ansi(what, style)}"
             else:
                 # format user expression
                 expression = breakpoint["expression"]
-                line += " for {}".format(ansi(expression, style))
+                line += f" for {ansi(expression, style)}"
             # format condition
             condition = breakpoint["condition"]
             if condition:
-                line += " if {}".format(ansi(condition, style))
+                line += f" if {ansi(condition, style)}"
             # format hit count
             hit_count = breakpoint["hit_count"]
             if hit_count:

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck source=/dev/null
 
 sudo apt-get update -y
 sudo apt-get upgrade -y
@@ -86,7 +87,6 @@ sudo update-alternatives --set x-terminal-emulator "$(which kitty)"
 gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
 gsettings set org.gnome.desktop.default-applications.terminal exec kitty
 
-
 # set locale
 sudo locale-gen en_GB
 sudo locale-gen en_GB.UTF-8
@@ -97,7 +97,6 @@ for item in ~/Desktop/dotfiles/.config/*; do
   ln -sfn "$item" ~/.config/
 done
 
-
 # Install Docker
 sudo apt-get update -y
 sudo apt-get -y install ca-certificates curl
@@ -106,8 +105,8 @@ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyring
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" \
+  | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update -y
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo groupadd docker
@@ -120,4 +119,3 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 sudo apt-get -y install ubuntu-restricted-extras
 
 echo -e "\e[31mYOU SHOULD REBOOT\e[0m"
-

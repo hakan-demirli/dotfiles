@@ -7,7 +7,7 @@ if [ ${#files[@]} -eq 0 ]; then
   exit 1
 fi
 
-index=$(( $(date +%j) % ${#files[@]} ))
+index=$(($(date +%j) % ${#files[@]}))
 selected="${files[$index]}"
 
 swww img "$selected"

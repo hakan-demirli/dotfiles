@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-bash $(home-manager generations | fzf | awk -F '-> ' '{print $2 "/activate"}')
-
+selected_gen=$(home-manager generations | fzf | awk -F '-> ' '{print $2 "/activate"}') || exit
+bash "$selected_gen"

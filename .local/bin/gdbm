@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 
 if [ "$#" -eq 0 ]; then
-    echo "Usage: gdbm <program> [program-arguments...]"
-    exit 1
+  echo "Usage: gdbm <program> [program-arguments...]"
+  exit 1
 fi
 
 GDB_LAYOUT_SCRIPT="$HOME/.config/gdb/gdb-tmux-layout.sh"
 
 if ! command -v jq &> /dev/null; then
-    echo "Error: jq is not installed. Please install it to use this script." >&2
-    exit 1
+  echo "Error: jq is not installed. Please install it to use this script." >&2
+  exit 1
 fi
 
 if [ ! -f "$GDB_LAYOUT_SCRIPT" ]; then
-    echo "Error: Layout script not found at $GDB_LAYOUT_SCRIPT" >&2
-    exit 1
+  echo "Error: Layout script not found at $GDB_LAYOUT_SCRIPT" >&2
+  exit 1
 fi
-
 
 EXECUTABLE="$1"
 shift
@@ -26,37 +25,36 @@ PROGRAM_ARGS_QUOTED=$(printf "%q " "$@")
 
 GDB_COMMAND="gdb --args $EXECUTABLE_QUOTED $PROGRAM_ARGS_QUOTED"
 
-
 if [ -z "$TMUX" ]; then
-    echo "No tmux session found. Creating a new one for GDB..."
-    SESSION_NAME="gdb-session-$$"
+  echo "No tmux session found. Creating a new one for GDB..."
+  SESSION_NAME="gdb-session-$$"
 
-    tmux new-session -d -s "$SESSION_NAME"
-    WINDOW_ID=$(tmux list-windows -t "$SESSION_NAME" -F '#{window_id}')
+  tmux new-session -d -s "$SESSION_NAME"
+  WINDOW_ID=$(tmux list-windows -t "$SESSION_NAME" -F '#{window_id}')
 
-    GDB_PANE_ID=$("$GDB_LAYOUT_SCRIPT" "$WINDOW_ID")
-    if [ -z "$GDB_PANE_ID" ]; then
-        echo "Error: Layout script did not return a GDB pane ID. Aborting." >&2
-        tmux kill-session -t "$SESSION_NAME"
-        exit 1
-    fi
+  GDB_PANE_ID=$("$GDB_LAYOUT_SCRIPT" "$WINDOW_ID")
+  if [ -z "$GDB_PANE_ID" ]; then
+    echo "Error: Layout script did not return a GDB pane ID. Aborting." >&2
+    tmux kill-session -t "$SESSION_NAME"
+    exit 1
+  fi
 
-    tmux send-keys -t "$GDB_PANE_ID" "$GDB_COMMAND" C-m
+  tmux send-keys -t "$GDB_PANE_ID" "$GDB_COMMAND" C-m
 
-    tmux attach-session -t "$SESSION_NAME"
+  tmux attach-session -t "$SESSION_NAME"
 else
-    echo "Creating new GDB window in current session..."
+  echo "Creating new GDB window in current session..."
 
-    WINDOW_ID=$(tmux new-window -d -P -n "gdb")
+  WINDOW_ID=$(tmux new-window -d -P -n "gdb")
 
-    GDB_PANE_ID=$("$GDB_LAYOUT_SCRIPT" "$WINDOW_ID")
-    if [ -z "$GDB_PANE_ID" ]; then
-        echo "Error: Layout script did not return a GDB pane ID. Aborting." >&2
-        tmux kill-window -t "$WINDOW_ID"
-        exit 1
-    fi
+  GDB_PANE_ID=$("$GDB_LAYOUT_SCRIPT" "$WINDOW_ID")
+  if [ -z "$GDB_PANE_ID" ]; then
+    echo "Error: Layout script did not return a GDB pane ID. Aborting." >&2
+    tmux kill-window -t "$WINDOW_ID"
+    exit 1
+  fi
 
-    tmux send-keys -t "$GDB_PANE_ID" "$GDB_COMMAND" C-m
+  tmux send-keys -t "$GDB_PANE_ID" "$GDB_COMMAND" C-m
 
-    tmux select-window -t "$WINDOW_ID"
+  tmux select-window -t "$WINDOW_ID"
 fi

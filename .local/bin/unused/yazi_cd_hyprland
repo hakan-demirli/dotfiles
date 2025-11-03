@@ -3,13 +3,12 @@
 tmp="$(mktemp -t "yazi-cwd.XXXXX")"
 yazi --cwd-file="$tmp"
 if [ -f "$tmp" ]; then
-	dir="$(command cat "$tmp")"
-	rm -f "$tmp"
-	if [ -d "$dir" ]; then
-		if [ "$dir" != "$(pwd)" ]; then
-			cd "$dir"
-			exec "${SHELL:-sh}"
-		fi
-	fi
+  dir="$(command cat "$tmp")"
+  rm -f "$tmp"
+  if [ -d "$dir" ]; then
+    if [ "$dir" != "$(pwd)" ]; then
+      cd "$dir" || exit 1
+      exec "${SHELL:-sh}"
+    fi
+  fi
 fi
-

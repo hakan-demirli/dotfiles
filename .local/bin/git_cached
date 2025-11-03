@@ -30,11 +30,10 @@ def create_cache_dir():
 def run_git(cmd_args, cwd=None, ignore_unshallow_error=False):
     try:
         result = subprocess.run(
-            [GIT] + cmd_args,
+            [GIT, *cmd_args],
             check=True,
             cwd=cwd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
             text=True,
         )
         return result.stdout
@@ -69,7 +68,7 @@ def gitc_clone(
     path_parts = parsed_url.path.strip("/").split("/")
     if len(path_parts) < 2:
         # If URL is not in the expected form, delegate to Git.
-        subprocess.run([GIT] + original_args)
+        subprocess.run([GIT, *original_args])
         return
 
     # Build cache paths.
@@ -91,7 +90,7 @@ def gitc_clone(
             clone_cmd += ["-b", branch]
         if depth:
             clone_cmd += ["--depth", str(depth)]
-        clone_cmd += extra_args + [url, repo_dir]
+        clone_cmd += [*extra_args, url, repo_dir]
         run_git(clone_cmd)
         logging.info("Repository cache created.")
 
@@ -107,7 +106,7 @@ def gitc_clone(
 
     # If the destination already exists, delegate to Git so that Git produces its error.
     if os.path.exists(dst_dir):
-        subprocess.run([GIT] + original_args)
+        subprocess.run([GIT, *original_args])
         return
 
     # Copy from the cache into the destination.
@@ -130,7 +129,7 @@ def parse_clone_args(args):
 def git_command(args):
     # For any non-clone command, simply delegate to Git.
     if not args or args[0] != "clone":
-        subprocess.run([GIT] + args)
+        subprocess.run([GIT, *args])
         return
 
     # Parse clone arguments.
@@ -138,7 +137,7 @@ def git_command(args):
     depth, branch, url, dst, unknown = parse_clone_args(clone_args)
     # If URL is missing or there are unknown arguments, delegate to Git.
     if url is None or unknown:
-        subprocess.run([GIT] + args)
+        subprocess.run([GIT, *args])
         return
 
     # Call our caching clone function and pass the original clone arguments

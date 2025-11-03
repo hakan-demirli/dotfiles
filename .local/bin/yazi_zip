@@ -7,11 +7,11 @@ function yazi_zip() {
   read -r dir_name
   dir_name="${dir_name}_$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c6)"
   mkdir "$dir_name"
-  
+
   for file in "$@"; do
     cp -r "$file" "$dir_name"
   done
-  
+
   (cd "$dir_name" && zip -r "../${dir_name%_*}.zip" .)
   rm -rf "$dir_name"
 }

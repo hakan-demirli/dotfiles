@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
 import argparse
-import subprocess
 import os
-
+import subprocess
 
 """
 gpr: gem5 python runner
 
 run a python script using gem5
-    
+
 """
 GEM5_BINARY = "/mnt/second/rep/gem5_projects/gem5/build/X86/gem5.opt"
 

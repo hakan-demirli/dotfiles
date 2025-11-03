@@ -4,12 +4,12 @@
 # a tmux session for that directory.
 
 if ! command -v yazi &> /dev/null; then
-    echo "Error: yazi is not installed or not in your PATH." >&2
-    exit 1
+  echo "Error: yazi is not installed or not in your PATH." >&2
+  exit 1
 fi
 if ! command -v tmux &> /dev/null; then
-    echo "Error: tmux is not installed or not in your PATH." >&2
-    exit 1
+  echo "Error: tmux is not installed or not in your PATH." >&2
+  exit 1
 fi
 
 tmp_file=$(mktemp)
@@ -17,10 +17,10 @@ yazi --cwd-file="$tmp_file"
 
 target_dir=$(cat "$tmp_file")
 
-if [[ -z "$target_dir" || ! -d "$target_dir" ]]; then
-    echo "No valid directory selected from yazi."
-    rm -f "$tmp_file"
-    exit 0
+if [[ -z $target_dir || ! -d $target_dir ]]; then
+  echo "No valid directory selected from yazi."
+  rm -f "$tmp_file"
+  exit 0
 fi
 
 selected="$target_dir"
@@ -28,20 +28,19 @@ selected="$target_dir"
 selected_path_hash=$(echo -n "$selected" | md5sum | awk '{ print $1 }')
 session_name=$(basename "$selected")_$selected_path_hash
 
-if ! tmux info &>/dev/null; then
+if ! tmux info &> /dev/null; then
   rm -f "$tmp_file"
   exec tmux new-session -s "$session_name" -c "$selected"
 else
-  if ! tmux has-session -t="$session_name" 2>/dev/null; then
-    tmux new-session -ds "$session_name" -c "$selected"
-    if [[ $? -ne 0 ]]; then
+  if ! tmux has-session -t="$session_name" 2> /dev/null; then
+    if ! tmux new-session -ds "$session_name" -c "$selected"; then
       echo "Error: Failed to create tmux session '$session_name'." >&2
       rm -f "$tmp_file"
       exit 1
     fi
   fi
   rm -f "$tmp_file"
-  if [[ -n "$TMUX" ]]; then
+  if [[ -n $TMUX ]]; then
     tmux switch-client -t "$session_name"
   else
     exec tmux attach-session -t "$session_name"

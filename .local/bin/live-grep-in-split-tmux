@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 
 tmux display-popup -w 80% -E "live-grep-helix"
-
