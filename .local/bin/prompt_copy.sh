@@ -29,6 +29,7 @@ copy_to_clipboard() {
 while true; do
   if ! selected_file=$(
     find "$PROMPTS_PATH" -maxdepth 1 -type f -printf "%f\n" \
+      | sort \
       | fzf --prompt="Select prompt to copy > " \
         --preview="cat '${PROMPTS_PATH}/{}'" \
         --layout=reverse
