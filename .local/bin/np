@@ -38,9 +38,13 @@ def run_fzf_inside_cache_and_copy():
         sys.exit(1)
 
     try:
-        cmd = f"find -L {CACHE_DIR} -mindepth 1 -maxdepth 1 -type d -print | fzf"
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, shell=True)
-        selected_directory = result.stdout.decode().strip()
+        dirs = [d for d in CACHE_DIR.iterdir() if d.is_dir()]
+        sorted_dirs = sorted(dirs)
+        fzf_input = "\n".join(str(path) for path in sorted_dirs).encode("utf-8")
+        fzf_proc = subprocess.run(
+            ["fzf"], input=fzf_input, stdout=subprocess.PIPE, check=True
+        )
+        selected_directory = fzf_proc.stdout.decode().strip()
 
         if selected_directory:
             selected_path = Path(selected_directory)
@@ -51,7 +55,7 @@ def run_fzf_inside_cache_and_copy():
             print("No directory selected.")
 
     except subprocess.CalledProcessError as e:
-        print(f"fzf failed: {e}")
+        print(f"Operation cancelled or fzf failed: {e}")
 
 
 if __name__ == "__main__":
