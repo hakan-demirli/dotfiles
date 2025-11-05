@@ -33,6 +33,7 @@ tooltip {
 #pulseaudio#mic,
 #workspaces,
 #custom-notification,
+#custom-power,
 #memory,
 #tray {
   background: alpha(@background, 0.8);
@@ -73,6 +74,7 @@ tooltip {
 #custom-updates,
 #gamemode,
 #custom-github,
+#custom-power,
 #custom-camera,
 #custom-notifications,
 #custom-recorder,
@@ -183,4 +185,20 @@ tooltip {
   font-weight: bold;
   padding-left: 0px;
   padding-right: 0px;
+}
+
+#custom-power {
+  font-size: 1.1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+menu {
+  border-radius: 0.5rem;
+  background: @background;
+  color: @foreground;
+}
+
+menuitem {
+  border-radius: 15px;
 }
