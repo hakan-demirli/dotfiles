@@ -30,7 +30,8 @@
     "custom/left-arrow-dark",
     "custom/notification",
     "custom/left-arrow-dark",
-    "tray"
+    "tray",
+    "custom/power"
   ],
   "custom/left-arrow-dark": {
     "format": " ",
@@ -186,5 +187,18 @@
     "on-click": "waybar_timer -t",
     "on-click-right": "waybar_timer -m",
     "interval": 1
-  }
+  },
+  "custom/power": {
+    "format": "⏻",
+    "tooltip": false,
+    "menu": "on-click",
+    "menu-file": "~/.config/waybar/power_menu.xml",
+    "menu-actions": {
+      "shutdown": "gtk_applet_power_menu  --action shutdown",
+      "reboot": "gtk_applet_power_menu  --action reboot",
+      "suspend": "gtk_applet_power_menu  --action sleep",
+      "hibernate": "gtk_applet_power_menu  --action hibernate",
+      "logout": "gtk_applet_power_menu  --action logout"
+    },
+  },
 }
