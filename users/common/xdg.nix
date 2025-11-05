@@ -143,10 +143,18 @@
       );
     in
     {
-      configFile = mutableConfigFiles // immutableConfigFiles;
+      configFile =
+        mutableConfigFiles
+        // immutableConfigFiles
+        // {
+          "hypr/monitors.conf" = {
+            source = ../../.config/hypr/monitors.conf;
+            force = true;
+          };
+        };
+
       dataFile = mutableDataFiles // immutableDataFiles;
       stateFile = mutableStateFiles;
-
       portal = {
         enable = true;
         xdgOpenUsePortal = true;
