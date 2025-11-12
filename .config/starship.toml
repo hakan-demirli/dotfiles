@@ -97,6 +97,11 @@ time_format = '%H:%M'
 [fill]
 symbol = ' '
 
+[env_var.vault_status]
+variable = "IN_VAULT_SHELL"
+format = "on [🔐 vault]($style) "
+style = "bold yellow"
+
 # [custom.taskwarrior]
 # command = """
 # #!/usr/bin/env bash
