@@ -102,13 +102,12 @@ let
     hypridle
     hyprlock
     hyprshot
-    imhex
-    inputs.small-apps.packages.${pkgs.system}.gtk_applet
+    # imhex
+    # inputs.small-apps.packages.${pkgs.system}.gtk_applet
     inputs.small-apps.packages.${pkgs.system}.waybar_timer
     kdePackages.breeze-icons
     kdePackages.kolourpaint
     kdePackages.qtimageformats
-    kdePackages.xwaylandvideobridge
     kooha
     localsend
     mpv
@@ -130,7 +129,7 @@ let
     wl-clip-persist
     wlr-randr
     wttrbar
-    xdragon
+    dragon-drop
   ];
 
 in
