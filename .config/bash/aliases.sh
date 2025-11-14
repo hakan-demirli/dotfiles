@@ -57,7 +57,7 @@ alias txlw='tmux list-windows'
 
 # Hardware specific (Asus)
 if [ -d "/sys/devices/platform/asus-nb-wmi" ]; then
-  alias fan-turbo='cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 1 >>  fan_boost_mode"; sudo sh -c "echo 1 >> throttle_thermal_policy";'
-  alias fan-performance='cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 0 >>  fan_boost_mode"; sudo sh -c "echo 0 >> throttle_thermal_policy";'
-  alias fan-silent='cd /sys/devices/platform/asus-nb-wmi; sudo sh -c "echo 2 >>  fan_boost_mode"; sudo sh -c "echo 2 >> throttle_thermal_policy";'
+  alias fan-turbo='echo 1 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 1 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
+  alias fan-performance='echo 0 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 0 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
+  alias fan-silent='echo 2 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 2 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
 fi
