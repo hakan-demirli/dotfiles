@@ -293,10 +293,9 @@
       devShells = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
         system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = (import ./overlay.nix { }).nixpkgs.overlays;
-          };
+          pkgs = nixpkgs.legacyPackages.${system}.extend (
+            lib.composeManyExtensions (import ./overlay.nix { }).nixpkgs.overlays
+          );
         in
         {
           barebone = pkgs.mkShell {
@@ -308,10 +307,9 @@
       packages = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
         system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = (import ./overlay.nix { }).nixpkgs.overlays;
-          };
+          pkgs = nixpkgs.legacyPackages.${system}.extend (
+            lib.composeManyExtensions (import ./overlay.nix { }).nixpkgs.overlays
+          );
         in
         {
           barebone = pkgs.buildEnv {

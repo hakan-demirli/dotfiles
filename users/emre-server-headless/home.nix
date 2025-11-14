@@ -17,7 +17,10 @@ in
     })
   ];
 
-  targets.genericLinux.enable = true;
+  targets.genericLinux = {
+    enable = true;
+    gpu.enable = false;
+  };
 
   programs = {
     gpg.homedir = "${config.xdg.dataHome}/gnupg";
