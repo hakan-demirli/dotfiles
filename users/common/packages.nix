@@ -71,6 +71,7 @@ let
     rsync
     # unar
     zip
+    openssl
   ];
 
   server-cli =
