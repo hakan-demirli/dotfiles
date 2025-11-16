@@ -59,7 +59,8 @@
             allowPasswordAuth = false;
             hostName = "vm-oracle-aarch64";
             emulatedSystems = [ "x86_64-linux" ];
-            efiInstallAsRemovable = true;
+            efiInstallAsRemovable = false;
+            canTouchEfiVariables = true;
             swapSize = "1G";
             diskDevice = "/dev/sda";
             grubDevice = "/dev/sda";
