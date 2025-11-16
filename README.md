@@ -112,21 +112,27 @@
 * ```nixos-anywhere  --flake .#vm_oracle_aarch64 root@192.168.1.128```
 
 # Tailscale/Headscale
-* Update tailscale-key:
-  * ```sudo headscale preauthkeys create --user 1 --reusable --expiration 1752000h --tags tag:bootstrap```
-  * Add it to `./secrets/tailscale-key`
-* Approve Routes:
-  * Get the ID of the node routes:
-    * ```sudo headscale nodes routes list```
-  * Approve routes:
-    * ```sudo headscale nodes approve-routes -i 5 -r "0.0.0.0/0,::/0"```
-  * Check if it is approved:
-    * ```sudo headscale nodes routes list```
-* Assign exit node:
-  * Find the host you want to use as an exit node:
-    * ```sudo headscale nodes list```
-  * Assign exitnode tag:
-    * ```sudo headscale nodes tag -i 5 -t tag:exitnode```
+* On each clean installation of the Headscale server:
+  * Ensure the users specified in the ACL policy exist:
+    * ```sudo headscale users list```
+    * If not create them:
+      * ```sudo headscale users create emre```
+  * Create a new tailscale-key:
+    * ```sudo headscale preauthkeys create --user 1 --reusable --expiration 1752000h --tags tag:bootstrap```
+      * Add it to `./secrets/tailscale-key`
+  * git pull and switch to the new key on all hosts.
+  * Configure the exit nodes:
+    * Get the ID of the node you want to use as an exit node:
+      * ```sudo headscale nodes routes list```
+    * Allow the routing through that node:
+      * ```sudo headscale nodes approve-routes -i 1 -r "0.0.0.0/0,::/0"```
+      * Check if it is approved:
+        * ```sudo headscale nodes routes list```
+    * Assign exit node tag for the ACL policy:
+      * Find the host you want to use as an exit node:
+        * ```sudo headscale nodes list```
+      * Assign exitnode tag:
+        * ```sudo headscale nodes tag -i 1 -t tag:exitnode```
 * [Optional QOL] 
   * Remove unused nodes: ```sudo headscale nodes delete --identifier 4```
   * Rename hostnames: ```sudo headscale nodes rename laptop -i 6```
