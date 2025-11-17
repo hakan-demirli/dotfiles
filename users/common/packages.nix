@@ -114,6 +114,7 @@ let
     mpv
     networkmanagerapplet
     nwg-displays
+    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.nix-treemap
     (pkgs.callPackage ../../pkgs/gparted.nix { })
     playerctl
     qalculate-qt
