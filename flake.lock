@@ -106,11 +106,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1763094590,
-        "narHash": "sha256-ipRQsT1ChDUD7yo/8Us2ZPfdc7sftv+8P+ypoJsHoFw=",
+        "lastModified": 1763394000,
+        "narHash": "sha256-8lJzsbjp/Z9sTxZ/+k9ixJ4ksv+/yGwZqpj3Jwx6v9g=",
         "owner": "hakan-demirli",
         "repo": "small-apps",
-        "rev": "7d9928812bba65d5d348405a0a3e3e55d6d7dd3f",
+        "rev": "f2637f573b66aca6025d98b629cf38c68ff813ff",
         "type": "github"
       },
       "original": {
