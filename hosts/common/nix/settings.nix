@@ -78,6 +78,9 @@
       keep-outputs = true;
       keep-derivations = true;
 
+      fallback = true;
+      connect-timeout = 5;
+
       max-substitution-jobs = maxSubstitutionJobs;
     };
   };
