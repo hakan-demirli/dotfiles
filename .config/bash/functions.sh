@@ -20,7 +20,7 @@ yazi_cd() {
     return 1
   fi
 
-  mkdir -p "$TMPDIR"
+  mkdir -p "$TMPDIR" 2> /dev/null
   tmp="$(mktemp -t "yazi-cwd.XXXXX")"
 
   yazi --cwd-file="$tmp"
