@@ -25,8 +25,6 @@ local function entry(_, args)
       -o -name 'flake-inputs' \
       -o -name '.ICAClient' \
       -o -name '.cache' \
-      -o -name '.local' \
-      -o -name '.config' \
       -o -name '.mill' \
       -o -name '.metals' \
       -o -name '.android' \
@@ -41,7 +39,6 @@ local function entry(_, args)
       -o -name '.steel' \
       -o -name '.smt_solvers' \
       -o -name '.tor project' \
-      -o -name 'Downloads' \
       -o -name 'nixpkgs' \
       -o -name 'nixpkgs_mine' \
       -o -name '.nix-defexpr' \
@@ -55,7 +52,6 @@ local function entry(_, args)
       -o -name '.venv' \
       -o -name '.tldrc' \
       -o -name 'node_modules' \
-      -o -path './.local' \
       -o -name '.direnv' \) \
       -prune -o -type d -print |
       fzf ]]

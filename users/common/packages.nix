@@ -16,6 +16,7 @@ let
     tree
     yazi
     yek
+    starship
   ];
 
   editors = with pkgs; [
