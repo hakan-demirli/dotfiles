@@ -97,6 +97,11 @@ gitexplode() {
     return 1
   fi
 
+  echo "Migrating staging area (index) to new worktree..."
+  if [ -f ".bare/index" ]; then
+    cp ".bare/index" ".bare/worktrees/$current_branch/index"
+  fi
+
   echo "Moving temp files to '$current_branch'..."
   cp -a .temp_files/. "$current_branch"/ 2> /dev/null || true
   rm -rf .temp_files
