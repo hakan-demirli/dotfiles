@@ -66,7 +66,7 @@ let
     ffmpeg-full
     ffmpegthumbnailer
     ghostscript
-    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.difffenced
+    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.dap
     mutagen
     ouch
     rsync
