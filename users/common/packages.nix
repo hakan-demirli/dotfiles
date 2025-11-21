@@ -105,7 +105,7 @@ let
     hyprlock
     hyprshot
     # imhex
-    # inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.gtk_applet
+    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.gtk_applet
     inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.waybar_timer
     kdePackages.breeze-icons
     kdePackages.kolourpaint
