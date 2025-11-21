@@ -46,6 +46,42 @@ if [[ $? -ne 0 || ! -d $selected ]]; then
   exit 1
 fi
 
+git_target=""
+
+if [[ -d "$selected/.bare" ]]; then
+  git_target="$selected/.bare"
+elif [[ -d "$selected/.git" ]]; then
+  if [[ "$(git -C "$selected/.git" rev-parse --is-bare-repository 2> /dev/null)" == "true" ]]; then
+    git_target="$selected/.git"
+  fi
+elif [[ "$(git -C "$selected" rev-parse --is-bare-repository 2> /dev/null)" == "true" ]]; then
+  git_target="$selected"
+fi
+
+if [[ -n $git_target ]]; then
+  worktrees=$(git -C "$git_target" worktree list --porcelain | grep "^worktree " | cut -d ' ' -f 2 | grep -vFx "$git_target" | grep -vFx "$selected")
+
+  target_wt=""
+
+  if [[ -n $worktrees ]]; then
+    for branch in "main" "master" "default" "dev" "develop"; do
+      match=$(echo "$worktrees" | grep "/$branch$")
+      if [[ -n $match ]]; then
+        target_wt=$(echo "$match" | head -n 1)
+        break
+      fi
+    done
+
+    if [[ -z $target_wt ]]; then
+      target_wt=$(echo "$worktrees" | head -n 1)
+    fi
+
+    if [[ -n $target_wt ]]; then
+      selected="$target_wt"
+    fi
+  fi
+fi
+
 selected_path_hash=$(echo -n "$selected" | md5sum | awk '{ print $1 }')
 session_name=$(basename "$selected")_$selected_path_hash
 
