@@ -1,5 +1,36 @@
 #!/usr/bin/env bash
 
+# shellcheck disable=SC2016
+COLORIZER_AWK='
+{
+  lines[NR] = $0
+  n = split($0, parts, "/")
+  base = parts[n]
+  counts[base]++
+}
+END {
+  c_green = "\033[1;32m"
+  c_reset = "\033[0m"
+
+  for (i=1; i<=NR; i++) {
+    clean_line = lines[i]
+    n = split(clean_line, parts, "/")
+
+    if (counts[parts[n]] > 1 && n > 1) {
+       target = n - 1
+    } else {
+       target = n
+    }
+
+    parts[target] = c_green parts[target] c_reset
+
+    colored_line = parts[1]
+    for (j=2; j<=n; j++) colored_line = colored_line "/" parts[j]
+
+    print clean_line "|" colored_line
+  }
+}'
+
 if [[ -z $TMUX ]]; then
   while true; do
     raw_input=$(
@@ -8,7 +39,9 @@ if [[ -z $TMUX ]]; then
         find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
       } \
         | sed "s|^${HOME}|~|" \
-        | fzf --prompt="Select project: "
+        | awk "$COLORIZER_AWK" \
+        | fzf --ansi --delimiter='|' --with-nth 2 --prompt="Select project: " \
+        | cut -d'|' -f 1
     )
     [[ -n $raw_input ]] && break
   done
@@ -19,7 +52,9 @@ else
       find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
     } \
       | sed "s|^${HOME}|~|" \
-      | fzf --prompt="Select project: "
+      | awk "$COLORIZER_AWK" \
+      | fzf --ansi --delimiter='|' --with-nth 2 --prompt="Select project: " \
+      | cut -d'|' -f 1
   )
 fi
 
