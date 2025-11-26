@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:pane_current_path}" \
+tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:session_path}" \
   | awk '
     BEGIN { FS="|"; OFS="|" }
     {
