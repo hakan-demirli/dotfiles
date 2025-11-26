@@ -132,7 +132,7 @@ cmd mount_mtp ${{
 
 
 cmd yank_path &{{
-  printf "%s" "${f}" | wl-copy
+  printf "%s" "${f}" | gclip
 }}
 
 

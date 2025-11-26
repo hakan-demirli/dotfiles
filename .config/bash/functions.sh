@@ -34,12 +34,8 @@ gcmp() {
   git commit -m "$1" && git push
 }
 
-_copy_readline_to_clipboard_local() {
-  echo -n "$READLINE_LINE" | wl-copy
-}
-
-_copy_readline_to_clipboard_remote() {
-  printf '\e]52;c;%s\a' "$(echo -n "$READLINE_LINE" | base64 -w0)"
+_copy_readline_to_clipboard() {
+  echo -n "$READLINE_LINE" | gclip
 }
 
 ensure_prompt_symbol() {

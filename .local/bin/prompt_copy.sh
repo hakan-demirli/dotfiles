@@ -8,22 +8,7 @@ fi
 
 copy_to_clipboard() {
   local content="$1"
-
-  if [[ -z $SSH_CONNECTION ]] && command -v wl-copy &> /dev/null; then
-    printf "%s" "$content" | wl-copy
-    return 0
-  fi
-
-  if [[ -n $TMUX ]]; then
-    local tty
-    tty=$(tmux display-message -p '#{client_tty}')
-    printf "\e]52;c;%s\a" "$(printf "%s" "$content" | base64 --wrap=0)" > "$tty"
-    return 0
-  else
-
-    printf "\e]52;c;%s\a" "$(printf "%s" "$content" | base64 --wrap=0)"
-    return 0
-  fi
+  printf "%s" "$content" | gclip
 }
 
 while true; do
