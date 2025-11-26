@@ -60,28 +60,32 @@
     '';
   };
 
-  boot.initrd.availableKernelModules = [
-    "ata_piix"
-    "uhci_hcd"
-  ];
-  boot.kernelParams = [
-    "panic=30"
-    "boot.panic_on_fail" # reboot the machine upon fatal boot issues
-    "console=ttyS0" # enable serial console
-    "console=tty1"
-  ];
-  boot.kernel.sysctl."vm.overcommit_memory" = "1";
-
+  boot = {
+    initrd.availableKernelModules = [
+      "ata_piix"
+      "uhci_hcd"
+    ];
+    kernelParams = [
+      "panic=30"
+      "boot.panic_on_fail" # reboot the machine upon fatal boot issues
+      "console=ttyS0" # enable serial console
+      "console=tty1"
+    ];
+    kernel.sysctl."vm.overcommit_memory" = "1";
+  };
   environment.systemPackages = with pkgs; [ cryptsetup ];
   environment.variables.GC_INITIAL_HEAP_SIZE = "1M";
 
   networking.hostName = "kexec";
 
-  services.getty.autologinUser = "root";
-  services.openssh = {
-    enable = true;
-    challengeResponseAuthentication = false;
-    passwordAuthentication = false;
+  services = {
+    getty.autologinUser = "root";
+    openssh = {
+      enable = true;
+      challengeResponseAuthentication = false;
+      passwordAuthentication = false;
+    };
+    udisks2.enable = false;
   };
 
   documentation.enable = false;
@@ -91,7 +95,6 @@
   programs.command-not-found.enable = false;
   security.polkit.enable = false;
   security.rtkit.enable = pkgs.lib.mkForce false;
-  services.udisks2.enable = false;
   i18n.supportedLocales = [ (config.i18n.defaultLocale + "/UTF-8") ];
 
   users.users.root.openssh.authorizedKeys.keys = [

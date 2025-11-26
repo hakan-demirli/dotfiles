@@ -23,7 +23,7 @@
   outputs =
     { nixpkgs, ... }@inputs:
     let
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
       systemArgs = {
 
         laptop = {
@@ -31,7 +31,7 @@
           hardwareConfigPath = ./hosts/laptop/hardware-configuration.nix;
           system = "x86_64-linux";
           argOverrides = {
-            hashedPassword = hashedPassword;
+            inherit hashedPassword;
             emulatedSystems = [ "aarch64-linux" ];
             reverseSshRemoteHost = reverseSshBounceServerHost;
             slurmClient = true;
@@ -180,7 +180,7 @@
       slurmClusterHardware =
         let
           slurmClusterMembers = lib.filterAttrs (
-            hostname: args: (args.argOverrides.slurmNode or false) || (args.argOverrides.slurmMaster or false)
+            _hostname: args: (args.argOverrides.slurmNode or false) || (args.argOverrides.slurmMaster or false)
           ) systemArgs;
         in
         lib.mapAttrs (attrName: args: {
@@ -200,7 +200,7 @@
 
       localX86ServerArgs = lib.listToAttrs (
         map (server: {
-          name = server.name;
+          inherit (server) name;
           value = {
             baseConfigPath = ./hosts/vm_qemu_x86/configuration.nix;
             hardwareConfigPath = ./hosts/server_local_x86/hardware-configuration.nix;
@@ -217,8 +217,8 @@
               reverseSshRemoteHost = reverseSshBounceServerHost;
               reverseSshRemoteUser = reverseSshBounceServerUser;
               reverseSshPrivateKeyPath = reverseTunnelClientPrivateKeyPath;
-              hardwareConfiguration = server.hardwareConfiguration;
-              slurmNode = server.slurmNode;
+              inherit (server) hardwareConfiguration;
+              inherit (server) slurmNode;
 
               extraImports = [
                 ./hosts/common/services/warp.nix
@@ -251,7 +251,7 @@
         };
 
       nixosConfigurations = lib.mapAttrs (
-        hostname: args:
+        _hostname: args:
         let
           isSlurmParticipant =
             (args.argOverrides.slurmNode or false) || (args.argOverrides.slurmMaster or false);
@@ -274,7 +274,7 @@
         mkSystem finalArgs
       ) systemArgs;
 
-      forEachSystem = systems: f: lib.genAttrs systems (system: f system);
+      forEachSystem = systems: f: lib.genAttrs systems f;
       barebonePackages =
         pkgs:
         let

@@ -23,7 +23,7 @@ let
 in
 pkgs.stdenv.mkDerivation {
   pname = pkgs.libqalculate.pname + "-fzf";
-  version = pkgs.libqalculate.version;
+  inherit (pkgs.libqalculate) version;
   dontUnpack = true;
   nativeBuildInputs = [ pkgs.makeWrapper ];
   installPhase = ''
@@ -50,5 +50,5 @@ pkgs.stdenv.mkDerivation {
       fi
     done
   '';
-  passthru = pkgs.libqalculate.passthru;
+  inherit (pkgs.libqalculate) passthru;
 }

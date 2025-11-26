@@ -7,7 +7,7 @@
   programs = {
     bash = {
       enable = true;
-      historyFile = historyFile;
+      inherit historyFile;
       historyFileSize = -1;
       historySize = -1;
       historyControl = [

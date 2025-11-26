@@ -70,8 +70,12 @@ main() {
   }
 
   if [[ $mode == "check" ]]; then
+    run_check deadnix --fail .
+    run_check statix check .
     run_check nixfmt-tree --fail-on-change .
   else
+    run_check deadnix --edit .
+    run_check statix fix .
     run_check nixfmt-tree .
   fi
 

@@ -15,17 +15,18 @@
     ];
   };
 
-  networking.firewall = {
-    checkReversePath = "loose";
-    trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ config.services.tailscale.port ];
+  networking = {
+    firewall = {
+      checkReversePath = "loose";
+      trustedInterfaces = [ "tailscale0" ];
+      allowedUDPPorts = [ config.services.tailscale.port ];
+    };
+
+    networkmanager.unmanaged = [ "tailscale0" ];
+    networkmanager.dns = "systemd-resolved";
   };
 
-  networking.networkmanager.unmanaged = [ "tailscale0" ];
-
   services.resolved.enable = true;
-  networking.networkmanager.dns = "systemd-resolved";
-
   environment.persistence."/persist/system".directories = [
     "/var/lib/tailscale"
   ];

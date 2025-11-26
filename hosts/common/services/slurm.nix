@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   lib,
   slurmClusterHardware,
   ...
@@ -16,11 +15,11 @@ let
       masterNode.hostName;
   isMaster = config.networking.hostName == masterNodeName;
   nodeNameList = lib.mapAttrsToList (
-    name: node:
+    _name: node:
     "${node.hostName} CPUs=${toString node.cores} RealMemory=${toString node.ram_mb} State=UNKNOWN"
   ) slurmClusterHardware;
   computeNodesHardware = lib.filterAttrs (
-    name: node: !(node.isSlurmMaster or false)
+    _name: node: !(node.isSlurmMaster or false)
   ) slurmClusterHardware;
   computeNodeNamesForPartition = lib.concatStringsSep "," (
     map (node: node.hostName) (lib.attrValues computeNodesHardware)
@@ -36,8 +35,31 @@ let
   '' nodeNameList;
 in
 {
-  services.timesyncd.enable = true;
-  services.munge.enable = true;
+  services = {
+    timesyncd.enable = true;
+    munge.enable = true;
+
+    slurm = {
+      server.enable = isMaster;
+      client.enable = true;
+      controlMachine = masterNodeName;
+      clusterName = "nixos-slurm";
+      procTrackType = "proctrack/pgid";
+
+      nodeName = tracedNodeNameList;
+
+      partitionName = [
+        "master Nodes=${masterNodeName} MaxTime=INFINITE State=UP"
+        "compute Nodes=${computeNodeNamesForPartition} Default=YES MaxTime=INFINITE State=UP"
+      ];
+
+      extraConfig = ''
+        AuthType=auth/none
+        CryptoType=crypto/none
+      '';
+    };
+  };
+
   environment.etc."munge/munge.key" = {
     text = "mungeverryweakkeybuteasytointegratoinatest";
     mode = "0400";
@@ -50,24 +72,4 @@ in
     group = "slurm";
   };
   users.groups.slurm = { };
-
-  services.slurm = {
-    server.enable = isMaster;
-    client.enable = true;
-    controlMachine = masterNodeName;
-    clusterName = "nixos-slurm";
-    procTrackType = "proctrack/pgid";
-
-    nodeName = tracedNodeNameList;
-
-    partitionName = [
-      "master Nodes=${masterNodeName} MaxTime=INFINITE State=UP"
-      "compute Nodes=${computeNodeNamesForPartition} Default=YES MaxTime=INFINITE State=UP"
-    ];
-
-    extraConfig = ''
-      AuthType=auth/none
-      CryptoType=crypto/none
-    '';
-  };
 }

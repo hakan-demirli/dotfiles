@@ -126,31 +126,35 @@ in
   };
 
   networking = {
-    hostName = finalArgs.hostName;
+    inherit (finalArgs) hostName;
     networkmanager.enable = true;
   };
 
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1; # required to share your internet
-    # "net.ipv6.conf.all.forwarding" = 1;
+  boot = {
+    kernel.sysctl = {
+      "net.ipv4.ip_forward" = 1; # required to share your internet
+      # "net.ipv6.conf.all.forwarding" = 1;
 
-    # fix too many files open
-    "fs.file-max" = "20480000";
-    "fs.inotify.max_user_watches" = "20480000";
-    "fs.inotify.max_user_instances" = "20480000";
-    "fs.inotify.max_queued_events" = "20480000";
+      # fix too many files open
+      "fs.file-max" = "20480000";
+      "fs.inotify.max_user_watches" = "20480000";
+      "fs.inotify.max_user_instances" = "20480000";
+      "fs.inotify.max_queued_events" = "20480000";
+    };
+
+    kernelPackages = pkgs.linuxPackages_latest;
+
+    kernelParams = [
+
+    ];
+
+    supportedFilesystems = [ "ntfs" ];
+    binfmt.emulatedSystems = finalArgs.emulatedSystems;
   };
 
   systemd.services.NetworkManager-wait-online.enable = false;
   systemd.network.wait-online.enable = false;
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  boot.kernelParams = [
-
-  ];
-
-  boot.supportedFilesystems = [ "ntfs" ];
   fileSystems."/mnt/second" = {
     device = "/dev/disk/by-uuid/120CC7A90CC785E7";
     fsType = "ntfs-3g";
@@ -193,8 +197,5 @@ in
   };
 
   hardware.keyboard.qmk.enable = true;
-
-  boot.binfmt.emulatedSystems = finalArgs.emulatedSystems;
-
   system.stateVersion = "25.05";
 }

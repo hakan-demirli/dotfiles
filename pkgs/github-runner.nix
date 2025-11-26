@@ -160,7 +160,7 @@
       let
         enabledRunners = lib.filterAttrs (_: cfg: cfg.enable) config.services.github-runners-urlFile;
       in
-      (lib.flip lib.mapAttrs' enabledRunners (
+      lib.flip lib.mapAttrs' enabledRunners (
         name: cfg:
         let
           svcName = "github-runner-${name}";
@@ -371,6 +371,6 @@
             cfg.serviceOverrides
           ];
         }
-      ));
+      );
   };
 }
