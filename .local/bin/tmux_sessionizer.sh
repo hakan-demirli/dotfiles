@@ -29,14 +29,25 @@ tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:pane_cu
                 target = n
             }
 
-            path_arr[target] = c_green path_arr[target] c_reset
+            label_text = path_arr[target]
 
+            if (length(label_text) > 15) {
+                label_text = substr(label_text, 1, 15)
+            }
+            padding = ""
+            if (length(label_text) < 15) {
+                padding = sprintf("%*s", 15 - length(label_text), "")
+            }
+            label_col = c_green label_text c_reset padding
+
+            session_col = sprintf("%-15s", meta[1])
+            path_arr[target] = c_green path_arr[target] c_reset
             new_path = path_arr[1]
             for (j=2; j<=n; j++) {
                 new_path = new_path "/" path_arr[j]
             }
 
-            print parts[1] "|" meta[1] ": " new_path
+            print parts[1] "|" label_col " " session_col ": " new_path
         }
     }
 ' \
