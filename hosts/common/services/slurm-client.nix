@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   slurmClusterHardware,
   ...
@@ -12,8 +11,20 @@ let
   masterNodeName = if masterNode == null then throw "No Slurm master found." else masterNode.hostName;
 in
 {
-  services.timesyncd.enable = true;
-  services.munge.enable = true;
+  services = {
+    timesyncd.enable = true;
+    munge.enable = true;
+    slurm = {
+      enableStools = true;
+      controlMachine = masterNodeName;
+      clusterName = "nixos-slurm";
+      extraConfig = ''
+        AuthType=auth/none
+        CryptoType=crypto/none
+      '';
+    };
+  };
+
   environment.etc."munge/munge.key" = {
     text = "mungeverryweakkeybuteasytointegratoinatest";
     mode = "0400";
@@ -26,13 +37,4 @@ in
     group = "slurm";
   };
   users.groups.slurm = { };
-
-  services.slurm.enableStools = true;
-
-  services.slurm.controlMachine = masterNodeName;
-  services.slurm.clusterName = "nixos-slurm";
-  services.slurm.extraConfig = ''
-    AuthType=auth/none
-    CryptoType=crypto/none
-  '';
 }

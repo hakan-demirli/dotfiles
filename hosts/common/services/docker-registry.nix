@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.dockerRegistry = {
     enable = true;
     listenAddress = "0.0.0.0";
