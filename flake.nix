@@ -40,7 +40,7 @@
               ram_mb = 21000;
             };
             extraImports = [
-              ./pkgs/sshfs-mount.nix
+              # ./pkgs/sshfs-mount.nix
             ];
           };
         };
@@ -78,7 +78,7 @@
               ./hosts/common/services/headscale.nix
               ./hosts/common/services/fail2ban.nix
               ./hosts/common/services/docker-registry.nix
-              ./pkgs/sshfs-mount.nix
+              # ./pkgs/sshfs-mount.nix
             ];
             allowedUDPPorts = [
               3478 # STUN for Headscale/DERP
@@ -224,8 +224,8 @@
                 ./hosts/common/services/warp.nix
                 ./hosts/common/services/tailscale.nix
                 ./hosts/common/services/reverse-ssh-client.nix
-              ]
-              ++ lib.optional (server.name != "s01") ./pkgs/sshfs-mount.nix;
+              ];
+              # ++ lib.optional (server.name != "s01") ./pkgs/sshfs-mount.nix;
             };
           };
         }) localX86Servers
