@@ -34,7 +34,7 @@
   };
 
   powerManagement = {
-    enable = true;
+    enable = lib.mkDefault true;
     cpuFreqGovernor = lib.mkDefault "schedutil";
   };
 }
