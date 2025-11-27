@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+FILE="$1"
+if [ -z "$FILE" ]; then
+  echo "Usage: ytransfer <file>"
+  exit 1
+fi
+
+ABS_FILE=$(realpath "$FILE")
+
+transfer_file() {
+  local src="$1"
+
+  if [[ $TERM == *"kitty"* ]]; then
+    if command -v kitten > /dev/null 2>&1; then
+      kitten transfer "$src" ./Downloads/
+      return 0
+    else
+      echo "TERM claims to be '$TERM', but 'kitten' binary not found."
+      echo "(Did you ssh with 'kitty +kitten ssh user@host'?)"
+    fi
+  fi
+
+  if [[ $TERM_PROGRAM == "WezTerm" ]] || [[ $TERM_PROGRAM == "iTerm.app" ]] || [[ $LC_TERMINAL == "iTerm2" ]]; then
+    if command -v base64 > /dev/null 2>&1; then
+      local fn
+      fn=$(basename "$src")
+      printf "\033]1337;File=name=%s;size=%d:" "$(echo -n "$fn" | base64 | tr -d '\n')" "$(wc -c < "$src")"
+      base64 < "$src" | tr -d '\n'
+      printf "\a"
+      return 0
+    fi
+  fi
+
+  if command -v sz > /dev/null 2>&1; then
+    sz --quiet "$src"
+    return 0
+  fi
+
+  echo "Error: No suitable transfer method found."
+  echo "  TERM: $TERM"
+  echo "  TERM_PROGRAM: $TERM_PROGRAM"
+  return 1
+}
+
+IS_REMOTE=0
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -n "$SSH_CONNECTION" ]; then
+  IS_REMOTE=1
+fi
+
+MENU_ITEMS=""
+if [ "$IS_REMOTE" -eq 1 ]; then
+  MENU_ITEMS="back-home"$'\n'
+fi
+SSH_HOSTS=$(grep -P "^Host " ~/.ssh/config 2> /dev/null | awk '{print $2}' | grep -F -v "*")
+MENU_ITEMS+="$SSH_HOSTS"
+
+TARGET=$(echo -e "$MENU_ITEMS" | fzf --layout=reverse --prompt="Transfer $(basename "$FILE") to > ")
+
+if [ -z "$TARGET" ]; then exit 0; fi
+
+if [ "$TARGET" == "back-home" ]; then
+  transfer_file "$ABS_FILE"
+  exit 0
+fi
+
+echo "Connecting to $TARGET..."
+REMOTE_TMP="/tmp/yazi_cwd_$$"
+ssh -t "$TARGET" "yazi --cwd-file '$REMOTE_TMP'"
+Q_REMOTE_TMP=$(printf %q "$REMOTE_TMP")
+# shellcheck disable=SC2029
+REMOTE_DIR=$(ssh "$TARGET" "cat $Q_REMOTE_TMP && rm -f $Q_REMOTE_TMP")
+REMOTE_DIR=$(echo "$REMOTE_DIR" | tr -d '\r\n')
+
+if [ -z "$REMOTE_DIR" ]; then
+  echo "Cancelled."
+  exit 0
+fi
+
+echo "Transferring to $TARGET:$REMOTE_DIR/"
+if ssh "$TARGET" "command -v rsync >/dev/null 2>&1"; then
+  rsync -avP "$ABS_FILE" "$TARGET":"$REMOTE_DIR/"
+else
+  scp -r "$ABS_FILE" "$TARGET":"$REMOTE_DIR/"
+fi
