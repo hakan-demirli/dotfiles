@@ -8,6 +8,8 @@ _: {
 
       # Nvidia GPU goes full throttle without this
       RUNTIME_PM_ON_AC = "auto";
+      # Ethernet adapter doesn't work: lspci | grep -i ethernet
+      RUNTIME_PM_DENYLIST = "02:00.0";
 
       PLATFORM_PROFILE_ON_AC = "balanced";
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
