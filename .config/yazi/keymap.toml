@@ -39,7 +39,8 @@ keymap = [
 	{ on = [ "<Space>", "f" ], run = "plugin fzf", desc = "jump to file using fzf" },
 	{ on = [ "<Space>", "F" ], run = "create",     desc = "Create a file or directory (ends with / for directories)" },
 	{ on = [ "<Space>", "D" ], run = "create",     desc = "Create a file or directory (ends with / for directories)" },
-	{ on = [ "<Space>", "y" ], run = "copy path",  desc = "Copy the absolute path" },
+	{ on = [ "<Space>", "y", "p" ], run = "copy path",  desc = "Copy the absolute path" },
+	{ on = [ "<Space>", "y", "r" ], run = [''' shell --block --confirm 'gtransfer "$@"' ''',"escape"],   desc = "Transfer Menu (Remote/Upload)" },
 	# { on = [ "<Space>", "x" ], run = "extract",    desc = "Extract archive" },
 	{ on = [ "<Space>", "c" ], run = [''' shell --block --confirm 'yazi_zip "$@"' ''',"escape"], desc = "Zip selected" },
 	# ripdrag fails when nvidia gpu is enabled. Use dragon as alternative
