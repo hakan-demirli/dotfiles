@@ -10,8 +10,6 @@
     nixos.enable = lib.mkDefault false;
   };
 
-  fonts.fontconfig.enable = true;
-
   programs = {
     bash.completion.enable = true;
     command-not-found.enable = false;

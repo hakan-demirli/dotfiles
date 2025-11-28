@@ -14,6 +14,7 @@ let
     username = "emre";
     uid = 1000;
     emulatedSystems = [ ];
+    minimalFonts = false;
 
     hashedPassword = throw "You must specify a hashedPassword";
     hardwareConfiguration = throw "You must specify a hardwareConfiguration";
@@ -82,6 +83,7 @@ in
 
   imports = [
     ../common/system/base.nix
+    ../common/system/fonts.nix
     ../common/system/locale.nix
 
     ../common/hardware/disko-btrfs-lvm.nix
@@ -163,11 +165,6 @@ in
       "uid=${toString finalArgs.uid}"
     ];
   };
-
-  fonts.packages = [
-    pkgs.nerd-fonts.jetbrains-mono
-    pkgs.corefonts
-  ];
 
   environment.systemPackages = with pkgs; [
     home-manager
