@@ -14,6 +14,7 @@ let
     username = "emre";
     uid = 1000;
     emulatedSystems = [ ];
+    minimalFonts = true;
 
     hashedPassword = throw "You must specify a hashedPassword";
     hardwareConfiguration = throw "You must specify a hardwareConfiguration";
@@ -86,6 +87,7 @@ in
   imports = [
     # Common Modules
     ../common/system/base.nix
+    ../common/system/fonts.nix
     ../common/system/locale.nix
     # ../common/system/network.nix # NetworkManager enabled below
     ../common/hardware/disko-btrfs-lvm.nix
