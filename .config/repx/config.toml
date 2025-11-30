@@ -1,18 +1,37 @@
 theme = "default"
 submission_target = "local"
-
+default_scheduler = "local"
 [targets]
-
   [targets.local]
-  base_path = "~/.local/share/repx-store"
-  execution_type = "docker"
+  base_path = "~/Desktop/repx-store"
+  default_scheduler = "local"
+  default_execution_type = "bwrap"
+    [targets.local.local]
+    execution_types = ["bwrap", "native", "docker"]
+    local_concurrency = 15
 
-  [targets.tailscale-vm-oracle-aarch64]
-  base_path = "~/.local/share/repx-store"
-  address = "tailscale-vm-oracle-aarch64"
-  execution_type = "docker"
+    [targets.local.slurm]
+    execution_types = ["bwrap", "native", "docker"]
+
+  [targets.tailscale-s01]
+  address = "tailscale-s01"
+  base_path = "~/Desktop/repx-store"
+  default_scheduler = "slurm"
+  default_execution_type = "bwrap"
+    [targets.tailscale-s01.local]
+    execution_types = ["bwrap", "docker"]
+    local_concurrency = 15
+    [targets.tailscale-s01.slurm]
+    execution_types = ["bwrap", "docker"]
 
   [targets.safari]
-  base_path = "/mnt/galactica/demirlie/.local/share/repx-store"
   address = "safari"
-  execution_type = "podman"
+  base_path = "/mnt/galactica/demirlie/.local/share/repx-store"
+  default_scheduler = "slurm"
+  default_execution_type = "bwrap"
+    [targets.safari.local]
+    execution_types = ["bwrap", "podman"]
+    local_concurrency = 47
+    [targets.safari.slurm]
+    execution_types = ["bwrap", "podman"]
+
