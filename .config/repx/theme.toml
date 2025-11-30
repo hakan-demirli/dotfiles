@@ -2,6 +2,7 @@ name = "Dracula"
 
 [palette]
 background = "#282a36"
+black = "#000000"
 comment = "#6272a4"
 current_line = "#44475a"
 cyan = "#8be9fd"
@@ -22,6 +23,10 @@ styles = []
 color = "red"
 styles = []
 
+[elements.job_status.submit_failed]
+color = "red"
+styles = ["bold"]
+
 [elements.job_status.pending]
 color = "yellow"
 styles = []
@@ -36,6 +41,14 @@ styles = []
 
 [elements.job_status.running]
 color = "cyan"
+styles = []
+
+[elements.job_status.submitting]
+color = "pink"
+styles = ["bold"]
+
+[elements.job_status.unknown]
+color = "comment"
 styles = []
 
 [elements.identifiers.run_id]
@@ -64,6 +77,78 @@ styles = []
 
 [elements.summary.info]
 color = "foreground"
+styles = []
+
+[elements.panels.overview]
+color = "pink"
+styles = []
+
+[elements.panels.targets]
+color = "comment"
+styles = []
+
+[elements.panels.context]
+color = "green"
+styles = []
+
+[elements.panels.logs]
+color = "red"
+styles = []
+
+[elements.panels.runs_jobs]
+color = "cyan"
+styles = []
+
+[elements.graphs.background]
+color = "background"
+styles = []
+
+[elements.graphs.rate_low]
+color = "orange"
+styles = []
+
+[elements.graphs.rate_high]
+color = "yellow"
+styles = []
+
+[elements.tables.row_highlight_fg]
+color = "black"
+styles = ["bold"]
+
+[elements.tables.row_highlight_bg]
+color = "cyan"
+styles = []
+
+[elements.tables.cell_highlight_fg]
+color = "black"
+styles = []
+
+[elements.tables.cell_highlight_bg]
+color = "comment"
+styles = []
+
+[elements.tables.selector]
+color = "yellow"
+styles = []
+
+[elements.target_states.active]
+color = "green"
+styles = ["bold"]
+
+[elements.target_states.inactive]
+color = "yellow"
+styles = []
+
+[elements.popups.border]
+color = "yellow"
+styles = []
+
+[elements.popups.key_fg]
+color = "black"
+styles = ["bold"]
+
+[elements.popups.key_bg]
+color = "yellow"
 styles = []
 
 [symbols]
