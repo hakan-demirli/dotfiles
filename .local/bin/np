@@ -1,65 +1,49 @@
-#!/usr/bin/env python3
+#!/usr/bin/env bash
 
-import shutil
-import subprocess
-import sys
-from pathlib import Path
+REPO_URL="https://github.com/hakan-demirli/code_templates"
+CACHE_DIR="$HOME/.cache/np_templates"
+IGNORE_DIRS=(".git" "_deprecated")
 
-REPO_URL = "https://github.com/hakan-demirli/code_templates"
-CACHE_DIR = Path.home() / ".cache" / "np_templates"
-GIT = shutil.which("git") or "git"
+function update_cache() {
+  if [ -d "$CACHE_DIR" ]; then
+    echo "Updating cache..."
+    git -C "$CACHE_DIR" pull
+  else
+    echo "Cloning templates..."
+    mkdir -p "$(dirname "$CACHE_DIR")"
+    git clone --depth 1 "$REPO_URL" "$CACHE_DIR"
+  fi
+}
 
-"""
-np: new project
-copy a template project to current dir.
-"""
+if [[ $# -gt 0 ]]; then
+  if [[ $1 == "pull" ]]; then
+    update_cache
+    exit 0
+  else
+    echo "Error: Unknown argument '$1'"
+    echo "Usage: $(basename "$0") [pull]"
+    exit 1
+  fi
+fi
 
+if [ ! -d "$CACHE_DIR" ]; then
+  echo "Cache not found. Please run 'np pull' first."
+  exit 1
+fi
 
-def clone_repo():
-    CACHE_DIR.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run([GIT, "clone", "--depth", "1", REPO_URL, str(CACHE_DIR)], check=True)
+find_args=("$CACHE_DIR" -mindepth 1 -maxdepth 1 -type d)
+for dir in "${IGNORE_DIRS[@]}"; do
+  find_args+=(! -name "$dir")
+done
+find_args+=(-printf "%f\n")
 
+selected=$(find "${find_args[@]}" | sort | fzf)
 
-def pull_repo():
-    if CACHE_DIR.exists():
-        try:
-            subprocess.run([GIT, "-C", str(CACHE_DIR), "pull"], check=True)
-            print("Cache updated.")
-        except subprocess.CalledProcessError as e:
-            print(f"Failed to update cache: {e}")
-    else:
-        print("Cache not found. Cloning...")
-        clone_repo()
-
-
-def run_fzf_inside_cache_and_copy():
-    if not CACHE_DIR.exists():
-        print("Cache not found. Run `np pull` first.")
-        sys.exit(1)
-
-    try:
-        dirs = [d for d in CACHE_DIR.iterdir() if d.is_dir()]
-        sorted_dirs = sorted(dirs)
-        fzf_input = "\n".join(str(path) for path in sorted_dirs).encode("utf-8")
-        fzf_proc = subprocess.run(
-            ["fzf"], input=fzf_input, stdout=subprocess.PIPE, check=True
-        )
-        selected_directory = fzf_proc.stdout.decode().strip()
-
-        if selected_directory:
-            selected_path = Path(selected_directory)
-            dest = Path.cwd() / selected_path.name
-            shutil.copytree(selected_path, dest)
-            print(f"Project copied to: {dest}")
-        else:
-            print("No directory selected.")
-
-    except subprocess.CalledProcessError as e:
-        print(f"Operation cancelled or fzf failed: {e}")
-
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "pull":
-        pull_repo()
-    else:
-        run_fzf_inside_cache_and_copy()
+if [ -n "$selected" ]; then
+  if [ -d "$selected" ]; then
+    echo "Directory '$selected' already exists."
+    exit 1
+  fi
+  cp -r "$CACHE_DIR/$selected" .
+  echo "Project copied to: $(pwd)/$selected"
+fi
