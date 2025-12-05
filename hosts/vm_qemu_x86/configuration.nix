@@ -97,6 +97,7 @@ in
     ../common/system/bootloader-grub-efi.nix
     ../common/services/ssh.nix
     ../common/services/docker.nix
+    ../common/services/earlyoom.nix
   ]
   ++ finalArgs.extraImports;
 
