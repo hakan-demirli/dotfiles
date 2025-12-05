@@ -1,4 +1,5 @@
 {
+  config,
   reverseSshRemoteHost ? throw "You must specify a reverseSshRemoteHost",
   allowedUDPPorts ? [ ],
   ...
@@ -65,7 +66,7 @@
 
     tailscale = {
       enable = true;
-      authKeyFile = "/persist/home/emre/Desktop/dotfiles/secrets/tailscale-key";
+      authKeyFile = config.sops.secrets.tailscale-key.path;
       extraUpFlags = [
         "--login-server=https://${reverseSshRemoteHost}"
         "--advertise-exit-node"

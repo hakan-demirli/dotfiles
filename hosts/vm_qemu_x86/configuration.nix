@@ -97,7 +97,6 @@ in
     ../common/system/bootloader-grub-efi.nix
     ../common/services/ssh.nix
     ../common/services/docker.nix
-    ../../pkgs/symlink_secrets.nix
   ]
   ++ finalArgs.extraImports;
 

@@ -138,10 +138,18 @@
   * Rename hostnames: ```sudo headscale nodes rename laptop -i 6```
 
 # Deploy Secrets
-* Decrypt:
-  * ```nix-shell -p openssl```
-  * ```read -sp "Enter passphrase: " password && echo && (head -c8 ~/Desktop/dotfiles/secrets/git-crypt-key | grep -q '^Salted__' || { echo "File does not appear encrypted."; exit 1; }) && (openssl enc -d -aes-256-cbc -pbkdf2 -in ~/Desktop/dotfiles/secrets/git-crypt-key -out /tmp/git-crypt-key -pass pass:"$password" && echo "Decryption complete.") && unset password```
-* If decrypted, secrets are automatically symlinked/deployed on boot using `pkgs/symlink_secrets.nix`
-  * Manual deployment:
-    * ```cd ~/Desktop/dotfiles/ && git-crypt unlock /tmp/git-crypt-key && ln -s ~/Desktop/dotfiles/secrets/{git_tokens,git_users,git_keys} ~/.config/git/ && ln -s ~/Desktop/dotfiles/secrets/.ssh ~/.ssh```
-  *  IF ENCRYPTED DO NOT DEPLOY
+
+## Setup (One-time per machine)
+1. **Decrypt the Master Key** (Install the God Key):
+   * ```nix-shell -p age```
+   * ```sudo mkdir -p /var/lib/sops-nix```
+   * ```age -d secrets/age.key.enc | sudo tee /var/lib/sops-nix/key.txt > /dev/null```
+   * *Enter Passphrase*
+   * ```sudo chmod 600 /var/lib/sops-nix/key.txt```
+2. **Install/Switch**:
+   * ```sudo nixos-rebuild switch --flake .#hostname```
+
+## Editing Secrets
+1. Enter shell: ```nix-shell -p sops```
+2. Edit: ```sops secrets/secrets.yaml```
+   * (Uses config from `secrets/.sops.yaml`)
