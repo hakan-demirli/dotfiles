@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck source-path=SCRIPTDIR
 
-privateEnvFile="$HOME/Desktop/dotfiles/secrets/environment"
+privateEnvFile="$HOME/.config/secrets/environment"
 if [ -f "${privateEnvFile}" ] && [[ "$(file -b --mime-type "${privateEnvFile}")" == "text/plain" ]]; then
   # shellcheck disable=SC1090
   source "${privateEnvFile}"
