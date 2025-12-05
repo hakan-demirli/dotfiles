@@ -60,10 +60,7 @@ _: {
         path = "/home/emre/.config/nix/nixauth";
       };
 
-      "nix-serve-key" = {
-        owner = "nix-serve";
-        group = "nix-serve";
-      };
+      "nix-serve-key" = { };
 
       "environment" = {
         owner = "emre";
