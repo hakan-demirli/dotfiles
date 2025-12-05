@@ -5,5 +5,6 @@
     package = pkgs.nix-serve-ng;
     secretKeyFile = config.sops.secrets.nix-serve-key.path;
     openFirewall = true;
+    port = 5101;
   };
 }
