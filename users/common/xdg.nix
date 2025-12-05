@@ -19,6 +19,7 @@
         "anyrun"
         "awatcher"
         "bat"
+        "bash"
         "btop"
         "cargo"
         "clangd"

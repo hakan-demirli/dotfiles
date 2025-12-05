@@ -3,7 +3,6 @@ _: {
     defaultSopsFile = ../../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
     age.keyFile = "/var/lib/sops-nix/key.txt";
-    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
     secrets = {
       "tailscale-key" = { };
