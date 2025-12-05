@@ -77,6 +77,7 @@
               ./hosts/common/services/headscale.nix
               ./hosts/common/services/fail2ban.nix
               ./hosts/common/services/docker-registry.nix
+              ./hosts/common/services/nix-serve.nix
               # ./pkgs/sshfs-mount.nix
             ];
             allowedUDPPorts = [
