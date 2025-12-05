@@ -150,6 +150,5 @@
    * ```sudo nixos-rebuild switch --flake .#hostname```
 
 ## Editing Secrets
-1. Enter shell: ```nix-shell -p sops```
-2. Edit: ```sops secrets/secrets.yaml```
-   * (Uses config from `secrets/.sops.yaml`)
+* ```nix-shell -p sops age ssh-to-age```
+* ```SOPS_AGE_KEY=$(age -d secrets/age.key.enc) sops secrets/secrets.yaml```
