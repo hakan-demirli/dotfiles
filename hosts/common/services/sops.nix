@@ -74,6 +74,7 @@ _: {
 
   systemd.tmpfiles.rules = [
     "d /home/emre/.ssh 0700 emre users -"
+    "d /home/emre/.config 0755 emre users -"
     "d /home/emre/.config/git 0755 emre users -"
     "d /home/emre/.config/nix 0755 emre users -"
     "d /home/emre/.config/secrets 0755 emre users -"
