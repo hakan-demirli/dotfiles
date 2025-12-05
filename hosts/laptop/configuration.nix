@@ -97,6 +97,7 @@ in
     ../common/services/base-desktop.nix
     ../common/services/warp.nix
     ../common/services/tailscale.nix
+    ../common/services/earlyoom.nix
 
     ./hardware-configuration.nix
     ./nvidia.nix

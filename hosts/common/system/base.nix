@@ -39,7 +39,7 @@
     "panic=30"
     "boot.panic_on_fail"
   ];
-  boot.kernel.sysctl."vm.overcommit_memory" = "1";
+  boot.kernel.sysctl."vm.overcommit_memory" = "0";
 
   environment = {
     variables = {
