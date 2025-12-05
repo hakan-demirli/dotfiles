@@ -11,13 +11,12 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    impermanence = {
-      url = "github:nix-community/impermanence";
-    };
-    small-apps = {
-      url = "github:hakan-demirli/small-apps";
+    impermanence.url = "github:nix-community/impermanence";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    small-apps.url = "github:hakan-demirli/small-apps";
   };
 
   outputs =
@@ -193,7 +192,7 @@
       hashedServerPassword = "$6$hjsD4y4Iy/9ql6dC$WYxNpnvlx9r6TbGwWcXMqzzsyzh6IvftawYlyvwB4/Zr21UNO5eyj87WB2JqcH.EoO3rmP10P5X/d0b6tNcSh/";
       common_ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICDDPkxYuzRBqtndEoRNx/ua5P0KCG9gMsCe77qf+2ie ehdemirli@proton.me";
       reverseTunnelClientPublicKey = common_ssh_key;
-      reverseTunnelClientPrivateKeyPath = "/persist/home/emre/Desktop/dotfiles/secrets/.ssh/id_ed25519_proton";
+      reverseTunnelClientPrivateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
       reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
       reverseSshBounceServerUser = "emre";
       reverseSshBasePort = 42000;
@@ -245,6 +244,8 @@
             inputs.home-manager.nixosModules.home-manager
             inputs.disko.nixosModules.default
             inputs.impermanence.nixosModules.impermanence
+            inputs.sops-nix.nixosModules.sops
+            ./hosts/common/services/sops.nix
             ./overlay.nix
           ]
           ++ (args.argOverrides.extraImports or [ ]);

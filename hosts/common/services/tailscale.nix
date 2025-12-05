@@ -8,7 +8,7 @@
   # warp-cli disconnect
   services.tailscale = {
     enable = true;
-    authKeyFile = "/persist/home/emre/Desktop/dotfiles/secrets/tailscale-key";
+    authKeyFile = config.sops.secrets.tailscale-key.path;
     useRoutingFeatures = "client";
     extraUpFlags = [
       "--login-server=https://${reverseSshRemoteHost}"

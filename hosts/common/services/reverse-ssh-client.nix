@@ -72,15 +72,4 @@ in
     }
   ];
 
-  # This block EXTENDS the service defined above. NixOS will merge them.
-  systemd.services."autossh-${reverseSshSessionName}" = {
-    serviceConfig = {
-      # The '+' prefix tells systemd to run these commands with root privileges,
-      # which is required for chmod to work reliably in this context.
-      ExecStartPre = [
-        "+${pkgs.coreutils}/bin/chmod 700 ${builtins.dirOf reverseSshPrivateKeyPath}"
-        "+${pkgs.coreutils}/bin/chmod 400 ${reverseSshPrivateKeyPath}"
-      ];
-    };
-  };
 }
