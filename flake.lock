@@ -91,17 +91,36 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1764667669,
-        "narHash": "sha256-7WUCZfmqLAssbDqwg9cUDAXrSoXN79eEEq17qhTNM/Y=",
+        "lastModified": 1764831616,
+        "narHash": "sha256-OtzF5wBvO0jgW1WW1rQU9cMGx7zuvkF7CAVJ1ypzkxA=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "418468ac9527e799809c900eda37cbff999199b6",
+        "rev": "c97c47f2bac4fa59e2cbdeba289686ae615f8ed4",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "nixos-unstable",
+        "ref": "nixos-25.11",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nur": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1765040386,
+        "narHash": "sha256-B1T/0kFoIiMchWggBybQ410lzvC7I2R9e9TdVN16LLc=",
+        "owner": "hakan-demirli",
+        "repo": "NUR",
+        "rev": "69985ef5b167961c6dc69cd701d99eda61d9a4d8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hakan-demirli",
+        "repo": "NUR",
         "type": "github"
       }
     },
@@ -111,27 +130,8 @@
         "home-manager": "home-manager",
         "impermanence": "impermanence",
         "nixpkgs": "nixpkgs",
-        "small-apps": "small-apps",
+        "nur": "nur",
         "sops-nix": "sops-nix"
-      }
-    },
-    "small-apps": {
-      "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs_2"
-      },
-      "locked": {
-        "lastModified": 1764586292,
-        "narHash": "sha256-mkUXq3BIWe3PKQiqSI39cQRDnf2Id09UfjQv1jzKh40=",
-        "owner": "hakan-demirli",
-        "repo": "small-apps",
-        "rev": "40eebaed826e8bc5f4056b65f8ccec88313d3413",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hakan-demirli",
-        "repo": "small-apps",
-        "type": "github"
       }
     },
     "sops-nix": {
