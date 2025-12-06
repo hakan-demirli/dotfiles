@@ -67,6 +67,7 @@ let
     ffmpegthumbnailer
     ghostscript
     inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.dap
+    inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.flake-updater
     mutagen
     ouch
     rsync
