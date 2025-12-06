@@ -41,6 +41,16 @@ _: {
         path = "/home/emre/.ssh/id_ed25519_sf.pub";
         mode = "0644";
       };
+      "ssh/gh_action_key" = {
+        owner = "emre";
+        path = "/home/emre/.ssh/gh_action_key";
+        mode = "0600";
+      };
+      "ssh/gh_action_key.pub" = {
+        owner = "emre";
+        path = "/home/emre/.ssh/gh_action_key.pub";
+        mode = "0644";
+      };
 
       "git_tokens" = {
         owner = "emre";
