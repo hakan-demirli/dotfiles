@@ -16,7 +16,7 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    small-apps.url = "github:hakan-demirli/small-apps";
+    nur.url = "github:hakan-demirli/NUR";
   };
 
   outputs =

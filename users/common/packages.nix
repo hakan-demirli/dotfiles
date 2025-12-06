@@ -36,7 +36,7 @@ let
     clippy
     cmake-language-server
     gnumake
-    # inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.markdown-countdown-lsp
+    # inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.markdown-countdown-lsp
     lldb
     lsp-ai
     lua-language-server
@@ -66,7 +66,7 @@ let
     ffmpeg-full
     ffmpegthumbnailer
     ghostscript
-    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.dap
+    inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.dap
     mutagen
     ouch
     rsync
@@ -86,8 +86,8 @@ let
     ++ lib.optional pkgs.stdenv.hostPlatform.isx86_64 cpufrequtils;
 
   desktop-cli = with pkgs; [
-    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.auto_refresh
-    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.youtube_sync
+    inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.auto_refresh
+    inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.youtube_sync
     libnotify
     # libqalculate
     pavucontrol
@@ -105,8 +105,8 @@ let
     hyprlock
     hyprshot
     # imhex
-    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.gtk_applet
-    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.waybar_timer
+    inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.gtk_applet
+    inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.waybar_timer
     kdePackages.breeze-icons
     kdePackages.kolourpaint
     kdePackages.qtimageformats
@@ -115,7 +115,7 @@ let
     mpv
     networkmanagerapplet
     nwg-displays
-    inputs.small-apps.packages.${pkgs.stdenv.hostPlatform.system}.nix-treemap
+    inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.nix-treemap
     (pkgs.callPackage ../../pkgs/gparted.nix { })
     playerctl
     qalculate-qt
