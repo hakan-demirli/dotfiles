@@ -29,7 +29,7 @@
     path = ./git_tokens
 
 [include]
-    path = ./git_keys
+    path = ./git_sign
 
 [http]
 	postBuffer = 1048576000

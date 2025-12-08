@@ -103,6 +103,7 @@ in
     ./hardware-configuration.nix
     ./nvidia.nix
     ./battery.nix
+    ./gnupg.nix
 
     ./virtualisation.nix
     ../common/services/docker.nix
