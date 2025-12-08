@@ -98,6 +98,7 @@ in
     ../common/services/warp.nix
     ../common/services/tailscale.nix
     ../common/services/earlyoom.nix
+    ../common/services/yubikey.nix
 
     ./hardware-configuration.nix
     ./nvidia.nix

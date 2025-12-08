@@ -1,4 +1,11 @@
-_: {
+{ pkgs, ... }:
+
+let
+  publicData = builtins.fromTOML (builtins.readFile ../../../secrets/public.toml);
+  mkPubKey = path: content: "L+ ${path} - - - - ${pkgs.writeText (baseNameOf path) content}";
+in
+{
+
   sops = {
     defaultSopsFile = ../../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
@@ -16,40 +23,20 @@ _: {
         path = "/home/emre/.ssh/id_ed25519";
         mode = "0600";
       };
-      "ssh/id_ed25519.pub" = {
-        owner = "emre";
-        path = "/home/emre/.ssh/id_ed25519.pub";
-        mode = "0644";
-      };
       "ssh/id_ed25519_proton" = {
         owner = "emre";
         path = "/home/emre/.ssh/id_ed25519_proton";
         mode = "0600";
-      };
-      "ssh/id_ed25519_proton.pub" = {
-        owner = "emre";
-        path = "/home/emre/.ssh/id_ed25519_proton.pub";
-        mode = "0644";
       };
       "ssh/id_ed25519_sf" = {
         owner = "emre";
         path = "/home/emre/.ssh/id_ed25519_sf";
         mode = "0600";
       };
-      "ssh/id_ed25519_sf.pub" = {
-        owner = "emre";
-        path = "/home/emre/.ssh/id_ed25519_sf.pub";
-        mode = "0644";
-      };
       "ssh/gh_action_key" = {
         owner = "emre";
         path = "/home/emre/.ssh/gh_action_key";
         mode = "0600";
-      };
-      "ssh/gh_action_key.pub" = {
-        owner = "emre";
-        path = "/home/emre/.ssh/gh_action_key.pub";
-        mode = "0644";
       };
 
       "git_tokens" = {
@@ -89,6 +76,11 @@ _: {
     "d /home/emre/.config/git 0755 emre users -"
     "d /home/emre/.config/nix 0755 emre users -"
     "d /home/emre/.config/secrets 0755 emre users -"
+
+    (mkPubKey "/home/emre/.ssh/id_ed25519.pub" publicData.ssh.id_ed25519_pub)
+    (mkPubKey "/home/emre/.ssh/id_ed25519_proton.pub" publicData.ssh.id_ed25519_proton_pub)
+    (mkPubKey "/home/emre/.ssh/id_ed25519_sf.pub" publicData.ssh.id_ed25519_sf_pub)
+    (mkPubKey "/home/emre/.ssh/gh_action_key.pub" publicData.ssh.gh_action_key_pub)
   ];
 
   environment.persistence."/persist/system".directories = [

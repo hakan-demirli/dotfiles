@@ -23,6 +23,7 @@
     { nixpkgs, ... }@inputs:
     let
       inherit (nixpkgs) lib;
+      publicData = builtins.fromTOML (builtins.readFile ./secrets/public.toml);
       systemArgs = {
 
         laptop = {
@@ -190,10 +191,11 @@
           isSlurmMaster = args.argOverrides.slurmMaster or false;
         }) slurmClusterMembers;
 
-      hashedPassword = "$6$dxLcMi321Rg6B7Nu$tRRLCU/7AEFKg7HW56XIKkbtowfyX4uSOq0M8.pKRZIgg6FrdF9o19yAf1mEov.C.SnhSlXG48rmVbVFqtbEn1";
-      hashedServerPassword = "$6$hjsD4y4Iy/9ql6dC$WYxNpnvlx9r6TbGwWcXMqzzsyzh6IvftawYlyvwB4/Zr21UNO5eyj87WB2JqcH.EoO3rmP10P5X/d0b6tNcSh/";
-      common_ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICDDPkxYuzRBqtndEoRNx/ua5P0KCG9gMsCe77qf+2ie ehdemirli@proton.me";
-      gh_action_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJc3ZOX/1j5c3hhDtVzckc9cxUybO0HwFvgrF+x+x6rr emre@laptop";
+      hashedPassword = publicData.passwords.laptop;
+      hashedServerPassword = publicData.passwords.server;
+      common_ssh_key = publicData.ssh.id_ed25519_proton_pub;
+      gh_action_key = publicData.ssh.gh_action_key_pub;
+
       reverseTunnelClientPublicKey = common_ssh_key;
       reverseTunnelClientPrivateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
       reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
