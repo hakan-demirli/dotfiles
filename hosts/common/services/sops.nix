@@ -3,6 +3,13 @@
 let
   publicData = builtins.fromTOML (builtins.readFile ../../../secrets/public.toml);
   mkPubKey = path: content: "L+ ${path} - - - - ${pkgs.writeText (baseNameOf path) content}";
+
+  gitSignConfigFile = ''
+    [user]
+      signingkey = ${publicData.yubikey.gpg_key_id}
+    [commit]
+      gpgsign = true
+  '';
 in
 {
 
@@ -47,10 +54,6 @@ in
         owner = "emre";
         path = "/home/emre/.config/git/git_users";
       };
-      "git_keys" = {
-        owner = "emre";
-        path = "/home/emre/.config/git/git_keys";
-      };
 
       "nixauth" = {
         owner = "emre";
@@ -81,6 +84,7 @@ in
     (mkPubKey "/home/emre/.ssh/id_ed25519_proton.pub" publicData.ssh.id_ed25519_proton_pub)
     (mkPubKey "/home/emre/.ssh/id_ed25519_sf.pub" publicData.ssh.id_ed25519_sf_pub)
     (mkPubKey "/home/emre/.ssh/gh_action_key.pub" publicData.ssh.gh_action_key_pub)
+    (mkPubKey "/home/emre/.config/git/git_sign" gitSignConfigFile)
   ];
 
   environment.persistence."/persist/system".directories = [
