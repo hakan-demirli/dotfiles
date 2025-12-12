@@ -80,6 +80,7 @@ let
   server-cli =
     with pkgs;
     [
+      systemctl-tui
       bandwhich
       usbutils
     ]
