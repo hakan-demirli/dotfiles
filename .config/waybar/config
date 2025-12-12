@@ -1,6 +1,6 @@
 {
   "layer": "top",
-  // "output": "eDP-1", 
+  // "output": "eDP-1",
   "position": "right",
   "modules-left": [
     "hyprland/workspaces"
@@ -49,11 +49,8 @@
     "on-click": "activate",
     "disable-scroll-wraparound": true,
     "justify": "center",
-    //"persistent_workspaces": {
-    //  "1": [],
-    //  "2": [],
-    //  "3": []
-    //}
+    // "format-icons": { "special": "" },
+    // "show-special":  true
   },
   "clock#h-m": {
     "justify": "center",
@@ -114,28 +111,27 @@
   "backlight": {
     "justify": "center",
     "device": "amdgpu_bl2", // cd /var/lib/systemd/backlight
-    "format": "{icon}\n{percent}%",
-    "format-icons": ["", ""],
+    "format": "{icon}",
+    "format-icons": ["", "", "", "", "", "", "", "", ""],
     "on-scroll-up": "exec brightnessctl s 5%+",
     "on-scroll-down": "exec brightnessctl s 5%-",
+    "tooltip-format": "Brighntess {}%",
     "reverse-scrolling": 1
   },
-  "battery": { // 6 space max size preoccupied
+  "battery": {
     "justify": "center",
-    "format": "{icon}\n {capacity}%\n{time}",
+    "format": "{icon}\n{capacity}%",
     "format-icons": {
-      "default": [
-        "",
-        "",
-        "",
-        ""
-      ],
-      "plugged": " "
+      "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+      "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"],
+      "plugged": ""
     },
     "format-time": "{H}h{M}m",
-    "format-charging": " {icon}\n {capacity}%\n{time}",
-    "format-full": " {icon}",
+    "format-discharging": "{icon}\n{capacity}%\n{time}",
+    "format-charging": "{icon}\n{capacity}%\n{time}",
+    "format-full": "󱟢\n{capacity}%",
     "interval": 5,
+    "format-plugged": "\n{capacity}%",
     "states": {
       "warning": 25,
       "critical": 10
