@@ -28,6 +28,7 @@ let
   ai = with pkgs; [
     aider-chat
     aichat
+    opencode
   ];
 
   lsp = with pkgs; [
