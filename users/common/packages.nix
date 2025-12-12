@@ -80,8 +80,6 @@ let
   server-cli =
     with pkgs;
     [
-      adb-sync
-      android-tools
       bandwhich
       usbutils
     ]
@@ -90,6 +88,8 @@ let
   desktop-cli = with pkgs; [
     inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.auto_refresh
     inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.youtube_sync
+    adb-sync
+    android-tools
     libnotify
     # libqalculate
     pavucontrol
