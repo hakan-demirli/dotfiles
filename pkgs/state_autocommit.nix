@@ -33,7 +33,7 @@ let
       COMMIT_MSG+=$'\n\nChanges:\n'"$CHANGED_FILES"
     fi
 
-    git commit -m "$COMMIT_MSG"
+    git commit --no-gpg-sign -m "$COMMIT_MSG"
 
     echo "Successfully created a new state commit."
   '';
