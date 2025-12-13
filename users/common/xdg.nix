@@ -18,6 +18,7 @@
         "aider"
         "anyrun"
         "awatcher"
+        "wayscriber"
         "bat"
         "bash"
         "btop"
