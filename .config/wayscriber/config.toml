@@ -1,0 +1,40 @@
+[keybindings]
+exit = [
+    "Escape",
+    "Ctrl+Q",
+    "Alt+Q",
+]
+undo = ["Ctrl+Z", "U"]
+redo = [
+    "Ctrl+Shift+Z",
+    "Ctrl+Y",
+    "Shift+U"
+]
+toggle_help = [
+    "F10",
+    "F1",
+    "Shift+H"
+]
+toggle_status_bar = [
+    "F12",
+    "F4",
+    "Shift+B"
+]
+toggle_toolbar = [
+    "F2",
+    "F9",
+    "Shift+T"
+]
+
+[capture]
+enabled = true
+save_directory = "~/Documents"
+filename_template = "screenshot_%Y-%m-%d_%H%M%S"
+format = "png"
+copy_to_clipboard = true
+
+[ui.toolbar]
+show_status_bar = false
+top_pinned = false
+side_pinned = false
+
