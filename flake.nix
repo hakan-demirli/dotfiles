@@ -325,10 +325,27 @@
           };
         }
       );
+
+      formatter = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        pkgs.callPackage ./nix/formatter.nix { }
+      );
+      checks = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        import ./nix/checks.nix { inherit pkgs; }
+      );
     in
     {
       inherit nixosConfigurations;
       inherit devShells;
       inherit packages;
+      inherit formatter;
+      inherit checks;
     };
 }
