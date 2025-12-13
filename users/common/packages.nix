@@ -106,7 +106,10 @@ let
     exfatprogs
     hypridle
     hyprlock
-    hyprshot
+    # hyprshot
+    grim
+    slurp
+    wayscriber
     # imhex
     inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.gtk_applet
     inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.waybar_timer
