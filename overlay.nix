@@ -26,17 +26,17 @@ _: {
       });
 
       wayscriber = prev.wayscriber.overrideAttrs (_oldAttrs: rec {
-        version = "0.8.9";
+        version = "0.9.6";
         src = prev.fetchFromGitHub {
           owner = "devmobasa";
           repo = "wayscriber";
           tag = "v${version}";
-          hash = "sha256-NQmi9JozGOD/EQ8dMiBCgIziUmjwhInxypX9dyk3TTY=";
+          hash = "sha256-6NhwHebGarFpgPLYD5STMutn4XyoQeW5bPqhamfGJhA=";
         };
         cargoDeps = prev.rustPlatform.fetchCargoVendor {
           inherit src;
           name = "wayscriber-${version}-cargo-deps";
-          hash = "sha256-c/eSzYyAELeP8zU1nnkbmx1E8U1EY5zAR55Wp2zLn9k=";
+          hash = "sha256-3RKkppcDJun6dOpspExni6pgU/1PuDOj+YwgogxUti4=";
         };
       });
     })
