@@ -8,7 +8,7 @@ let
     hostName = throw "You must specify a hostName";
     diskDevice = "/dev/vda";
     swapSize = "8G";
-    timeZone = "Europe/Istanbul";
+    timeZone = "Europe/Zurich";
     defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = { };
     username = "emre";

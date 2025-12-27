@@ -8,7 +8,7 @@ let
     hostName = "laptop";
     diskDevice = "/dev/nvme1n1";
     swapSize = "32G";
-    timeZone = "Europe/Istanbul";
+    timeZone = "Europe/Zurich";
     defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = { };
     username = "emre";
