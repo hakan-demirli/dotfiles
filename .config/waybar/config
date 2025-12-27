@@ -172,7 +172,7 @@
     "format": "{}",
     "tooltip": true,
     "interval": 60,
-    "exec": "wttrbar --location Ankara",
+    "exec": "wttrbar --location Zürich",
     "return-type": "json"
   },
   "custom/timer": {
