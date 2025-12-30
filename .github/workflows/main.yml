@@ -33,20 +33,30 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - host: laptop
-            # runner: ubuntu-latest
-          - host: vm_oracle_x86
-            runner: ubuntu-latest
-          - host: vm_qemu_x86
-            runner: ubuntu-latest
-          - host: s01
-            runner: ubuntu-latest
-          # - host: s02
+          # - name: laptop
+          #   target: nixosConfigurations.laptop.config.system.build.toplevel
           #   runner: ubuntu-latest
-          - host: vm_oracle_aarch64
+          - name: vm_oracle_x86
+            target: nixosConfigurations.vm_oracle_x86.config.system.build.toplevel
+            runner: ubuntu-latest
+          - name: vm_qemu_x86
+            target: nixosConfigurations.vm_qemu_x86.config.system.build.toplevel
+            runner: ubuntu-latest
+          - name: s01
+            target: nixosConfigurations.s01.config.system.build.toplevel
+            runner: ubuntu-latest
+          # - name: s02
+          #   target: nixosConfigurations.s02.config.system.build.toplevel
+          #   runner: ubuntu-latest
+          - name: vm_oracle_aarch64
+            target: nixosConfigurations.vm_oracle_aarch64.config.system.build.toplevel
             runner: ubuntu-22.04-arm
-          # - host: vm_qemu_aarch64
-            # runner: ubuntu-22.04-arm
+          # - name: vm_qemu_aarch64
+          #   target: nixosConfigurations.vm_qemu_aarch64.config.system.build.toplevel
+          #   runner: ubuntu-22.04-arm
+          - name: kexec
+            target: kexec
+            runner: ubuntu-22.04-arm
 
     runs-on: ${{ matrix.runner }}
 
@@ -55,5 +65,5 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v11
       - name: Enable Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v7
-      - name: Build system for ${{ matrix.host }}
-        run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
+      - name: Build ${{ matrix.name }}
+        run: nix build .#${{ matrix.target }}
