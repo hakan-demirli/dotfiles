@@ -17,7 +17,6 @@ let
         enable = true;
       };
 
-      # XDG directories configuration
       xdg = {
         enable = true;
         userDirs = {
@@ -34,7 +33,6 @@ let
         };
       };
 
-      # Bash configuration
       programs.bash = {
         enable = true;
         enableCompletion = true;
