@@ -18,7 +18,6 @@
     inputs.flake-parts.flakeModules.modules
   ];
 
-  # set flake.systems
   systems = [
     "aarch64-darwin"
     "aarch64-linux"

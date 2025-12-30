@@ -1,5 +1,5 @@
 {
-  flake.modules.nixos.services-docker = { config, ... }: {
+  flake.modules.nixos.services-docker = _: {
     virtualisation.docker.enable = true;
     virtualisation.docker.storageDriver = "btrfs";
 

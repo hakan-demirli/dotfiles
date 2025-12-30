@@ -1,5 +1,5 @@
 {
-  flake.modules.nixos.system-battery = { ... }: {
+  flake.modules.nixos.system-battery = _: {
     services.power-profiles-daemon.enable = false;
     powerManagement.enable = false;
     services.tlp = {

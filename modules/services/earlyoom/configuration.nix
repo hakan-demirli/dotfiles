@@ -1,5 +1,5 @@
 {
-  flake.modules.nixos.services-earlyoom = { ... }: {
+  flake.modules.nixos.services-earlyoom = _: {
     services.earlyoom = {
       enable = true;
       freeMemThreshold = 10;

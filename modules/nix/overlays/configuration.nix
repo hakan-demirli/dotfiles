@@ -25,22 +25,6 @@
             prev.gst_all_1.gst-vaapi
           ];
         });
-
-        # TODO: wayscriber overlay - needs proper hashes
-        # wayscriber = prev.wayscriber.overrideAttrs (_oldAttrs: rec {
-        #   version = "0.9.7";
-        #   src = prev.fetchFromGitHub {
-        #     owner = "devmobasa";
-        #     repo = "wayscriber";
-        #     tag = "v${version}";
-        #     hash = ""; # TODO: get proper hash
-        #   };
-        #   cargoDeps = prev.rustPlatform.fetchCargoVendor {
-        #     inherit src;
-        #     name = "wayscriber-${version}-cargo-deps";
-        #     hash = ""; # TODO: get proper hash
-        #   };
-        # });
       })
     ];
   };

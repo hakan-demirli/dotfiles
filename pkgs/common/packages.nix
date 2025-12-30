@@ -69,17 +69,22 @@ let
     ghostscript
     inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.dap
     inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.flake-updater
-    mutagen
+    # mutagen
     ouch
     rsync
+    curl
+    wget
+    file
     # unar
     zip
+    unzip
     openssl
   ];
 
   server-cli =
     with pkgs;
     [
+      btop
       systemctl-tui
       bandwhich
       usbutils

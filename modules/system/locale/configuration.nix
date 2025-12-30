@@ -1,5 +1,5 @@
 {
-  flake.modules.nixos.system-locale = { config, lib, ... }: {
+  flake.modules.nixos.system-locale = _: {
     time.hardwareClockInLocalTime = false;
 
     i18n = {

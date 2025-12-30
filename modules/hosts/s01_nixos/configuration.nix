@@ -1,6 +1,5 @@
 {
   inputs,
-  lib,
   ...
 }:
 let
@@ -11,102 +10,89 @@ let
   serverId = 1;
 in
 {
-  flake.modules.nixos.s01 = { config, pkgs, ... }: {
-    imports = with inputs.self.modules.nixos; [
-      system-base
-      system-fonts
-      system-locale
-      system-impermanence
-      system-boot-grub
-      system-disko-btrfs-lvm
-      user-base
-      nix-settings
-      services-ssh
-      services-docker
-      services-earlyoom
-      services-reverse-ssh-client
-      services-warp
-      services-tailscale
-      s01-hardware
-    ];
-
-    # Host specific config
-    networking.hostName = "s01";
-    networking.networkmanager.enable = true;
-    time.timeZone = "Europe/Zurich";
-
-    # Headless server target
-    systemd.defaultUnit = "multi-user.target";
-
-    # Options from modules
-    system.disko = {
-      device = "/dev/nvme0n1";
-      swapSize = "32G";
-    };
-
-    boot.loader.grub.device = "nodev";
-
-    system.impermanence = {
-      username = "emre";
-      uid = 1000;
-      persistentDirs = [
-        "/var/lib/nixos"
-        "/var/lib/systemd/coredump"
-        "/etc/NetworkManager/system-connections"
-        "/root/.cache/nix"
+  flake.modules.nixos.s01 =
+    { pkgs, ... }:
+    {
+      imports = with inputs.self.modules.nixos; [
+        system-base
+        system-fonts
+        system-locale
+        system-impermanence
+        system-boot-grub
+        system-disko-btrfs-lvm
+        user-base
+        nix-settings
+        services-ssh
+        services-docker
+        services-earlyoom
+        services-reverse-ssh-client
+        services-warp
+        services-tailscale
+        s01-hardware
       ];
+
+      networking.hostName = "s01";
+      networking.networkmanager.enable = true;
+      time.timeZone = "Europe/Zurich";
+
+      systemd.defaultUnit = "multi-user.target";
+
+      system.disko = {
+        device = "/dev/nvme0n1";
+        swapSize = "32G";
+      };
+
+      boot.loader.grub.device = "nodev";
+
+      system.impermanence = {
+        username = "emre";
+        uid = 1000;
+        persistentDirs = [
+          "/var/lib/nixos"
+          "/var/lib/systemd/coredump"
+          "/etc/NetworkManager/system-connections"
+          "/root/.cache/nix"
+        ];
+      };
+
+      system.user = {
+        username = "emre";
+        uid = 1000;
+        hashedPassword = publicData.passwords.server;
+        useHomeManager = true;
+        homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+      };
+
+      services.ssh = {
+        allowPasswordAuth = false;
+        rootSshKeys = [ publicData.ssh.id_ed25519_proton_pub ];
+      };
+
+      services.reverse-ssh-client = {
+        enable = true;
+        username = "emre";
+        remoteHost = reverseSshBounceServerHost;
+        remotePort = reverseSshBasePort + serverId; # 42001
+        remoteUser = reverseSshBounceServerUser;
+        privateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
+      };
+
+      services.tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
+
+      sops.defaultSopsFile = inputs.self + /secrets/secrets.yaml;
+      sops.age.keyFile = "/var/lib/sops-nix/key.txt";
+      sops.secrets.tailscale-key = { };
+
+      users.users.emre.openssh.authorizedKeys.keys = [ publicData.ssh.id_ed25519_proton_pub ];
+
+      nix.custom = {
+        allowUnfree = true;
+        cudaSupport = false;
+        rocmSupport = false;
+        username = "emre";
+      };
+
+      boot.kernelPackages = pkgs.linuxPackages_latest;
+      system.stateVersion = "25.05";
     };
-
-    system.user = {
-      username = "emre";
-      uid = 1000;
-      hashedPassword = publicData.passwords.server;
-      useHomeManager = true;
-      homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
-    };
-
-    services.ssh = {
-      allowPasswordAuth = false;
-      rootSshKeys = [ publicData.ssh.id_ed25519_proton_pub ];
-    };
-
-    # Reverse tunnel to bounce server
-    services.reverse-ssh-client = {
-      enable = true;
-      username = "emre";
-      remoteHost = reverseSshBounceServerHost;
-      remotePort = reverseSshBasePort + serverId;  # 42001
-      remoteUser = reverseSshBounceServerUser;
-      privateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
-    };
-
-    services.tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
-
-    sops.defaultSopsFile = inputs.self + /secrets/secrets.yaml;
-    sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-    sops.secrets.tailscale-key = {};
-
-    users.users.emre.openssh.authorizedKeys.keys = [ publicData.ssh.id_ed25519_proton_pub ];
-
-    nix.custom = {
-      allowUnfree = true;
-      cudaSupport = false;
-      rocmSupport = false;
-      username = "emre";
-    };
-
-    environment.systemPackages = with pkgs; [
-      home-manager
-      git
-      btop
-      fzf
-      git-crypt
-      wget
-      neovim
-      file
-    ];
-
-    boot.kernelPackages = pkgs.linuxPackages_latest;
-    system.stateVersion = "25.05";
-  };
 }

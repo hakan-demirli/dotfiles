@@ -1,9 +1,5 @@
-{
-  inputs,
-  ...
-}:
-{
-  flake.modules.nixos.services-docker-registry = { ... }: {
+_: {
+  flake.modules.nixos.services-docker-registry = _: {
     services.dockerRegistry = {
       enable = true;
       listenAddress = "0.0.0.0";

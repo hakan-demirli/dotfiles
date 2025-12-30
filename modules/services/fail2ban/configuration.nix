@@ -1,9 +1,5 @@
-{
-  inputs,
-  ...
-}:
-{
-  flake.modules.nixos.services-fail2ban = { ... }: {
+_: {
+  flake.modules.nixos.services-fail2ban = _: {
     services.fail2ban = {
       enable = true;
 
@@ -12,7 +8,7 @@
       bantime-increment = {
         enable = true;
         multipliers = "1 2 4 8 16 32 64";
-        maxtime = "168h";  # 1 week
+        maxtime = "168h"; # 1 week
       };
 
       jails = {

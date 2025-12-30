@@ -10,6 +10,7 @@ let
     let
       desktopDir = "/home/${username}/Desktop";
       historyFile = "${desktopDir}/history";
+      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
     in
     {
       targets.genericLinux = {
@@ -37,10 +38,13 @@ let
       programs.bash = {
         enable = true;
         enableCompletion = true;
-        historyFile = historyFile;
+        inherit historyFile;
         historyFileSize = 10000000;
         historySize = 10000000;
-        historyControl = [ "ignoredups" "ignorespace" ];
+        historyControl = [
+          "ignoredups"
+          "ignorespace"
+        ];
         shellOptions = [
           "histappend"
           "checkwinsize"
@@ -86,35 +90,13 @@ let
         stateVersion = "25.05";
       };
 
-      home.packages = with pkgs; [
-        # dev-essentials
-        git
-        gnumake
-        cmake
-        gcc
-        rsync
-
-        # editors
-        neovim
-
-        # tools-cli
-        btop
-        fzf
-        ripgrep
-        fd
-        jq
-        yq
-        tree
-        wget
-        curl
-        file
-        unzip
-        zip
-
-        # server-cli
-        tmux
-        htop
-      ];
+      home.packages =
+        common-packages.dev-essentials
+        ++ common-packages.editors
+        ++ common-packages.tools-cli
+        ++ common-packages.server-cli
+        ++ common-packages.ai
+        ++ common-packages.lsp;
     };
 in
 {

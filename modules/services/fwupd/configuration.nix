@@ -1,9 +1,5 @@
-{
-  inputs,
-  ...
-}:
-{
-  flake.modules.nixos.services-fwupd = { ... }: {
+_: {
+  flake.modules.nixos.services-fwupd = _: {
     services.fwupd.enable = true;
   };
 }

@@ -42,7 +42,10 @@ let
 
         "io/github/seadve/Kooha" = {
           capture-mode = "monitor-window";
-          framerate = inputs.home-manager.lib.hm.gvariant.mkTuple [ 20 1 ];
+          framerate = inputs.home-manager.lib.hm.gvariant.mkTuple [
+            20
+            1
+          ];
           profile-id = "matroska-h264";
           record-delay = inputs.home-manager.lib.hm.gvariant.mkUint32 3;
           saving-location = mkRawGVariant "b'${koohaDocsPath}'";

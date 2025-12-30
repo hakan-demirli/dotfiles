@@ -17,45 +17,46 @@
     };
   };
 
-  config.flake.modules.nixos.system-server-base = { config, pkgs, lib, ... }:
-  let
-    cfg = config.system.server;
-  in
-  lib.mkIf cfg.enable {
-    imports = with inputs.self.modules.nixos; [
-      system-base
-      system-fonts
-      system-locale
-      system-impermanence
-      system-boot-grub
-      system-disko-btrfs-lvm
-      user-base
-      nix-settings
-      services-ssh
-      services-docker
-      services-earlyoom
-    ];
+  config.flake.modules.nixos.system-server-base =
+    {
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    let
+      cfg = config.system.server;
+      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+    in
+    lib.mkIf cfg.enable {
+      imports = with inputs.self.modules.nixos; [
+        system-base
+        system-fonts
+        system-locale
+        system-impermanence
+        system-boot-grub
+        system-disko-btrfs-lvm
+        user-base
+        nix-settings
+        services-ssh
+        services-docker
+        services-earlyoom
+      ];
 
-    networking = {
-      hostName = cfg.hostName;
-      networkmanager.enable = true;
+      networking = {
+        inherit (cfg) hostName;
+        networkmanager.enable = true;
+      };
+
+      systemd.defaultUnit = "multi-user.target";
+
+      environment.systemPackages =
+        common-packages.server-cli
+        ++ (with pkgs; [
+          home-manager
+          git-crypt
+        ]);
+
+      boot.kernelPackages = pkgs.linuxPackages_latest;
     };
-
-    # Headless server target
-    systemd.defaultUnit = "multi-user.target";
-
-    # Basic packages for a headless server
-    environment.systemPackages = with pkgs; [
-      home-manager
-      git
-      btop
-      fzf
-      git-crypt
-      wget
-      neovim
-      file
-    ];
-
-    boot.kernelPackages = pkgs.linuxPackages_latest;
-  };
 }

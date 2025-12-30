@@ -3,59 +3,25 @@
   ...
 }:
 {
-  # Packages output for portable barebone environment as buildEnv
-  perSystem = { pkgs, system, ... }:
-  let
-    barebonePackages = with pkgs; [
-      # dev-essentials
-      bat
-      delta
-      fd
-      fzf
-      git
-      jq
-      parallel-full
-      ripgrep
-      tmux
-      trash-cli
-      tree
-      yazi
-      starship
-
-      # editors
-      helix
-      neovim
-      vim
-
-      # lsp
-      clang-tools
-      gnumake
-      lua-language-server
-      nixd
-      nixfmt-rfc-style
-      nodePackages_latest.bash-language-server
-      pyright
-      python3
-      ruff
-      shfmt
-      taplo
-      yaml-language-server
-
-      # tools-cli
-      rsync
-      ouch
-      zip
-      openssl
-
-      # additional essentials
-      ncurses
-      direnv
-    ];
-  in
-  {
-    packages.barebone = pkgs.buildEnv {
-      name = "barebone";
-      paths = barebonePackages;
+  perSystem =
+    { pkgs, ... }:
+    let
+      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+      barebonePackages =
+        common-packages.dev-essentials
+        ++ common-packages.editors
+        ++ common-packages.lsp
+        ++ common-packages.tools-cli
+        ++ [
+          pkgs.ncurses
+          pkgs.direnv
+          pkgs.openssl
+        ];
+    in
+    {
+      packages.barebone = pkgs.buildEnv {
+        name = "barebone";
+        paths = barebonePackages;
+      };
     };
-  };
 }
