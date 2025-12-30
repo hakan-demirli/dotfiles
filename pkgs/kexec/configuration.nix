@@ -85,8 +85,10 @@
     getty.autologinUser = "root";
     openssh = {
       enable = true;
-      challengeResponseAuthentication = false;
-      passwordAuthentication = false;
+      settings = {
+        KbdInteractiveAuthentication = false;
+        PasswordAuthentication = false;
+      };
     };
     udisks2.enable = false;
   };
@@ -94,7 +96,7 @@
   documentation.enable = false;
   documentation.nixos.enable = false;
   fonts.fontconfig.enable = false;
-  programs.bash.enableCompletion = false;
+  programs.bash.completion.enable = false;
   programs.command-not-found.enable = false;
   security.polkit.enable = false;
   security.rtkit.enable = pkgs.lib.mkForce false;

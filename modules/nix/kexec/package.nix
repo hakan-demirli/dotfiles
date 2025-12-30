@@ -2,7 +2,7 @@
 {
   perSystem =
     { system, ... }:
-    {
+    inputs.nixpkgs.lib.optionalAttrs (inputs.nixpkgs.lib.strings.hasSuffix "-linux" system) {
       packages.kexec =
         (inputs.nixpkgs.lib.nixosSystem {
           inherit system;
