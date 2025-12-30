@@ -1,0 +1,86 @@
+{
+  inputs,
+  ...
+}:
+let
+  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+in
+{
+  flake.modules.nixos.vm_qemu_aarch64 = { config, pkgs, lib, ... }: {
+    imports = with inputs.self.modules.nixos; [
+      system-base
+      system-fonts
+      system-locale
+      system-impermanence
+      system-boot-grub
+      system-disko-btrfs-lvm
+      user-base
+      nix-settings
+      services-ssh
+      services-docker
+      services-earlyoom
+      vm_qemu_aarch64-hardware
+    ];
+
+    # Host specific config
+    networking.hostName = "vm-qemu-aarch64";
+    networking.networkmanager.enable = true;
+    time.timeZone = "Europe/Zurich";
+
+    # Headless server target
+    systemd.defaultUnit = "multi-user.target";
+
+    # Options from modules
+    system.disko = {
+      device = "/dev/vda";
+      swapSize = "8G";
+    };
+
+    system.impermanence = {
+      username = "emre";
+      uid = 1000;
+      persistentDirs = [
+        "/var/lib/nixos"
+        "/var/lib/systemd/coredump"
+        "/etc/NetworkManager/system-connections"
+        "/root/.cache/nix"
+      ];
+    };
+
+    system.user = {
+      username = "emre";
+      uid = 1000;
+      hashedPassword = publicData.passwords.server;
+      useHomeManager = true;
+      homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+    };
+
+    services.ssh = {
+      allowPasswordAuth = false;
+      rootSshKeys = [ publicData.ssh.id_ed25519_proton_pub ];
+    };
+
+    users.users.emre.openssh.authorizedKeys.keys = [ publicData.ssh.id_ed25519_proton_pub ];
+
+    nix.custom = {
+      allowUnfree = true;
+      cudaSupport = false;
+      rocmSupport = false;
+      username = "emre";
+    };
+
+    environment.systemPackages = with pkgs; [
+      home-manager
+      git
+      btop
+      fzf
+      git-crypt
+      wget
+      neovim
+      file
+    ];
+
+    boot.kernelPackages = pkgs.linuxPackages_latest;
+    system.stateVersion = "25.05";
+  };
+}
