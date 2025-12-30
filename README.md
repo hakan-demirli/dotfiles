@@ -64,7 +64,7 @@
 
 ### Oracle VPS ARM
 * Set authorizedKeys in ./kexec.nix
-* ```nix-build --system aarch64-linux '<nixpkgs/nixos>' -A config.system.build.kexec_bundle -I nixos-config=./kexec.nix```
+* ```nix build .#kexec --system aarch64-linux```
 * ```scp -i ~/.ssh/id_ed25519_proton ./result ubuntu@140.238.223.249:/tmp/kexec```
 * ```ssh ubuntu@140.238.223.249 -i ~/.ssh/id_ed25519_proton -t sudo /tmp/kexec```
 * Wait for it to load kexec.
