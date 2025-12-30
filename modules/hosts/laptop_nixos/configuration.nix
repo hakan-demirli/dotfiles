@@ -45,32 +45,32 @@ in
       networking.hostName = "laptop";
       time.timeZone = "Europe/Zurich";
 
-      system.disko = {
-        device = "/dev/nvme1n1";
-        swapSize = "32G";
-      };
-
-      system.impermanence = {
-        username = "emre";
-        uid = 1000;
-        persistentDirs = [
-          "/var/lib/libvirt"
-          "/var/log"
-          "/var/lib/nixos"
-          "/var/lib/systemd/coredump"
-          "/etc/NetworkManager/system-connections"
-          "/var/lib/bluetooth"
-          "/root/.cache/nix"
-        ];
-      };
-
-      system.user = {
-        username = "emre";
-        uid = 1000;
-        hashedPassword = publicData.passwords.laptop;
-        useHomeManager = true;
-        extraGroups = [ "kvm" ];
-        homeManagerImports = [ inputs.self.modules.homeManager.desktop ];
+      system = {
+        disko = {
+          device = "/dev/nvme1n1";
+          swapSize = "32G";
+        };
+        impermanence = {
+          username = "emre";
+          uid = 1000;
+          persistentDirs = [
+            "/var/lib/libvirt"
+            "/var/log"
+            "/var/lib/nixos"
+            "/var/lib/systemd/coredump"
+            "/etc/NetworkManager/system-connections"
+            "/var/lib/bluetooth"
+            "/root/.cache/nix"
+          ];
+        };
+        user = {
+          username = "emre";
+          uid = 1000;
+          hashedPassword = publicData.passwords.laptop;
+          useHomeManager = true;
+          extraGroups = [ "kvm" ];
+          homeManagerImports = [ inputs.self.modules.homeManager.desktop ];
+        };
       };
 
       nix.custom = {
@@ -80,21 +80,25 @@ in
         username = "emre";
       };
 
-      sops.defaultSopsFile = inputs.self + /secrets/secrets.yaml;
-      sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-      sops.secrets.tailscale-key = { };
+      sops = {
+        defaultSopsFile = inputs.self + /secrets/secrets.yaml;
+        age.keyFile = "/var/lib/sops-nix/key.txt";
+        secrets.tailscale-key = { };
+      };
 
       services.tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";
 
-      boot.kernel.sysctl = {
-        "net.ipv4.ip_forward" = 1;
-        "fs.file-max" = "20480000";
-        "fs.inotify.max_user_watches" = "20480000";
-        "fs.inotify.max_user_instances" = "20480000";
-        "fs.inotify.max_queued_events" = "20480000";
+      boot = {
+        kernel.sysctl = {
+          "net.ipv4.ip_forward" = 1;
+          "fs.file-max" = "20480000";
+          "fs.inotify.max_user_watches" = "20480000";
+          "fs.inotify.max_user_instances" = "20480000";
+          "fs.inotify.max_queued_events" = "20480000";
+        };
+        kernelPackages = pkgs.linuxPackages_latest;
+        supportedFilesystems = [ "ntfs" ];
       };
-      boot.kernelPackages = pkgs.linuxPackages_latest;
-      boot.supportedFilesystems = [ "ntfs" ];
 
       systemd.services.NetworkManager-wait-online.enable = false;
       systemd.network.wait-online.enable = false;

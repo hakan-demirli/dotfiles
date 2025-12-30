@@ -33,28 +33,28 @@ in
 
       systemd.defaultUnit = "multi-user.target";
 
-      system.disko = {
-        device = "/dev/vda";
-        swapSize = "8G";
-      };
-
-      system.impermanence = {
-        username = "emre";
-        uid = 1000;
-        persistentDirs = [
-          "/var/lib/nixos"
-          "/var/lib/systemd/coredump"
-          "/etc/NetworkManager/system-connections"
-          "/root/.cache/nix"
-        ];
-      };
-
-      system.user = {
-        username = "emre";
-        uid = 1000;
-        hashedPassword = publicData.passwords.server;
-        useHomeManager = true;
-        homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+      system = {
+        disko = {
+          device = "/dev/vda";
+          swapSize = "8G";
+        };
+        impermanence = {
+          username = "emre";
+          uid = 1000;
+          persistentDirs = [
+            "/var/lib/nixos"
+            "/var/lib/systemd/coredump"
+            "/etc/NetworkManager/system-connections"
+            "/root/.cache/nix"
+          ];
+        };
+        user = {
+          username = "emre";
+          uid = 1000;
+          hashedPassword = publicData.passwords.server;
+          useHomeManager = true;
+          homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+        };
       };
 
       services.ssh = {

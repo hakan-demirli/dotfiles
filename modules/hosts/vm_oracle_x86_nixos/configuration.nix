@@ -33,31 +33,28 @@ in
 
       systemd.defaultUnit = "multi-user.target";
 
-      system.disko = {
-        device = "/dev/sda";
-        swapSize = "4G";
-      };
-
-      boot.loader.efi.efiSysMountPoint = "/boot";
-      boot.loader.grub.efiInstallAsRemovable = true;
-
-      system.impermanence = {
-        username = "emre";
-        uid = 1000;
-        persistentDirs = [
-          "/var/lib/nixos"
-          "/var/lib/systemd/coredump"
-          "/etc/NetworkManager/system-connections"
-          "/root/.cache/nix"
-        ];
-      };
-
-      system.user = {
-        username = "emre";
-        uid = 1000;
-        hashedPassword = publicData.passwords.server;
-        useHomeManager = true;
-        homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+      system = {
+        disko = {
+          device = "/dev/sda";
+          swapSize = "4G";
+        };
+        impermanence = {
+          username = "emre";
+          uid = 1000;
+          persistentDirs = [
+            "/var/lib/nixos"
+            "/var/lib/systemd/coredump"
+            "/etc/NetworkManager/system-connections"
+            "/root/.cache/nix"
+          ];
+        };
+        user = {
+          username = "emre";
+          uid = 1000;
+          hashedPassword = publicData.passwords.server;
+          useHomeManager = true;
+          homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+        };
       };
 
       services.ssh = {
@@ -74,7 +71,11 @@ in
         username = "emre";
       };
 
-      boot.kernelPackages = pkgs.linuxPackages_latest;
+      boot = {
+        loader.efi.efiSysMountPoint = "/boot";
+        loader.grub.efiInstallAsRemovable = true;
+        kernelPackages = pkgs.linuxPackages_latest;
+      };
       system.stateVersion = "25.05";
     };
 }

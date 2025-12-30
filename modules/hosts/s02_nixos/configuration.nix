@@ -37,51 +37,51 @@ in
 
       systemd.defaultUnit = "multi-user.target";
 
-      system.disko = {
-        device = "/dev/sda";
-        swapSize = "32G";
+      system = {
+        disko = {
+          device = "/dev/sda";
+          swapSize = "32G";
+        };
+        impermanence = {
+          username = "emre";
+          uid = 1000;
+          persistentDirs = [
+            "/var/lib/nixos"
+            "/var/lib/systemd/coredump"
+            "/etc/NetworkManager/system-connections"
+            "/root/.cache/nix"
+          ];
+        };
+        user = {
+          username = "emre";
+          uid = 1000;
+          hashedPassword = publicData.passwords.server;
+          useHomeManager = true;
+          homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+        };
       };
 
-      boot.loader.grub.device = "nodev";
-
-      system.impermanence = {
-        username = "emre";
-        uid = 1000;
-        persistentDirs = [
-          "/var/lib/nixos"
-          "/var/lib/systemd/coredump"
-          "/etc/NetworkManager/system-connections"
-          "/root/.cache/nix"
-        ];
+      services = {
+        ssh = {
+          allowPasswordAuth = false;
+          rootSshKeys = [ publicData.ssh.id_ed25519_proton_pub ];
+        };
+        reverse-ssh-client = {
+          enable = true;
+          username = "emre";
+          remoteHost = reverseSshBounceServerHost;
+          remotePort = reverseSshBasePort + serverId; # 42002
+          remoteUser = reverseSshBounceServerUser;
+          privateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
+        };
+        tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
       };
 
-      system.user = {
-        username = "emre";
-        uid = 1000;
-        hashedPassword = publicData.passwords.server;
-        useHomeManager = true;
-        homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
+      sops = {
+        defaultSopsFile = inputs.self + /secrets/secrets.yaml;
+        age.keyFile = "/var/lib/sops-nix/key.txt";
+        secrets.tailscale-key = { };
       };
-
-      services.ssh = {
-        allowPasswordAuth = false;
-        rootSshKeys = [ publicData.ssh.id_ed25519_proton_pub ];
-      };
-
-      services.reverse-ssh-client = {
-        enable = true;
-        username = "emre";
-        remoteHost = reverseSshBounceServerHost;
-        remotePort = reverseSshBasePort + serverId; # 42002
-        remoteUser = reverseSshBounceServerUser;
-        privateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
-      };
-
-      services.tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
-
-      sops.defaultSopsFile = inputs.self + /secrets/secrets.yaml;
-      sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-      sops.secrets.tailscale-key = { };
 
       users.users.emre.openssh.authorizedKeys.keys = [ publicData.ssh.id_ed25519_proton_pub ];
 
