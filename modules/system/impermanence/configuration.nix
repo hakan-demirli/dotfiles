@@ -21,12 +21,7 @@
         };
         persistentDirs = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          default = [
-            "/var/lib/nixos"
-            "/var/lib/systemd/coredump"
-            "/etc/NetworkManager/system-connections"
-            "/root/.cache/nix"
-          ];
+          default = [ ];
         };
         persistentUserDirs = lib.mkOption {
           type = lib.types.listOf lib.types.str;
@@ -64,7 +59,13 @@
 
         environment.persistence."/persist/system" = {
           hideMounts = true;
-          directories = cfg.persistentDirs;
+          directories = [
+            "/var/lib/nixos"
+            "/var/lib/systemd/coredump"
+            "/etc/NetworkManager/system-connections"
+            "/root/.cache/nix"
+          ]
+          ++ cfg.persistentDirs;
         };
 
         environment.persistence."/persist" = {
