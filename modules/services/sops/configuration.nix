@@ -40,7 +40,7 @@ in
         };
         ageKeyFile = lib.mkOption {
           type = lib.types.str;
-          default = "/var/lib/sops-nix/key.txt";
+          default = "/persist/system/var/lib/sops-nix/key.txt";
           description = "Path to age key file";
         };
       };
@@ -52,8 +52,6 @@ in
           age.keyFile = cfg.ageKeyFile;
 
           secrets = {
-            "tailscale-key" = { };
-
             "ssh/config" = {
               owner = username;
               path = "/home/${username}/.ssh/config";
@@ -93,8 +91,6 @@ in
               path = "/home/${username}/.config/nix/nixauth";
             };
 
-            "nix-serve-key" = { };
-
             "environment" = {
               owner = username;
               path = "/home/${username}/.config/secrets/environment";
@@ -120,7 +116,7 @@ in
           (mkPubKey "/home/${username}/.config/git/git_sign" gitSignConfigFile)
         ];
 
-        environment.persistence."/persist".directories = [
+        environment.persistence."/persist/system".directories = [
           "/var/lib/sops-nix"
         ];
       };

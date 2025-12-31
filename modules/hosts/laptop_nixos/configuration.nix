@@ -37,12 +37,16 @@ in
           system-battery
           system-gnupg
           system-virtualisation
+          system-sound
+          system-bluetooth
+          system-automount
         ]
         ++ [
           (inputs.self + /pkgs/state_autocommit.nix)
         ];
 
       networking.hostName = "laptop";
+      networking.networkmanager.enable = true;
       time.timeZone = "Europe/Zurich";
 
       system = {
@@ -56,11 +60,19 @@ in
           persistentDirs = [
             "/var/lib/libvirt"
             "/var/log"
-            "/var/lib/nixos"
-            "/var/lib/systemd/coredump"
-            "/etc/NetworkManager/system-connections"
             "/var/lib/bluetooth"
-            "/root/.cache/nix"
+          ];
+          persistentUserDirs = [
+            ".config/pulse"
+            ".local/state/pipewire"
+            ".local/state/wireplumber"
+            ".cache"
+            ".mozilla"
+            ".local/share"
+            "Desktop"
+            "Documents"
+            "Downloads"
+            "Videos"
           ];
         };
         user = {
@@ -78,12 +90,6 @@ in
         cudaSupport = false;
         rocmSupport = false;
         username = "emre";
-      };
-
-      sops = {
-        defaultSopsFile = inputs.self + /secrets/secrets.yaml;
-        age.keyFile = "/var/lib/sops-nix/key.txt";
-        secrets.tailscale-key = { };
       };
 
       services.tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";

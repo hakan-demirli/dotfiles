@@ -41,12 +41,6 @@ in
         impermanence = {
           username = "emre";
           uid = 1000;
-          persistentDirs = [
-            "/var/lib/nixos"
-            "/var/lib/systemd/coredump"
-            "/etc/NetworkManager/system-connections"
-            "/root/.cache/nix"
-          ];
         };
         user = {
           username = "emre";

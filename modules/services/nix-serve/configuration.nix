@@ -2,6 +2,8 @@ _: {
   flake.modules.nixos.services-nix-serve =
     { config, pkgs, ... }:
     {
+      sops.secrets.nix-serve-key = { };
+
       services.nix-serve = {
         enable = true;
         package = pkgs.nix-serve-ng;

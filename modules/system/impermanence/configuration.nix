@@ -21,6 +21,15 @@
         };
         persistentDirs = lib.mkOption {
           type = lib.types.listOf lib.types.str;
+          default = [
+            "/var/lib/nixos"
+            "/var/lib/systemd/coredump"
+            "/etc/NetworkManager/system-connections"
+            "/root/.cache/nix"
+          ];
+        };
+        persistentUserDirs = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
           default = [ ];
         };
       };
@@ -56,6 +65,13 @@
         environment.persistence."/persist/system" = {
           hideMounts = true;
           directories = cfg.persistentDirs;
+        };
+
+        environment.persistence."/persist" = {
+          hideMounts = true;
+          users.${cfg.username} = {
+            directories = cfg.persistentUserDirs;
+          };
         };
 
         systemd.tmpfiles.rules = [
