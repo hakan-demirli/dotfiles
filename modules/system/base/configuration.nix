@@ -28,6 +28,7 @@
       systemd.settings.Manager.DefaultLimitNOFILE = 1048576;
 
       hardware.uinput.enable = true;
+      hardware.enableRedistributableFirmware = true;
 
       boot.kernelParams = [
         "console=tty1"
