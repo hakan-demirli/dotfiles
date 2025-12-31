@@ -24,6 +24,7 @@ in
         services-ssh
         services-docker
         services-earlyoom
+        services-sops
         vm_qemu_aarch64-hardware
       ];
 

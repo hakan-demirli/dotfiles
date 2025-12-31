@@ -31,6 +31,7 @@ in
           services-warp
           services-earlyoom
           services-yubikey
+          services-sops
           # Laptop-specific modules
           laptop-hardware
           system-nvidia

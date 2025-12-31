@@ -24,6 +24,7 @@ in
         services-ssh
         services-docker
         services-earlyoom
+        services-sops
         vm_oracle_x86-hardware
       ];
 
