@@ -31,7 +31,7 @@
       };
 
       config = lib.mkIf cfg.enable {
-        sops.secrets.tailscale-key = { };
+
 
         services = {
           headscale = {
@@ -88,19 +88,16 @@
             };
           };
 
-          tailscale = {
-            enable = true;
-            authKeyFile = config.sops.secrets.tailscale-key.path;
-            extraUpFlags = [
-              "--login-server=https://${cfg.serverUrl}"
-              "--advertise-exit-node"
-            ];
-          };
+          # Tailscale client for headscale server (adds exit node capability)
+          # Base tailscale config comes from services-tailscale module
+          tailscale.extraUpFlags = [
+            "--login-server=https://${cfg.serverUrl}"
+            "--advertise-exit-node"
+          ];
         };
 
         environment.persistence."/persist".directories = [
           "/var/lib/headscale"
-          "/var/lib/tailscale"
           "/var/lib/caddy"
         ];
 

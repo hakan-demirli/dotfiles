@@ -42,8 +42,11 @@
 
         # Dont block switch if network is down
         systemd.services.tailscaled-autoconnect = {
+          # Don't block nixos-rebuild switch if this fails
+          wantedBy = lib.mkForce [ ];
           serviceConfig = {
             TimeoutStartSec = "5s";
+            Restart = "no";
           };
         };
       };
