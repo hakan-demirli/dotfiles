@@ -12,6 +12,11 @@
         cudaSupport = lib.mkEnableOption "cuda support";
         rocmSupport = lib.mkEnableOption "rocm support";
         username = lib.mkOption { type = lib.types.str; };
+        excludeSubstituters = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          description = "Substituters to exclude (e.g., to avoid self-substitution)";
+        };
       };
 
       config = {
@@ -51,7 +56,7 @@
 
             download-buffer-size = 8 * 1024 * 1024 * 1024;
 
-            substituters = [
+            substituters = builtins.filter (s: !builtins.elem s config.nix.custom.excludeSubstituters) [
               "https://cache.nixos.org/"
               "https://ai.cachix.org"
               "https://nix-community.cachix.org"

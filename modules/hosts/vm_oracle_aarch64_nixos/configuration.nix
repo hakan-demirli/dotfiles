@@ -15,6 +15,7 @@ in
       imports = with inputs.self.modules.nixos; [
         system-server-base
         services-reverse-ssh-server
+        services-tailscale
         services-headscale
         services-fail2ban
         services-docker-registry
@@ -70,6 +71,7 @@ in
             41641 # Tailscale discovery
           ];
         };
+        tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
       };
 
       users.users.emre.openssh.authorizedKeys.keys = [
@@ -82,6 +84,8 @@ in
         cudaSupport = false;
         rocmSupport = false;
         username = "emre";
+        # Don't substitute from self - this IS the binary cache server
+        excludeSubstituters = [ "http://100.64.0.1:5101" ];
       };
 
       boot = {
