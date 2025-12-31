@@ -41,6 +41,7 @@ in
           system-sound
           system-bluetooth
           system-automount
+          system-v4l2loopback
         ]
         ++ [
           (inputs.self + /pkgs/state_autocommit.nix)
