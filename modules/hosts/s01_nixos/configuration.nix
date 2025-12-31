@@ -28,6 +28,7 @@ in
         services-reverse-ssh-client
         services-warp
         services-tailscale
+        services-sops
         s01-hardware
       ];
 

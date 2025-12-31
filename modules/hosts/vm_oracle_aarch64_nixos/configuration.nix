@@ -29,6 +29,7 @@ in
         services-fail2ban
         services-docker-registry
         services-nix-serve
+        services-sops
         vm_oracle_aarch64-hardware
       ];
 
