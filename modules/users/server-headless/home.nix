@@ -33,7 +33,7 @@ let
         enable = true;
         userDirs = {
           enable = true;
-          createDirectories = true;
+          createDirectories = false;
           desktop = desktopDir;
           documents = "${config.home.homeDirectory}/Documents";
           download = "${config.home.homeDirectory}/Downloads";

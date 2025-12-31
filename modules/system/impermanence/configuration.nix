@@ -25,7 +25,13 @@
         };
         persistentUserDirs = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          default = [ ];
+          default = [
+            "Desktop"
+            "Documents"
+            "Downloads"
+            "Videos"
+          ];
+          description = "User directories to persist (relative to home)";
         };
       };
 
