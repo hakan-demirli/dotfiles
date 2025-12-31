@@ -13,6 +13,8 @@
       config = {
         # you must disconnect warp
         # warp-cli disconnect
+        sops.secrets.tailscale-key = { };
+
         services.tailscale = {
           enable = true;
           authKeyFile = config.sops.secrets.tailscale-key.path;
@@ -37,6 +39,13 @@
         environment.persistence."/persist/system".directories = [
           "/var/lib/tailscale"
         ];
+
+        # Dont block switch if network is down
+        systemd.services.tailscaled-autoconnect = {
+          serviceConfig = {
+            TimeoutStartSec = "5s";
+          };
+        };
       };
     };
 }

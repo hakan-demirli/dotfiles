@@ -46,12 +46,6 @@ in
         impermanence = {
           username = "emre";
           uid = 1000;
-          persistentDirs = [
-            "/var/lib/nixos"
-            "/var/lib/systemd/coredump"
-            "/etc/NetworkManager/system-connections"
-            "/root/.cache/nix"
-          ];
         };
         user = {
           username = "emre";
@@ -90,13 +84,6 @@ in
         publicData.ssh.id_ed25519_proton_pub
         publicData.ssh.gh_action_key_pub
       ];
-
-      sops = {
-        defaultSopsFile = inputs.self + /secrets/secrets.yaml;
-        age.keyFile = "/var/lib/sops-nix/key.txt";
-        secrets.tailscale-key = { };
-        secrets.nix-serve-key = { };
-      };
 
       nix.custom = {
         allowUnfree = true;

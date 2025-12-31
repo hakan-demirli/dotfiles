@@ -45,12 +45,6 @@ in
         impermanence = {
           username = "emre";
           uid = 1000;
-          persistentDirs = [
-            "/var/lib/nixos"
-            "/var/lib/systemd/coredump"
-            "/etc/NetworkManager/system-connections"
-            "/root/.cache/nix"
-          ];
         };
         user = {
           username = "emre";
@@ -75,12 +69,6 @@ in
           privateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
         };
         tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
-      };
-
-      sops = {
-        defaultSopsFile = inputs.self + /secrets/secrets.yaml;
-        age.keyFile = "/var/lib/sops-nix/key.txt";
-        secrets.tailscale-key = { };
       };
 
       users.users.emre.openssh.authorizedKeys.keys = [ publicData.ssh.id_ed25519_proton_pub ];
