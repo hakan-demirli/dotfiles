@@ -8,33 +8,22 @@ in
 {
   flake.modules.nixos.vm_oracle_x86 =
     {
-      pkgs,
       ...
     }:
     {
       imports = with inputs.self.modules.nixos; [
-        system-base
-        system-fonts
-        system-locale
-        system-impermanence
-        system-boot-grub
-        system-disko-btrfs-lvm
-        user-base
-        nix-settings
-        services-ssh
-        services-docker
-        services-earlyoom
+        system-server-base
         services-sops
         vm_oracle_x86-hardware
       ];
 
-      networking.hostName = "vm-oracle-x86";
-      networking.networkmanager.enable = true;
       time.timeZone = "Europe/Zurich";
 
-      systemd.defaultUnit = "multi-user.target";
-
       system = {
+        server = {
+          enable = true;
+          hostName = "vm-oracle-x86";
+        };
         disko = {
           device = "/dev/sda";
           swapSize = "4G";
@@ -50,6 +39,7 @@ in
           useHomeManager = true;
           homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
         };
+        stateVersion = "25.05";
       };
 
       services.ssh = {
@@ -69,8 +59,7 @@ in
       boot = {
         loader.efi.efiSysMountPoint = "/boot";
         loader.grub.efiInstallAsRemovable = true;
-        kernelPackages = pkgs.linuxPackages_latest;
       };
-      system.stateVersion = "25.05";
+
     };
 }

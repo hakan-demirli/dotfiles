@@ -8,33 +8,22 @@ in
 {
   flake.modules.nixos.vm_qemu_aarch64 =
     {
-      pkgs,
       ...
     }:
     {
       imports = with inputs.self.modules.nixos; [
-        system-base
-        system-fonts
-        system-locale
-        system-impermanence
-        system-boot-grub
-        system-disko-btrfs-lvm
-        user-base
-        nix-settings
-        services-ssh
-        services-docker
-        services-earlyoom
+        system-server-base
         services-sops
         vm_qemu_aarch64-hardware
       ];
 
-      networking.hostName = "vm-qemu-aarch64";
-      networking.networkmanager.enable = true;
       time.timeZone = "Europe/Zurich";
 
-      systemd.defaultUnit = "multi-user.target";
-
       system = {
+        server = {
+          enable = true;
+          hostName = "vm-qemu-aarch64";
+        };
         disko = {
           device = "/dev/vda";
           swapSize = "8G";
@@ -50,6 +39,7 @@ in
           useHomeManager = true;
           homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
         };
+        stateVersion = "25.05";
       };
 
       services.ssh = {
@@ -66,7 +56,5 @@ in
         username = "emre";
       };
 
-      boot.kernelPackages = pkgs.linuxPackages_latest;
-      system.stateVersion = "25.05";
     };
 }

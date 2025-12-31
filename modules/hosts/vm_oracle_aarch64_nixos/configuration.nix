@@ -10,20 +10,10 @@ let
 in
 {
   flake.modules.nixos.vm_oracle_aarch64 =
-    { pkgs, ... }:
+    { ... }:
     {
       imports = with inputs.self.modules.nixos; [
-        system-base
-        system-fonts
-        system-locale
-        system-impermanence
-        system-boot-grub
-        system-disko-btrfs-lvm
-        user-base
-        nix-settings
-        services-ssh
-        services-docker
-        services-earlyoom
+        system-server-base
         services-reverse-ssh-server
         services-headscale
         services-fail2ban
@@ -33,13 +23,13 @@ in
         vm_oracle_aarch64-hardware
       ];
 
-      networking.hostName = "vm-oracle-aarch64";
-      networking.networkmanager.enable = true;
       time.timeZone = "Europe/Zurich";
 
-      systemd.defaultUnit = "multi-user.target";
-
       system = {
+        server = {
+          enable = true;
+          hostName = "vm-oracle-aarch64";
+        };
         disko = {
           device = "/dev/sda";
           swapSize = "1G";
@@ -55,6 +45,7 @@ in
           useHomeManager = true;
           homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
         };
+        stateVersion = "25.05";
       };
 
       services = {
@@ -97,8 +88,7 @@ in
         loader.efi.canTouchEfiVariables = true;
         loader.grub.efiInstallAsRemovable = false;
         binfmt.emulatedSystems = [ "x86_64-linux" ];
-        kernelPackages = pkgs.linuxPackages_latest;
       };
-      system.stateVersion = "25.05";
+
     };
 }
