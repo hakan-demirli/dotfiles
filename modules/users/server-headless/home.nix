@@ -4,15 +4,27 @@
 }:
 let
   username = "emre";
+  desktopDir = "/home/${username}/Desktop";
+  historyFile = "${desktopDir}/history";
 
   flake.modules.homeManager.server-headless =
     { config, pkgs, ... }:
     let
-      desktopDir = "/home/${username}/Desktop";
-      historyFile = "${desktopDir}/history";
       common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
     in
     {
+      imports = [
+        (import (inputs.self + /pkgs/common/bash.nix) {
+          bashConfigDir = inputs.self + /.config/bash;
+          inherit historyFile;
+        })
+        (import (inputs.self + /pkgs/common/xdg.nix) {
+          inherit pkgs inputs;
+          inherit desktopDir;
+          enablePortal = false;
+        })
+      ];
+
       targets.genericLinux = {
         enable = true;
       };
@@ -23,13 +35,9 @@ let
           enable = true;
           createDirectories = true;
           desktop = desktopDir;
-          documents = "${desktopDir}/documents";
-          download = "${desktopDir}/download";
-          videos = "${desktopDir}/videos";
-          music = desktopDir;
-          pictures = desktopDir;
-          publicShare = desktopDir;
-          templates = desktopDir;
+          documents = "${config.home.homeDirectory}/Documents";
+          download = "${config.home.homeDirectory}/Downloads";
+          videos = "${config.home.homeDirectory}/Videos";
         };
       };
 
@@ -37,12 +45,6 @@ let
         enable = true;
         enableCompletion = true;
         inherit historyFile;
-        historyFileSize = 10000000;
-        historySize = 10000000;
-        historyControl = [
-          "ignoredups"
-          "ignorespace"
-        ];
         shellOptions = [
           "histappend"
           "checkwinsize"
@@ -52,22 +54,8 @@ let
           "autocd"
         ];
         bashrcExtra = ''
-          # Prompt history append
-          PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
-
           # Better less defaults
           export LESS='-R --use-color -Dd+r$Du+b'
-
-          # fzf integration
-          if command -v fzf &> /dev/null; then
-            eval "$(fzf --bash)"
-          fi
-        '';
-        initExtra = ''
-          # Starship prompt
-          if command -v starship &> /dev/null; then
-            eval "$(starship init bash)"
-          fi
         '';
       };
 

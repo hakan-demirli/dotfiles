@@ -1,6 +1,7 @@
 {
   pkgs,
   desktopDir ? throw "Set this to your state dir",
+  enablePortal ? true,
   ...
 }:
 {
@@ -157,6 +158,8 @@
 
       dataFile = mutableDataFiles // immutableDataFiles;
       stateFile = mutableStateFiles;
+    }
+    // pkgs.lib.optionalAttrs enablePortal {
       portal = {
         enable = true;
         xdgOpenUsePortal = true;
