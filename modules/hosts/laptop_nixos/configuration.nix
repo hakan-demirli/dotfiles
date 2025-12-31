@@ -71,6 +71,8 @@ in
             ".cache"
             ".mozilla"
             ".local/share"
+            ".antigravity"
+            ".gemini"
             "Desktop"
             "Documents"
             "Downloads"
