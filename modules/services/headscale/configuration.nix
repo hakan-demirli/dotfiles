@@ -31,6 +31,8 @@
       };
 
       config = lib.mkIf cfg.enable {
+        sops.secrets.tailscale-key = { };
+
         services = {
           headscale = {
             enable = true;
