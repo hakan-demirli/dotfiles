@@ -43,7 +43,7 @@ let
       gnumake
       # inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.markdown-countdown-lsp
       lldb
-      lsp-ai
+      # lsp-ai
       lua-language-server
       marksman
       nixd
