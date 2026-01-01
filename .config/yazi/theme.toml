@@ -424,7 +424,7 @@ files = [
 # Conditions
 conds = [
     # Default
-    { if = "dir",  text = "󰝰", fg = "yellow" },
+    { if = "dir",  text = "󰉋", fg = "yellow" },
     { if = "exec", text = "" },
     { if = "!dir", text = "" }, # Fallback for normal files
 ]
