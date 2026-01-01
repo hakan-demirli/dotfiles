@@ -86,6 +86,7 @@ let
       # unar
       zip
       unzip
+      p7zip
       openssl
     ];
 

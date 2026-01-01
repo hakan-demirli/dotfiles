@@ -36,9 +36,9 @@ return {
 		end
 
 		if changed(selected_char) then
-			ya.manager_emit("find_do", { search_pattern })
+			ya.mgr_emit("find_do", { search_pattern })
 		else
-			ya.manager_emit("find_arrow", {})
+			ya.mgr_emit("find_arrow", {})
 		end
 	end,
 }
