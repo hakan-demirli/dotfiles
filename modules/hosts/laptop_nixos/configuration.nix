@@ -72,6 +72,7 @@ in
             ".mozilla"
             ".local/share"
             ".antigravity"
+            ".config/Antigravity"
             ".gemini"
             "Desktop"
             "Documents"
