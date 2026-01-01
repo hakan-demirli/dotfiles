@@ -100,6 +100,7 @@ in
       services.tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";
 
       boot = {
+        binfmt.emulatedSystems = [ "aarch64-linux" ];
         kernel.sysctl = {
           "net.ipv4.ip_forward" = 1;
           "fs.file-max" = "20480000";
