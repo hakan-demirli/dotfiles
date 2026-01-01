@@ -75,7 +75,7 @@ local function entry(_, args)
     local file_url = splitAndGetFirst(target,":")
 
 	if file_url ~= "" then
-		ya.manager_emit(file_url:match("[/\\]$") and "cd" or "reveal", { file_url })
+		ya.mgr_emit(file_url:match("[/\\]$") and "cd" or "reveal", { file_url })
 	end
 end
 
