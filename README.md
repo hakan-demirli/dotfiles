@@ -1,4 +1,4 @@
-<img width="1921" height="1081" alt="Image" src="https://github.com/user-attachments/assets/5ecc9adf-455b-4941-8cb3-29e410a525b1" />
+<img width="1921" height="1081" alt="Image" src="https://github.com/user-attachments/assets/3922fbba-ec02-4a65-9da7-54690810e899" />
 
 |   |   |
 |---|---|
@@ -119,7 +119,7 @@
       * ```sudo headscale users create emre```
   * Create a new tailscale-key:
     * ```sudo headscale preauthkeys create --user 1 --reusable --expiration 1752000h --tags tag:bootstrap```
-      * Add it to `./secrets/tailscale-key`
+      * Add it to `./secrets/secrets.yaml`
   * git pull and switch to the new key on all hosts.
   * Configure the exit nodes:
     * Get the ID of the node you want to use as an exit node:
