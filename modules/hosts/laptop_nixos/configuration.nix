@@ -32,6 +32,7 @@ in
           services-earlyoom
           services-yubikey
           services-sops
+          services-slurm-client
           # Laptop-specific modules
           laptop-hardware
           system-nvidia
@@ -98,6 +99,11 @@ in
       };
 
       services.tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";
+
+      services.slurm-client = {
+        enable = true;
+        masterHostname = "vm-oracle-aarch64";
+      };
 
       boot = {
         binfmt.emulatedSystems = [ "aarch64-linux" ];
