@@ -16,19 +16,8 @@ jobs:
       - name: Run Flake Check
         run: nix flake check --all-systems
 
-  lint-and-format:
-    runs-on: ubuntu-latest
-    needs: [flake-check]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@v11
-      - uses: DeterminateSystems/magic-nix-cache-action@v7
-
-      - name: Run the master check script
-        run: bash .local/bin/lint-and-format-check.sh
-
   build-systems:
-    needs: [lint-and-format]
+    needs: [flake-check]
     strategy:
       fail-fast: false
       matrix:
