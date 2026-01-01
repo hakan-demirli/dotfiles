@@ -19,6 +19,8 @@ in
         services-warp
         services-tailscale
         services-sops
+        services-slurm
+        slurm-cluster-nodes
         s02-hardware
       ];
 
@@ -61,6 +63,11 @@ in
           privateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
         };
         tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
+
+        slurm-cluster = {
+          enable = true;
+          isMaster = false;
+        };
       };
 
       users.users.emre.openssh.authorizedKeys.keys = [ publicData.ssh.id_ed25519_proton_pub ];

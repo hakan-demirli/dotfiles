@@ -21,6 +21,8 @@ in
         services-docker-registry
         services-nix-serve
         services-sops
+        services-slurm
+        slurm-cluster-nodes
         vm_oracle_aarch64-hardware
       ];
 
@@ -72,6 +74,11 @@ in
           ];
         };
         tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
+
+        slurm-cluster = {
+          enable = true;
+          isMaster = true;
+        };
       };
 
       users.users.emre.openssh.authorizedKeys.keys = [
