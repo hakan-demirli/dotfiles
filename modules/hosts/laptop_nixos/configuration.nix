@@ -54,7 +54,7 @@ in
 
       system = {
         disko = {
-          device = "/dev/nvme1n1";
+          device = "/dev/nvme0n1";
           swapSize = "32G";
         };
         impermanence = {
