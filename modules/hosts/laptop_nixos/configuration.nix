@@ -54,7 +54,7 @@ in
 
       system = {
         disko = {
-          device = "/dev/nvme0n1";
+          device = "/dev/disk/by-id/nvme-KIOXIA-EXCERIA_SSD_X26FC0ZVF4M3";
           swapSize = "32G";
         };
         impermanence = {
@@ -120,15 +120,6 @@ in
 
       systemd.services.NetworkManager-wait-online.enable = false;
       systemd.network.wait-online.enable = false;
-
-      fileSystems."/mnt/second" = {
-        device = "/dev/disk/by-uuid/120CC7A90CC785E7";
-        fsType = "ntfs-3g";
-        options = [
-          "rw"
-          "uid=1000"
-        ];
-      };
 
       environment.systemPackages = with pkgs; [
         kitty
