@@ -98,18 +98,20 @@ in
         username = "emre";
       };
 
-      services.tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";
+      services = {
+        tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";
 
-      services.slurm-client = {
-        enable = true;
-        masterHostname = "vm-oracle-aarch64";
-      };
+        slurm-client = {
+          enable = true;
+          masterHostname = "vm-oracle-aarch64";
+        };
 
-      # prevent sleep. laptop gpu dies if it sleeps. Hardware/Firmware bug.
-      services.logind.settings.Login = {
-        HandleLidSwitch = "ignore";
-        HandleLidSwitchExternalPower = "ignore";
-        HandleLidSwitchDocked = "ignore";
+        # prevent sleep. laptop gpu dies if it sleeps. Hardware/Firmware bug.
+        logind.settings.Login = {
+          HandleLidSwitch = "ignore";
+          HandleLidSwitchExternalPower = "ignore";
+          HandleLidSwitchDocked = "ignore";
+        };
       };
 
       boot = {
