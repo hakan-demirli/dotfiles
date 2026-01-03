@@ -105,6 +105,13 @@ in
         masterHostname = "vm-oracle-aarch64";
       };
 
+      # prevent sleep. laptop gpu dies if it sleeps. Hardware/Firmware bug.
+      services.logind.settings.Login = {
+        HandleLidSwitch = "ignore";
+        HandleLidSwitchExternalPower = "ignore";
+        HandleLidSwitchDocked = "ignore";
+      };
+
       boot = {
         binfmt.emulatedSystems = [ "aarch64-linux" ];
         kernel.sysctl = {
