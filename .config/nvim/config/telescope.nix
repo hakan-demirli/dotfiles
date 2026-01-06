@@ -1,5 +1,4 @@
-{ helpers, ... }:
-{
+_: {
   plugins.telescope = {
     enable = true;
     keymaps = {
