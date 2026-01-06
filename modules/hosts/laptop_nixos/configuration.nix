@@ -122,6 +122,7 @@ in
           "fs.inotify.max_user_watches" = "20480000";
           "fs.inotify.max_user_instances" = "20480000";
           "fs.inotify.max_queued_events" = "20480000";
+          "kernel.perf_event_paranoid" = 1;
         };
         kernelPackages = pkgs.linuxPackages_latest;
         supportedFilesystems = [ "ntfs" ];
