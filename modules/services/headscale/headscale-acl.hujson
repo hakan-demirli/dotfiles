@@ -1,13 +1,15 @@
 {
   "groups": {
-    "group:emre": ["emre@headscale.net"]
+    "group:emre": ["emre@ts.headscale"],
+    "group:um": ["um@ts.headscale"]
   },
 
   "tagowners": {
     "tag:server":   ["group:emre"],
     "tag:laptop":   ["group:emre"],
     "tag:phone":    ["group:emre"],
-    "tag:exitnode": ["group:emre"]
+    "tag:exitnode": ["group:emre"],
+    "tag:shared-server": ["group:emre", "group:um"]
   },
 
   "autoApprovers": {
@@ -17,8 +19,13 @@
   "acls": [
     {
       "action": "accept",
-      "src": ["*"],
-      "dst": ["*:*"]
+      "src": ["group:emre"],
+      "dst": ["group:emre:*", "tag:shared-server:*"]
+    },
+    {
+      "action": "accept",
+      "src": ["group:um"],
+      "dst": ["group:um:*", "tag:shared-server:*"]
     }
   ]
 }
