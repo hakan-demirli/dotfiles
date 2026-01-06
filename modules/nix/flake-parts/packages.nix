@@ -22,6 +22,7 @@
       packages.barebone = pkgs.buildEnv {
         name = "barebone";
         paths = barebonePackages;
+        meta.description = "Barebone development environment";
       };
     };
 }

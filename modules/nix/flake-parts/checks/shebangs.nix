@@ -9,16 +9,33 @@
             src = inputs.self;
           }
           ''
-            cd $src
+            cp -r $src ./src
+            chmod -R +w ./src
+            cd ./src
 
-            if grep -rE '^#!/(bin/|usr/bin/)bash([[:space:]]|$)' . --exclude-dir=.git; then
-              echo "ERROR: Absolute path bash shebang found. Use #!/usr/bin/env bash"
-              exit 1
-            fi
+            failed=0
 
-            if grep -rE '^#!/(bin/|usr/bin/)python[3]?([[:space:]]|$)' . --exclude-dir=.git; then
-              echo "ERROR: Absolute path python shebang found. Use #!/usr/bin/env python3"
-              exit 1
+            echo "Checking for absolute bash paths..."
+            while IFS= read -r -d "" file; do
+                if head -n1 "$file" 2> /dev/null | grep -Eq '^#!/(bin/|usr/bin/)bash([[:space:]]|$)'; then
+                    echo "ERROR: Absolute path shebang found in: $file"
+                    head -n1 "$file"
+                    failed=1
+                fi
+            done < <(find . -type f -not -path "./.git/*" -print0)
+
+            echo "Checking for absolute python paths..."
+            while IFS= read -r -d "" file; do
+                if head -n1 "$file" 2> /dev/null | grep -Eq '^#!/(bin/|usr/bin/)python[3]?([[:space:]]|$)'; then
+                    echo "ERROR: Absolute python path shebang found in: $file"
+                    head -n1 "$file"
+                    failed=1
+                fi
+            done < <(find . -type f -not -path "./.git/*" -print0)
+
+            if [ "$failed" -eq 1 ]; then
+                echo "Shebang check failed. Use /usr/bin/env instead of absolute paths."
+                exit 1
             fi
 
             touch $out

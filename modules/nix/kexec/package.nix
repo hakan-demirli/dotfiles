@@ -9,6 +9,9 @@
           modules = [
             (inputs.self + /pkgs/kexec/configuration.nix)
           ];
-        }).config.system.build.kexec_bundle;
+        }).config.system.build.kexec_bundle
+        // {
+          meta.description = "kexec bundle for NixOS";
+        };
     };
 }
