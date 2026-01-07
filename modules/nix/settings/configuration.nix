@@ -62,7 +62,7 @@
               "https://nix-community.cachix.org"
               "https://cuda-maintainers.cachix.org"
               "https://numtide.cachix.org"
-              "http://100.64.0.1:5101"
+              "http://100.64.0.1:5101?priority=60"
             ];
 
             trusted-public-keys = [
