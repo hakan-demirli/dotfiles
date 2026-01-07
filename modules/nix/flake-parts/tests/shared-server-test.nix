@@ -7,6 +7,7 @@ _: {
         program = "${config.legacyPackages.integrationChecks.shared-server-test.driver}/bin/nixos-test-driver";
         meta.description = "Run the shared server ACL integration test";
       };
+
       legacyPackages.integrationChecks.shared-server-test =
         let
           aclFile = ../../../services/headscale/headscale-acl.hujson;
