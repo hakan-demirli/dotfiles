@@ -16,6 +16,16 @@ jobs:
       - name: Run Flake Check
         run: nix flake check --all-systems
 
+  integration-tests:
+    needs: [flake-check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: DeterminateSystems/magic-nix-cache-action@v7
+      - name: Run Shared Server Test
+        run: nix run .#test
+
   build-systems:
     needs: [flake-check]
     strategy:
