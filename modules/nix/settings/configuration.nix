@@ -56,14 +56,20 @@
 
             download-buffer-size = 8 * 1024 * 1024 * 1024;
 
-            substituters = builtins.filter (s: !builtins.elem s config.nix.custom.excludeSubstituters) [
-              "https://cache.nixos.org?priority=10"
-              "https://ai.cachix.org"
-              "https://nix-community.cachix.org"
-              "https://cuda-maintainers.cachix.org"
-              "https://numtide.cachix.org"
-              "http://100.64.0.1:5101?priority=60"
-            ];
+            substituters =
+              builtins.filter
+                (
+                  s:
+                  !(lib.lists.any (excluded: lib.strings.hasInfix excluded s) config.nix.custom.excludeSubstituters)
+                )
+                [
+                  "https://cache.nixos.org?priority=10"
+                  "https://ai.cachix.org"
+                  "https://nix-community.cachix.org"
+                  "https://cuda-maintainers.cachix.org"
+                  "https://numtide.cachix.org"
+                  "http://100.64.0.1:5101?priority=60"
+                ];
 
             trusted-public-keys = [
               "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
