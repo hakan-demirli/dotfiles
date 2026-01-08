@@ -57,7 +57,7 @@
             download-buffer-size = 8 * 1024 * 1024 * 1024;
 
             substituters = builtins.filter (s: !builtins.elem s config.nix.custom.excludeSubstituters) [
-              "https://cache.nixos.org/"
+              "https://cache.nixos.org?priority=10"
               "https://ai.cachix.org"
               "https://nix-community.cachix.org"
               "https://cuda-maintainers.cachix.org"
