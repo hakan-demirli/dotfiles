@@ -40,12 +40,18 @@
           "/var/lib/tailscale"
         ];
 
-        # Dont block switch if network is down
+        # Make tailscaled-autoconnect non-blocking so nixos-rebuild switch doesn't hang when offline
         systemd.services.tailscaled-autoconnect = {
-          # Don't block nixos-rebuild switch if this fails
-          wantedBy = lib.mkForce [ ];
+          # Keep it in wantedBy so it starts automatically (don't use mkForce to disable)
+          # But make it non-blocking if it fails
+          unitConfig = {
+            # Don't block other services if this fails to start
+            DefaultDependencies = false;
+          };
           serviceConfig = {
+            # Timeout quickly if network is unavailable
             TimeoutStartSec = "5s";
+            # Don't restart on failure (will be retried on next boot/network change)
             Restart = "no";
           };
         };
