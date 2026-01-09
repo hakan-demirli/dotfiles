@@ -1,7 +1,7 @@
 {
   "groups": {
-    "group:emre": ["emre@ts.headscale"],
-    "group:um": ["um@ts.headscale"]
+    "group:emre": ["emre@headscale.net"],
+    "group:um": ["um@headscale.net"]
   },
 
   "tagowners": {
@@ -19,13 +19,8 @@
   "acls": [
     {
       "action": "accept",
-      "src": ["group:emre"],
-      "dst": ["group:emre:*", "tag:shared-server:*"]
-    },
-    {
-      "action": "accept",
-      "src": ["group:um"],
-      "dst": ["group:um:*", "tag:shared-server:*"]
+      "src": ["*"],
+      "dst": ["*:*"]
     }
   ]
 }
