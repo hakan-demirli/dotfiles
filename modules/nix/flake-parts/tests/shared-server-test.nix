@@ -54,7 +54,7 @@ _: {
                       policy.path = aclFile;
                       dns = {
                         magic_dns = true;
-                        base_domain = "ts.headscale";
+                        base_domain = "headscale.net";
                         nameservers.global = [ "1.1.1.1" ];
                       };
 
@@ -273,8 +273,8 @@ _: {
             headscale.wait_for_open_port(8080)
             headscale.wait_for_open_port(443)
 
-            headscale.succeed("headscale users create emre@ts.headscale")
-            headscale.succeed("headscale users create um@ts.headscale")
+            headscale.succeed("headscale users create emre@headscale.net")
+            headscale.succeed("headscale users create um@headscale.net")
 
             def get_user_id(username):
                 import json
@@ -285,8 +285,8 @@ _: {
                         return user["id"]
                 raise Exception(f"User {username} not found in output: {output}")
 
-            emre_id = get_user_id("emre@ts.headscale")
-            um_id = get_user_id("um@ts.headscale")
+            emre_id = get_user_id("emre@headscale.net")
+            um_id = get_user_id("um@headscale.net")
 
             emre_key = headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h").strip()
             um_key = headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
@@ -322,12 +322,12 @@ _: {
 
 
 
+            # Test connectivity - both groups can reach shared server
             emre_machine.wait_until_succeeds(f"ping -c 2 {server_ip}")
-
             um_machine.wait_until_succeeds(f"ping -c 2 {server_ip}")
-
+            
+            # Test ACL isolation - groups CANNOT ping each other
             um_machine.fail(f"ping -c 2 -W 1 {emre_ip}")
-
             emre_machine.fail(f"ping -c 2 -W 1 {um_ip}")
 
             print("ALL VERIFICATIONS PASSED")
