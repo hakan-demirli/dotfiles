@@ -43,7 +43,7 @@ play = [
 
 [open]
 rules = [
-	{ name = "*/", use = [ "edit", "open", "reveal" ] },
+	{ url = "*/", use = [ "edit", "open", "reveal" ] },
 
 	{ mime = "text/*",  use = [ "edit", "reveal" ] },
 	{ mime = "image/*", use = [ "open", "reveal" ] },
@@ -77,8 +77,8 @@ image_bound = [ 0, 0 ]
 # [plugins]
 
 [plugin]
-prepend_previewers = [{ name = "*.opus", run = "opus-preview" }]
-prepend_preloaders = [{ name = "*.opus", run = "opus-preview" }]
+prepend_previewers = [{ url = "*.opus", run = "opus-preview" }]
+prepend_preloaders = [{ url = "*.opus", run = "opus-preview" }]
 
 [input]
 # cd
