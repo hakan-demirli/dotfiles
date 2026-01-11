@@ -121,6 +121,7 @@ let
         ++ common-packages.desktop-cli
         ++ common-packages.ai
         ++ common-packages.gui
+        ++ common-packages.gaming
         ++ common-packages.tools-cli;
     };
 in
