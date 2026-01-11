@@ -21,6 +21,11 @@ let
     starship
   ];
 
+  gaming = with pkgs; [
+    winetricks
+    wineWowPackages.waylandFull
+  ];
+
   editors = with pkgs; [
     helix
     neovim
@@ -170,5 +175,6 @@ in
     lsp
     server-cli
     tools-cli
+    gaming
     ;
 }
