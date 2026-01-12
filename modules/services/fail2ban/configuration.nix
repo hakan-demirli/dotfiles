@@ -16,7 +16,7 @@ _: {
           settings = {
             enable = true;
             backend = "systemd";
-            maxretry = 5;
+            maxretry = 2;
             findtime = "60m";
           };
         };
