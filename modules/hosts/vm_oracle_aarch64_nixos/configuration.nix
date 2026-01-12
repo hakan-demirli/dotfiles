@@ -12,19 +12,24 @@ in
   flake.modules.nixos.vm_oracle_aarch64 =
     { ... }:
     {
-      imports = with inputs.self.modules.nixos; [
-        system-server-base
-        services-reverse-ssh-server
-        services-tailscale
-        services-headscale
-        services-fail2ban
-        services-docker-registry
-        services-nix-serve
-        services-sops
-        services-slurm
-        slurm-cluster-nodes
-        vm_oracle_aarch64-hardware
-      ];
+      imports =
+        with inputs.self.modules.nixos;
+        [
+          system-server-base
+          services-reverse-ssh-server
+          services-tailscale
+          services-headscale
+          services-fail2ban
+          services-docker-registry
+          services-nix-serve
+          services-sops
+          services-slurm
+          slurm-cluster-nodes
+          vm_oracle_aarch64-hardware
+        ]
+        ++ [
+          (inputs.self + /pkgs/github_backup.nix)
+        ];
 
       time.timeZone = "Europe/Zurich";
 

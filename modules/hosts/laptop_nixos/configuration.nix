@@ -46,6 +46,7 @@ in
         ]
         ++ [
           (inputs.self + /pkgs/state_autocommit.nix)
+          (inputs.self + /pkgs/github_backup.nix)
         ];
 
       networking.hostName = "laptop";
