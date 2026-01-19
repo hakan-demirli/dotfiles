@@ -55,14 +55,17 @@
 
               derp = {
                 server = {
-                  enable = true;
+                  enabled = true;
                   region_id = 999;
                   region_code = "oracle-vps";
                   region_name = "Oracle Cloud VPS";
                   private_key_path = "/var/lib/headscale/derp_server.key";
+                  stun_listen_addr = "0.0.0.0:3478";
+                  verify_clients = true;
                 };
-                stun.listen_addr = "0.0.0.0:3478";
-                paths = [ (inputs.self + /modules/services/headscale/derp.yaml) ];
+                # paths = [ (inputs.self + /modules/services/headscale/derp.yaml) ];
+                # paths = [ ];
+                urls = [ ]; # disable public derps
                 auto_update_enabled = true;
                 update_frequency = "24h";
               };
@@ -73,16 +76,8 @@
             enable = true;
             virtualHosts."${cfg.serverUrl}" = {
               extraConfig = ''
-                # Headscale traffic
-                reverse_proxy http://127.0.0.1:8080
-
-                # DERP traffic (upgrades to a TCP tunnel)
-                @derp {
-                    path /derp/*
-                    header Connection Upgrade
-                    header Upgrade websocket
-                }
-                reverse_proxy @derp http://127.0.0.1:8080
+                # Headscale traffic (includes DERP via Websockets and HTTP probes)
+                reverse_proxy * http://127.0.0.1:8080
               '';
             };
           };
