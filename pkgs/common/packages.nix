@@ -82,6 +82,7 @@ let
       ghostscript
       (nurPkgs.dap or null)
       (nurPkgs.flake-updater or null)
+      (nurPkgs.riveroftime or null)
       # mutagen
       ouch
       rsync
