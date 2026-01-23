@@ -52,7 +52,7 @@ let
       lua-language-server
       marksman
       nixd
-      nixfmt-rfc-style
+      nixfmt
       nodePackages.diagnostic-languageserver
       nodePackages_latest.bash-language-server
       nodePackages_latest.prettier
