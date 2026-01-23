@@ -61,6 +61,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Free Disk Space (Ubuntu)
+        uses: BRAINSia/free-disk-space@v2
+        with:
+          tool-cache: false
+          mandb:   true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - uses: DeterminateSystems/nix-installer-action@v11
       - name: Enable Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v7
