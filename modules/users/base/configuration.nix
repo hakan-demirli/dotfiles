@@ -58,6 +58,18 @@
             imports = config.system.user.homeManagerImports;
           };
         };
+
+        # fix: https://github.com/nix-community/home-manager/issues/7166
+        system.activationScripts.home-manager-restart = lib.mkIf config.system.user.useHomeManager {
+          text = ''
+            ${pkgs.systemd}/bin/systemctl restart home-manager-${config.system.user.username}.service || true
+          '';
+          deps = [
+            "users"
+            "groups"
+          ];
+        };
+
         programs.fuse.userAllowOther = true;
       };
     };
