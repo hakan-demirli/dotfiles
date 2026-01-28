@@ -1,2 +1,3 @@
 .aider*
 .ruff_cache*
+.opencode
