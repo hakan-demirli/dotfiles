@@ -75,6 +75,8 @@ in
             ".local/share"
             ".antigravity"
             ".config/Antigravity"
+            ".config/opencode"
+            ".local/state/opencode"
             ".gemini"
             "Desktop"
             "Documents"
