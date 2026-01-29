@@ -23,7 +23,7 @@
         "GHORG_CLONE_WIKI=true"
         "GHORG_PRUNE=true"
         "GHORG_PRUNE_NO_CONFIRM=true"
-        "GHORG_SKIP_ARCHIVED=true"
+        "GHORG_SKIP_ARCHIVED=false"
         "GHORG_SKIP_FORKS=true"
       ];
     };
