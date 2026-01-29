@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "Killing scdaemon and gpg-agent..."
+gpgconf --kill scdaemon 2>/dev/null || true
+gpgconf --kill gpg-agent 2>/dev/null || true
+
+echo "Removing stale sockets..."
+rm -f ~/.gnupg/S.scdaemon ~/.gnupg/S.gpg-agent* 2>/dev/null || true
+
+echo "Force killing any remaining processes..."
+pkill -9 scdaemon 2>/dev/null || true
+pkill -9 gpg-agent 2>/dev/null || true
+
+sleep 1
+
+echo "Restarting gpg-agent..."
+gpg-agent --daemon 2>/dev/null || true
+
+echo ""
+echo "Testing card status..."
+if gpg --card-status >/dev/null 2>&1; then
+    echo "Yubikey is working!"
+    gpg --card-status | grep -E "^(Reader|serial|Name)"
+else
+    echo "Still not working. Try unplugging and replugging the Yubikey, then run this again."
+fi
