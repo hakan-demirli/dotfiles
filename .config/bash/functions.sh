@@ -77,7 +77,7 @@ gitexplode() {
 
   (
     shopt -s extglob dotglob
-    mv !(.git|.temp_files) .temp_files/ 2> /dev/null
+    eval 'mv !(.git|.temp_files) .temp_files/ 2> /dev/null'
   )
 
   mv .git .bare
