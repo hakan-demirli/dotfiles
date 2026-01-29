@@ -20,4 +20,4 @@ if [ -z "$output" ]; then
   exit 0
 fi
 
-printf "%s" "$output" | gclip
+printf "%s" "$output" | tmux load-buffer -w -
