@@ -151,7 +151,6 @@ _: {
                   firewall.checkReversePath = "loose";
                 };
                 environment.systemPackages = [ pkgs.netcat ];
-                services.openssh.enable = true;
 
                 containers = {
                   alice = {
@@ -167,7 +166,6 @@ _: {
                       }
                     ];
                     config = _: {
-                      services.openssh.enable = true;
                       networking.firewall.allowedTCPPorts = [ 22 ];
                       system.stateVersion = "25.05";
                       users.users.alice = {
@@ -190,7 +188,6 @@ _: {
                       }
                     ];
                     config = _: {
-                      services.openssh.enable = true;
                       networking.firewall.allowedTCPPorts = [ 22 ];
                       system.stateVersion = "25.05";
                       users.users.bob = {
@@ -235,7 +232,6 @@ _: {
                   trustedInterfaces = [ "tailscale0" ];
                 };
                 networking.extraHosts = "192.168.1.1 headscale";
-                services.openssh.enable = true;
               };
 
             um_machine =
@@ -266,7 +262,6 @@ _: {
                   trustedInterfaces = [ "tailscale0" ];
                 };
                 networking.extraHosts = "192.168.1.1 headscale";
-                services.openssh.enable = true;
               };
 
             ssh_target =
@@ -293,7 +288,6 @@ _: {
                   trustedInterfaces = [ "tailscale0" ];
                 };
                 networking.extraHosts = "192.168.1.1 headscale";
-                services.openssh.enable = true;
               };
           };
 
@@ -376,7 +370,14 @@ _: {
             # Test Shared Server Isolation
             # Incoming SSH should work (Tag:shared-server is in 'dst' of SSH ACL)
             emre_machine.wait_until_succeeds(f"ping -c 2 {server_ip}")
-            emre_machine.succeed(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {server_ip} true")
+
+            cmd = f"ssh -vvv -o StrictHostKeyChecking=no -o ConnectTimeout=5 {server_ip} true"
+            code, output = emre_machine.execute(cmd, timeout=30)
+            if code != 0:
+                print(f"SSH failed with code {code}. Output:\n{output}")
+                print("Shared Server Tailscaled Logs:")
+                print(shared_server.execute("journalctl -u tailscaled --no-pager -n 100")[1])
+                raise Exception(f"SSH failed with code {code}")
 
             # Outgoing Traffic should FAIL (Tag:shared-server is NOT in 'src' of any ACL)
             shared_server.fail(f"ping -c 2 -W 1 {emre_ip}")
