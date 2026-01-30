@@ -108,8 +108,8 @@ $CONTAINER_RUNTIME run --rm -it \
     echo "$BASHRC_CONTENT" > /root/.bashrc
 
     echo "Creating .bash_profile for login shells (SSH/Tmux)..."
-    echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" > /root/.bash_profile
-    echo "[[ -f ~/.profile ]] && . ~/.profile" >> /root/.bash_profile
+    echo "[[ -f ~/.profile ]] && . ~/.profile" > /root/.bash_profile
+    echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> /root/.bash_profile
 
     echo "Creating Nix store archive..."
     tar -I "zstd -1 -T0" -cpf /persistent/nix.tar.zst -C /nix .
