@@ -26,6 +26,8 @@
           pkgs.util-linux
           pkgs.coreutils
           pkgs.rsync
+          pkgs.grep
+          pkgs.gawk
           pkgs.nix
           pkgs.tailscale
         ];

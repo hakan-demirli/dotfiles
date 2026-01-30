@@ -59,6 +59,7 @@ done
 
 BASHRC_CONTENT=$(
   cat << 'EOF'
+export PATH="$HOME/.nix-profile/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.local/share/python/bin:$PATH"
 
