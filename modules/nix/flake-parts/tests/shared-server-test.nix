@@ -41,7 +41,7 @@ _: {
           name = "shared-server-acl-test";
 
           nodes = {
-            headscale =
+            a00_headscale =
               { pkgs, ... }:
               {
                 services = {
@@ -147,6 +147,7 @@ _: {
                     internalInterfaces = [ "ve-+" ];
                     externalInterface = "eth1";
                   };
+                  extraHosts = "192.168.1.1 headscale";
                   firewall.checkReversePath = "loose";
                 };
                 environment.systemPackages = [ pkgs.netcat ];
@@ -232,6 +233,7 @@ _: {
                   checkReversePath = "loose";
                   trustedInterfaces = [ "tailscale0" ];
                 };
+                networking.extraHosts = "192.168.1.1 headscale";
                 services.openssh.enable = true;
               };
 
@@ -262,6 +264,7 @@ _: {
                   checkReversePath = "loose";
                   trustedInterfaces = [ "tailscale0" ];
                 };
+                networking.extraHosts = "192.168.1.1 headscale";
                 services.openssh.enable = true;
               };
 
@@ -288,6 +291,7 @@ _: {
                   checkReversePath = "loose";
                   trustedInterfaces = [ "tailscale0" ];
                 };
+                networking.extraHosts = "192.168.1.1 headscale";
                 services.openssh.enable = true;
               };
           };
@@ -295,16 +299,16 @@ _: {
           testScript = ''
             start_all()
 
-            headscale.wait_for_unit("headscale.service")
-            headscale.wait_for_open_port(8080)
-            headscale.wait_for_open_port(443)
+            a00_headscale.wait_for_unit("headscale.service")
+            a00_headscale.wait_for_open_port(8080)
+            a00_headscale.wait_for_open_port(443)
 
-            headscale.succeed("headscale users create emre")
-            headscale.succeed("headscale users create um")
+            a00_headscale.succeed("headscale users create emre")
+            a00_headscale.succeed("headscale users create um")
 
             def get_user_id(username):
                 import json
-                output = headscale.succeed("headscale users list --output json")
+                output = a00_headscale.succeed("headscale users list --output json")
                 users = json.loads(output)
                 for user in users:
                     if user.get("name") == username:
@@ -314,31 +318,32 @@ _: {
             emre_id = get_user_id("emre")
             um_id = get_user_id("um")
 
-            emre_key = headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h").strip()
-            um_key = headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
+            emre_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h").strip()
+            um_key = a00_headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
 
-            server_key = headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:shared-server").strip()
-            ssh_key = headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:sshable").strip()
+            server_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:shared-server").strip()
+            laptop_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:laptop").strip()
+            ssh_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:sshable").strip()
 
             shared_server.wait_for_unit("tailscaled.service")
             shared_server.succeed(f"tailscale up --authkey={server_key} --hostname=shared-server --advertise-tags=tag:shared-server --login-server=https://headscale")
 
             ssh_target.wait_for_unit("tailscaled.service")
-            ssh_target.succeed(f"tailscale up --authkey={ssh_key} --hostname=ssh-target --advertise-tags=tag:sshable --login-server=https://headscale")
+            ssh_target.succeed(f"tailscale up --authkey={ssh_key} --hostname=ssh-target --advertise-tags=tag:sshable --ssh --login-server=https://headscale")
 
             emre_machine.wait_for_unit("tailscaled.service")
 
             emre_machine.succeed("ping -c 1 192.168.1.1 >&2")
 
-            emre_machine.succeed(f"tailscale up --authkey={emre_key} --hostname=emre-laptop --login-server=https://headscale")
+            emre_machine.succeed(f"tailscale up --authkey={laptop_key} --hostname=emre-laptop --advertise-tags=tag:laptop --login-server=https://headscale")
 
             um_machine.wait_for_unit("tailscaled.service")
             um_machine.succeed(f"tailscale up --authkey={um_key} --hostname=um-laptop --login-server=https://headscale")
 
-            headscale.wait_until_succeeds("headscale nodes list | grep shared-server")
-            headscale.wait_until_succeeds("headscale nodes list | grep ssh-target")
-            headscale.wait_until_succeeds("headscale nodes list | grep emre-laptop")
-            headscale.wait_until_succeeds("headscale nodes list | grep um-laptop")
+            a00_headscale.wait_until_succeeds("headscale nodes list | grep shared-server")
+            a00_headscale.wait_until_succeeds("headscale nodes list | grep ssh-target")
+            a00_headscale.wait_until_succeeds("headscale nodes list | grep emre-laptop")
+            a00_headscale.wait_until_succeeds("headscale nodes list | grep um-laptop")
 
             def get_ts_ip(node):
                 return node.succeed("tailscale ip -4").strip()
@@ -364,6 +369,7 @@ _: {
             emre_machine.fail(f"ping -c 2 -W 1 {um_ip}")
 
             emre_machine.wait_until_succeeds(f"ping -c 2 {ssh_target_ip}")
+            emre_machine.succeed(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {ssh_target_ip} true")
             um_machine.fail(f"ping -c 2 -W 1 {ssh_target_ip}")
 
             print("ALL VERIFICATIONS PASSED")
