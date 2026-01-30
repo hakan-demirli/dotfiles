@@ -128,6 +128,9 @@ $CONTAINER_RUNTIME run --rm -it \
     mkdir -p /var/log
     tailscaled --state=/var/lib/tailscale/tailscaled.state --tun=userspace-networking > /var/log/tailscaled.log 2>&1 &
 
+    echo "Command to run:"
+    echo "tailscale up --login-server=https://sshr.polarbearvuzi.com --ssh"
+
     echo "Workspace loaded. Executing into main Nix environment..."
     cd /root/Desktop/dotfiles
     rm -rf /root/.nix-profile
