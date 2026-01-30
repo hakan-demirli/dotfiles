@@ -20,6 +20,14 @@
           pkgs.kitty.terminfo
           pkgs.tailscale
           pkgs.btop
+          pkgs.coreutils
+          pkgs.zstd
+          pkgs.gnutar
+          pkgs.util-linux
+          pkgs.coreutils
+          pkgs.rsync
+          pkgs.nix
+          pkgs.tailscale
         ];
     in
     {
