@@ -2,8 +2,8 @@
 
 persist-workspace() {
   echo "Saving workspace to persistent archives..."
-  tar -cf - -C /nix . | zstd -1 -T0 > /persistent/nix.tar.zst && echo "nix.tar.zst saved." &
-  tar -cf - -C /workspace . | zstd -1 -T0 > /persistent/workspace.tar.zst && echo "workspace.tar.zst saved." &
+  tar -cf - -C /nix . | zstd -1 -T0 > /persistent/nix.tar.zst.tmp && mv /persistent/nix.tar.zst.tmp /persistent/nix.tar.zst && echo "nix.tar.zst saved." &
+  tar -cf - -C /workspace . | zstd -1 -T0 > /persistent/workspace.tar.zst.tmp && mv /persistent/workspace.tar.zst.tmp /persistent/workspace.tar.zst && echo "workspace.tar.zst saved." &
   wait
   echo "All archives saved!"
 }
