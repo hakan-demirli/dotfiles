@@ -107,6 +107,10 @@ $CONTAINER_RUNTIME run --rm -it \
     echo "Creating .bashrc from environment variable..."
     echo "$BASHRC_CONTENT" > /root/.bashrc
 
+    echo "Creating .bash_profile for login shells (SSH/Tmux)..."
+    echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" > /root/.bash_profile
+    echo "[[ -f ~/.profile ]] && . ~/.profile" >> /root/.bash_profile
+
     echo "Creating Nix store archive..."
     tar -I "zstd -1 -T0" -cpf /persistent/nix.tar.zst -C /nix .
 
@@ -114,7 +118,7 @@ $CONTAINER_RUNTIME run --rm -it \
     tar -I "zstd -1 -T0" \
       -cpf /persistent/workspace.tar.zst \
       -C /root \
-      Desktop .bashrc
+      Desktop .bashrc .bash_profile
 
     echo "Creating Tailscale state archive..."
     mkdir -p /var/lib/tailscale

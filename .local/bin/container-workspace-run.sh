@@ -120,6 +120,7 @@ $CONTAINER_RUNTIME run --rm -it \
 
     ln -sf /workspace/Desktop /root/Desktop
     ln -sf /workspace/.bashrc /root/.bashrc
+    ln -sf /workspace/.bash_profile /root/.bash_profile
     ln -sf /workspace/Desktop/dotfiles/.config/* /root/.config
     ln -sf /workspace/Desktop/dotfiles/.local/bin/* /root/.local/bin
 
@@ -132,6 +133,7 @@ $CONTAINER_RUNTIME run --rm -it \
         export LOCALE_ARCHIVE=/root/.nix-profile/lib/locale/locale-archive
     fi
     export TERMINFO_DIRS="/root/.nix-profile/share/terminfo${TERMINFO_DIRS:+:$TERMINFO_DIRS}"
+    export PATH="/root/.nix-profile/bin:$PATH"
 
     exec bash -i
   '
