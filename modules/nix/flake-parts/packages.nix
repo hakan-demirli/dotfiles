@@ -18,6 +18,8 @@
           pkgs.openssl
           pkgs.glibcLocalesUtf8
           pkgs.kitty.terminfo
+          pkgs.tailscale
+          pkgs.btop
         ];
     in
     {
