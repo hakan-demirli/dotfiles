@@ -16,6 +16,8 @@
           pkgs.ncurses
           pkgs.direnv
           pkgs.openssl
+          pkgs.glibcLocalesUtf8
+          pkgs.kitty.terminfo
         ];
     in
     {

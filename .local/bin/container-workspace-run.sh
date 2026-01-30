@@ -74,6 +74,11 @@ $CONTAINER_RUNTIME run --rm -it \
   nix-shell -p zstd gnutar util-linux coreutils rsync nix --run '
     set -e
 
+    export LANG=C.UTF-8
+    export LC_ALL=C.UTF-8
+    export TERM="${TERM:-xterm-256color}"
+    export TZ="${TZ:-UTC}"
+
     mkdir -p /mem/nix /mem/workspace /mem/tmp
 
     rsync -a /tmp/ /mem/tmp/
@@ -115,5 +120,11 @@ $CONTAINER_RUNTIME run --rm -it \
     cd /root/Desktop/dotfiles
     rm -rf /root/.nix-profile
     nix profile install .#barebone --extra-experimental-features "nix-command flakes"
+
+    if [[ -f /root/.nix-profile/lib/locale/locale-archive ]]; then
+        export LOCALE_ARCHIVE=/root/.nix-profile/lib/locale/locale-archive
+    fi
+    export TERMINFO_DIRS="/root/.nix-profile/share/terminfo${TERMINFO_DIRS:+:$TERMINFO_DIRS}"
+
     exec bash -i
   '
