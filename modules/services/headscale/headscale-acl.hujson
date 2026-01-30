@@ -9,7 +9,8 @@
     "tag:laptop":   ["group:emre"],
     "tag:phone":    ["group:emre"],
     "tag:exitnode": ["group:emre"],
-    "tag:shared-server": ["group:emre", "group:um"]
+    "tag:shared-server": ["group:emre", "group:um"],
+    "tag:sshable":  ["group:emre"]
   },
 
   "autoApprovers": {
@@ -20,12 +21,29 @@
     {
       "action": "accept",
       "src": ["emre@", "tag:laptop", "tag:exitnode", "tag:server", "tag:phone"],
-      "dst": ["emre@:*", "tag:laptop:*", "tag:exitnode:*", "tag:server:*", "tag:phone:*", "tag:shared-server:*"]
+      "dst": [
+        "emre@:*",
+        "tag:laptop:*",
+        "tag:exitnode:*",
+        "tag:server:*",
+        "tag:phone:*",
+        "tag:shared-server:*",
+        "tag:sshable:*"
+      ]
     },
     {
       "action": "accept",
       "src": ["um@"],
       "dst": ["um@:*", "tag:shared-server:*"]
+    }
+  ],
+
+  "ssh": [
+    {
+      "action": "accept",
+      "src": ["group:emre"],
+      "dst": ["tag:sshable"],
+      "users": ["autogroup:nonroot", "root"]
     }
   ]
 }

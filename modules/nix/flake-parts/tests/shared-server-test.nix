@@ -264,6 +264,32 @@ _: {
                 };
                 services.openssh.enable = true;
               };
+
+            ssh_target =
+              { config, ... }:
+              {
+                services.tailscale = {
+                  enable = true;
+                  port = 41641;
+                  extraUpFlags = [ "--login-server=https://headscale" ];
+                };
+
+                systemd.services.tailscaled.environment = {
+                  TS_NO_UDP_GROT = "1";
+                  TS_DEBUG_NETCHECK = "0";
+                };
+                systemd.services.tailscaled.serviceConfig.LogLevelMax = "notice";
+
+                security.pki.certificateFiles = [ "${tls-cert}/cert.pem" ];
+
+                networking.firewall = {
+                  enable = true;
+                  allowedUDPPorts = [ config.services.tailscale.port ];
+                  checkReversePath = "loose";
+                  trustedInterfaces = [ "tailscale0" ];
+                };
+                services.openssh.enable = true;
+              };
           };
 
           testScript = ''
@@ -292,9 +318,13 @@ _: {
             um_key = headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
 
             server_key = headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:shared-server").strip()
+            ssh_key = headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:sshable").strip()
 
             shared_server.wait_for_unit("tailscaled.service")
             shared_server.succeed(f"tailscale up --authkey={server_key} --hostname=shared-server --advertise-tags=tag:shared-server --login-server=https://headscale")
+
+            ssh_target.wait_for_unit("tailscaled.service")
+            ssh_target.succeed(f"tailscale up --authkey={ssh_key} --hostname=ssh-target --advertise-tags=tag:sshable --login-server=https://headscale")
 
             emre_machine.wait_for_unit("tailscaled.service")
 
@@ -306,6 +336,7 @@ _: {
             um_machine.succeed(f"tailscale up --authkey={um_key} --hostname=um-laptop --login-server=https://headscale")
 
             headscale.wait_until_succeeds("headscale nodes list | grep shared-server")
+            headscale.wait_until_succeeds("headscale nodes list | grep ssh-target")
             headscale.wait_until_succeeds("headscale nodes list | grep emre-laptop")
             headscale.wait_until_succeeds("headscale nodes list | grep um-laptop")
 
@@ -313,12 +344,14 @@ _: {
                 return node.succeed("tailscale ip -4").strip()
 
             server_ip = get_ts_ip(shared_server)
+            ssh_target_ip = get_ts_ip(ssh_target)
             emre_ip = get_ts_ip(emre_machine)
             um_ip = get_ts_ip(um_machine)
 
             print(f"Server IP: {server_ip}")
             print(f"Emre IP: {emre_ip}")
             print(f"Um IP: {um_ip}")
+            print(f"SSH Target IP: {ssh_target_ip}")
 
 
 
@@ -329,6 +362,9 @@ _: {
             # Test ACL isolation - groups CANNOT ping each other
             um_machine.fail(f"ping -c 2 -W 1 {emre_ip}")
             emre_machine.fail(f"ping -c 2 -W 1 {um_ip}")
+
+            emre_machine.wait_until_succeeds(f"ping -c 2 {ssh_target_ip}")
+            um_machine.fail(f"ping -c 2 -W 1 {ssh_target_ip}")
 
             print("ALL VERIFICATIONS PASSED")
           '';
