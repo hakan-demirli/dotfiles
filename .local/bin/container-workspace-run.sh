@@ -72,7 +72,7 @@ $CONTAINER_RUNTIME run --rm -it \
   -v "$HOST_HOME"/Desktop:/host-desktop:z \
   -v "$HOST_HOME"/Downloads:/host-downloads:z \
   docker.io/nixos/nix \
-  nix-shell -p zstd gnutar util-linux coreutils rsync nix --run '
+  nix-shell -p zstd gnutar util-linux coreutils rsync nix tailscale --run '
     set -e
 
     export LANG=C.UTF-8
@@ -123,6 +123,10 @@ $CONTAINER_RUNTIME run --rm -it \
     ln -sf /workspace/.bash_profile /root/.bash_profile
     ln -sf /workspace/Desktop/dotfiles/.config/* /root/.config
     ln -sf /workspace/Desktop/dotfiles/.local/bin/* /root/.local/bin
+
+    echo "Starting Tailscale daemon..."
+    mkdir -p /var/log
+    tailscaled --state=/var/lib/tailscale/tailscaled.state --tun=userspace-networking > /var/log/tailscaled.log 2>&1 &
 
     echo "Workspace loaded. Executing into main Nix environment..."
     cd /root/Desktop/dotfiles
