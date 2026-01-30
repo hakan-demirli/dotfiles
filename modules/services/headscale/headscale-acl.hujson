@@ -42,7 +42,7 @@
     {
       "action": "accept",
       "src": ["group:emre", "tag:server", "tag:laptop", "tag:phone", "tag:exitnode"],
-      "dst": ["tag:sshable"],
+      "dst": ["tag:sshable", "tag:shared-server"],
       "users": ["autogroup:nonroot", "root"]
     }
   ]

@@ -108,6 +108,12 @@ $CONTAINER_RUNTIME run --rm -it \
     # rm /tmp/workspace.tar.zst
     tar -I "zstd -d -T0" -xf /persistent/workspace.tar.zst -C /workspace
 
+    echo "Setting up Tailscale state..."
+    mkdir -p /mem/tailscale
+    tar -I "zstd -d -T0" -xf /persistent/tailscale.tar.zst -C /mem/tailscale
+    mkdir -p /var/lib/tailscale
+    mount --bind /mem/tailscale /var/lib/tailscale
+
     mkdir -p /root/.config
     mkdir -p /root/.local/bin
     mkdir -p /root/.local/share

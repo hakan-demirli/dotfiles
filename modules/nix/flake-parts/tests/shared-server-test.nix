@@ -151,6 +151,7 @@ _: {
                   firewall.checkReversePath = "loose";
                 };
                 environment.systemPackages = [ pkgs.netcat ];
+                services.openssh.enable = true;
 
                 containers = {
                   alice = {
@@ -326,7 +327,7 @@ _: {
             ssh_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:sshable").strip()
 
             shared_server.wait_for_unit("tailscaled.service")
-            shared_server.succeed(f"tailscale up --authkey={server_key} --hostname=shared-server --advertise-tags=tag:shared-server --login-server=https://headscale")
+            shared_server.succeed(f"tailscale up --authkey={server_key} --hostname=shared-server --advertise-tags=tag:shared-server --login-server=https://headscale --ssh")
 
             ssh_target.wait_for_unit("tailscaled.service")
             ssh_target.succeed(f"tailscale up --authkey={ssh_key} --hostname=ssh-target --advertise-tags=tag:sshable --ssh --login-server=https://headscale")
@@ -371,6 +372,17 @@ _: {
             emre_machine.wait_until_succeeds(f"ping -c 2 {ssh_target_ip}")
             emre_machine.succeed(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {ssh_target_ip} true")
             um_machine.fail(f"ping -c 2 -W 1 {ssh_target_ip}")
+
+            # Test Shared Server Isolation
+            # Incoming SSH should work (Tag:shared-server is in 'dst' of SSH ACL)
+            emre_machine.wait_until_succeeds(f"ping -c 2 {server_ip}")
+            emre_machine.succeed(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {server_ip} true")
+
+            # Outgoing Traffic should FAIL (Tag:shared-server is NOT in 'src' of any ACL)
+            shared_server.fail(f"ping -c 2 -W 1 {emre_ip}")
+            shared_server.fail(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 {emre_ip} true")
+            shared_server.fail(f"ping -c 2 -W 1 {emre_ip}")
+            shared_server.fail(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 {emre_ip} true")
 
             print("ALL VERIFICATIONS PASSED")
           '';
