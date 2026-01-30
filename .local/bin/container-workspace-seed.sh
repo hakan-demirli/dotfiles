@@ -116,5 +116,11 @@ $CONTAINER_RUNTIME run --rm -it \
       -C /root \
       Desktop .bashrc
 
+    echo "Creating Tailscale state archive..."
+    mkdir -p /var/lib/tailscale
+    tar -I "zstd -1 -T0" \
+      -cpf /persistent/tailscale.tar.zst \
+      -C /var/lib/tailscale .
+
     echo "Seeding complete!"
   '
