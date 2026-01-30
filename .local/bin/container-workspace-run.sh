@@ -63,6 +63,7 @@ echo "Shared Tmpfs Size:   ${TOTAL_TMPFS_SIZE}"
 echo "Persistent Home:     ${HOST_HOME}"
 echo "---------------------------"
 
+# shellcheck disable=SC2016
 $CONTAINER_RUNTIME run --rm -it \
   --cap-add SYS_ADMIN \
   --tmpfs /mem:rw,size="$TOTAL_TMPFS_SIZE",exec \

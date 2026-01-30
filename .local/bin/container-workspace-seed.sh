@@ -62,6 +62,8 @@ BASHRC_CONTENT=$(
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.local/share/python/bin:$PATH"
 
+PROMPT_COMMAND="history -a; history -n"
+
 if [ -f "$HOME/Desktop/dotfiles/.config/bash/main.sh" ]; then
   source "$HOME/Desktop/dotfiles/.config/bash/main.sh"
 fi
@@ -69,7 +71,6 @@ if [ -f "$HOME/Desktop/dotfiles/.config/bash/container_helpers.sh" ]; then
   source "$HOME/Desktop/dotfiles/.config/bash/container_helpers.sh"
 fi
 
-PROMPT_COMMAND="history -a; history -n"
 
 HISTCONTROL=ignoredups:erasedups
 HISTFILE="$HOME/Desktop/history"
