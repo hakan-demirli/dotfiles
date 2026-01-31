@@ -19,12 +19,16 @@ jobs:
   integration-tests:
     needs: [flake-check]
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [test-shared-server, test-ssh-acl]
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v11
       - uses: DeterminateSystems/magic-nix-cache-action@v7
-      - name: Run Shared Server Test
-        run: nix run .#test
+      - name: Run Integration Test ${{ matrix.test }}
+        run: nix run .#${{ matrix.test }}
 
   build-systems:
     needs: [flake-check]

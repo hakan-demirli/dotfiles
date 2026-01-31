@@ -2,13 +2,13 @@ _: {
   perSystem =
     { config, pkgs, ... }:
     {
-      apps.test = {
+      apps.test-shared-server = {
         type = "app";
-        program = "${config.legacyPackages.integrationChecks.shared-server-test.driver}/bin/nixos-test-driver";
+        program = "${config.packages.shared-server-test.driver}/bin/nixos-test-driver";
         meta.description = "Run the shared server ACL integration test";
       };
 
-      legacyPackages.integrationChecks.shared-server-test =
+      packages.shared-server-test =
         let
           aclFile = ../../../services/headscale/headscale-acl.hujson;
 
@@ -152,51 +152,6 @@ _: {
                 };
                 environment.systemPackages = [ pkgs.netcat ];
 
-                containers = {
-                  alice = {
-                    autoStart = true;
-                    privateNetwork = true;
-                    hostAddress = "192.168.100.10";
-                    localAddress = "192.168.100.11";
-                    forwardPorts = [
-                      {
-                        protocol = "tcp";
-                        hostPort = 2201;
-                        containerPort = 22;
-                      }
-                    ];
-                    config = _: {
-                      networking.firewall.allowedTCPPorts = [ 22 ];
-                      system.stateVersion = "25.05";
-                      users.users.alice = {
-                        isNormalUser = true;
-                        extraGroups = [ "wheel" ];
-                      };
-                    };
-                  };
-
-                  bob = {
-                    autoStart = true;
-                    privateNetwork = true;
-                    hostAddress = "192.168.101.10";
-                    localAddress = "192.168.101.11";
-                    forwardPorts = [
-                      {
-                        protocol = "tcp";
-                        hostPort = 2202;
-                        containerPort = 22;
-                      }
-                    ];
-                    config = _: {
-                      networking.firewall.allowedTCPPorts = [ 22 ];
-                      system.stateVersion = "25.05";
-                      users.users.bob = {
-                        isNormalUser = true;
-                        extraGroups = [ "wheel" ];
-                      };
-                    };
-                  };
-                };
                 networking.firewall = {
                   enable = true;
                   allowedUDPPorts = [ config.services.tailscale.port ];
@@ -263,32 +218,6 @@ _: {
                 };
                 networking.extraHosts = "192.168.1.1 headscale";
               };
-
-            ssh_target =
-              { config, ... }:
-              {
-                services.tailscale = {
-                  enable = true;
-                  port = 41641;
-                  extraUpFlags = [ "--login-server=https://headscale" ];
-                };
-
-                systemd.services.tailscaled.environment = {
-                  TS_NO_UDP_GROT = "1";
-                  TS_DEBUG_NETCHECK = "0";
-                };
-                systemd.services.tailscaled.serviceConfig.LogLevelMax = "notice";
-
-                security.pki.certificateFiles = [ "${tls-cert}/cert.pem" ];
-
-                networking.firewall = {
-                  enable = true;
-                  allowedUDPPorts = [ config.services.tailscale.port ];
-                  checkReversePath = "loose";
-                  trustedInterfaces = [ "tailscale0" ];
-                };
-                networking.extraHosts = "192.168.1.1 headscale";
-              };
           };
 
           testScript = ''
@@ -313,30 +242,21 @@ _: {
             emre_id = get_user_id("emre")
             um_id = get_user_id("um")
 
-            emre_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h").strip()
-            um_key = a00_headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
-
             server_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:shared-server").strip()
             laptop_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:laptop").strip()
-            ssh_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:sshable").strip()
+            um_key = a00_headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
 
             shared_server.wait_for_unit("tailscaled.service")
             shared_server.succeed(f"tailscale up --authkey={server_key} --hostname=shared-server --advertise-tags=tag:shared-server --login-server=https://headscale --ssh")
 
-            ssh_target.wait_for_unit("tailscaled.service")
-            ssh_target.succeed(f"tailscale up --authkey={ssh_key} --hostname=ssh-target --advertise-tags=tag:sshable --ssh --login-server=https://headscale")
-
             emre_machine.wait_for_unit("tailscaled.service")
-
             emre_machine.succeed("ping -c 1 192.168.1.1 >&2")
-
             emre_machine.succeed(f"tailscale up --authkey={laptop_key} --hostname=emre-laptop --advertise-tags=tag:laptop --login-server=https://headscale")
 
             um_machine.wait_for_unit("tailscaled.service")
             um_machine.succeed(f"tailscale up --authkey={um_key} --hostname=um-laptop --login-server=https://headscale")
 
             a00_headscale.wait_until_succeeds("headscale nodes list | grep shared-server")
-            a00_headscale.wait_until_succeeds("headscale nodes list | grep ssh-target")
             a00_headscale.wait_until_succeeds("headscale nodes list | grep emre-laptop")
             a00_headscale.wait_until_succeeds("headscale nodes list | grep um-laptop")
 
@@ -344,16 +264,12 @@ _: {
                 return node.succeed("tailscale ip -4").strip()
 
             server_ip = get_ts_ip(shared_server)
-            ssh_target_ip = get_ts_ip(ssh_target)
             emre_ip = get_ts_ip(emre_machine)
             um_ip = get_ts_ip(um_machine)
 
             print(f"Server IP: {server_ip}")
             print(f"Emre IP: {emre_ip}")
             print(f"Um IP: {um_ip}")
-            print(f"SSH Target IP: {ssh_target_ip}")
-
-
 
             # Test connectivity - both groups can reach shared server
             emre_machine.wait_until_succeeds(f"ping -c 2 {server_ip}")
@@ -362,10 +278,6 @@ _: {
             # Test ACL isolation - groups CANNOT ping each other
             um_machine.fail(f"ping -c 2 -W 1 {emre_ip}")
             emre_machine.fail(f"ping -c 2 -W 1 {um_ip}")
-
-            emre_machine.wait_until_succeeds(f"ping -c 2 {ssh_target_ip}")
-            emre_machine.succeed(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {ssh_target_ip} true")
-            um_machine.fail(f"ping -c 2 -W 1 {ssh_target_ip}")
 
             # Test Shared Server Isolation
             # Incoming SSH should work (Tag:shared-server is in 'dst' of SSH ACL)
