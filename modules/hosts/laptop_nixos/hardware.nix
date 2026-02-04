@@ -25,11 +25,6 @@
             "uid=1000"
           ];
         };
-
-        "/mnt/third" = {
-          device = "/dev/disk/by-uuid/676ca51a-3db9-46fb-9b09-b4edb9a3f795";
-          fsType = "btrfs";
-        };
       };
 
       networking.useDHCP = lib.mkDefault true;
