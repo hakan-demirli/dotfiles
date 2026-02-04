@@ -79,5 +79,6 @@ in
         username = "emre";
       };
 
+      boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
     };
 }

@@ -8,6 +8,7 @@ in
 {
   flake.modules.nixos.vm_oracle_x86 =
     {
+      pkgs,
       ...
     }:
     {
@@ -58,8 +59,8 @@ in
 
       boot = {
         loader.efi.efiSysMountPoint = "/boot";
-        loader.grub.efiInstallAsRemovable = true;
+        loader.grub.efiInstallAsRemovable = pkgs.lib.mkForce true;
+        loader.efi.canTouchEfiVariables = pkgs.lib.mkForce false;
       };
-
     };
 }
