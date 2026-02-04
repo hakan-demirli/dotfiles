@@ -45,18 +45,16 @@
     * ```sudo su```
   * Go to home:
     * ```cd```
-  * Find out the disk you want to install nixos to:
-    * ```lsblk```
-  * Create a disko layout, or borrow someone elses layout:
-    * Get all layouts in this repo.
+  * Get this repo.
       * ```git clone https://github.com/hakan-demirli/dotfiles```
+  * Ensure the disk label is correct and matches with the disko config
+    * ```lsblk```
   * Format the disk using disko:
-    * ```sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./dotfiles/hosts/common/hardware/disko-btrfs-lvm.nix --arg diskDevice '"/dev/vda"' --arg swapSize '"8G"'```
+    * ```sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko --flake ./dotfiles/#vm```
   * Obtain a new hardware-configuration.nix for your device
     * Generate nixos config:
       * ```sudo nixos-generate-config --no-filesystems --root .```
-  * Create a new host dir for your device and copy hardware-configurations.nix there: 
-    * ```cp ./etc/nixos/hardware-configuration.nix ./dotfiles/hosts/vm/hardware```
+  * Transfer the changes to an existing host or create a new host.
   * Install nixos:
     * ```nixos-install --root /mnt --flake ./dotfiles/.#vm```
   * Reboot
@@ -121,6 +119,7 @@
     * ```sudo headscale preauthkeys create --user 1 --reusable --expiration 1752000h --tags tag:bootstrap```
       * Add it to `./secrets/secrets.yaml`
   * git pull and switch to the new key on all hosts.
+  * Ensure the node has a correct tag for its purpose, listed here: `/modules/services/headscale/headscale-acl.hujson`
   * Configure the exit nodes:
     * Get the ID of the node you want to use as an exit node:
       * ```sudo headscale nodes routes list```
