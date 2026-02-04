@@ -57,10 +57,12 @@ in
         username = "emre";
       };
 
-      boot = {
-        loader.efi.efiSysMountPoint = "/boot";
-        loader.grub.efiInstallAsRemovable = pkgs.lib.mkForce true;
-        loader.efi.canTouchEfiVariables = pkgs.lib.mkForce false;
+      boot.loader = {
+        grub.efiInstallAsRemovable = pkgs.lib.mkForce true;
+        efi = {
+          efiSysMountPoint = "/boot";
+          canTouchEfiVariables = pkgs.lib.mkForce false;
+        };
       };
     };
 }
