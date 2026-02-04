@@ -156,6 +156,7 @@ let
       tailscale-systray
       tor-browser
       transmission_4-qt
+      (pkgs.callPackage ../../pkgs/ttf-wps-fonts.nix { })
       udiskie
       waybar
       wl-clipboard
