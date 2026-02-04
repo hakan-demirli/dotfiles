@@ -24,6 +24,8 @@ in
         s01-hardware
       ];
 
+      networking.networkmanager.enable = true;
+
       time.timeZone = "Europe/Zurich";
 
       system = {
