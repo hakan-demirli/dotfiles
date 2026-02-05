@@ -61,6 +61,18 @@ in
               path = "/home/${username}/.ssh/id_ed25519";
               mode = "0600";
             };
+            "root_id_ed25519_proton" = {
+              key = "ssh/id_ed25519_proton";
+              owner = "root";
+              path = "/root/.ssh/id_ed25519_proton";
+              mode = "0600";
+            };
+            "root_ssh_config" = {
+              key = "ssh/config";
+              owner = "root";
+              path = "/root/.ssh/config";
+              mode = "0600";
+            };
             "ssh/id_ed25519_proton" = {
               owner = username;
               path = "/home/${username}/.ssh/id_ed25519_proton";
