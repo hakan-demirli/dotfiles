@@ -247,7 +247,7 @@ _: {
             # Test ACL isolation
             # emre can reach ssh_target
             emre_machine.wait_until_succeeds(f"ping -c 2 {ssh_target_ip}")
-            emre_machine.succeed(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {ssh_target_ip} true")
+            emre_machine.wait_until_succeeds(f"ssh -F /dev/null -o BatchMode=yes -o StrictHostKeyChecking=no -o ConnectTimeout=5 {ssh_target_ip} true", timeout=60)
 
             # um CANNOT reach ssh_target
             um_machine.fail(f"ping -c 2 -W 1 {ssh_target_ip}")
