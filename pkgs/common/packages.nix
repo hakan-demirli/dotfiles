@@ -10,6 +10,7 @@ let
     fd
     fzf
     git
+    gh
     jq
     parallel-full
     ripgrep
