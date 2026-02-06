@@ -147,7 +147,10 @@ def git_command(args):
 
 def main():
     setup_logger()
-    git_command(sys.argv[1:])
+    try:
+        git_command(sys.argv[1:])
+    except KeyboardInterrupt:
+        sys.exit(130)
 
 
 if __name__ == "__main__":
