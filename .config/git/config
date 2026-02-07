@@ -33,3 +33,11 @@
 
 [http]
 	postBuffer = 1048576000
+
+[alias]
+	next = stack next
+	prev = stack previous
+	reword = stack reword
+	amend = stack amend
+	sync = stack sync
+	run = stack run
