@@ -25,6 +25,7 @@ in
           services-sops
           services-slurm
           slurm-cluster-nodes
+          services-ntfy
           vm_oracle_aarch64-hardware
         ]
         ++ [

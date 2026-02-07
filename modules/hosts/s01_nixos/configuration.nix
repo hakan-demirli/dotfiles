@@ -81,6 +81,8 @@ in
         username = "emre";
       };
 
+      programs.nix-ld.enable = true;
+
       boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
     };
 }
