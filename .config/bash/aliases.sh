@@ -35,16 +35,7 @@ alias gb='fzf_git_branches'
 alias gc='git commit'
 alias gcm='git commit -m'
 alias gca='git commit --amend'
-alias gl='fzf_git_commits'
-
-alias gss='git stack'
-alias gsy='git sync'
-alias gsn='git next'
-alias gsp='git prev'
-alias gsa='git amend'
-alias gsr='git reword'
-alias gsP='git stack --push'
-alias gsR='git stack --repair'
+alias gl='git log --oneline --graph --first-parent -10'
 
 # Notifications & Sound
 alias bell='source $HOME/.local/bin/prompt-bell'
