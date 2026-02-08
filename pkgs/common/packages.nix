@@ -11,7 +11,6 @@ let
     fzf
     git
     gh
-    git-stack
     jq
     parallel-full
     ripgrep
