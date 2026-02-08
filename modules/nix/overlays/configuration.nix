@@ -35,24 +35,6 @@
               })
             else
               prev.kooha;
-
-          nwg-displays = prev.nwg-displays.overrideAttrs (oldAttrs: {
-            patches = (oldAttrs.patches or [ ]) ++ [
-              (prev.writeText "nwg-displays-fix-import.patch" ''
-                diff --git a/nwg_displays/main.py b/nwg_displays/main.py
-                index 22da645..08407c9 100644
-                --- a/nwg_displays/main.py
-                +++ b/nwg_displays/main.py
-                @@ -16,6 +16,7 @@ Thank you, Kurt Jacobson!
-                 import argparse
-                 import os.path
-                 import sys
-                +import stat
-                 
-                 import gi
-              '')
-            ];
-          });
         })
       ];
     };
