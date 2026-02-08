@@ -82,6 +82,7 @@ let
       ffmpegthumbnailer
       ghostscript
       (nurPkgs.dap or null)
+      (nurPkgs.uncomment or null)
       (nurPkgs.flake-updater or null)
       (nurPkgs.riveroftime or null)
       # mutagen
