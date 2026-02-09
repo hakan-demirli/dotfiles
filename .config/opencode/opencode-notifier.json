@@ -5,7 +5,7 @@
     "path": "sh",
     "args": [
       "-c",
-      "ffplay -autoexit -nodisp -af 'volume=2.0' $HOME/.local/share/sounds/effects/nier_enter.mp3 >/dev/null 2>&1"
+      "HN=$(hostname); if [ \"$HN\" != \"laptop\" ]; then tnotify.sh \"opencode done ($HN)\"; curl -d \"opencode done ($HN)\" -H \"Title: Opencode ($HN)\" http://vm-oracle-aarch64:8111/emre-laptop; fi"
     ]
   }
 }
