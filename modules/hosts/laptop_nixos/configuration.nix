@@ -47,6 +47,7 @@ in
         ++ [
           (inputs.self + /pkgs/state_autocommit.nix)
           (inputs.self + /pkgs/github_backup.nix)
+          (inputs.self + /pkgs/ntfy-listener.nix)
         ];
 
       networking.hostName = "laptop";
