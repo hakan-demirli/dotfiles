@@ -6,11 +6,13 @@ let
   username = "emre";
   desktopDir = "/home/${username}/Desktop";
   historyFile = "${desktopDir}/history";
+  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
 
   flake.modules.homeManager.server-headless =
     { config, pkgs, ... }:
     let
       common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+      gpgPublicKeyFile = pkgs.writeText "yubikey-gpg-public.asc" publicData.yubikey.gpg_public_key;
     in
     {
       imports = [
@@ -60,7 +62,16 @@ let
       };
 
       programs = {
-        gpg.homedir = "${config.xdg.dataHome}/gnupg";
+        gpg = {
+          enable = true;
+          homedir = "${config.xdg.dataHome}/gnupg";
+          publicKeys = [
+            {
+              source = gpgPublicKeyFile;
+              trust = 5;
+            }
+          ];
+        };
         home-manager.enable = true;
         starship.enable = true;
         direnv = {
