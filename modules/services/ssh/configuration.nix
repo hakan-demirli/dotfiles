@@ -26,6 +26,7 @@ _: {
             PermitRootLogin = "prohibit-password";
             KbdInteractiveAuthentication = false;
             UsePAM = true;
+            StreamLocalBindUnlink = "yes";
           };
         };
 
