@@ -35,7 +35,7 @@ alias gb='fzf_git_branches'
 alias gc='git commit'
 alias gcm='git commit -m'
 alias gca='git commit --amend'
-alias gl='git log --oneline --graph --first-parent -10'
+alias gl='git --no-pager log --oneline --graph --first-parent -10'
 
 # Notifications & Sound
 alias bell='source $HOME/.local/bin/prompt-bell'
