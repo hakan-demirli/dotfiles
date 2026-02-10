@@ -1,0 +1,15 @@
+name: "PR Check"
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  flake-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: DeterminateSystems/magic-nix-cache-action@v7
+      - name: Run Flake Check
+        run: nix flake check --all-systems
