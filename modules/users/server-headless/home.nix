@@ -64,7 +64,6 @@ let
       programs = {
         gpg = {
           enable = true;
-          homedir = "${config.xdg.dataHome}/gnupg";
           publicKeys = [
             {
               source = gpgPublicKeyFile;
