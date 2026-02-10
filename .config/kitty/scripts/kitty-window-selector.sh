@@ -42,12 +42,50 @@ declare -a windows
 target_index=-1
 current_idx=0
 
-while IFS='|' read -r id title; do
+window_info=$(echo "$json_data" | jq -r '
+  .[].tabs[].windows[] |
+  .id as $id |
+  .cwd as $cwd |
+  .title as $title |
+
+  ((.foreground_processes // []) | map(
+    select(.cmdline | length > 0) |
+    .cmdline |
+    if (.[0] | test("ssh$")) or (.[1]? == "ssh") then
+      (to_entries | map(select(.value | test("^[a-zA-Z0-9._-]+$") and (test("^-") | not))) | last // {value: "unknown"}).value
+    elif .[0] == "kitten" and .[1]? == "ssh" then
+      .[2] // "unknown"
+    else
+      null
+    end
+  ) | map(select(. != null)) | first // null) as $ssh_host |
+
+  ((.foreground_processes // []) | map(
+    select(.cmdline | length > 0) |
+    .cmdline[0] | split("/") | last |
+    select(. != "bash" and . != "sh" and . != "zsh" and . != "fish" and . != "ssh" and . != "kitten")
+  ) | first // null) as $fg_proc |
+
+  ($cwd | split("/") | if length > 2 then .[-2:] else . end | join("/") |
+   gsub("^/home/[^/]+"; "~")) as $short_cwd |
+
+  (if $ssh_host then
+    " " + $ssh_host
+  elif $fg_proc then
+    "󰍹 " + $fg_proc
+  else
+    "󰍹 " + $short_cwd
+  end) as $display |
+
+  "\($id)|\($display)"
+')
+
+while IFS='|' read -r id display; do
   if [[ $id == "$self_id" ]]; then
     continue
   fi
 
-  line="WIN: $title ($id)"
+  line="$display ($id)"
   windows+=("$line")
 
   if [[ $id == "$target_id" ]]; then
@@ -55,7 +93,7 @@ while IFS='|' read -r id title; do
   fi
 
   ((current_idx++))
-done < <(echo "$json_data" | jq -r '.[].tabs[].windows[] | "\(.id)|\(.title)"')
+done <<< "$window_info"
 
 fzf_bind_arg=""
 if [[ $target_index -ge 0 ]]; then
@@ -67,8 +105,8 @@ fi
   for win in "${windows[@]}"; do echo "$win"; done
 } | fzf --margin=20%,20% --border $fzf_bind_arg \
   --preview '
-      if [[ {} == "WIN:"* ]]; then
-        id=$(echo {} | sed "s/.*(\([0-9]*\))$/\1/")
+      id=$(echo {} | sed "s/.*(\([0-9]*\))$/\1/")
+      if [[ -n $id ]]; then
         kitty @ get-text --match id:$id --ansi
       fi
     ' | {
@@ -77,10 +115,10 @@ fi
     exit 0
   fi
 
-  if [[ $selection == WIN:* ]]; then
-    id="${selection##*(}"
-    id="${id%)}"
+  id="${selection##*(}"
+  id="${id%)}"
 
+  if [[ -n $id ]]; then
     kitty @ focus-window -m "id:$id"
   fi
 }
