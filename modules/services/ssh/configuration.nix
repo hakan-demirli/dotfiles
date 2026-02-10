@@ -31,11 +31,6 @@ _: {
         };
 
         users.users.root.openssh.authorizedKeys.keys = cfg.rootSshKeys;
-
-        programs.gnupg.agent = {
-          enable = true;
-          enableSSHSupport = true;
-        };
       };
     };
 }
