@@ -36,6 +36,7 @@ in
         disko = {
           device = "/dev/nvme0n1";
           swapSize = "32G";
+          additionalDisks = [ "/dev/nvme1n1" ];
         };
         impermanence = {
           username = "emre";
