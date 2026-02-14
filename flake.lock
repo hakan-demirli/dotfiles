@@ -202,11 +202,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1770580334,
-        "narHash": "sha256-aBn/F4ve9YfZPCAK7S4ZHERDisEDnPkZnKJQLJZ5lps=",
+        "lastModified": 1771095921,
+        "narHash": "sha256-jM6k68wbasF4+qL7rRVaH+Zo1afmpD32NScV/ttW2ds=",
         "owner": "hakan-demirli",
         "repo": "NUR",
-        "rev": "874d3ad1ab72e719b68d8f552ae824f82863b1bd",
+        "rev": "470cefb727fb59ae63ee7e8ef9d051fb0d670c89",
         "type": "github"
       },
       "original": {
