@@ -46,7 +46,7 @@
       ]
       ++ cfg.extraAddresses;
 
-      configJson = pkgs.writeText "homepage-config.json" (
+      configJson = builtins.toFile "homepage-config.json" (
         builtins.toJSON { inherit services addresses; }
       );
 

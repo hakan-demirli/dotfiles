@@ -28,6 +28,7 @@ in
           services-ntfy
           services-homepage
           services-deasciifier
+          services-jellyfin
           vm_oracle_aarch64-hardware
         ]
         ++ [
