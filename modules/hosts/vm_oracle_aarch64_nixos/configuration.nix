@@ -26,6 +26,8 @@ in
           services-slurm
           slurm-cluster-nodes
           services-ntfy
+          services-homepage
+          services-deasciifier
           vm_oracle_aarch64-hardware
         ]
         ++ [
