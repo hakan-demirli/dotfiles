@@ -11,7 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v11
-      - uses: DeterminateSystems/magic-nix-cache-action@v7
       - name: Run Flake Check
         run: nix flake check --all-systems
 
@@ -25,7 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v11
-      - uses: DeterminateSystems/magic-nix-cache-action@v7
       - name: Run Integration Test ${{ matrix.test }}
         run: nix run .#${{ matrix.test }}
 
@@ -76,7 +74,5 @@ jobs:
           docker-images: true
           swap-storage: true
       - uses: DeterminateSystems/nix-installer-action@v11
-      - name: Enable Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v7
       - name: Build ${{ matrix.name }}
         run: nix build .#${{ matrix.target }}
