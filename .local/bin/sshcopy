@@ -7,7 +7,7 @@ if [ -z "$HOST" ]; then
   exit 1
 fi
 
-read -e -p -r "Remote Path: " REMOTE_PATH
+read -e -p "Remote Path: " REMOTE_PATH
 
 if [ -z "$REMOTE_PATH" ]; then
   echo "No path provided."
