@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: DeterminateSystems/nix-installer-action@main
       - name: Run Flake Check
         run: nix flake check --all-systems
 
@@ -23,7 +23,7 @@ jobs:
         test: [test-shared-server, test-ssh-acl]
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: DeterminateSystems/nix-installer-action@main
       - name: Run Integration Test ${{ matrix.test }}
         run: nix run .#${{ matrix.test }}
 
@@ -73,6 +73,6 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
-      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: DeterminateSystems/nix-installer-action@main
       - name: Build ${{ matrix.name }}
         run: nix build .#${{ matrix.target }}
