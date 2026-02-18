@@ -24,7 +24,10 @@ let
 
   gaming = with pkgs; [
     winetricks
-    wineWowPackages.waylandFull
+    umu-launcher
+    gamescope
+    winetricks
+    mangohud
   ];
 
   editors = with pkgs; [
