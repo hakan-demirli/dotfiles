@@ -4,7 +4,14 @@
     {
       services.xserver.videoDrivers = [
         "nvidia"
-        "displayLink"
+      ];
+
+      # https://github.com/NixOS/nixpkgs/issues/491861
+      services.xserver.drivers = [
+        {
+          name = "displaylink";
+          display = false;
+        }
       ];
 
       hardware.graphics = {
