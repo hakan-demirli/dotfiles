@@ -80,6 +80,16 @@ image_bound = [ 0, 0 ]
 prepend_previewers = [{ url = "*.opus", run = "opus-preview" }]
 prepend_preloaders = [{ url = "*.opus", run = "opus-preview" }]
 
+[[plugin.prepend_fetchers]]
+id  = "git"
+url = "*"
+run = "git"
+
+[[plugin.prepend_fetchers]]
+id  = "git"
+url = "*/"
+run = "git"
+
 [input]
 # cd
 cd_title  = "Change directory:"
