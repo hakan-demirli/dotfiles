@@ -242,8 +242,8 @@ _: {
             emre_id = get_user_id("emre")
             um_id = get_user_id("um")
 
-            server_key = a00_headscale.succeed("headscale preauthkeys create --reusable --expiration 24h --tags tag:shared-server").strip()
-            laptop_key = a00_headscale.succeed("headscale preauthkeys create --reusable --expiration 24h --tags tag:laptop").strip()
+            server_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:shared-server").strip()
+            laptop_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:laptop").strip()
             um_key = a00_headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
 
             shared_server.wait_for_unit("tailscaled.service")
