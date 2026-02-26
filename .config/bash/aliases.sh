@@ -47,6 +47,9 @@ alias yarn='yarn --use-yarnrc "$XDG_CONFIG_HOME/yarn/config"'
 alias wget='wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'
 alias arduino-cli='arduino-cli --config-file $XDG_CONFIG_HOME/arduino15/arduino-cli.yaml'
 
+# GPG
+alias fixgpg='source fixgpg'
+
 # Tmux
 alias tmux='tmux -f ~/.config/tmux/tmux.conf'
 alias txa='tmux attach-session -t $(tmux list-sessions -F "#{session_name}" | head -n 1)'
