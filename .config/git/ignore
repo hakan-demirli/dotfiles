@@ -1,3 +1,6 @@
 .aider*
 .ruff_cache*
 .opencode
+.fuse_hidden*
+.Trash-*
+.nfs*
