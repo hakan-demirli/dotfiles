@@ -1,7 +1,7 @@
 {
   "groups": {
-    "group:emre": ["emre"],
-    "group:um": ["um"]
+    "group:emre": ["emre@"],
+    "group:um": ["um@"]
   },
 
   "tagOwners": {
