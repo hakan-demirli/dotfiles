@@ -30,8 +30,20 @@
             "Documents"
             "Downloads"
             "Videos"
+            ".cache"
+            ".local/share"
+            ".local/state/opencode"
+            ".config/opencode"
+            ".antigravity"
+            ".config/Antigravity"
+            ".gemini"
           ];
-          description = "User directories to persist (relative to home)";
+          description = "Base user directories to persist (relative to home)";
+        };
+        extraPersistentUserDirs = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          description = "Extra user directories to persist, appended to persistentUserDirs";
         };
       };
 
@@ -77,7 +89,7 @@
         environment.persistence."/persist" = {
           hideMounts = true;
           users.${cfg.username} = {
-            directories = cfg.persistentUserDirs;
+            directories = cfg.persistentUserDirs ++ cfg.extraPersistentUserDirs;
           };
         };
 
