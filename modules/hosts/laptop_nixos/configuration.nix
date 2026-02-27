@@ -67,22 +67,11 @@ in
             "/var/log"
             "/var/lib/bluetooth"
           ];
-          persistentUserDirs = [
+          extraPersistentUserDirs = [
             ".config/pulse"
             ".local/state/pipewire"
             ".local/state/wireplumber"
-            ".cache"
             ".mozilla"
-            ".local/share"
-            ".antigravity"
-            ".config/Antigravity"
-            ".config/opencode"
-            ".local/state/opencode"
-            ".gemini"
-            "Desktop"
-            "Documents"
-            "Downloads"
-            "Videos"
           ];
         };
         user = {
