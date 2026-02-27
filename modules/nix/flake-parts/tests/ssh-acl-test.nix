@@ -212,19 +212,18 @@ _: {
                         return user["id"]
                 raise Exception(f"User {username} not found in output: {output}")
 
-            emre_id = get_user_id("emre")
             um_id = get_user_id("um")
 
-            laptop_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:laptop").strip()
+            laptop_key = a00_headscale.succeed("headscale preauthkeys create --reusable --expiration 24h --tags tag:laptop").strip()
             um_key = a00_headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
-            ssh_key = a00_headscale.succeed(f"headscale preauthkeys create --user {emre_id} --reusable --expiration 24h --tags tag:sshable").strip()
+            ssh_key = a00_headscale.succeed("headscale preauthkeys create --reusable --expiration 24h --tags tag:sshable").strip()
 
             ssh_target.wait_for_unit("tailscaled.service")
-            ssh_target.succeed(f"tailscale up --authkey={ssh_key} --hostname=ssh-target --advertise-tags=tag:sshable --ssh --login-server=https://headscale")
+            ssh_target.succeed(f"tailscale up --authkey={ssh_key} --hostname=ssh-target --ssh --login-server=https://headscale")
 
             emre_machine.wait_for_unit("tailscaled.service")
             emre_machine.succeed("ping -c 1 192.168.1.1 >&2")
-            emre_machine.succeed(f"tailscale up --authkey={laptop_key} --hostname=emre-laptop --advertise-tags=tag:laptop --login-server=https://headscale")
+            emre_machine.succeed(f"tailscale up --authkey={laptop_key} --hostname=emre-laptop --login-server=https://headscale")
 
             um_machine.wait_for_unit("tailscaled.service")
             um_machine.succeed(f"tailscale up --authkey={um_key} --hostname=um-laptop --login-server=https://headscale")
