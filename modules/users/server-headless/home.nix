@@ -64,6 +64,8 @@ let
       programs = {
         gpg = {
           enable = true;
+          mutableKeys = false;
+          mutableTrust = false;
           settings = {
             no-autostart = true;
           };
