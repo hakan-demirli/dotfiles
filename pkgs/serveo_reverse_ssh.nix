@@ -43,7 +43,7 @@ in
           "HOME=${scriptHome}"
           "USER=${scriptUser}"
           "PATH=${pkgs.coreutils}/bin:${pkgs.git}/bin:${pkgs.openssh}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin"
-          "GIT_CONFIG_GLOBAL=/home/emre/.config/git/config"
+          "GIT_CONFIG_GLOBAL=${scriptHome}/.config/git/config"
         ];
         WorkingDirectory = gitRepoPath;
         ExecStart = "${pkgs.bash}/bin/bash ${reverseSshScript}";
