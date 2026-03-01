@@ -60,7 +60,7 @@ in
           remoteHost = reverseSshBounceServerHost;
           remotePort = reverseSshBasePort + serverId; # 42002
           remoteUser = reverseSshBounceServerUser;
-          privateKeyPath = "/home/emre/.ssh/id_ed25519_proton";
+          privateKeyPath = "/home/${reverseSshBounceServerUser}/.ssh/id_ed25519_proton";
         };
         tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
 
