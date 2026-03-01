@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 function yazi_zip() {
   tput reset

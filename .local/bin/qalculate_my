@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-is_running=$(pgrep "qalculate")
+is_running=$(pgrep "qalculate" || true)
 echo "$is_running"
 
 if [ -n "$is_running" ]; then

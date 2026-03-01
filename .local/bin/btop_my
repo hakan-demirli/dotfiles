@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-is_running=$(pgrep -f "my_btop")
+is_running=$(pgrep -f "my_btop" || true)
 echo "$is_running"
 
 if [ -n "$is_running" ]; then

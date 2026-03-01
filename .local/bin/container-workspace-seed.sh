@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 CONTAINER_RUNTIME="docker"
 HOST_HOME="$HOME"
