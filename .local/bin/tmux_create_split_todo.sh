@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 _SESSION=$(tmux display-message -p '#S')
 _WINDOW=$(tmux display-message -p '#I')

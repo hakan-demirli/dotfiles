@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-is_running=$(pgrep -f "my_todo")
+is_running=$(pgrep -f "my_todo" || true)
 echo "$is_running"
 
 if [ -n "$is_running" ]; then
@@ -8,5 +9,5 @@ if [ -n "$is_running" ]; then
   hyprctl dispatch togglespecialworkspace todo
 else
   echo "just todo"
-  cd /home/emre/.local/share/scratchpads/ && kitty --title "my_todo" txh &
+  cd "${HOME}/.local/share/scratchpads/" && kitty --title "my_todo" txh &
 fi

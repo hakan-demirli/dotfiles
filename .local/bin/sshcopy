@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 HOST=$(grep -P "^Host " ~/.ssh/config 2> /dev/null | awk '{print $2}' | grep -F -v "*" | fzf --height=40% --layout=reverse --border --prompt="Select Host > ")
 

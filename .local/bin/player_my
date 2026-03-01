@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-is_running=$(pgrep -f "my_player")
+is_running=$(pgrep -f "my_player" || true)
 echo "$is_running"
 
 if [ -n "$is_running" ]; then
@@ -8,6 +9,6 @@ if [ -n "$is_running" ]; then
   hyprctl dispatch togglespecialworkspace
 else
   echo "just kitty"
-  kitty --title "my_player" yazi /home/emre/.local/share/sounds_deployed/music &
+  kitty --title "my_player" yazi "${HOME}/.local/share/sounds_deployed/music" &
   # hyprctl dispatch focuswindow title:my_player
 fi

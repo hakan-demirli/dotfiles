@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 CONTAINER_RUNTIME="docker"
 TOTAL_TMPFS_SIZE="100g"

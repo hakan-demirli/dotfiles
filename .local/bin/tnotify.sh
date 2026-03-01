@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-TOKEN="$TELEGRAMBOT0_API_KEY"
+TOKEN="${TELEGRAMBOT0_API_KEY:-}"
 CHAT_ID="$TELEGRAM_CHAT_ID"
 
 if [[ -z $TOKEN ]]; then

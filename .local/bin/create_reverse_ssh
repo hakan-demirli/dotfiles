@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GIT_REPO_PATH="/home/emre/Desktop/serveo"
+GIT_REPO_PATH="${HOME}/Desktop/serveo"
 TUNNEL_INFO_FILE="serveo_tunnel.url"
 GIT_REMOTE="origin"
 GIT_BRANCH="main"

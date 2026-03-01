@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-read -r -d '' pane_contents
+read -r -d '' pane_contents || true
 
 output=$(printf "%s" "$pane_contents" | awk '
   /❯/ { i++; idx[i] = NR }
