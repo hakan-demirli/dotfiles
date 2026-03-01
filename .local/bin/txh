@@ -17,6 +17,11 @@ fi
 # from previously saved hooks
 # then make the window idx of the first hook 0
 
+if [[ ! -f "$data_file" ]]; then
+  tmux new-session -s "$session_name" "hx ."
+  exit 0
+fi
+
 min=9999
 max=9999999
 
