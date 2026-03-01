@@ -52,6 +52,8 @@ static int fzf_search_history(int count, int key) {
 
   char result[4096] = {0};
   ssize_t n = read(pipe_out[0], result, sizeof(result) - 1);
+  if (n < 0) n = 0;
+  result[n] = '\0';
   close(pipe_out[0]);
 
   int status;
