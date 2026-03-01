@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # txf: Tmux + Yazi/Finder
 # Launches yazi to let you find a directory, then creates or attaches to
 # a tmux session for that directory.

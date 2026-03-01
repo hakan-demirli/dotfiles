@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 current_path=$(tmux display-message -p "#{pane_current_path}")
 project_root=$(dirname "$current_path")

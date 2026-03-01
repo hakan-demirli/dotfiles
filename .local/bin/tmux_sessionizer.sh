@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:session_path}" \
   | awk '

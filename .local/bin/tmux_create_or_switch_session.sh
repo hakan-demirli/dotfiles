@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 tmux_cwd=$(pwd)
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
