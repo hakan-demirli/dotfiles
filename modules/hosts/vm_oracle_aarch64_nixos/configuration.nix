@@ -21,7 +21,7 @@ in
           services-headscale
           services-fail2ban
           services-docker-registry
-          services-nix-serve
+          services-harmonia
           services-sops
           services-slurm
           slurm-cluster-nodes
