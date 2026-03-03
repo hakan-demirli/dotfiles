@@ -23,7 +23,7 @@ trigger_desktop_action() {
   local do_desktop="$2"
   local do_sound="$3"
 
-  if [[ -n $DISPLAY || -n $WAYLAND_DISPLAY ]]; then
+  if [[ -n ${DISPLAY:-} || -n ${WAYLAND_DISPLAY:-} ]]; then
     if [[ $do_desktop -eq 1 ]]; then
       if command -v notify-send > /dev/null 2>&1; then
         notify-send "Tmux Task Finished" "$msg"

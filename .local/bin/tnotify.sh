@@ -2,7 +2,7 @@
 set -euo pipefail
 
 TOKEN="${TELEGRAMBOT0_API_KEY:-}"
-CHAT_ID="$TELEGRAM_CHAT_ID"
+CHAT_ID="${TELEGRAM_CHAT_ID:-}"
 
 if [[ -z $TOKEN ]]; then
   echo "Error: TELEGRAMBOT0_API_KEY environment variable is not set." >&2
