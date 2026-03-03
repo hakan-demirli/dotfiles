@@ -26,7 +26,7 @@ PROGRAM_ARGS_QUOTED=$(printf "%q " "$@")
 
 GDB_COMMAND="gdb --args $EXECUTABLE_QUOTED $PROGRAM_ARGS_QUOTED"
 
-if [ -z "$TMUX" ]; then
+if [ -z "${TMUX:-}" ]; then
   echo "No tmux session found. Creating a new one for GDB..."
   SESSION_NAME="gdb-session-$$"
 

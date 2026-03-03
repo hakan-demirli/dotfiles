@@ -12,17 +12,17 @@ ABS_FILE=$(realpath "$FILE")
 transfer_file() {
   local src="$1"
 
-  if [[ $TERM == *"kitty"* ]]; then
+  if [[ ${TERM:-} == *"kitty"* ]]; then
     if command -v kitten > /dev/null 2>&1; then
       kitten transfer "$src" ./Downloads/
       return 0
     else
-      echo "TERM claims to be '$TERM', but 'kitten' binary not found."
+      echo "TERM claims to be '${TERM:-}', but 'kitten' binary not found."
       echo "(Did you ssh with 'kitty +kitten ssh user@host'?)"
     fi
   fi
 
-  if [[ $TERM_PROGRAM == "WezTerm" ]] || [[ $TERM_PROGRAM == "iTerm.app" ]] || [[ $LC_TERMINAL == "iTerm2" ]]; then
+  if [[ ${TERM_PROGRAM:-} == "WezTerm" ]] || [[ ${TERM_PROGRAM:-} == "iTerm.app" ]] || [[ ${LC_TERMINAL:-} == "iTerm2" ]]; then
     if command -v base64 > /dev/null 2>&1; then
       local fn
       fn=$(basename "$src")
@@ -39,13 +39,13 @@ transfer_file() {
   fi
 
   echo "Error: No suitable transfer method found."
-  echo "  TERM: $TERM"
-  echo "  TERM_PROGRAM: $TERM_PROGRAM"
+  echo "  TERM: ${TERM:-}"
+  echo "  TERM_PROGRAM: ${TERM_PROGRAM:-}"
   return 1
 }
 
 IS_REMOTE=0
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -n "$SSH_CONNECTION" ]; then
+if [ -n "${SSH_CLIENT:-}" ] || [ -n "${SSH_TTY:-}" ] || [ -n "${SSH_CONNECTION:-}" ]; then
   IS_REMOTE=1
 fi
 
