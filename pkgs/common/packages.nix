@@ -24,6 +24,7 @@ let
 
   gaming = with pkgs; [
     winetricks
+    wineWow64Packages.wayland
     umu-launcher
     gamescope
     winetricks
