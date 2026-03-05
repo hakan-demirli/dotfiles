@@ -15,6 +15,7 @@ in
     {
       imports = with inputs.self.modules.nixos; [
         system-server-base
+        overlays
         services-reverse-ssh-client
         services-warp
         services-tailscale

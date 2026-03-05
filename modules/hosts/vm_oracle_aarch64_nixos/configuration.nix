@@ -16,6 +16,7 @@ in
         with inputs.self.modules.nixos;
         [
           system-server-base
+          overlays
           services-reverse-ssh-server
           services-tailscale
           services-headscale
