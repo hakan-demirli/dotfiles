@@ -13,6 +13,7 @@ in
     {
       imports = with inputs.self.modules.nixos; [
         system-server-base
+        overlays
         vm_qemu_x86-hardware
       ];
 

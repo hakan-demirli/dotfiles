@@ -14,6 +14,7 @@ in
     {
       imports = with inputs.self.modules.nixos; [
         system-server-base
+        overlays
         services-sops
         vm_oracle_x86-hardware
       ];

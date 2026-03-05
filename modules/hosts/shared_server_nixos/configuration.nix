@@ -11,6 +11,7 @@ in
     {
       imports = with inputs.self.modules.nixos; [
         system-server-base
+        overlays
         services-tailscale
         services-sops
         shared_server-hardware
