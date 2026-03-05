@@ -24,6 +24,31 @@
           };
           python312Packages = final.python312.pkgs;
 
+          # https://github.com/anomalyco/opencode/pull/14743
+          opencode = prev.opencode.overrideAttrs (
+            finalAttrs: oldAttrs: {
+              version = "pr-14743";
+              src = prev.fetchFromGitHub {
+                owner = "anomalyco";
+                repo = "opencode";
+                rev = "refs/pull/14743/head";
+                hash = "sha256-i+RAZt0/sE08kTzU7qqIzjnKvyK1hZIdNV/R58bNiMc=";
+              };
+              node_modules = oldAttrs.node_modules.overrideAttrs (_: {
+                version = "pr-14743";
+                inherit (finalAttrs) src;
+                outputHash = "sha256-KNK2r6fS99j019qvHrbzpJE1LfXluRdhp5iruvaQdtg=";
+              });
+
+              postInstall = (oldAttrs.postInstall or "") + ''
+                wrapProgram $out/bin/opencode \
+                  --set OPENCODE_CACHE_AUDIT 1 \
+                  --set OPENCODE_EXPERIMENTAL_CACHE_STABILIZATION 1 \
+                  --set OPENCODE_EXPERIMENTAL_CACHE_1H_TTL 0 
+              '';
+            }
+          );
+
           # https://github.com/NixOS/nixpkgs/issues/409755#issuecomment-2931205330
           kooha =
             if prev.stdenv.isLinux then
