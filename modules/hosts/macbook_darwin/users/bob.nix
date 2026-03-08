@@ -1,15 +1,11 @@
 {
-  inputs,
-  ...
-}:
-{
   flake.modules.darwin.macbook = {
-    imports = with inputs.self.modules.darwin; [
-      bob
-    ];
-
+    users.users.bob = {
+      name = "bob";
+      home = "/Users/bob";
+    };
     home-manager.users.bob = {
-      ###
+      home.stateVersion = "24.11";
     };
   };
 }

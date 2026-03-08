@@ -6,16 +6,49 @@ on:
   workflow_dispatch:
 
 jobs:
-  flake-check:
-    runs-on: ubuntu-latest
+  checks:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            system: x86_64-linux
+          - runner: ubuntu-22.04-arm
+            system: aarch64-linux
+          - runner: macos-latest
+            system: aarch64-darwin
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
-      - name: Run Flake Check
-        run: nix flake check --all-systems
+      - name: Run Flake Checks
+        run: |
+          # See: https://github.com/actions/partner-runner-images/issues/147
+          checks=$(nix flake show --json 2>/dev/null | jq -r '.checks."${{ matrix.system }}" // {} | keys[]')
+          for check in $checks; do
+            if [[ "${{ matrix.system }}" == "aarch64-linux" && "$check" == "ephemeral-root" ]]; then
+              echo "Skipping $check on aarch64-linux (requires KVM)"
+              continue
+            fi
+            echo "Building checks.${{ matrix.system }}.$check"
+            nix build .#checks.${{ matrix.system }}.$check
+          done
+
+  flake-check:
+    name: flake-check
+    needs: [checks]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Verify all checks passed
+        run: |
+          if [[ "${{ needs.checks.result }}" != "success" ]]; then
+            echo "One or more flake checks failed"
+            exit 1
+          fi
 
   integration-tests:
-    needs: [flake-check]
+    needs: [checks]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -28,7 +61,7 @@ jobs:
         run: nix run .#${{ matrix.test }}
 
   build-systems:
-    needs: [flake-check]
+    needs: [checks]
     strategy:
       fail-fast: false
       matrix:
@@ -57,6 +90,9 @@ jobs:
           - name: kexec
             target: kexec
             runner: ubuntu-22.04-arm
+          - name: macbook
+            target: darwinConfigurations.macbook.system
+            runner: macos-latest
 
     runs-on: ${{ matrix.runner }}
 

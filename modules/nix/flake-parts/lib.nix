@@ -30,6 +30,7 @@
         modules = [
           inputs.self.modules.darwin.${name}
           { nixpkgs.hostPlatform = lib.mkDefault system; }
+          inputs.home-manager.darwinModules.home-manager
         ];
       };
     };

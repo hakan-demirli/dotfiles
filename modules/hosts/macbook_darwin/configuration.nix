@@ -1,15 +1,8 @@
-{
-  inputs,
-  ...
-}:
-{
+_: {
   flake.modules.darwin.macbook = {
-    imports = with inputs.self.modules.darwin; [
-      system-desktop
-      ###
-    ];
     networking.hostName = "macbook";
 
+    system.stateVersion = 6;
     system.primaryUser = "bob";
 
     homebrew = {
