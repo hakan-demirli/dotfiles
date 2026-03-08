@@ -34,6 +34,7 @@
         system-fonts
         system-locale
         system-impermanence
+        system-ephemeral-root
         system-boot-grub
         system-disko-btrfs-lvm
         user-base
