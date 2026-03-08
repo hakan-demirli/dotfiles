@@ -19,6 +19,7 @@ in
           system-fonts
           system-locale
           system-impermanence
+          system-ephemeral-root
           system-polkit
           system-boot-grub
           system-disko-btrfs-lvm
