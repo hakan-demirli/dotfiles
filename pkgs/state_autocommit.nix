@@ -1,9 +1,9 @@
 # pkgs/state_autocommit.nix
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
 
-  username = "emre";
+  inherit (config.system.user) username;
   userHome = "/home/${username}";
   repoPath = "${userHome}/Desktop/state";
   logBranch = "nocon";

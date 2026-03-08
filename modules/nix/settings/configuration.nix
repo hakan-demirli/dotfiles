@@ -2,7 +2,6 @@
   flake.modules.nixos.nix-settings =
     {
       config,
-      pkgs,
       lib,
       ...
     }:
@@ -11,7 +10,11 @@
         allowUnfree = lib.mkEnableOption "allow unfree";
         cudaSupport = lib.mkEnableOption "cuda support";
         rocmSupport = lib.mkEnableOption "rocm support";
-        username = lib.mkOption { type = lib.types.str; };
+        username = lib.mkOption {
+          type = lib.types.str;
+          default = config.system.user.username;
+          description = "Username for nix trusted-users";
+        };
         excludeSubstituters = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [ ];
@@ -25,7 +28,7 @@
           inherit (config.nix.custom) cudaSupport;
           inherit (config.nix.custom) rocmSupport;
 
-          allowUnfreePredicate = pkgs.lib.mkIf config.nix.custom.allowUnfree (
+          allowUnfreePredicate = lib.mkIf config.nix.custom.allowUnfree (
             p:
             builtins.all (
               license:

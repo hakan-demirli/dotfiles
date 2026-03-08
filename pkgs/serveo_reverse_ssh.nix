@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
-  scriptUser = "emre";
+  scriptUser = config.system.user.username;
   scriptHome = "/home/${scriptUser}";
   gitRepoPath = "${scriptHome}/Desktop/serveo";
 

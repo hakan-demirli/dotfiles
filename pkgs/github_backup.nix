@@ -1,13 +1,13 @@
 { pkgs, config, ... }:
 let
-  username = "emre";
+  inherit (config.system.user) username;
   userHome = "/home/${username}";
 in
 {
   environment.systemPackages = [ pkgs.ghorg ];
 
   sops.secrets.git_token_emre_github = {
-    owner = "emre";
+    owner = username;
   };
 
   systemd.services.github-backup = {
@@ -18,7 +18,7 @@ in
     ];
     serviceConfig = {
       Type = "oneshot";
-      User = "emre";
+      User = username;
       Environment = [
         "GHORG_SCM_TYPE=github"
         "GHORG_CLONE_TYPE=user"

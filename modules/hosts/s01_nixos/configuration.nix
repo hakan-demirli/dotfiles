@@ -3,7 +3,7 @@
   ...
 }:
 let
-  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+  inherit (inputs.self.lib) publicData;
   reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
   reverseSshBounceServerUser = "emre";
   reverseSshBasePort = 42000;
@@ -39,10 +39,6 @@ in
           swapSize = "32G";
           additionalDisks = [ "/dev/nvme1n1" ];
         };
-        impermanence = {
-          username = "emre";
-          uid = 1000;
-        };
         user = {
           username = "emre";
           uid = 1000;
@@ -60,7 +56,6 @@ in
         };
         reverse-ssh-client = {
           enable = true;
-          username = "emre";
           remoteHost = reverseSshBounceServerHost;
           remotePort = reverseSshBasePort + serverId; # 42001
           remoteUser = reverseSshBounceServerUser;
@@ -80,7 +75,6 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
-        username = "emre";
       };
 
       programs.nix-ld.enable = true;

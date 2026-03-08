@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-function fgf() {
+fgf() {
   local -r prompt_add="Add > "
   local -r prompt_reset="Reset > "
 

@@ -3,7 +3,7 @@ set -euo pipefail
 
 FILE="${1:-}"
 if [ -z "$FILE" ]; then
-  echo "Usage: ytransfer <file>"
+  echo "Usage: gtransfer <file>"
   exit 1
 fi
 

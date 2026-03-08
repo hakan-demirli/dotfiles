@@ -31,6 +31,12 @@
       };
 
       config = lib.mkIf cfg.enable {
+        assertions = [
+          {
+            assertion = cfg.serverUrl != "";
+            message = "services.headscale-server.serverUrl must be set when Headscale is enabled";
+          }
+        ];
 
         services = {
           headscale = {

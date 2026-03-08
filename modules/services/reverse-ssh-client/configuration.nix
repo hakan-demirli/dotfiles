@@ -18,7 +18,7 @@ _: {
         };
         username = lib.mkOption {
           type = lib.types.str;
-          default = "emre";
+          default = config.system.user.username;
           description = "Username for autossh";
         };
         remoteHost = lib.mkOption {
@@ -33,7 +33,6 @@ _: {
         };
         remoteUser = lib.mkOption {
           type = lib.types.str;
-          default = "emre";
           description = "Username on the remote bounce server";
         };
         localTargetPort = lib.mkOption {
