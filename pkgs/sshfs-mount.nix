@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
-  username = "emre";
+  inherit (config.system.user) username;
   userHome = "/home/${username}";
   mountPoint = "${userHome}/.local/share/repx-store";
   remoteHost = "tailscale-s01";

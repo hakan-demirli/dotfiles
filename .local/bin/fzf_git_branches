@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 fgb() {
   local -r LIST_LOCAL_CMD="git branch --all --color --format=\$'%(HEAD) %(color:yellow)%(refname:short)\t%(color:green)%(committerdate:short)\t%(color:blue)%(subject)' | column --table --separator=\$'\t'"

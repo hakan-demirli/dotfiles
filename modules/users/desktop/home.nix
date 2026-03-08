@@ -3,12 +3,11 @@
   ...
 }:
 let
-  username = "emre";
-
   flake.modules.homeManager.desktop =
     { config, pkgs, ... }:
     let
-      koohaDocsPath = "${config.home.homeDirectory}/Documents";
+      inherit (config.home) username homeDirectory;
+      koohaDocsPath = "${homeDirectory}/Documents";
       historyFile = "$HOME/.local/state/bash/history";
       mkRawGVariant = rawString: {
         _type = "gvariant";
@@ -16,17 +15,17 @@ let
         value = rawString;
         __toString = self: self.value;
       };
-      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+      common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
     in
     {
       imports = [
-        (import (inputs.self + /pkgs/firefox.nix) { inherit username; })
+        (inputs.self.factory.firefox { inherit username; })
         (inputs.self + /pkgs/low_battery_notify.nix)
-        (import (inputs.self + /pkgs/common/xdg.nix) {
+        (inputs.self.factory.xdg {
           inherit pkgs inputs config;
-          desktopDir = "/home/${username}/Desktop/";
+          desktopDir = "${homeDirectory}/Desktop/";
         })
-        (import (inputs.self + /pkgs/common/bash.nix) {
+        (inputs.self.factory.bash {
           bashConfigDir = inputs.self + /.config/bash;
           inherit historyFile;
         })
@@ -102,8 +101,6 @@ let
       };
 
       home = {
-        inherit username;
-        homeDirectory = "/home/${username}";
         stateVersion = "25.05";
         pointerCursor = {
           gtk.enable = true;

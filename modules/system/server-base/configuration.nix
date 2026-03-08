@@ -13,7 +13,7 @@
     }:
     let
       cfg = config.system.server;
-      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+      common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
     in
     {
       # Server base system configuration - shared across all servers

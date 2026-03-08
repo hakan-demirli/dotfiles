@@ -4,7 +4,7 @@
   ...
 }:
 let
-  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+  inherit (inputs.self.lib) publicData;
   reverseSshBounceServerHost = "sshr.polarbearvuzi.com";
   reverseSshBasePort = 42000;
 in
@@ -46,10 +46,6 @@ in
         disko = {
           device = "/dev/sda";
           swapSize = "1G";
-        };
-        impermanence = {
-          username = "emre";
-          uid = 1000;
         };
         user = {
           username = "emre";
@@ -100,7 +96,6 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
-        username = "emre";
         # Don't substitute from self - this IS the binary cache server
         excludeSubstituters = [ "http://100.64.0.1:5101" ];
       };

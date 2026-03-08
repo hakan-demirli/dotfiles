@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 tmux_harpoon_update.sh &
 
 idx=$1

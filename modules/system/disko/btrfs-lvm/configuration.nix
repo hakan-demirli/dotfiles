@@ -17,6 +17,17 @@
       };
 
       config = {
+        assertions = [
+          {
+            assertion = cfg.device != "";
+            message = "system.disko.device must be set to a non-empty device path";
+          }
+          {
+            assertion = cfg.swapSize != "";
+            message = "system.disko.swapSize must be set to a non-empty size string (e.g., \"32G\")";
+          }
+        ];
+
         disko.devices = mkDevices {
           inherit lib;
           inherit (cfg) device swapSize additionalDisks;

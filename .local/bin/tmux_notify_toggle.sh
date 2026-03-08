@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -u
+set -euo pipefail
 
 STATE_DIR="/tmp/tmux_notify_locks"
 mkdir -p "$STATE_DIR"

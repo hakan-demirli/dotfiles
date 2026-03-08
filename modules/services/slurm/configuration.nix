@@ -46,6 +46,17 @@ _: {
       };
 
       config = lib.mkIf cfg.enable {
+        assertions = [
+          {
+            assertion = cfg.masterHostname != "";
+            message = "services.slurm-cluster.masterHostname must be set when SLURM is enabled";
+          }
+          {
+            assertion = cfg.clusterNodes != [ ];
+            message = "services.slurm-cluster.clusterNodes must be non-empty when SLURM is enabled";
+          }
+        ];
+
         services = {
           timesyncd.enable = true;
           munge.enable = true;

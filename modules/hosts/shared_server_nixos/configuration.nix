@@ -3,7 +3,7 @@
   ...
 }:
 let
-  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+  inherit (inputs.self.lib) publicData;
 in
 {
   flake.modules.nixos.shared_server =
@@ -28,11 +28,6 @@ in
           device = "/dev/nvme0n1";
           swapSize = "32G";
         };
-        impermanence = {
-          username = "emre";
-          uid = 1000;
-        };
-
         user = {
           username = "emre";
           uid = 1000;
@@ -48,8 +43,6 @@ in
         isNormalUser = true;
         uid = 1001;
         extraGroups = [
-          "wheel"
-          "docker"
           "networkmanager"
         ];
         openssh.authorizedKeys.keys = [ publicData.ssh.id_um_pub ];
@@ -146,7 +139,6 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
-        username = "emre";
       };
     };
 }
