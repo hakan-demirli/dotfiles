@@ -99,6 +99,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Free Disk Space (Ubuntu)
+        if: runner.os == 'Linux'
         uses: BRAINSia/free-disk-space@v2
         with:
           tool-cache: false
