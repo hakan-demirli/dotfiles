@@ -3,7 +3,7 @@
   ...
 }:
 let
-  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+  inherit (inputs.self.lib) publicData;
 in
 {
   flake.modules.nixos.vm_qemu_aarch64 =
@@ -29,10 +29,6 @@ in
           device = "/dev/vda";
           swapSize = "8G";
         };
-        impermanence = {
-          username = "emre";
-          uid = 1000;
-        };
         user = {
           username = "emre";
           uid = 1000;
@@ -54,7 +50,6 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
-        username = "emre";
       };
 
     };

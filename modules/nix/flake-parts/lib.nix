@@ -5,11 +5,21 @@
 }:
 {
   options.flake.lib = lib.mkOption {
-    type = lib.types.attrsOf lib.types.unspecified;
+    type = lib.types.attrsOf lib.types.raw;
+    default = { };
+  };
+
+  options.flake.factory = lib.mkOption {
+    type = lib.types.attrsOf lib.types.raw;
     default = { };
   };
 
   config.flake.lib = {
+
+    publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+
+    mkPackages =
+      { pkgs, inputs }: import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
 
     mkNixos = system: name: {
       ${name} = inputs.nixpkgs.lib.nixosSystem {
@@ -44,5 +54,11 @@
       };
     };
 
+  };
+
+  config.flake.factory = {
+    firefox = args: import (inputs.self + /pkgs/firefox.nix) args;
+    xdg = args: import (inputs.self + /pkgs/common/xdg.nix) args;
+    bash = args: import (inputs.self + /pkgs/common/bash.nix) args;
   };
 }

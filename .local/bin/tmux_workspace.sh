@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # shellcheck disable=SC2016
 COLORIZER_AWK='
@@ -73,11 +74,8 @@ if [[ $path_to_resolve == "~"* ]]; then
   path_to_resolve="${path_to_resolve/#\~/$HOME}"
 fi
 
-selected=$(realpath -e "$path_to_resolve" 2> /dev/null)
-
-if [[ $? -ne 0 || ! -d $selected ]]; then
+if ! selected=$(realpath -e "$path_to_resolve" 2> /dev/null) || [[ ! -d $selected ]]; then
   echo "Error: Resolved path '$path_to_resolve' is not a valid directory." >&2
-  echo "(Attempted resolution: '$selected')" >&2
   exit 1
 fi
 

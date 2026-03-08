@@ -27,7 +27,6 @@ let
     wineWow64Packages.wayland
     umu-launcher
     gamescope
-    winetricks
     mangohud
   ];
 

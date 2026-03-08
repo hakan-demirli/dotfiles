@@ -20,6 +20,13 @@ _: {
       };
 
       config = lib.mkIf cfg.enable {
+        assertions = [
+          {
+            assertion = cfg.masterHostname != "";
+            message = "services.slurm-client.masterHostname must be set when SLURM client is enabled";
+          }
+        ];
+
         services = {
           timesyncd.enable = true;
           munge.enable = true;

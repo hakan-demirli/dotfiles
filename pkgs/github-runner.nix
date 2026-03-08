@@ -107,13 +107,13 @@
             };
 
             extraEnvironment = lib.mkOption {
-              type = lib.types.attrs;
+              type = lib.types.attrsOf lib.types.str;
               description = "Extra environment variables to set for the runner.";
               default = { };
             };
 
             serviceOverrides = lib.mkOption {
-              type = lib.types.attrs;
+              type = lib.types.attrsOf lib.types.anything;
               description = "Modify the systemd service.";
               default = { };
             };

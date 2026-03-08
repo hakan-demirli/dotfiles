@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-function fgc() {
+fgc() {
   local -r git_log=$(
     cat <<- EOF
 			git log --graph --color --format="%C(white)%h - %C(green)%cs - %C(blue)%s%C(red)%d"

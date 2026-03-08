@@ -12,11 +12,13 @@
       options.system.impermanence = {
         username = lib.mkOption {
           type = lib.types.str;
-          default = "emre";
+          default = config.system.user.username;
+          description = "Username for impermanence user directory persistence";
         };
         uid = lib.mkOption {
           type = lib.types.int;
-          default = 1000;
+          default = config.system.user.uid;
+          description = "UID for impermanence user directory ownership";
         };
         persistentDirs = lib.mkOption {
           type = lib.types.listOf lib.types.str;

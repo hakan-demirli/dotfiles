@@ -3,12 +3,12 @@
   ...
 }:
 let
-  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+  inherit (inputs.self.lib) publicData;
 in
 {
   flake.modules.nixos.vm_oracle_x86 =
     {
-      pkgs,
+      lib,
       ...
     }:
     {
@@ -29,10 +29,6 @@ in
         disko = {
           device = "/dev/sda";
           swapSize = "4G";
-        };
-        impermanence = {
-          username = "emre";
-          uid = 1000;
         };
         user = {
           username = "emre";
@@ -55,14 +51,13 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
-        username = "emre";
       };
 
       boot.loader = {
-        grub.efiInstallAsRemovable = pkgs.lib.mkForce true;
+        grub.efiInstallAsRemovable = lib.mkForce true;
         efi = {
           efiSysMountPoint = "/boot";
-          canTouchEfiVariables = pkgs.lib.mkForce false;
+          canTouchEfiVariables = lib.mkForce false;
         };
       };
     };

@@ -6,7 +6,7 @@
   perSystem =
     { pkgs, ... }:
     let
-      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+      common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
       barebonePackages =
         common-packages.dev-essentials
         ++ common-packages.editors

@@ -10,7 +10,7 @@
           pam_u2f
           ;
       };
-      publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+      inherit (inputs.self.lib) publicData;
     in
     {
       services.pcscd.enable = true;

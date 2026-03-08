@@ -6,7 +6,7 @@
   perSystem =
     { pkgs, ... }:
     let
-      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+      common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
       barebonePackages =
         common-packages.dev-essentials
         ++ common-packages.editors
@@ -24,12 +24,10 @@
           pkgs.zstd
           pkgs.gnutar
           pkgs.util-linux
-          pkgs.coreutils
           pkgs.rsync
           pkgs.gnugrep
           pkgs.gawk
           pkgs.nix
-          pkgs.tailscale
         ];
     in
     {

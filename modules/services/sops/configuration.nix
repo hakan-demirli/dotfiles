@@ -3,7 +3,7 @@
   ...
 }:
 let
-  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+  inherit (inputs.self.lib) publicData;
 in
 {
 
@@ -30,7 +30,7 @@ in
       options.services.sops = {
         username = lib.mkOption {
           type = lib.types.str;
-          default = "emre";
+          default = config.system.user.username;
           description = "Username for sops secrets ownership";
         };
         defaultSopsFile = lib.mkOption {

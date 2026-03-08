@@ -1,24 +1,48 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-function decrypt_git_crypt_key {
-  read -spr "Enter passphrase: " password && echo && (head -c8 ~/Desktop/dotfiles/secrets/git-crypt-key | grep -q '^Salted__' || {
-    echo "File does not appear encrypted."
+KEY_FILE=""
+
+cleanup() {
+  if [[ -n "$KEY_FILE" && -f "$KEY_FILE" ]]; then
+    rm -f "$KEY_FILE"
+  fi
+}
+trap cleanup EXIT
+
+decrypt_git_crypt_key() {
+  local encrypted_key="$HOME/Desktop/dotfiles/secrets/git-crypt-key"
+
+  if ! head -c8 "$encrypted_key" | grep -q '^Salted__'; then
+    echo "File does not appear encrypted." >&2
     exit 1
-  }) && (openssl enc -d -aes-256-cbc -pbkdf2 -in ~/Desktop/dotfiles/secrets/git-crypt-key -out /tmp/git-crypt-key -pass pass:"$password" && echo "Decryption complete.") && unset password
+  fi
+
+  KEY_FILE=$(umask 077 && mktemp /tmp/git-crypt-key.XXXXXXXXXX)
+
+  read -srp "Enter passphrase: " password
+  echo
+
+  echo "$password" | openssl enc -d -aes-256-cbc -pbkdf2 \
+    -in "$encrypted_key" \
+    -out "$KEY_FILE" \
+    -pass stdin
+
+  unset password
+  echo "Decryption complete."
 }
 
-function decrypt_secrets {
-  git-crypt unlock /tmp/git-crypt-key && ln -s ~/Desktop/dotfiles/secrets/git_tokens ~/.config/git/git_tokens && ln -s ~/Desktop/dotfiles/secrets/git_users ~/.config/git/git_users
+decrypt_secrets() {
+  git-crypt unlock "$KEY_FILE"
+  ln -sf "$HOME/Desktop/dotfiles/secrets/git_tokens" "$HOME/.config/git/git_tokens"
+  ln -sf "$HOME/Desktop/dotfiles/secrets/git_users" "$HOME/.config/git/git_users"
 }
 
-function disko_format {
-  sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko /root/dotfiles_tmp/hosts/laptop/hardware/disko.nix --arg device '"/dev/vda"'
+disko_format() {
+  sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
+    --mode disko /root/dotfiles_tmp/hosts/laptop/hardware/disko.nix \
+    --arg device '"/dev/vda"'
 }
-
-sudo su
-cd || exit 1
 
 decrypt_git_crypt_key
-
 decrypt_secrets

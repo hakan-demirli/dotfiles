@@ -3,24 +3,24 @@
   ...
 }:
 let
-  username = "emre";
-  desktopDir = "/home/${username}/Desktop";
-  historyFile = "${desktopDir}/history";
-  publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+  inherit (inputs.self.lib) publicData;
 
   flake.modules.homeManager.server-headless =
     { config, pkgs, ... }:
     let
-      common-packages = import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
+      inherit (config.home) homeDirectory;
+      desktopDir = "${homeDirectory}/Desktop";
+      historyFile = "${desktopDir}/history";
+      common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
       gpgPublicKeyFile = pkgs.writeText "yubikey-gpg-public.asc" publicData.yubikey.gpg_public_key;
     in
     {
       imports = [
-        (import (inputs.self + /pkgs/common/bash.nix) {
+        (inputs.self.factory.bash {
           bashConfigDir = inputs.self + /.config/bash;
           inherit historyFile;
         })
-        (import (inputs.self + /pkgs/common/xdg.nix) {
+        (inputs.self.factory.xdg {
           inherit pkgs inputs;
           inherit desktopDir;
           enablePortal = false;
@@ -86,8 +86,6 @@ let
       };
 
       home = {
-        inherit username;
-        homeDirectory = "/home/${username}";
         stateVersion = "25.05";
       };
 
