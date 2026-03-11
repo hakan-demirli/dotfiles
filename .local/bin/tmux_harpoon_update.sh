@@ -14,7 +14,7 @@ read -r tmux_window_current tmux_command_current tmux_pane_path_current <<< "$(t
 
 # echo "editor_status: $editor_status" >> test.dd
 
-status_line=$(tmux capture-pane -pS -3 | tail -n 3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3')
+status_line=$(tmux capture-pane -pS -3 | tail -n 3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3' || true)
 read -r buffer_path cursor_row_current cursor_col_current <<< "$status_line"
 
 read -r _tmux_session tmux_window _tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name} #{window_index} #{pane_current_command} #{pane_current_path}')"
