@@ -6,4 +6,3 @@ FILE_PATH=$(live-grep | tr '\n' ' ' | sed 's/ *$//')
 if [[ -n $FILE_PATH ]]; then
   tmux send-keys -t 0 ":open $FILE_PATH" C-m
 fi
-tmux send-keys -t 0 ":open $FILE_PATH" C-m

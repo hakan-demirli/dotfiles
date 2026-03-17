@@ -7,7 +7,7 @@ CATPPUCCIN_MAUVE='#c6a0f6'
 COPY_FILE_PATH='ctrl-y:execute(echo -n {1}:{2} | gclip)'
 KEYS="$COPY_FILE_PATH"
 
-if [[ $1 == '--exit-on-execution' ]]; then
+if [[ ${1:-} == '--exit-on-execution' ]]; then
   KEYS="$KEYS+abort"
   shift
 fi
