@@ -67,7 +67,7 @@ fi
 
 echo "Connecting to $TARGET..."
 REMOTE_TMP="/tmp/yazi_cwd_$$"
-ssh -t "$TARGET" "yazi --cwd-file '$REMOTE_TMP'"
+ssh -t "$TARGET" "bash -lc 'yazi --cwd-file \"$REMOTE_TMP\"'"
 Q_REMOTE_TMP=$(printf %q "$REMOTE_TMP")
 # shellcheck disable=SC2029
 REMOTE_DIR=$(ssh "$TARGET" "cat $Q_REMOTE_TMP && rm -f $Q_REMOTE_TMP")
