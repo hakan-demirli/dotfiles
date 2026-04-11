@@ -4,7 +4,7 @@ _: {
     {
       sops.secrets.nix-serve-key = { };
 
-      services.harmonia = {
+      services.harmonia.cache = {
         enable = true;
         signKeyPaths = [ config.sops.secrets.nix-serve-key.path ];
         settings.bind = "[::]:5101";
