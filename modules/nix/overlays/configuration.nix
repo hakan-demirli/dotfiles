@@ -29,6 +29,8 @@
           };
           python312Packages = final.python312.pkgs;
 
+          claude-code = import ../../../pkgs/claude-code.nix prev;
+
           # https://github.com/anomalyco/opencode/pull/14743
           opencode = prev.opencode.overrideAttrs (
             finalAttrs: oldAttrs: {
