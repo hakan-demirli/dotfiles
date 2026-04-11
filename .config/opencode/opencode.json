@@ -11,7 +11,7 @@
   "lsp": false,
   "formatter": false,
   "plugin": [
-    "opencode-anthropic-login-via-cli@latest",
+    "opencode-claude-auth@latest",
     "opencode-gemini-auth@latest",
     "@mohak34/opencode-notifier@latest"
   ]
