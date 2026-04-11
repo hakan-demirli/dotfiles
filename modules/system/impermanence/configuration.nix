@@ -37,7 +37,6 @@
             ".config/opencode"
             ".antigravity"
             ".claude"
-            "claude.json"
             ".config/Antigravity"
             ".gemini"
           ];
@@ -47,6 +46,18 @@
           type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Extra user directories to persist, appended to persistentUserDirs";
+        };
+        persistentUserFiles = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [
+            ".claude.json"
+          ];
+          description = "Base user files to persist (relative to home)";
+        };
+        extraPersistentUserFiles = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          description = "Extra user files to persist, appended to persistentUserFiles";
         };
       };
 
@@ -68,6 +79,7 @@
           hideMounts = true;
           users.${cfg.username} = {
             directories = cfg.persistentUserDirs ++ cfg.extraPersistentUserDirs;
+            files = cfg.persistentUserFiles ++ cfg.extraPersistentUserFiles;
           };
         };
 
