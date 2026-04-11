@@ -3,6 +3,11 @@
     generic.overlays = {
       nixpkgs.overlays = [
         (final: prev: {
+          # https://github.com/NixOS/nixpkgs/pull/507484 (not yet in nixos-unstable)
+          # Bypass the deprecated `pkgs.hostPlatform` warning emitted when
+          # packages like flutter auto-inject it via callPackage.
+          inherit (prev.stdenv) hostPlatform;
+
           # https://github.com/NixOS/nixpkgs/issues/351717
           python312 = prev.python312.override {
             packageOverrides =
@@ -32,12 +37,12 @@
                 owner = "anomalyco";
                 repo = "opencode";
                 rev = "refs/pull/14743/head";
-                hash = "sha256-i+RAZt0/sE08kTzU7qqIzjnKvyK1hZIdNV/R58bNiMc=";
+                hash = "sha256-E6Z04kkmyku47Y4Oo7fH/idcLzIpJhH1XGFIBIczVro=";
               };
               node_modules = oldAttrs.node_modules.overrideAttrs (_: {
                 version = "pr-14743";
                 inherit (finalAttrs) src;
-                outputHash = "sha256-KNK2r6fS99j019qvHrbzpJE1LfXluRdhp5iruvaQdtg=";
+                outputHash = "sha256-K6wRsvkhKzNL727/nqAUedv0HvfJt7vu13RKKcJ9adk=";
               });
 
               postInstall = (oldAttrs.postInstall or "") + ''

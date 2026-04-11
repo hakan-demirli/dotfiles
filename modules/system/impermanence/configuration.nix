@@ -36,6 +36,8 @@
             ".local/state/opencode"
             ".config/opencode"
             ".antigravity"
+            ".claude"
+            "claude.json"
             ".config/Antigravity"
             ".gemini"
           ];

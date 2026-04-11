@@ -11,7 +11,7 @@ fi
 index=$((10#$(date +%j) % ${#files[@]}))
 selected="${files[$index]}"
 
-swww img "$selected"
+awww img "$selected"
 
 rm -f "$HOME/.mozilla/firefox/emre/chrome/wp.png" && cp "$selected" "$HOME/.mozilla/firefox/emre/chrome/wp.png"
 

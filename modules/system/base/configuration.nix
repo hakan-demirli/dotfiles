@@ -1,7 +1,10 @@
+{ inputs, ... }:
 {
   flake.modules.nixos.system-base =
     { config, lib, ... }:
     {
+      system.stateVersion = inputs.self.lib.stateVersion;
+
       documentation = {
         enable = lib.mkDefault false;
         nixos.enable = lib.mkDefault false;

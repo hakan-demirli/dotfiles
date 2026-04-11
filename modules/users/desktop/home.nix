@@ -91,7 +91,10 @@ let
           package = pkgs.dracula-theme;
           size = 10;
         };
-        gtk4.extraConfig.gtk-application-prefer-dark-theme = true;
+        gtk4 = {
+          inherit (config.gtk) theme;
+          extraConfig.gtk-application-prefer-dark-theme = true;
+        };
         gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
       };
 
@@ -101,7 +104,7 @@ let
       };
 
       home = {
-        stateVersion = "25.05";
+        inherit (inputs.self.lib) stateVersion;
         pointerCursor = {
           gtk.enable = true;
           name = "Dracula-cursors";

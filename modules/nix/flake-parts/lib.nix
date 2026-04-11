@@ -16,6 +16,8 @@
 
   config.flake.lib = {
 
+    stateVersion = "26.05";
+
     publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
 
     mkPackages =

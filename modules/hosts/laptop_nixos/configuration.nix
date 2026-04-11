@@ -135,6 +135,5 @@ in
       };
 
       hardware.keyboard.qmk.enable = true;
-      system.stateVersion = "25.05";
     };
 }

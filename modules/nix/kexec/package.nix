@@ -6,6 +6,7 @@
       packages.kexec =
         (inputs.nixpkgs.lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit inputs; };
           modules = [
             (inputs.self + /pkgs/kexec/configuration.nix)
           ];

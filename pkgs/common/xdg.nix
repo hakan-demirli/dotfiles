@@ -10,7 +10,6 @@
       mutable_configs = [
         # "hypr"
         # "rclone"
-        "rvc-cli"
       ];
 
       immutable_configs = [
@@ -44,6 +43,7 @@
         "npm"
         "nwg"
         "opencode"
+        "claude"
         "parallel"
         # "piper" # not working, workaround below
         "qalculate"
@@ -146,15 +146,7 @@
       );
     in
     {
-      configFile =
-        mutableConfigFiles
-        // immutableConfigFiles
-        // {
-          "hypr/monitors.conf" = {
-            source = ../../.config/hypr/monitors.conf;
-            force = true;
-          };
-        };
+      configFile = mutableConfigFiles // immutableConfigFiles;
 
       dataFile = mutableDataFiles // immutableDataFiles;
       stateFile = mutableStateFiles;
@@ -251,31 +243,5 @@
     #   recursive = false;
     #   executable = false;
     # };
-    ".config/rvc-cli/rvc/models/embedders/contentvec/pytorch_model.bin".source = "${pkgs.fetchurl {
-      url = "https://huggingface.co/IAHispano/Applio/resolve/main/Resources/embedders/contentvec/pytorch_model.bin";
-      sha256 = "sha256-2N1ADgVN305r512rWiVJ23SMyZ51agl8SWwJn2WkhU4=";
-    }}";
-    ".config/rvc-cli/rvc/models/embedders/contentvec/config.json".source = "${pkgs.fetchurl {
-      url = "https://huggingface.co/IAHispano/Applio/resolve/main/Resources/embedders/contentvec/config.json";
-      sha256 = "sha256-Ld3gY7eV042QUachWgkv7PTP4Ui1QlHjjeUdiNNWiYs=";
-    }}";
-    ".config/rvc-cli/models/predictors/rmvpe.pt".source = "${pkgs.fetchurl {
-      url = "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt";
-      sha256 = "sha256-bWIhX0MG48ongkYYhgcgnwmvPcd+1CMu/dBpeYxOwZM=";
-    }}";
-    ".config/rvc-cli/models/custom/".source = "${pkgs.fetchzip {
-      url = "https://huggingface.co/PGR-RVC/NieR_RVC_v2/resolve/main/EN/Pod042EN_e250_s14250_RVCv2_RMVPE.zip";
-      sha256 = "sha256-PGPCG5FwsoPGE6PGtYTBuE3fan1JTj95d5J3b77GLxg=";
-      stripRoot = false;
-    }}";
-    ".config/piper/models/jenny_dioco.onnx".source = "${pkgs.fetchurl {
-      url = "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx";
-      sha256 = "sha256-RpxjDSCeE53TkqZr9KveSrhjkKAmnB5HtOXXzoFSawE=";
-    }}";
-    ".config/piper/models/jenny_dioco.json".source = "${pkgs.fetchurl {
-      url = "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx.json";
-      sha256 = "sha256-qaepOjF8mjy2Vj436wV9+e8JwGGIqKQ0Gw/LWMulTdQ=";
-    }}";
-    ".config/piper/substitutions.json".source = "${../../.config/piper/substitutions.json}"; # workaround
   };
 }

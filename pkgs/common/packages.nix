@@ -40,15 +40,18 @@ let
     aider-chat
     aichat
     opencode
+    claude-code
   ];
 
   lsp =
     with pkgs;
     [
       asm-lsp
+      bash-language-server
       clang-tools
       clippy
       cmake-language-server
+      diagnostic-languageserver
       gnumake
       # inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.markdown-countdown-lsp
       lldb
@@ -57,10 +60,7 @@ let
       marksman
       nixd
       nixfmt
-      nodePackages.diagnostic-languageserver
-      nodePackages_latest.bash-language-server
-      nodePackages_latest.prettier
-      nodePackages_latest.vscode-json-languageserver
+      prettier
       pyright
       python3
       ruff
@@ -72,6 +72,7 @@ let
       uwu-colors
       # veridian
       verilator
+      vscode-json-languageserver
       yaml-language-server
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
@@ -157,7 +158,7 @@ let
       sioyek
       swaynotificationcenter
       swayosd
-      swww
+      awww
       tailscale-systray
       tor-browser
       transmission_4-qt

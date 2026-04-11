@@ -36,7 +36,6 @@ in
           useHomeManager = true;
           homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
         };
-        stateVersion = "25.05";
       };
 
       users.users.um = {
@@ -99,7 +98,7 @@ in
           };
 
           networking.firewall.allowedTCPPorts = [ 22 ];
-          system.stateVersion = "25.05";
+          system.stateVersion = inputs.self.lib.stateVersion;
         };
       };
 
@@ -131,7 +130,7 @@ in
           };
 
           networking.firewall.allowedTCPPorts = [ 22 ];
-          system.stateVersion = "25.05";
+          system.stateVersion = inputs.self.lib.stateVersion;
         };
       };
 

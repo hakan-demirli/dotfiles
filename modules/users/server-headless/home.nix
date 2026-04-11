@@ -86,7 +86,7 @@ let
       };
 
       home = {
-        stateVersion = "25.05";
+        inherit (inputs.self.lib) stateVersion;
       };
 
       home.packages =
