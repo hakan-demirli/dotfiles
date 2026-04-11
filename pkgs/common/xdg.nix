@@ -194,6 +194,9 @@
     ".aider.conf.yml" = {
       source = ../../.config/aider/.aider.conf.yml;
     };
+    ".claude/settings.json" = {
+      source = ../../.config/claude/settings.json;
+    };
     ".local/state" = {
       source = pkgs.linkFarm "gdrive-links" [
         {
