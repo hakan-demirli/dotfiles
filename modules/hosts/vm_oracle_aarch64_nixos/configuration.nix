@@ -54,7 +54,6 @@ in
           useHomeManager = true;
           homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
         };
-        stateVersion = "25.05";
       };
 
       services = {

@@ -44,7 +44,7 @@
 
           environment.systemPackages = [ pkgs.btrfs-progs ];
 
-          system.stateVersion = "24.11";
+          system.stateVersion = inputs.self.lib.stateVersion;
         };
 
         extraTestScript = ''

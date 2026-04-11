@@ -7,13 +7,12 @@
       "~/Desktop/**": "allow"
     }
   },
-  "theme": "system",
   "autoupdate": false,
   "lsp": false,
   "formatter": false,
   "plugin": [
-    "opencode-antigravity-auth@latest",
-    "@mohak34/opencode-notifier@latest",
-    "@ex-machina/opencode-anthropic-auth"
+    "opencode-anthropic-login-via-cli@latest",
+    "opencode-gemini-auth@latest",
+    "@mohak34/opencode-notifier@latest"
   ]
 }
