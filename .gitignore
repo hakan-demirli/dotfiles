@@ -4,6 +4,7 @@
 *.bin
 *.wav
 *.json
+!.config/claude/settings.json
 **/__pycache__
 **/venv_*
 **/venv
