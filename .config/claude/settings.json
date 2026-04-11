@@ -16,6 +16,8 @@
     "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
     "DISABLE_AUTOUPDATER": "1",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+    "CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION": "false",
     "CLAUDE_CODE_AUTO_CONNECT_IDE": "0",
     "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL": "1",
     "CLAUDE_CODE_IDE_SKIP_VALID_CHECK": "1"
@@ -38,6 +40,7 @@
   },
   "feedbackSurveyRate": 0,
   "effortLevel": "high",
+  "autoMemoryEnabled": false,
   "spinnerTipsEnabled": false,
   "alwaysThinkingEnabled": true,
   "showThinkingSummaries": true,
