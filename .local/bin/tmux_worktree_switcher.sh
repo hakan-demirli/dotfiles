@@ -62,7 +62,7 @@ fi
 
 absolute_target_path=$(realpath "$target_path")
 path_hash=$(echo -n "$absolute_target_path" | md5sum | awk '{ print $1 }')
-session_name="$(basename "$absolute_target_path")_$path_hash"
+session_name="$(basename "$absolute_target_path" | tr '.:' '_')_$path_hash"
 
 if ! tmux has-session -t="$session_name" 2> /dev/null; then
   tmux new-session -d -s "$session_name" -c "$absolute_target_path"
