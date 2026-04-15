@@ -116,7 +116,7 @@ if [[ -n $git_target ]]; then
 fi
 
 selected_path_hash=$(echo -n "$selected" | md5sum | awk '{ print $1 }')
-session_name=$(basename "$selected")_$selected_path_hash
+session_name=$(basename "$selected" | tr '.:' '_')_$selected_path_hash
 
 if ! tmux info &> /dev/null; then
   echo "No tmux server found. Starting new session '$session_name'..."
