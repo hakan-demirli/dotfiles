@@ -1,16 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-tmux_harpoon_update.sh &
-
 idx=$1
 editor_command=${EDITOR:-hx}
 terminal_command="bash"
 
-tmux_cwd=$(pwd)
+tmux_cwd=$(tmux display-message -p '#{session_path}')
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
+
+if [[ ! -f $data_file ]] || [[ ! -s $data_file ]]; then
+  IFS='|' read -r tmux_session tmux_pane_path <<< "$(tmux display-message -p '#{session_name}|#{pane_current_path}')"
+  mkdir -p "$cache_dir"
+  {
+    for i in {0..3}; do
+      echo "$i,bash,::,,$tmux_pane_path"
+    done
+    echo
+    echo "# session_name: $tmux_session"
+    echo "# pane_id , command , file_name:r:c , file_path , workspace_dir"
+  } > "$data_file"
+fi
+
+tmux_harpoon_update.sh &
 
 hook_to_switch=$(sed -n "${idx}p" "$data_file")
 if [[ -z $hook_to_switch ]]; then

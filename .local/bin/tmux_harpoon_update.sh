@@ -3,7 +3,7 @@ set -euo pipefail
 
 # editor_status=$1
 
-tmux_cwd=$(pwd)
+tmux_cwd=$(tmux display-message -p '#{session_path}')
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"

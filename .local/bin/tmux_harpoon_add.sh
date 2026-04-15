@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-tmux_cwd=$(pwd)
+tmux_cwd=$(tmux display-message -p '#{session_path}')
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
@@ -96,7 +96,7 @@ fi
 
 if [[ $populated -eq 0 ]]; then
   {
-    for i in {1..3}; do
+    for i in {0..2}; do
       default_line="$i,bash,::,,$tmux_pane_path"
       echo "$default_line"
     done
