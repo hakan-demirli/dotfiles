@@ -52,7 +52,7 @@ alias fixgpg='source fixgpg'
 
 # Tmux
 alias tmux='tmux -f ~/.config/tmux/tmux.conf'
-alias txa='tmux attach-session -t $(tmux list-sessions -F "#{session_name}" | head -n 1)'
+alias txa='tmux attach-session -t "$(tmux list-sessions -F "#{session_name}" | head -n 1)"'
 alias txls='tmux list-sessions'
 alias txks='tmux kill-session -t'
 alias txn='tmux new-session -s'
