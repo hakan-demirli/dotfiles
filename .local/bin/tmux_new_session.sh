@@ -17,7 +17,7 @@ elif [ $file_manager = "yazi" ]; then
 fi
 
 tmux_cwd_hash=$(echo -n "$target_dir" | md5sum | awk '{ print $1 }')
-session_name=$(basename "$target_dir")_$tmux_cwd_hash
+session_name=$(basename "$target_dir" | tr '.:' '_')_$tmux_cwd_hash
 
 tmux new-session -d -s "$session_name" -c "$target_dir"
 tmux switch-client -t "$session_name"
