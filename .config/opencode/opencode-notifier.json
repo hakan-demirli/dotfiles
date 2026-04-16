@@ -7,5 +7,13 @@
       "-c",
       "HN=$(hostname); if [ \"$HN\" != \"laptop\" ]; then tnotify.sh \"opencode done ($HN)\"; curl -d \"opencode done ($HN)\" -H \"Title: Opencode ($HN)\" http://vm-oracle-aarch64:8111/emre-laptop; fi"
     ]
+  },
+  "events": {
+    "user_message":      { "sound": false, "notification": false, "command": false, "bell": false },
+    "session_started":   { "sound": false, "notification": false, "command": false, "bell": false },
+    "client_connected":  { "sound": false, "notification": false, "command": false, "bell": false },
+    "subagent_complete": { "sound": false, "notification": false, "command": false, "bell": false },
+    "user_cancelled":    { "sound": false, "notification": false, "command": false, "bell": false },
+    "plan_exit":         { "sound": false, "notification": false, "command": false, "bell": false }
   }
 }
