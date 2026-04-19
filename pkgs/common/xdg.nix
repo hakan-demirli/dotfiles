@@ -35,6 +35,7 @@
         "hypr"
         "input-remapper-2"
         "kitty"
+        "lesskey"
         "lf"
         "mimeapps.list"
         "mpd"

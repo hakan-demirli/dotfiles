@@ -55,4 +55,8 @@ tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:session
   | fzf --ansi -d '|' \
     --with-nth 2 \
     --preview 'tmux capture-pane -ep -t {1}' \
-    --bind 'enter:execute(tmux switch-client -t {1})+accept'
+    --bind 'enter:execute(tmux switch-client -t {1})+accept' \
+    --bind 'alt-u:pos(1)+execute(tmux switch-client -t {1})+accept' \
+    --bind 'alt-i:pos(2)+execute(tmux switch-client -t {1})+accept' \
+    --bind 'alt-o:pos(3)+execute(tmux switch-client -t {1})+accept' \
+    --bind 'alt-p:pos(4)+execute(tmux switch-client -t {1})+accept'
