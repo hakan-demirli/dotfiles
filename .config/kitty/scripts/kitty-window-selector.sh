@@ -104,6 +104,10 @@ fi
 {
   for win in "${windows[@]}"; do echo "$win"; done
 } | fzf --margin=20%,20% --border $fzf_bind_arg \
+  --bind "alt-u:pos(1)+accept" \
+  --bind "alt-i:pos(2)+accept" \
+  --bind "alt-o:pos(3)+accept" \
+  --bind "alt-p:pos(4)+accept" \
   --preview '
       id=$(echo {} | sed "s/.*(\([0-9]*\))$/\1/")
       if [[ -n $id ]]; then

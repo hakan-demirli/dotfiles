@@ -44,11 +44,11 @@ keymap:
       Shift-Alt-dot: reserved
       Shift-Alt-slash: reserved
 
-      # Alt-y: reserved # tmux prefix
-      # Alt-u: tmux tab 1
-      # Alt-i: tmux tab 2
-      # Alt-o: tmux tab 3
-      # Alt-p: tmux tab 4
+      # Alt-y: (free)
+      # Alt-u: tmux harpoon slot 1
+      # Alt-i: tmux harpoon slot 2
+      # Alt-o: tmux harpoon slot 3
+      # Alt-p: tmux harpoon slot 4
       Alt-KEY_SPACE: KEY_SPACE
 
       Alt-h: KEY_LEFT
@@ -61,11 +61,11 @@ keymap:
       Ctrl-Alt-l: Ctrl-KEY_RIGHT
       Alt-KEY_SEMICOLON: reserved
 
-      # Alt-n: toggle btop
-      # Alt-m: workspace 1
-      # Alt-comma: workspace 2
-      # Alt-dot: workspace 3
-      # Alt-slash: workspace 4
+      # Alt-n: hyprland todo_my
+      # Alt-m: hyprland workspace 1
+      # Alt-comma: hyprland workspace 2
+      # Alt-dot: hyprland workspace 3
+      # Alt-slash: hyprland workspace 4
 
 
       # Left Hand
@@ -87,23 +87,23 @@ keymap:
       Shift-Alt-v: Shift-KEY_5 # percent
       Shift-Alt-b: Shift-KEY_BACKSLASH # pipe
 
-      # Alt-q: quit tab
+      # Alt-q: (free)
       Alt-w: KEY_7
       Alt-e: KEY_8
       Alt-r: KEY_9
       Alt-t: KEY_0
 
-      # Alt-a: open terminal
+      # Alt-a: tmux prefix (M-a)
       Alt-s: KEY_4
       Alt-d: KEY_5
       Alt-f: KEY_6
-      # Alt-g: reserved # tmux harpoon add key
+      # Alt-g: kitty window selector
 
-      # Alt-z: open browser
+      # Alt-z: hyprland plan_my
       Alt-x: KEY_1
       Alt-c: KEY_2
       Alt-v: KEY_3
-      # Alt-b: toggle waybar
+      # Alt-b: tmux switch-client last
 
 
       KEY_1: reserved

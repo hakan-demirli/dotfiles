@@ -1,0 +1,4 @@
+#command
+# Disable `s` which prompts to save piped input as a log file.
+# Pager is for viewing, not for saving random shit to disk.
+s           noaction
