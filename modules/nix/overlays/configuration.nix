@@ -29,22 +29,41 @@
           };
           python312Packages = final.python312.pkgs;
 
-          claude-code = import ../../../pkgs/claude-code.nix prev;
-
           # https://github.com/anomalyco/opencode/pull/14743
+          # Pinned to a specific commit SHA (not refs/pull/14743/head) so upstream
+          # pushes to the PR branch don't silently change the build inputs.
           opencode = prev.opencode.overrideAttrs (
             finalAttrs: oldAttrs: {
               version = "pr-14743";
               src = prev.fetchFromGitHub {
-                owner = "anomalyco";
+                owner = "bhagirathsinh-vaghela";
                 repo = "opencode";
-                rev = "refs/pull/14743/head";
+                rev = "2e02781f4f6e61f8c673bc669e982810dc0268c1";
                 hash = "sha256-E6Z04kkmyku47Y4Oo7fH/idcLzIpJhH1XGFIBIczVro=";
               };
               node_modules = oldAttrs.node_modules.overrideAttrs (_: {
                 version = "pr-14743";
                 inherit (finalAttrs) src;
-                outputHash = "sha256-K6wRsvkhKzNL727/nqAUedv0HvfJt7vu13RKKcJ9adk=";
+                # Upstream PR has an inconsistent bun.lock, so we can't use
+                # --frozen-lockfile. Let bun update the lockfile at build time.
+                buildPhase = ''
+                  runHook preBuild
+
+                  bun install \
+                    --cpu="*" \
+                    --filter ./packages/app \
+                    --filter ./packages/desktop \
+                    --filter ./packages/opencode \
+                    --ignore-scripts \
+                    --no-progress \
+                    --os="*"
+
+                  bun --bun ./nix/scripts/canonicalize-node-modules.ts
+                  bun --bun ./nix/scripts/normalize-bun-binaries.ts
+
+                  runHook postBuild
+                '';
+                outputHash = "sha256-/5tUPT885z7uJBh80WXj/69G86zg3Be1LjlhgRD9Ico=";
               });
 
               postInstall = (oldAttrs.postInstall or "") + ''

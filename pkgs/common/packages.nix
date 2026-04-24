@@ -29,7 +29,6 @@ let
     gamescope
     mangohud
     (nurPkgs.umu-fzf or null)
-    (nurPkgs.fitgirl-extract or null)
   ];
 
   editors = with pkgs; [
