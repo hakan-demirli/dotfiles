@@ -1,5 +1,5 @@
 {
-  flake.modules.nixos.laptop-hardware =
+  flake.modules.nixos.l01-hardware =
     { lib, config, ... }:
     {
       boot = {

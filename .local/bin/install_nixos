@@ -40,7 +40,7 @@ decrypt_secrets() {
 
 disko_format() {
   sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
-    --mode disko /root/dotfiles_tmp/hosts/laptop/hardware/disko.nix \
+    --mode disko /root/dotfiles_tmp/hosts/l01/hardware/disko.nix \
     --arg device '"/dev/vda"'
 }
 

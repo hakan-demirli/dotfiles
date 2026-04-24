@@ -20,6 +20,8 @@
       security.pam.u2f = {
         enable = true;
         settings = {
+          origin = "pam://emre-sudo";
+          appid = "pam://emre-sudo";
           cue = true;
           control = "sufficient";
           authfile = pkgs.writeText "u2f_keys" publicData.yubikey.u2fkey;

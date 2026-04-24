@@ -223,13 +223,13 @@ _: {
 
             emre_machine.wait_for_unit("tailscaled.service")
             emre_machine.succeed("ping -c 1 192.168.1.1 >&2")
-            emre_machine.succeed(f"tailscale up --authkey={laptop_key} --hostname=emre-laptop --login-server=https://headscale")
+            emre_machine.succeed(f"tailscale up --authkey={laptop_key} --hostname=emre-l01 --login-server=https://headscale")
 
             um_machine.wait_for_unit("tailscaled.service")
             um_machine.succeed(f"tailscale up --authkey={um_key} --hostname=um-laptop --login-server=https://headscale")
 
             a00_headscale.wait_until_succeeds("headscale nodes list | grep ssh-target")
-            a00_headscale.wait_until_succeeds("headscale nodes list | grep emre-laptop")
+            a00_headscale.wait_until_succeeds("headscale nodes list | grep emre-l01")
             a00_headscale.wait_until_succeeds("headscale nodes list | grep um-laptop")
 
             def get_ts_ip(node):
