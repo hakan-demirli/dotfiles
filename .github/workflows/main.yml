@@ -66,8 +66,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: laptop
-          #   target: nixosConfigurations.laptop.config.system.build.toplevel
+          # - name: l01
+          #   target: nixosConfigurations.l01.config.system.build.toplevel
           #   runner: ubuntu-latest
           - name: vm_oracle_x86
             target: nixosConfigurations.vm_oracle_x86.config.system.build.toplevel

@@ -28,10 +28,10 @@
 # Installation and Deployment
 ## Generic
 ### Switch to a new config
-*  ```sudo nixos-rebuild switch --flake ./.#laptop```
+*  ```sudo nixos-rebuild switch --flake ./.#l01```
 
 ### Build without switch
-* ```sudo nixos-rebuild build --flake ~/Desktop/dotfiles/#laptop```
+* ```sudo nixos-rebuild build --flake ~/Desktop/dotfiles/#l01```
 
 ### Build an iso or qcow2
 * ```nix run github:nix-community/nixos-generators -- --flake .#vm_oracle_aarch64 --format iso```
@@ -134,7 +134,7 @@
         * ```sudo headscale nodes tag -i 1 -t tag:exitnode```
 * [Optional QOL] 
   * Remove unused nodes: ```sudo headscale nodes delete --identifier 4```
-  * Rename hostnames: ```sudo headscale nodes rename laptop -i 6```
+  * Rename hostnames: ```sudo headscale nodes rename l01 -i 6```
 
 # Deploy Secrets
 
