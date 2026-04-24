@@ -18,7 +18,7 @@
         }:$PATH
 
         ${pkgs.ntfy-sh}/bin/ntfy sub -c /dev/null \
-          "http://vm-oracle-aarch64:8111/emre-laptop" \
+          "http://vm-oracle-aarch64:8111/emre-$(hostname)" \
           'bash -c "ffplay -autoexit -nodisp -af volume=2.0 $HOME/.local/share/sounds/effects/nier_enter.mp3 > /dev/null 2>&1 & notify-send \"$t\" \"$m\""'
       '';
       Restart = "always";

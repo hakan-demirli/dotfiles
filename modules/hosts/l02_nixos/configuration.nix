@@ -6,44 +6,15 @@ let
   inherit (inputs.self.lib) publicData;
 in
 {
-  flake.modules.nixos.laptop =
-    {
-      pkgs,
-      ...
-    }:
+  flake.modules.nixos.l02 =
+    { pkgs, ... }:
     {
       imports =
         with inputs.self.modules.nixos;
         [
-          system-base
-          system-fonts
-          system-locale
-          system-impermanence
-          system-ephemeral-root
-          system-polkit
-          system-boot-grub
-          system-disko-btrfs-lvm
-          user-base
-          nix-settings
-          overlays
-          services-hyprland
-          services-tailscale
-          services-docker
-          services-warp
-          services-earlyoom
-          services-yubikey
-          services-sops
+          system-laptop-base
           services-slurm-client
-          # Laptop-specific modules
-          laptop-hardware
-          system-nvidia
-          system-battery
-          system-gnupg
-          system-virtualisation
-          system-sound
-          system-bluetooth
-          system-automount
-          system-v4l2loopback
+          l02-hardware
         ]
         ++ [
           (inputs.self + /pkgs/state_autocommit.nix)
@@ -51,13 +22,11 @@ in
           (inputs.self + /pkgs/ntfy-listener.nix)
         ];
 
-      networking.hostName = "laptop";
-      networking.networkmanager.enable = true;
-      time.timeZone = "Europe/Zurich";
+      networking.hostName = "l02";
 
       system = {
         disko = {
-          device = "/dev/disk/by-id/nvme-KIOXIA-EXCERIA_SSD_X26FC0ZVF4M3";
+          device = "/dev/disk/by-id/nvme-PC_SN8000S_SDEPNRG-2T00-1006_25290K800525";
           swapSize = "32G";
         };
         impermanence = {
@@ -76,7 +45,7 @@ in
         user = {
           username = "emre";
           uid = 1000;
-          hashedPassword = publicData.passwords.laptop;
+          hashedPassword = publicData.passwords.l02;
           useHomeManager = true;
           extraGroups = [ "kvm" ];
           homeManagerImports = [ inputs.self.modules.homeManager.desktop ];
@@ -96,13 +65,6 @@ in
           enable = true;
           masterHostname = "vm-oracle-aarch64";
         };
-
-        # prevent sleep. laptop gpu dies if it sleeps. Hardware/Firmware bug.
-        logind.settings.Login = {
-          HandleLidSwitch = "ignore";
-          HandleLidSwitchExternalPower = "ignore";
-          HandleLidSwitchDocked = "ignore";
-        };
       };
 
       boot = {
@@ -116,24 +78,10 @@ in
           "kernel.perf_event_paranoid" = 1;
         };
         kernelPackages = pkgs.linuxPackages_latest;
-        supportedFilesystems = [ "ntfs" ];
+        supportedFilesystems = [
+          "ntfs"
+          "xfs"
+        ];
       };
-
-      systemd.services.NetworkManager-wait-online.enable = false;
-      systemd.network.wait-online.enable = false;
-
-      environment.systemPackages = with pkgs; [
-        kitty
-        foot
-        xterm
-        tofi
-      ];
-
-      documentation = {
-        enable = true;
-        nixos.enable = true;
-      };
-
-      hardware.keyboard.qmk.enable = true;
     };
 }
