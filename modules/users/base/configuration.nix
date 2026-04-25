@@ -53,7 +53,16 @@
 
         home-manager = lib.mkIf config.system.user.useHomeManager {
           extraSpecialArgs = { inherit inputs pkgs; };
-          backupFileExtension = "backup";
+          backupCommand = ''
+            src="$1"
+            dest="$src.backup"
+            i=1
+            while [ -e "$dest" ]; do
+              dest="$src.backup$i"
+              i=$((i + 1))
+            done
+            ${pkgs.coreutils}/bin/mv -v "$src" "$dest"
+          '';
           users.${config.system.user.username} = {
             imports = config.system.user.homeManagerImports;
           };

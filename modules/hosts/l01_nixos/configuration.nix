@@ -16,6 +16,7 @@ in
         with inputs.self.modules.nixos;
         [
           system-laptop-base
+          system-hibernation
           services-slurm-client
           # Machine-specific modules
           l01-hardware

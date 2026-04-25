@@ -4,10 +4,26 @@ let
   critical_level = "5";
 
   low_battery_notify = pkgs.writers.writeBash "lowBatteryNotifier" ''
-    BAT_PCT=`${pkgs.acpi}/bin/acpi -b | ${pkgs.gnugrep}/bin/grep -P -o '[0-9]+(?=%)'`
-    BAT_STA=`${pkgs.acpi}/bin/acpi -b | ${pkgs.gnugrep}/bin/grep -P -o '\w+(?=,)'`
+    set -u
 
-    if test $BAT_PCT -le ${low_level} && test $BAT_PCT -gt ${critical_level} && test $BAT_STA = "Discharging"; then
+    BAT_PCT=""
+    BAT_STA=""
+    for bat in /sys/class/power_supply/BAT*; do
+        [ -d "$bat" ] || continue
+        if [ -r "$bat/capacity" ] && [ -r "$bat/status" ]; then
+            BAT_PCT=$(${pkgs.coreutils}/bin/cat "$bat/capacity" 2>/dev/null)
+            BAT_STA=$(${pkgs.coreutils}/bin/cat "$bat/status" 2>/dev/null)
+            break
+        fi
+    done
+
+    [ -n "$BAT_PCT" ] || exit 0
+    [ -n "$BAT_STA" ] || exit 0
+    case "$BAT_PCT" in
+        *[!0-9]*) exit 0 ;;
+    esac
+
+    if [ "$BAT_PCT" -le ${low_level} ] && [ "$BAT_PCT" -gt ${critical_level} ] && [ "$BAT_STA" = "Discharging" ]; then
         DISPLAY=:0.0 ${pkgs.dunst}/bin/dunstify \
             -a battery \
             -h string:x-dunst-stack-tag:battery \
@@ -16,7 +32,7 @@ let
             "Low battery."
     fi
 
-    if test $BAT_PCT -le ${critical_level} && test $BAT_STA = "Discharging"; then
+    if [ "$BAT_PCT" -le ${critical_level} ] && [ "$BAT_STA" = "Discharging" ]; then
         DISPLAY=:0.0 ${pkgs.dunst}/bin/dunstify \
             -a battery \
             -h string:x-dunst-stack-tag:battery \

@@ -13,6 +13,7 @@ in
         with inputs.self.modules.nixos;
         [
           system-laptop-base
+          system-hibernation
           services-fprintd
           services-slurm-client
           services-tablet
