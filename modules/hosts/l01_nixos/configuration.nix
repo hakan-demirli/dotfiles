@@ -47,7 +47,7 @@ in
             ".config/pulse"
             ".local/state/pipewire"
             ".local/state/wireplumber"
-            ".mozilla"
+            ".config/mozilla"
           ];
         };
         user = {
@@ -67,7 +67,7 @@ in
       };
 
       services = {
-        tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";
+        tailscale.loginServerHost = "sshr.polarbearvuzi.com";
 
         slurm-client = {
           enable = true;

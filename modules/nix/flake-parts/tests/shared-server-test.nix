@@ -2,13 +2,13 @@ _: {
   perSystem =
     { config, pkgs, ... }:
     {
-      apps.test-shared-server = {
+      apps.test-ss0 = {
         type = "app";
-        program = "${config.packages.shared-server-test.driver}/bin/nixos-test-driver";
+        program = "${config.packages.ss0-test.driver}/bin/nixos-test-driver";
         meta.description = "Run the shared server ACL integration test";
       };
 
-      packages.shared-server-test =
+      packages.ss0-test =
         let
           aclFile = ../../../services/headscale/headscale-acl.hujson;
 
@@ -38,7 +38,7 @@ _: {
           '';
         in
         pkgs.testers.runNixOSTest {
-          name = "shared-server-acl-test";
+          name = "ss0-acl-test";
 
           nodes = {
             a00_headscale =
@@ -106,7 +106,7 @@ _: {
                 environment.systemPackages = [ pkgs.headscale ];
               };
 
-            shared_server =
+            ss0 =
               { config, pkgs, ... }:
               {
                 virtualisation.containers.enable = true;
@@ -245,8 +245,8 @@ _: {
             laptop_key = a00_headscale.succeed("headscale preauthkeys create --reusable --expiration 24h --tags tag:laptop").strip()
             um_key = a00_headscale.succeed(f"headscale preauthkeys create --user {um_id} --reusable --expiration 24h").strip()
 
-            shared_server.wait_for_unit("tailscaled.service")
-            shared_server.succeed(f"tailscale up --authkey={server_key} --hostname=shared-server --login-server=https://headscale --ssh")
+            ss0.wait_for_unit("tailscaled.service")
+            ss0.succeed(f"tailscale up --authkey={server_key} --hostname=ss0 --login-server=https://headscale --ssh")
 
             emre_machine.wait_for_unit("tailscaled.service")
             emre_machine.succeed("ping -c 1 192.168.1.1 >&2")
@@ -255,14 +255,14 @@ _: {
             um_machine.wait_for_unit("tailscaled.service")
             um_machine.succeed(f"tailscale up --authkey={um_key} --hostname=um-laptop --login-server=https://headscale")
 
-            a00_headscale.wait_until_succeeds("headscale nodes list | grep shared-server")
+            a00_headscale.wait_until_succeeds("headscale nodes list | grep ss0")
             a00_headscale.wait_until_succeeds("headscale nodes list | grep emre-l01")
             a00_headscale.wait_until_succeeds("headscale nodes list | grep um-laptop")
 
             def get_ts_ip(node):
                 return node.succeed("tailscale ip -4").strip()
 
-            server_ip = get_ts_ip(shared_server)
+            server_ip = get_ts_ip(ss0)
             emre_ip = get_ts_ip(emre_machine)
             um_ip = get_ts_ip(um_machine)
 
@@ -286,15 +286,18 @@ _: {
             code, output = emre_machine.execute(cmd, timeout=30)
             if code != 0:
                 print(f"SSH failed with code {code}. Output:\n{output}")
-                print("Shared Server Tailscaled Logs:")
-                print(shared_server.execute("journalctl -u tailscaled --no-pager -n 100")[1])
+                print("SS0 Tailscaled Logs:")
+                print(ss0.execute("journalctl -u tailscaled --no-pager -n 100")[1])
                 raise Exception(f"SSH failed with code {code}")
 
+            # um can reach ss0 on network level but CANNOT SSH via Tailscale SSH
+            um_machine.fail(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {server_ip} true")
+
             # Outgoing Traffic should FAIL (Tag:shared-server is NOT in 'src' of any ACL)
-            shared_server.fail(f"ping -c 2 -W 1 {emre_ip}")
-            shared_server.fail(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 {emre_ip} true")
-            shared_server.fail(f"ping -c 2 -W 1 {emre_ip}")
-            shared_server.fail(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 {emre_ip} true")
+            ss0.fail(f"ping -c 2 -W 1 {emre_ip}")
+            ss0.fail(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 {emre_ip} true")
+            ss0.fail(f"ping -c 2 -W 1 {um_ip}")
+            ss0.fail(f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 {um_ip} true")
 
             print("ALL VERIFICATIONS PASSED")
           '';

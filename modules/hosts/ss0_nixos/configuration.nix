@@ -6,15 +6,14 @@ let
   inherit (inputs.self.lib) publicData;
 in
 {
-  flake.modules.nixos.shared_server =
+  flake.modules.nixos.ss0 =
     { ... }:
     {
       imports = with inputs.self.modules.nixos; [
         system-server-base
         overlays
         services-tailscale
-        services-sops
-        shared_server-hardware
+        ss0-hardware
       ];
 
       time.timeZone = "Europe/Zurich";
@@ -22,7 +21,7 @@ in
       system = {
         server = {
           enable = true;
-          hostName = "shared_server";
+          hostName = "ss0";
         };
         disko = {
           device = "/dev/nvme0n1";
@@ -58,8 +57,8 @@ in
         };
 
         tailscale = {
-          enable = true;
-          reverseSshRemoteHost = "sshr.polarbearvuzi.com";
+          loginServerHost = "sshr.polarbearvuzi.com";
+          useAuthKey = false;
           extraUpFlags = [ "--advertise-tags=tag:shared-server" ];
         };
       };
@@ -70,7 +69,7 @@ in
         externalInterface = "eth0";
       };
 
-      containers.alice = {
+      containers.emre = {
         autoStart = true;
         privateNetwork = true;
         hostAddress = "192.168.100.10";
@@ -90,10 +89,10 @@ in
             settings.PermitRootLogin = "yes";
           };
 
-          users.users.alice = {
+          users.users.emre = {
             isNormalUser = true;
             extraGroups = [ "wheel" ];
-            uid = 1001;
+            uid = 1000;
             openssh.authorizedKeys.keys = [ publicData.ssh.id_ed25519_proton_pub ];
           };
 
@@ -102,7 +101,7 @@ in
         };
       };
 
-      containers.bob = {
+      containers.um = {
         autoStart = true;
         privateNetwork = true;
         hostAddress = "192.168.101.10";
@@ -122,10 +121,10 @@ in
             settings.PermitRootLogin = "yes";
           };
 
-          users.users.bob = {
+          users.users.um = {
             isNormalUser = true;
             extraGroups = [ "wheel" ];
-            uid = 1002;
+            uid = 1001;
             openssh.authorizedKeys.keys = [ publicData.ssh.id_um_pub ];
           };
 
