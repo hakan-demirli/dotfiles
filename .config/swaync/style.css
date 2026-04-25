@@ -297,3 +297,55 @@
 .widget-mpris-subtitle {
   font-size: 1.1rem;
 }
+
+.widget-volume,
+.widget-backlight {
+  margin: 8px;
+  padding: 10px;
+  background: @background;
+  border: 1px solid @accent;
+  border-radius: 8px;
+  font-size: 1.2rem;
+}
+
+.widget-volume > box > label,
+.widget-backlight > box > label {
+  font-size: 1.6rem;
+  margin-right: 8px;
+  color: @foreground;
+}
+
+.widget-volume scale,
+.widget-backlight scale {
+  min-height: 18px;
+}
+
+.widget-volume scale trough,
+.widget-backlight scale trough {
+  min-height: 12px;
+  background: @current-line;
+  border-radius: 8px;
+}
+
+.widget-volume scale highlight,
+.widget-backlight scale highlight {
+  background: @accent;
+  border-radius: 8px;
+}
+
+.widget-volume scale slider,
+.widget-backlight scale slider {
+  min-width: 22px;
+  min-height: 22px;
+  background: @foreground;
+  border: 2px solid @accent;
+  border-radius: 50%;
+  margin: -8px;
+}
+
+.widget-volume .per-app-volume-row {
+  margin-top: 6px;
+  padding: 4px;
+  border-radius: 6px;
+  background: alpha(@current-line, 0.6);
+}

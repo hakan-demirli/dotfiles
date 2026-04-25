@@ -15,6 +15,7 @@ in
           system-laptop-base
           services-fprintd
           services-slurm-client
+          services-tablet
           l02-hardware
         ]
         ++ [
@@ -24,6 +25,8 @@ in
         ];
 
       networking.hostName = "l02";
+
+      environment.sessionVariables.HYPRLAND_IS_L02 = "1";
 
       system = {
         disko = {

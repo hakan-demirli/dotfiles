@@ -34,12 +34,49 @@ tooltip {
 #workspaces,
 #custom-notification,
 #custom-power,
+#custom-osk,
+#custom-orientation,
 #memory,
 #tray {
   background: alpha(@background, 0.8);
   border-radius: 8px;
   padding: 1px;
   margin-right: 1px;
+}
+
+#custom-osk,
+#custom-orientation {
+  padding: 10px 0;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  font-size: 1.8rem;
+}
+
+#custom-osk.osk-on {
+  color: @green;
+}
+
+#custom-osk.osk-off {
+  color: @foreground;
+}
+
+#custom-orientation.orient-auto {
+  color: @green;
+}
+
+#custom-orientation.orient-lock {
+  color: @foreground;
+}
+
+#custom-osk.osk-hidden,
+#custom-orientation.orient-hidden {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  font-size: 0;
 }
 
 #tray {

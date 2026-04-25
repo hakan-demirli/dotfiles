@@ -29,6 +29,8 @@ in
 
       networking.hostName = "l01";
 
+      environment.sessionVariables.HYPRLAND_IS_L01 = "1";
+
       system = {
         disko = {
           device = "/dev/disk/by-id/nvme-KIOXIA-EXCERIA_SSD_X26FC0ZVF4M3";

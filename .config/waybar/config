@@ -26,6 +26,8 @@
     "custom/left-arrow-dark",
     "battery",
     "custom/left-arrow-dark",
+    "custom/orientation",
+    "custom/osk",
     "custom/weather",
     "custom/left-arrow-dark",
     "custom/notification",
@@ -156,9 +158,8 @@
     "return-type": "json",
     "exec-if": "which swaync-client",
     "exec": "swaync-client -swb",
-    "on-click": "sleep 0.1; swaync-client -t -sw",
+    "on-click": "swaync-client -t -sw",
     "on-click-right": "swaync-client -d -sw",
-    "on-click-released": "swaync-client -t -sw",
     "escape": true
   },
   "tray": {
@@ -196,5 +197,21 @@
       "hibernate": "gtk_applet_power_menu  --action hibernate",
       "logout": "gtk_applet_power_menu  --action logout"
     },
+  },
+  "custom/osk": {
+    "justify": "center",
+    "exec": "waybar_osk",
+    "return-type": "json",
+    "signal": 5,
+    "format": "{}",
+    "on-click": "tablet_mode_apply osk-toggle"
+  },
+  "custom/orientation": {
+    "justify": "center",
+    "exec": "waybar_orientation",
+    "return-type": "json",
+    "signal": 6,
+    "format": "{}",
+    "on-click": "pkill -USR1 -f orientation_watcher"
   },
 }

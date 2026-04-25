@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+
+import fcntl
+import glob
+import os
+import signal
+import struct
+import subprocess
+import sys
+import time
+
+EV_SYN = 0x00
+EV_SW = 0x05
+SW_TABLET_MODE = 0x01
+
+
+EVENT_FMT = "llHHi"
+EVENT_SIZE = struct.calcsize(EVENT_FMT)
+
+_SW_BUFLEN = 8
+
+
+def _ioc(direction: int, type_char: str, nr: int, size: int) -> int:
+    return (direction << 30) | (size << 16) | (ord(type_char) << 8) | nr
+
+
+def EVIOCGBIT(ev_type: int, length: int) -> int:
+    return _ioc(2, "E", 0x20 + ev_type, length)
+
+
+def EVIOCGSW(length: int) -> int:
+    return _ioc(2, "E", 0x1B, length)
+
+
+def _has_bit(buf: bytes, bit: int) -> bool:
+    return bool((buf[bit // 8] >> (bit % 8)) & 1)
+
+
+def find_tablet_mode_device() -> str | None:
+    override = os.environ.get("TABLET_MODE_EVENT")
+    if override:
+        return override if os.path.exists(override) else None
+
+    for path in sorted(glob.glob("/dev/input/event*")):
+        try:
+            fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        except OSError:
+            continue
+        try:
+            buf = bytearray(_SW_BUFLEN)
+            fcntl.ioctl(fd, EVIOCGBIT(EV_SW, _SW_BUFLEN), buf, True)
+        except OSError:
+            os.close(fd)
+            continue
+        os.close(fd)
+        if _has_bit(buf, SW_TABLET_MODE):
+            return path
+    return None
+
+
+def query_initial_state(fd: int) -> bool:
+    buf = bytearray(_SW_BUFLEN)
+    try:
+        fcntl.ioctl(fd, EVIOCGSW(_SW_BUFLEN), buf, True)
+    except OSError as e:
+        log(f"EVIOCGSW failed: {e}; assuming tablet mode off")
+        return False
+    return _has_bit(buf, SW_TABLET_MODE)
+
+
+def log(msg: str) -> None:
+    sys.stderr.write(f"[tablet_mode_watcher] {time.strftime('%H:%M:%S')} {msg}\n")
+    sys.stderr.flush()
+
+
+def apply(state: bool) -> None:
+    arg = "on" if state else "off"
+    try:
+        subprocess.run(
+            ["tablet_mode_apply", arg],
+            check=False,
+            timeout=10,
+        )
+    except Exception as e:
+        log(f"tablet_mode_apply {arg} failed: {e}")
+
+
+_current_state = False
+
+
+def set_state(new: bool, *, force: bool = False) -> None:
+    global _current_state
+    if not force and new == _current_state:
+        return
+    _current_state = new
+    log(f"state -> {'on' if new else 'off'}")
+    apply(new)
+
+
+def on_sigusr1(_signum, _frame):
+    log("SIGUSR1 received: toggling")
+    set_state(not _current_state, force=True)
+
+
+def on_exit(_signum, _frame):
+    log("exit signal: restoring keyboard/touchpad")
+    apply(False)
+    sys.exit(0)
+
+
+def main() -> int:
+    device = find_tablet_mode_device()
+    if device is None:
+        log("no input device advertises SW_TABLET_MODE; nothing to watch")
+        return 1
+    log(f"watching {device}")
+
+    try:
+        fd = os.open(device, os.O_RDONLY)
+    except OSError as e:
+        log(f"open({device}) failed: {e}")
+        return 1
+
+    signal.signal(signal.SIGUSR1, on_sigusr1)
+    signal.signal(signal.SIGTERM, on_exit)
+    signal.signal(signal.SIGINT, on_exit)
+
+    initial = query_initial_state(fd)
+    log(f"initial SW_TABLET_MODE={int(initial)}")
+    set_state(initial, force=True)
+
+    try:
+        with os.fdopen(fd, "rb", buffering=0) as f:
+            while True:
+                data = f.read(EVENT_SIZE)
+                if not data or len(data) < EVENT_SIZE:
+                    log("short read; device disappeared?")
+                    return 1
+                _sec, _usec, etype, ecode, value = struct.unpack(EVENT_FMT, data)
+                if etype == EV_SYN:
+                    continue
+                if etype == EV_SW and ecode == SW_TABLET_MODE:
+                    set_state(bool(value))
+    except KeyboardInterrupt:
+        on_exit(None, None)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

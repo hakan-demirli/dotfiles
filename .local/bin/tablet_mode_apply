@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+
+set -u
+
+STATE_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
+STATE_FILE="$STATE_DIR/tablet_mode"
+WVKBD_VIS_FILE="$STATE_DIR/wvkbd_visible"
+
+log() { printf '[tablet_mode_apply] %s\n' "$*" >&2; }
+
+notify() {
+  command -v notify-send > /dev/null 2>&1 || return 0
+  notify-send -a tablet-mode -t 2500 \
+    -h string:x-canonical-private-synchronous:tablet-mode \
+    "$1" "${2:-}" 2> /dev/null || true
+}
+
+signal_waybar() {
+  pkill -RTMIN+5 waybar 2> /dev/null || true
+  pkill -RTMIN+6 waybar 2> /dev/null || true
+}
+
+set_wvkbd_visible() {
+  echo "$1" > "$WVKBD_VIS_FILE"
+  signal_waybar
+}
+
+ensure_wvkbd_running() {
+  if pgrep -x wvkbd-mobintl > /dev/null 2>&1; then
+    return 0
+  fi
+  setsid -f wvkbd-mobintl --hidden -L 280 -l full,special,emoji > /dev/null 2>&1 \
+    || log "failed to spawn wvkbd-mobintl (is it installed?)"
+  sleep 0.05
+  pgrep -x wvkbd-mobintl > /dev/null 2>&1
+}
+
+show_wvkbd() {
+  ensure_wvkbd_running || {
+    log "wvkbd not running, cannot show"
+    return 1
+  }
+  pkill -USR2 -x wvkbd-mobintl 2> /dev/null || log "wvkbd show signal failed"
+  set_wvkbd_visible 1
+}
+
+hide_wvkbd() {
+  pkill -USR1 -x wvkbd-mobintl 2> /dev/null || true
+  set_wvkbd_visible 0
+}
+
+toggle_wvkbd() {
+  ensure_wvkbd_running || {
+    log "wvkbd not running, cannot toggle"
+    return 1
+  }
+  if [[ "$(cat "$WVKBD_VIS_FILE" 2> /dev/null)" == "1" ]]; then
+    hide_wvkbd
+  else
+    pkill -USR2 -x wvkbd-mobintl 2> /dev/null || log "wvkbd show signal failed"
+    set_wvkbd_visible 1
+  fi
+}
+
+start_orientation_watcher() {
+  if pgrep -f orientation_watcher > /dev/null 2>&1; then
+    return 0
+  fi
+  mkdir -p ~/.local/state
+  setsid -f orientation_watcher >> ~/.local/state/orientation_watcher.log 2>&1
+  sleep 0.05
+  pgrep -f orientation_watcher > /dev/null 2>&1 \
+    || log "orientation_watcher failed to start"
+}
+
+stop_orientation_watcher() {
+  pkill -TERM -f orientation_watcher 2> /dev/null || true
+}
+
+apply_on() {
+  log "entering tablet mode"
+  echo on > "$STATE_FILE"
+  start_orientation_watcher
+  signal_waybar
+  notify "Tablet mode" "On"
+}
+
+apply_off() {
+  log "leaving tablet mode"
+  hide_wvkbd
+  stop_orientation_watcher
+  echo off > "$STATE_FILE"
+  signal_waybar
+  notify "Laptop mode" "On"
+}
+
+case "${1:-}" in
+  on) apply_on ;;
+  off) apply_off ;;
+  toggle)
+    if [[ "$(cat "$STATE_FILE" 2> /dev/null)" == "on" ]]; then
+      apply_off
+    else
+      apply_on
+    fi
+    ;;
+  osk-toggle) toggle_wvkbd ;;
+  osk-show) show_wvkbd ;;
+  osk-hide) hide_wvkbd ;;
+  status)
+    cat "$STATE_FILE" 2> /dev/null || echo "off"
+    ;;
+  *)
+    echo "usage: $0 {on|off|toggle|osk-toggle|osk-show|osk-hide|status}" >&2
+    exit 2
+    ;;
+esac
