@@ -13,6 +13,7 @@ in
         with inputs.self.modules.nixos;
         [
           system-laptop-base
+          services-fprintd
           services-slurm-client
           l02-hardware
         ]
@@ -34,12 +35,13 @@ in
             "/var/lib/libvirt"
             "/var/log"
             "/var/lib/bluetooth"
+            "/var/lib/fprint"
           ];
           extraPersistentUserDirs = [
             ".config/pulse"
             ".local/state/pipewire"
             ".local/state/wireplumber"
-            ".mozilla"
+            ".config/mozilla"
           ];
         };
         user = {
