@@ -78,7 +78,7 @@ in
             41641 # Tailscale discovery
           ];
         };
-        tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
+        tailscale.loginServerHost = reverseSshBounceServerHost;
 
         slurm-cluster = {
           enable = true;

@@ -148,6 +148,16 @@
 2. **Install/Switch**:
    * ```sudo nixos-rebuild switch --flake .#hostname```
 
+## ss0 (shared server, no sops)
+ss0 does not use sops. Do NOT deploy the age key to this machine.
+1. **Install/Switch**:
+   * ```sudo nixos-rebuild switch --flake .#ss0```
+2. **Register Tailscale** (one-time):
+   * ```sudo tailscale up --login-server=https://xxxxxxxx --advertise-tags=tag:shared-server```
+   * On the headscale server, register the node:
+     * ```sudo headscale nodes register --user emre --key nodekey:XXXXX```
+   * Tailscale state persists across reboots, so this only needs to be done once.
+
 ## Editing Secrets
 * ```nix-shell -p sops age ssh-to-age```
 * ```SOPS_AGE_KEY=$(age -d secrets/age.key.enc) sops secrets/secrets.yaml```

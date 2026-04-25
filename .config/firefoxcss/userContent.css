@@ -5,7 +5,7 @@
     overflow: hidden !important;
   }
   #root {
-    background-image: url("/home/emre/.mozilla/firefox/emre/chrome/wp.png") !important; /* TODO */
+    background-image: url("/home/emre/.config/mozilla/firefox/emre/chrome/wp.png") !important; /* TODO */
     background-size: cover !important;
     background-attachment: fixed !important;
     background-position: right !important;

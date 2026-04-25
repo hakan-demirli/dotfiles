@@ -5,22 +5,29 @@
       cfg = config.services.tailscale;
     in
     {
-      options.services.tailscale.reverseSshRemoteHost = lib.mkOption {
-        type = lib.types.str;
-        description = "Reverse SSH Remote Host for Tailscale login server";
+      options.services.tailscale = {
+        loginServerHost = lib.mkOption {
+          type = lib.types.str;
+          description = "Headscale login server hostname";
+        };
+        useAuthKey = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Whether to use a sops-managed auth key for automatic registration. When false, register manually via `sudo tailscale up`.";
+        };
       };
 
       config = {
         # you must disconnect warp
         # warp-cli disconnect
-        sops.secrets.tailscale-key = { };
+        sops.secrets.tailscale-key = lib.mkIf cfg.useAuthKey { };
 
         services.tailscale = {
           enable = true;
-          authKeyFile = config.sops.secrets.tailscale-key.path;
+          authKeyFile = lib.mkIf cfg.useAuthKey config.sops.secrets.tailscale-key.path;
           useRoutingFeatures = "client";
           extraUpFlags = [
-            "--login-server=https://${cfg.reverseSshRemoteHost}"
+            "--login-server=https://${cfg.loginServerHost}"
           ];
         };
 
