@@ -19,7 +19,7 @@ _: {
             cache_server =
               { pkgs, ... }:
               {
-                services.harmonia = {
+                services.harmonia.cache = {
                   enable = true;
                   signKeyPaths = [ "/var/lib/harmonia/signing-key.secret" ];
                   settings.bind = "[::]:5000";
