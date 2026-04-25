@@ -1,5 +1,5 @@
 {
-  flake.modules.nixos.shared_server-hardware =
+  flake.modules.nixos.ss0-hardware =
     { lib, config, ... }:
     {
       boot = {

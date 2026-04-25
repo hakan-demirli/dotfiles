@@ -60,7 +60,7 @@ in
           remoteUser = reverseSshBounceServerUser;
           privateKeyPath = "/home/${reverseSshBounceServerUser}/.ssh/id_ed25519_proton";
         };
-        tailscale.reverseSshRemoteHost = reverseSshBounceServerHost;
+        tailscale.loginServerHost = reverseSshBounceServerHost;
 
         slurm-cluster = {
           enable = true;

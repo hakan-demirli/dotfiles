@@ -65,7 +65,7 @@ in
       };
 
       services = {
-        tailscale.reverseSshRemoteHost = "sshr.polarbearvuzi.com";
+        tailscale.loginServerHost = "sshr.polarbearvuzi.com";
 
         slurm-client = {
           enable = true;
