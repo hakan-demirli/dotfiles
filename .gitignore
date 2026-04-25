@@ -5,6 +5,7 @@
 *.wav
 *.json
 !.config/claude/settings.json
+!.config/swaync/config.json
 **/__pycache__
 **/venv_*
 **/venv
