@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+# Power profile control for HP OmniBook Ultra Flip 14 (board 8CDE, Lunar Lake).
+#
+# Writes:
+#   intel-rapl{,-mmio}:0 PL1/PL2, cpufreq governor, EPP.
+#
+# Sustained package power is capped at ~28W by the FIVR vr_tdc current limit#
+
+MSR=/sys/class/powercap/intel-rapl:0
+MMIO=/sys/class/powercap/intel-rapl-mmio:0
+
+ORIG_ARGS=("$@")
+
+need_root() {
+  if [ "$(id -u)" -ne 0 ]; then
+    exec sudo -E "$0" "${ORIG_ARGS[@]}"
+  fi
+}
+
+write_to() {
+  local path=$1 val=$2
+  if [ ! -e "$path" ]; then
+    echo "  skip (no such file): $path"
+    return 0
+  fi
+  if printf '%s\n' "$val" >"$path" 2>/dev/null; then
+    local actual
+    actual=$(cat "$path" 2>/dev/null)
+    if [ "$actual" = "$val" ]; then
+      echo "  ok   $path = $val"
+    else
+      echo "  FAIL $path: wrote '$val' reads '$actual'"
+    fi
+  else
+    echo "  FAIL $path: write rejected"
+  fi
+}
+
+set_rapl() {
+  local pl1_uw=$(($1 * 1000000))
+  local pl2_uw=$(($2 * 1000000))
+  echo "RAPL package PL1=${1}W PL2=${2}W:"
+  write_to "$MSR/constraint_0_power_limit_uw" "$pl1_uw"
+  write_to "$MSR/constraint_1_power_limit_uw" "$pl2_uw"
+  write_to "$MMIO/constraint_0_power_limit_uw" "$pl1_uw"
+  write_to "$MMIO/constraint_1_power_limit_uw" "$pl2_uw"
+}
+
+set_governor() {
+  local gov=$1 fail=0 n=0
+  for p in /sys/devices/system/cpu/cpufreq/policy*/scaling_governor; do
+    n=$((n + 1))
+    printf '%s\n' "$gov" >"$p" 2>/dev/null || fail=$((fail + 1))
+  done
+  echo "governor=$gov ($n policies):"
+  if [ "$fail" -eq 0 ]; then echo "  ok"; else echo "  FAIL on $fail policies"; fi
+}
+
+# governor=performance pins EPP=performance and rejects further writes;
+# skip the write in that case to avoid spurious FAIL output.
+set_epp() {
+  local epp=$1
+  local gov
+  gov=$(cat /sys/devices/system/cpu/cpufreq/policy0/scaling_governor 2>/dev/null)
+  if [ "$gov" = "performance" ]; then
+    echo "EPP=performance (pinned by governor)"
+    return 0
+  fi
+  local fail=0 n=0
+  for p in /sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference; do
+    n=$((n + 1))
+    printf '%s\n' "$epp" >"$p" 2>/dev/null || fail=$((fail + 1))
+  done
+  echo "EPP=$epp ($n policies):"
+  if [ "$fail" -eq 0 ]; then echo "  ok"; else echo "  FAIL on $fail policies"; fi
+}
+
+read_w() { awk '{printf "%d", $1/1000000}' "$1" 2>/dev/null || echo "?"; }
+
+cmd_status() {
+  local ac
+  ac=$(cat /sys/class/power_supply/AC*/online 2>/dev/null | head -1)
+  : "${ac:=?}"
+  echo "AC online            : $ac"
+  echo "MSR  PL1 / PL2 (W)   : $(read_w $MSR/constraint_0_power_limit_uw) / $(read_w $MSR/constraint_1_power_limit_uw)"
+  if [ -d "$MMIO" ]; then
+    local peak="?"
+    [ -e "$MMIO/constraint_2_power_limit_uw" ] && peak=$(read_w "$MMIO/constraint_2_power_limit_uw")
+    echo "MMIO PL1 / PL2 / Peak: $(read_w $MMIO/constraint_0_power_limit_uw) / $(read_w $MMIO/constraint_1_power_limit_uw) / $peak"
+  fi
+  echo "Governor (cpu0)      : $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null)"
+  echo "EPP (cpu0)           : $(cat /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference 2>/dev/null)"
+  local gt=/sys/class/drm/card0/device/tile0/gt0/freq0
+  if [ -d "$gt" ]; then
+    echo "GT0 max / cur (MHz)  : $(cat $gt/max_freq 2>/dev/null) / $(cat $gt/cur_freq 2>/dev/null)"
+    echo "GT0 throttle reasons : $(cat $gt/throttle/reasons 2>/dev/null)"
+  fi
+  local fan=/sys/class/hwmon/hwmon3/fan1_input
+  [ -e "$fan" ] && echo "Fan RPM              : $(cat $fan)"
+}
+
+apply() {
+  local mode=$1 pl1=$2 pl2=$3 gov=$4 epp=$5
+  echo "==> mode: $mode (PL1=${pl1}W PL2=${pl2}W governor=$gov EPP=$epp)"
+  set_rapl "$pl1" "$pl2"
+  set_governor "$gov"
+  set_epp "$epp"
+  echo
+  cmd_status
+}
+
+cmd_turbo() {
+  need_root
+  apply turbo 37 95 performance performance
+}
+cmd_balanced() {
+  need_root
+  apply balanced 28 55 performance performance
+}
+cmd_silent() {
+  need_root
+  apply silent 15 25 powersave power
+}
+
+cmd_help() {
+  cat <<'EOF'
+usage: hp-power {status|turbo|balanced|silent|help}
+
+  status    show current state
+  turbo     PL1=37W PL2=95W,  governor=performance              [sudo]
+  balanced  PL1=28W PL2=55W,  governor=performance              [sudo]
+  silent    PL1=15W PL2=25W,  governor=powersave  EPP=power     [sudo]
+  help      this message
+
+Reboot reverts all writes. TLP may overwrite governor/EPP on AC plug events.
+EOF
+}
+
+case "${1:-status}" in
+status) cmd_status ;;
+turbo | t) cmd_turbo ;;
+balanced | b) cmd_balanced ;;
+silent | s | battery | bat) cmd_silent ;;
+help | -h | --help) cmd_help ;;
+*)
+  echo "unknown subcommand: $1" >&2
+  cmd_help >&2
+  exit 2
+  ;;
+esac
