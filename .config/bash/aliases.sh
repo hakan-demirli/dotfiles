@@ -66,3 +66,11 @@ if [ -d "/sys/devices/platform/asus-nb-wmi" ]; then
   alias fan-performance='echo 0 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 0 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
   alias fan-silent='echo 2 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 2 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
 fi
+
+# Hardware specific (HP)
+if [ -d "/sys/devices/platform/hp-wmi" ]; then
+  alias fan-turbo='hp-power turbo'
+  alias fan-performance='hp-power balanced'
+  alias fan-silent='hp-power silent'
+  alias fan-status='hp-power status'
+fi
