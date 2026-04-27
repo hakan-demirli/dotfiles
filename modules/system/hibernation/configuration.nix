@@ -7,6 +7,7 @@
           systemd.sleep.settings.Sleep = {
             HibernateMode = "shutdown";
             HibernateState = "disk";
+            HibernateDelaySec = "30min";
           };
 
           boot.kernelParams = [

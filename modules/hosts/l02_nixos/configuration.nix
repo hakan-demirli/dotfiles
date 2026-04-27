@@ -65,6 +65,12 @@ in
       };
 
       services = {
+        logind.settings.Login = {
+          HandleLidSwitch = "suspend-then-hibernate";
+          HandleLidSwitchExternalPower = "suspend-then-hibernate";
+          HandleLidSwitchDocked = "ignore";
+        };
+
         tailscale.loginServerHost = "sshr.polarbearvuzi.com";
 
         slurm-client = {
