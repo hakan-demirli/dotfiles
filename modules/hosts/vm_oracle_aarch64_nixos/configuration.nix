@@ -95,6 +95,7 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
+        hasTailscaleAuthority = true;
         # Don't substitute from self - this IS the binary cache server
         excludeSubstituters = [ "http://100.64.0.1:5101" ];
       };

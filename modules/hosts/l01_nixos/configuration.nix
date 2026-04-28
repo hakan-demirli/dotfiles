@@ -64,6 +64,8 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
+        hasNvidia = true;
+        hasTailscaleAuthority = true;
       };
 
       services = {
