@@ -62,6 +62,7 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
+        hasTailscaleAuthority = true;
       };
 
       services = {

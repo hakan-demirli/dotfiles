@@ -74,6 +74,7 @@ in
         allowUnfree = true;
         cudaSupport = false;
         rocmSupport = false;
+        hasTailscaleAuthority = true;
       };
 
       programs.nix-ld.enable = true;
