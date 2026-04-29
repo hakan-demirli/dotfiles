@@ -8,6 +8,8 @@
 
 MSR=/sys/class/powercap/intel-rapl:0
 MMIO=/sys/class/powercap/intel-rapl-mmio:0
+PLATFORM_PROFILE=/sys/firmware/acpi/platform_profile
+
 
 ORIG_ARGS=("$@")
 
@@ -75,6 +77,20 @@ set_epp() {
   if [ "$fail" -eq 0 ]; then echo "  ok"; else echo "  FAIL on $fail policies"; fi
 }
 
+set_platform_profile() {
+  local profile=$1
+  echo "platform_profile=$profile:"
+  if [ ! -e "$PLATFORM_PROFILE" ]; then
+    echo "  skip (no such file): $PLATFORM_PROFILE"
+    return 0
+  fi
+  if printf '%s\n' "$profile" >"$PLATFORM_PROFILE" 2>/dev/null; then
+    echo "  ok   $PLATFORM_PROFILE <- $profile"
+  else
+    echo "  FAIL $PLATFORM_PROFILE: write rejected"
+  fi
+}
+
 read_w() { awk '{printf "%d", $1/1000000}' "$1" 2>/dev/null || echo "?"; }
 
 cmd_status() {
@@ -90,36 +106,38 @@ cmd_status() {
   fi
   echo "Governor (cpu0)      : $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null)"
   echo "EPP (cpu0)           : $(cat /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference 2>/dev/null)"
+  local _pp
+  _pp=$(cat "$PLATFORM_PROFILE" 2>/dev/null) || _pp="(readback broken – kernel driver conflict)"
+  echo "Platform profile     : $_pp"
   local gt=/sys/class/drm/card0/device/tile0/gt0/freq0
   if [ -d "$gt" ]; then
     echo "GT0 max / cur (MHz)  : $(cat $gt/max_freq 2>/dev/null) / $(cat $gt/cur_freq 2>/dev/null)"
     echo "GT0 throttle reasons : $(cat $gt/throttle/reasons 2>/dev/null)"
   fi
-  local fan=/sys/class/hwmon/hwmon3/fan1_input
-  [ -e "$fan" ] && echo "Fan RPM              : $(cat $fan)"
 }
 
 apply() {
-  local mode=$1 pl1=$2 pl2=$3 gov=$4 epp=$5
-  echo "==> mode: $mode (PL1=${pl1}W PL2=${pl2}W governor=$gov EPP=$epp)"
+  local mode=$1 pl1=$2 pl2=$3 gov=$4 epp=$5 profile=$6
+  echo "==> mode: $mode (PL1=${pl1}W PL2=${pl2}W governor=$gov EPP=$epp profile=$profile)"
   set_rapl "$pl1" "$pl2"
   set_governor "$gov"
   set_epp "$epp"
+  set_platform_profile "$profile"
   echo
   cmd_status
 }
 
 cmd_turbo() {
   need_root
-  apply turbo 37 95 performance performance
+  apply turbo 37 95 performance performance performance
 }
 cmd_balanced() {
   need_root
-  apply balanced 28 55 performance performance
+  apply balanced 28 55 performance performance balanced
 }
 cmd_silent() {
   need_root
-  apply silent 15 25 powersave power
+  apply silent 15 25 powersave power cool
 }
 
 cmd_help() {
@@ -127,11 +145,12 @@ cmd_help() {
 usage: hp-power {status|turbo|balanced|silent|help}
 
   status    show current state
-  turbo     PL1=37W PL2=95W,  governor=performance              [sudo]
-  balanced  PL1=28W PL2=55W,  governor=performance              [sudo]
-  silent    PL1=15W PL2=25W,  governor=powersave  EPP=power     [sudo]
+  turbo     PL1=37W PL2=95W,  governor=performance  profile=performance  [sudo]
+  balanced  PL1=28W PL2=55W,  governor=performance  profile=balanced     [sudo]
+  silent    PL1=15W PL2=25W,  governor=powersave     profile=cool         [sudo]
   help      this message
 
+Platform profiles (via hp_wmi): cool quiet balanced performance
 Reboot reverts all writes. TLP may overwrite governor/EPP on AC plug events.
 EOF
 }
