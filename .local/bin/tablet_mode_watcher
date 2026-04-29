@@ -41,6 +41,7 @@ def find_tablet_mode_device() -> str | None:
     if override:
         return override if os.path.exists(override) else None
 
+    candidates = []
     for path in sorted(glob.glob("/dev/input/event*")):
         try:
             fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
@@ -52,10 +53,28 @@ def find_tablet_mode_device() -> str | None:
         except OSError:
             os.close(fd)
             continue
-        os.close(fd)
         if _has_bit(buf, SW_TABLET_MODE):
+            candidates.append((path, fd))
+        else:
+            os.close(fd)
+
+    if not candidates:
+        return None
+
+    for path, fd in candidates:
+        state = query_initial_state(fd)
+        os.close(fd)
+        if state:
+            log(f"multiple SW_TABLET_MODE devices; chose {path} (state=on)")
             return path
-    return None
+
+    for _path, fd in candidates[:-1]:
+        os.close(fd)
+    last_path, last_fd = candidates[-1]
+    os.close(last_fd)
+    if len(candidates) > 1:
+        log(f"multiple SW_TABLET_MODE devices; chose {last_path} (last)")
+    return last_path
 
 
 def query_initial_state(fd: int) -> bool:
