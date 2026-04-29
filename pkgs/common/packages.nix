@@ -117,6 +117,7 @@ let
     with pkgs;
     lib.filter (x: x != null) [
       (nurPkgs.auto_refresh or null)
+      (pkgs.callPackage "${inputs.nur}/pkgs/hibat/default.nix" { })
       (nurPkgs.youtube_sync or null)
       adb-sync
       android-tools
