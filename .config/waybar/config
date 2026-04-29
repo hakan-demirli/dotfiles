@@ -139,7 +139,7 @@
       "critical": 10
     },
     "tooltip": false,
-    "on-click": "gnome-power-statistics",
+    "on-click": "hibat",
   },
   "custom/notification": {
     "justify": "center",
