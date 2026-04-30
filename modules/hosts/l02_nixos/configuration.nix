@@ -81,6 +81,7 @@ in
       };
 
       boot = {
+        kernelParams = [ "video.brightness_switch_enabled=0" ];
         binfmt.emulatedSystems = [ "aarch64-linux" ];
         kernel.sysctl = {
           "net.ipv4.ip_forward" = 1;
