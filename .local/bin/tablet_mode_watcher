@@ -3,6 +3,8 @@
 import fcntl
 import glob
 import os
+import re
+import select
 import signal
 import struct
 import subprocess
@@ -36,13 +38,18 @@ def _has_bit(buf: bytes, bit: int) -> bool:
     return bool((buf[bit // 8] >> (bit % 8)) & 1)
 
 
-def find_tablet_mode_device() -> str | None:
+def _event_num(path: str) -> int:
+    m = re.search(r"event(\d+)$", path)
+    return int(m.group(1)) if m else -1
+
+
+def find_tablet_mode_devices() -> list[str]:
     override = os.environ.get("TABLET_MODE_EVENT")
     if override:
-        return override if os.path.exists(override) else None
+        return [override] if os.path.exists(override) else []
 
     candidates = []
-    for path in sorted(glob.glob("/dev/input/event*")):
+    for path in sorted(glob.glob("/dev/input/event*"), key=_event_num):
         try:
             fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
         except OSError:
@@ -53,28 +60,11 @@ def find_tablet_mode_device() -> str | None:
         except OSError:
             os.close(fd)
             continue
+        os.close(fd)
         if _has_bit(buf, SW_TABLET_MODE):
-            candidates.append((path, fd))
-        else:
-            os.close(fd)
+            candidates.append(path)
 
-    if not candidates:
-        return None
-
-    for path, fd in candidates:
-        state = query_initial_state(fd)
-        os.close(fd)
-        if state:
-            log(f"multiple SW_TABLET_MODE devices; chose {path} (state=on)")
-            return path
-
-    for _path, fd in candidates[:-1]:
-        os.close(fd)
-    last_path, last_fd = candidates[-1]
-    os.close(last_fd)
-    if len(candidates) > 1:
-        log(f"multiple SW_TABLET_MODE devices; chose {last_path} (last)")
-    return last_path
+    return candidates
 
 
 def query_initial_state(fd: int) -> bool:
@@ -128,40 +118,72 @@ def on_exit(_signum, _frame):
 
 
 def main() -> int:
-    device = find_tablet_mode_device()
-    if device is None:
+    devices = find_tablet_mode_devices()
+    if not devices:
         log("no input device advertises SW_TABLET_MODE; nothing to watch")
         return 1
-    log(f"watching {device}")
 
-    try:
-        fd = os.open(device, os.O_RDONLY)
-    except OSError as e:
-        log(f"open({device}) failed: {e}")
+    fds = {}
+    for dev in devices:
+        try:
+            fd = os.open(dev, os.O_RDONLY | os.O_NONBLOCK)
+            fds[fd] = dev
+            log(f"monitoring {dev}")
+        except OSError as e:
+            log(f"open({dev}) failed: {e}")
+
+    if not fds:
+        log("failed to open any SW_TABLET_MODE device")
         return 1
 
     signal.signal(signal.SIGUSR1, on_sigusr1)
     signal.signal(signal.SIGTERM, on_exit)
     signal.signal(signal.SIGINT, on_exit)
 
-    initial = query_initial_state(fd)
-    log(f"initial SW_TABLET_MODE={int(initial)}")
+    initial = False
+    for fd, dev in fds.items():
+        state = query_initial_state(fd)
+        log(f"  {dev}: initial SW_TABLET_MODE={int(state)}")
+        if state:
+            initial = True
+    log(f"initial state -> {'on' if initial else 'off'}")
     set_state(initial, force=True)
 
+    poll = select.poll()
+    for fd in fds:
+        poll.register(fd, select.POLLIN)
+
     try:
-        with os.fdopen(fd, "rb", buffering=0) as f:
-            while True:
-                data = f.read(EVENT_SIZE)
-                if not data or len(data) < EVENT_SIZE:
-                    log("short read; device disappeared?")
-                    return 1
-                _sec, _usec, etype, ecode, value = struct.unpack(EVENT_FMT, data)
-                if etype == EV_SYN:
+        while True:
+            try:
+                events = poll.poll()
+            except InterruptedError:
+                continue
+            for fd, mask in events:
+                if mask & (select.POLLHUP | select.POLLERR | select.POLLNVAL):
+                    log(f"{fds[fd]}: device error/hangup; removing")
+                    poll.unregister(fd)
+                    os.close(fd)
+                    del fds[fd]
+                    if not fds:
+                        log("all devices gone")
+                        return 1
                     continue
+                data = os.read(fd, EVENT_SIZE)
+                if not data or len(data) < EVENT_SIZE:
+                    continue
+                _sec, _usec, etype, ecode, value = struct.unpack(EVENT_FMT, data)
                 if etype == EV_SW and ecode == SW_TABLET_MODE:
+                    log(f"  event from {fds[fd]}: value={value}")
                     set_state(bool(value))
     except KeyboardInterrupt:
         on_exit(None, None)
+    finally:
+        for fd in fds:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
     return 0
 
 
