@@ -30,6 +30,7 @@ in
           services-homepage
           services-deasciifier
           services-jellyfin
+          services-transmission
           vm_oracle_aarch64-hardware
         ]
         ++ [
