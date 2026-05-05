@@ -4,6 +4,10 @@
     "external_directory": {
       "/nix/store/**": "allow",
       "/tmp/**": "allow",
+      "/sys/**": "allow",
+      "/proc/**": "allow",
+      "/bin/**": "allow",
+      "/boot/**": "allow",
       "~/Desktop/**": "allow"
     }
   },
