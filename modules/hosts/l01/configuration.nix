@@ -6,6 +6,40 @@ let
   inherit (inputs.self.lib) publicData;
 in
 {
+  flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "l01";
+
+  flake.modules.nixos.l01-hardware =
+    { lib, config, ... }:
+    {
+      boot = {
+        initrd.availableKernelModules = [
+          "xhci_pci"
+          "nvme"
+          "ahci"
+          "usb_storage"
+          "usbhid"
+          "sd_mod"
+        ];
+        initrd.kernelModules = [ ];
+        kernelModules = [ "kvm-amd" ];
+        extraModulePackages = [ ];
+      };
+
+      fileSystems = {
+        "/mnt/second" = {
+          device = "/dev/disk/by-uuid/120CC7A90CC785E7";
+          fsType = "ntfs-3g";
+          options = [
+            "rw"
+            "uid=1000"
+          ];
+        };
+      };
+
+      networking.useDHCP = lib.mkDefault true;
+      hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+    };
+
   flake.modules.nixos.l01 =
     {
       pkgs,
@@ -18,7 +52,6 @@ in
           system-laptop-base
           system-hibernation
           services-slurm-client
-          # Machine-specific modules
           l01-hardware
           system-nvidia
         ]
@@ -76,7 +109,6 @@ in
           masterHostname = "vm-oracle-aarch64";
         };
 
-        # Prevent sleep. This machine's GPU stack crashes after suspend.
         logind.settings.Login = {
           HandleLidSwitch = "ignore";
           HandleLidSwitchExternalPower = "ignore";
@@ -97,6 +129,5 @@ in
         kernelPackages = pkgs.linuxPackages_latest;
         supportedFilesystems = [ "ntfs" ];
       };
-
     };
 }

@@ -9,6 +9,28 @@ let
   reverseSshBasePort = 42000;
 in
 {
+  flake.nixosConfigurations = inputs.self.lib.mkNixos "aarch64-linux" "vm_oracle_aarch64";
+
+  flake.modules.nixos.vm_oracle_aarch64-hardware =
+    { lib, ... }:
+    {
+      services.qemuGuest.enable = true;
+
+      boot = {
+        initrd.availableKernelModules = [
+          "xhci_pci"
+          "virtio_pci"
+          "virtio_scsi"
+          "usbhid"
+        ];
+        initrd.kernelModules = [ "dm-snapshot" ];
+        kernelModules = [ ];
+        extraModulePackages = [ ];
+      };
+
+      networking.useDHCP = lib.mkDefault true;
+    };
+
   flake.modules.nixos.vm_oracle_aarch64 =
     { ... }:
     {
@@ -65,18 +87,18 @@ in
         reverse-ssh-server = {
           enable = true;
           allowedTCPPorts = [
-            22 # SSH
-            80 # HTTP
-            443 # HTTPS
+            22
+            80
+            443
           ]
-          ++ (lib.genList (n: reverseSshBasePort + n + 1) 10); # Ports 42001-42010
+          ++ (lib.genList (n: reverseSshBasePort + n + 1) 10);
         };
         headscale-server = {
           enable = true;
           serverUrl = reverseSshBounceServerHost;
           allowedUDPPorts = [
-            3478 # STUN
-            41641 # Tailscale discovery
+            3478
+            41641
           ];
         };
         tailscale.loginServerHost = reverseSshBounceServerHost;
@@ -97,7 +119,6 @@ in
         cudaSupport = false;
         rocmSupport = false;
         hasTailscaleAuthority = true;
-        # Don't substitute from self - this IS the binary cache server
         excludeSubstituters = [ "http://100.64.0.1:5101" ];
       };
 
@@ -106,6 +127,5 @@ in
         loader.grub.efiInstallAsRemovable = false;
         binfmt.emulatedSystems = [ "x86_64-linux" ];
       };
-
     };
 }

@@ -1,4 +1,10 @@
-_: {
+{
+  inputs,
+  ...
+}:
+{
+  flake.darwinConfigurations = inputs.self.lib.mkDarwin "aarch64-darwin" "macbook";
+
   flake.modules.darwin.macbook = {
     networking.hostName = "macbook";
 
