@@ -138,26 +138,26 @@
 
 # Deploy Secrets
 
+Personal infra uses `secrets/secrets.yaml` (one age key).
+Fleet machines use per-tenant files under `secrets/tenants/` (separate age keys).
+
 ## Setup (One-time per machine)
-1. **Decrypt the Master Key** (Install the God Key):
-   * ```nix-shell -p age```
+1. **Decrypt the age key**:
+   * Personal infra:
+     * ```AGE_KEY="$(age -d secrets/age-personal.key.enc)" || { echo "decrypt failed"; exit 1; }```
+   * Fleet machines:
+     * ```AGE_KEY="$(age -d secrets/age-fleet.key.enc)" || { echo "decrypt failed"; exit 1; }```
+2. **Deploy the key**:
    * ```sudo mkdir -p /var/lib/sops-nix```
-   * ```age -d secrets/age.key.enc | sudo tee /var/lib/sops-nix/key.txt > /dev/null```
-   * *Enter Passphrase*
+   * ```echo "$AGE_KEY" | sudo tee /var/lib/sops-nix/key.txt > /dev/null```
    * ```sudo chmod 600 /var/lib/sops-nix/key.txt```
-2. **Install/Switch**:
+3. **Install/Switch**:
    * ```sudo nixos-rebuild switch --flake .#hostname```
 
-## ss0 (shared server, no sops)
-ss0 does not use sops. Do NOT deploy the age key to this machine.
-1. **Install/Switch**:
+## Shared servers (no sops by default)
    * ```sudo nixos-rebuild switch --flake .#ss0```
-2. **Register Tailscale** (one-time):
-   * ```sudo tailscale up --login-server=https://xxxxxxxx --advertise-tags=tag:shared-server```
-   * On the headscale server, register the node:
-     * ```sudo headscale nodes register --user emre --key nodekey:XXXXX```
-   * Tailscale state persists across reboots, so this only needs to be done once.
+   * Register tailscale manually: ```sudo tailscale up --login-server=https://xxxxxxxx --advertise-tags=tag:shared-server```
 
 ## Editing Secrets
-* ```nix-shell -p sops age ssh-to-age```
-* ```SOPS_AGE_KEY=$(age -d secrets/age.key.enc) sops secrets/secrets.yaml```
+* ```export SOPS_AGE_KEY="$(age -d secrets/age-personal.key.enc)" || exit 1```
+* ```sops --config secrets/.sops.yaml secrets/secrets.yaml```
