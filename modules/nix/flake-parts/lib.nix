@@ -3,6 +3,9 @@
   lib,
   ...
 }:
+let
+  builders = import ./_builders.nix { inherit inputs lib; };
+in
 {
   options.flake.lib = lib.mkOption {
     type = lib.types.attrsOf lib.types.raw;
@@ -16,9 +19,15 @@
 
   config.flake.lib = {
 
-    stateVersion = "26.05";
+    inherit (builders)
+      stateVersion
+      publicData
+      mkSharedServer
+      mkPersonalServer
+      mkVM
+      ;
 
-    publicData = builtins.fromTOML (builtins.readFile (inputs.self + /secrets/public.toml));
+    mkFleet = builders.mkFleet { inherit inputs lib; };
 
     mkPackages =
       { pkgs, inputs }: import (inputs.self + /pkgs/common/packages.nix) { inherit pkgs inputs; };
