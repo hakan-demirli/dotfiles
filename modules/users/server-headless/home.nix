@@ -13,6 +13,7 @@ let
       historyFile = "${desktopDir}/history";
       common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
       gpgPublicKeyFile = pkgs.writeText "yubikey-gpg-public.asc" publicData.yubikey.gpg_public_key;
+      gpgSigningKeyFile = pkgs.writeText "signing-gpg-public.asc" publicData.gpg.signing_public_key;
     in
     {
       imports = [
@@ -72,6 +73,10 @@ let
           publicKeys = [
             {
               source = gpgPublicKeyFile;
+              trust = 5;
+            }
+            {
+              source = gpgSigningKeyFile;
               trust = 5;
             }
           ];

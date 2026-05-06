@@ -4,9 +4,10 @@
 }:
 let
   inherit (inputs.self.lib) publicData;
+  sopsFile = inputs.self + /secrets/secrets.yaml;
+  sshConfigFile = inputs.self + /.config/ssh/config;
 in
 {
-
   flake.modules.nixos.services-sops =
     {
       config,
@@ -16,12 +17,13 @@ in
     }:
     let
       cfg = config.services.sops;
-      mkPubKey = path: content: "L+ ${path} - - - - ${pkgs.writeText (baseNameOf path) content}";
       inherit (cfg) username;
+      mkPubKey = path: content: "L+ ${path} - - - - ${pkgs.writeText (baseNameOf path) content}";
+      mkFileLink = path: source: "L+ ${path} - - - - ${source}";
 
       gitSignConfigFile = ''
         [user]
-          signingkey = ${publicData.yubikey.gpg_key_id}
+          signingkey = ${publicData.gpg.signing_key_id}
         [commit]
           gpgsign = true
       '';
@@ -31,51 +33,34 @@ in
         username = lib.mkOption {
           type = lib.types.str;
           default = config.system.user.username;
-          description = "Username for sops secrets ownership";
-        };
-        defaultSopsFile = lib.mkOption {
-          type = lib.types.path;
-          default = inputs.self + /secrets/secrets.yaml;
-          description = "Default sops secrets file";
         };
         ageKeyFile = lib.mkOption {
           type = lib.types.str;
           default = "/persist/system/var/lib/sops-nix/key.txt";
-          description = "Path to age key file";
         };
       };
 
       config = {
         sops = {
-          inherit (cfg) defaultSopsFile;
+          defaultSopsFile = sopsFile;
           defaultSopsFormat = "yaml";
           age.keyFile = cfg.ageKeyFile;
 
           secrets = {
-            "ssh/config" = {
-              owner = username;
-              path = "/home/${username}/.ssh/config";
-            };
             "ssh/id_ed25519" = {
               owner = username;
               path = "/home/${username}/.ssh/id_ed25519";
+              mode = "0600";
+            };
+            "ssh/id_ed25519_proton" = {
+              owner = username;
+              path = "/home/${username}/.ssh/id_ed25519_proton";
               mode = "0600";
             };
             "root_id_ed25519_proton" = {
               key = "ssh/id_ed25519_proton";
               owner = "root";
               path = "/root/.ssh/id_ed25519_proton";
-              mode = "0600";
-            };
-            "root_ssh_config" = {
-              key = "ssh/config";
-              owner = "root";
-              path = "/root/.ssh/config";
-              mode = "0600";
-            };
-            "ssh/id_ed25519_proton" = {
-              owner = username;
-              path = "/home/${username}/.ssh/id_ed25519_proton";
               mode = "0600";
             };
             "ssh/id_ed25519_sf" = {
@@ -111,6 +96,12 @@ in
               owner = username;
               path = "/home/${username}/.config/secrets/questa_license.dat";
             };
+
+            "gpg_signing_key" = {
+              owner = username;
+              path = "/home/${username}/.gnupg/signing-key.asc";
+              mode = "0600";
+            };
           };
         };
 
@@ -120,6 +111,11 @@ in
           "d /home/${username}/.config/git 0755 ${username} users -"
           "d /home/${username}/.config/nix 0755 ${username} users -"
           "d /home/${username}/.config/secrets 0755 ${username} users -"
+          "d /home/${username}/.gnupg 0700 ${username} users -"
+          "d /root/.ssh 0700 root root -"
+
+          (mkFileLink "/home/${username}/.ssh/config" (toString sshConfigFile))
+          (mkFileLink "/root/.ssh/config" (toString sshConfigFile))
 
           (mkPubKey "/home/${username}/.ssh/id_ed25519.pub" publicData.ssh.id_ed25519_pub)
           (mkPubKey "/home/${username}/.ssh/id_ed25519_proton.pub" publicData.ssh.id_ed25519_proton_pub)
