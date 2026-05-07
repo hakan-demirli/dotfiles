@@ -39,6 +39,17 @@ mkFleet {
   ss1 = mkSharedServer {
     cpu = "intel";
     disk = "/dev/disk/by-id/nvme-WD_BLACK_SN7100_1TB_25422J805576";
+    extraTmpfilesRules = [
+      "d /persist/xilinx 0755 emre users -"
+    ];
+    extraConfig = {
+      system.impermanence.extraPersistentUserDirs = [
+        ".Xilinx"
+        "vivado-env"
+      ];
+
+      powerManagement.cpuFreqGovernor = "performance";
+    };
   };
 
   s01 = mkPersonalServer {

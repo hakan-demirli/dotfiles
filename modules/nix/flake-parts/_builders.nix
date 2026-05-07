@@ -157,6 +157,7 @@ in
       userList = lib.attrValues users;
       userEntries = lib.attrsToList users;
       hasContainers = lib.any (e: e.value ? container) userEntries;
+      sharedServerPassword = publicData.passwords.shared_server or publicData.passwords.server;
     in
     {
       system = "x86_64-linux";
@@ -189,7 +190,7 @@ in
             user = {
               username = "emre";
               uid = 1000;
-              hashedPassword = publicData.passwords.server;
+              hashedPassword = sharedServerPassword;
               authorizedKeys = [ publicData.ssh.id_ed25519_proton_pub ];
               useHomeManager = true;
               homeManagerImports = [ inputs.self.modules.homeManager.server-headless ];
@@ -201,7 +202,7 @@ in
             inherit (userCfg) uid;
             extraGroups = [ "networkmanager" ] ++ lib.optional (userCfg.root or false) "wheel";
             openssh.authorizedKeys.keys = userCfg.authorizedKeys;
-            hashedPassword = publicData.passwords.server;
+            hashedPassword = sharedServerPassword;
           }) users;
 
           services = {
