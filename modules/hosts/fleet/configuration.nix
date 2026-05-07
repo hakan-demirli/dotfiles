@@ -38,7 +38,7 @@ mkFleet {
 
   ss1 = mkSharedServer {
     cpu = "intel";
-    disk = "/dev/disk/by-id/nvme-WD_BLACK_SN770_1TB_25422J805576";
+    disk = "/dev/disk/by-id/nvme-WD_BLACK_SN7100_1TB_25422J805576";
   };
 
   s01 = mkPersonalServer {
