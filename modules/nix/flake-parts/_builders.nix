@@ -174,6 +174,7 @@ in
               overlays
               services-tailscale
             ]
+            ++ map (s: inputs.self.modules.nixos.${s}) (hostCfg.extraServices or [ ])
             ++ lib.optional (hostCfg ? extraConfig) hostCfg.extraConfig;
 
           time.timeZone = "Europe/Zurich";
