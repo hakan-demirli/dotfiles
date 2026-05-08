@@ -13,6 +13,7 @@
           boot.kernelParams = [
             "no_console_suspend"
             "pm_debug_messages"
+            "acpi_sleep=s4_nonvs"
           ];
 
           services.journald.extraConfig = ''
