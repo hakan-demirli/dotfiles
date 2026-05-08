@@ -18,6 +18,7 @@ mkFleet {
   ss0 = mkSharedServer {
     cpu = "amd";
     disk = "/dev/nvme0n1";
+    extraServices = [ "system-virtualisation" ];
     users = {
       emre = {
         uid = 1000;
@@ -39,6 +40,7 @@ mkFleet {
   ss1 = mkSharedServer {
     cpu = "intel";
     disk = "/dev/disk/by-id/nvme-WD_BLACK_SN7100_1TB_25422J805576";
+    extraServices = [ "system-virtualisation" ];
     extraTmpfilesRules = [
       "d /persist/xilinx 0755 emre users -"
     ];
