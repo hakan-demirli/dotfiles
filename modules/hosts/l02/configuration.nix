@@ -22,8 +22,8 @@ in
       };
 
       acpiOverrideZip = pkgs.fetchurl {
-        url = "https://github.com/user-attachments/files/27299824/acpi.zip";
-        hash = "sha256-0p8kYN20Evw6vSSjZNwpbz3CBRQ2c9rHtrLOtHcIqhI=";
+        url = "https://github.com/user-attachments/files/27517608/acpi.zip";
+        hash = "sha256-ECyBUsssI5jVCYW8RJ0WUmzRFReha0O6j7QxWb/6pKw=";
       };
       acpiOverride = pkgs.runCommand "acpi-override" { nativeBuildInputs = [ pkgs.unzip ]; } ''
         mkdir -p kernel/firmware/acpi
