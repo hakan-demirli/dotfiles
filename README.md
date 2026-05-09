@@ -144,9 +144,9 @@ Fleet machines use per-tenant files under `secrets/tenants/` (separate age keys)
 ## Setup (One-time per machine)
 1. **Decrypt the age key**:
    * Personal infra:
-     * ```AGE_KEY="$(age -d secrets/age-personal.key.enc)" || { echo "decrypt failed"; exit 1; }```
+     * ```AGE_KEY="$(age -d secrets/age-personal.key.enc)" || { echo "decrypt failed"; }```
    * Fleet machines:
-     * ```AGE_KEY="$(age -d secrets/age-fleet.key.enc)" || { echo "decrypt failed"; exit 1; }```
+     * ```AGE_KEY="$(age -d secrets/age-fleet.key.enc)" || { echo "decrypt failed"; }```
 2. **Deploy the key**:
    * ```sudo mkdir -p /var/lib/sops-nix```
    * ```echo "$AGE_KEY" | sudo tee /var/lib/sops-nix/key.txt > /dev/null```
