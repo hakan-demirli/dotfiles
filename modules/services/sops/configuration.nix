@@ -21,11 +21,22 @@ in
       mkPubKey = path: content: "L+ ${path} - - - - ${pkgs.writeText (baseNameOf path) content}";
       mkFileLink = path: source: "L+ ${path} - - - - ${source}";
 
+      signingPubKey = "/home/${username}/.ssh/id_ed25519_sign.pub";
+      allowedSignersFile = "/home/${username}/.config/git/allowed_signers";
+
       gitSignConfigFile = ''
         [user]
-          signingkey = ${publicData.gpg.signing_key_id}
+          signingkey = ${signingPubKey}
+        [gpg]
+          format = ssh
+        [gpg "ssh"]
+          allowedSignersFile = ${allowedSignersFile}
         [commit]
           gpgsign = true
+      '';
+
+      allowedSignersContent = ''
+        ${username} namespaces="git" ${publicData.ssh.id_ed25519_sign_pub}
       '';
     in
     {
@@ -68,6 +79,11 @@ in
               path = "/home/${username}/.ssh/id_ed25519_sf";
               mode = "0600";
             };
+            "ssh/id_ed25519_sign" = {
+              owner = username;
+              path = "/home/${username}/.ssh/id_ed25519_sign";
+              mode = "0600";
+            };
             "ssh/gh_action_key" = {
               owner = username;
               path = "/home/${username}/.ssh/gh_action_key";
@@ -96,12 +112,6 @@ in
               owner = username;
               path = "/home/${username}/.config/secrets/questa_license.dat";
             };
-
-            "gpg_signing_key" = {
-              owner = username;
-              path = "/home/${username}/.gnupg/signing-key.asc";
-              mode = "0600";
-            };
           };
         };
 
@@ -111,7 +121,6 @@ in
           "d /home/${username}/.config/git 0755 ${username} users -"
           "d /home/${username}/.config/nix 0755 ${username} users -"
           "d /home/${username}/.config/secrets 0755 ${username} users -"
-          "d /home/${username}/.gnupg 0700 ${username} users -"
           "d /root/.ssh 0700 root root -"
 
           (mkFileLink "/home/${username}/.ssh/config" (toString sshConfigFile))
@@ -120,7 +129,9 @@ in
           (mkPubKey "/home/${username}/.ssh/id_ed25519.pub" publicData.ssh.id_ed25519_pub)
           (mkPubKey "/home/${username}/.ssh/id_ed25519_proton.pub" publicData.ssh.id_ed25519_proton_pub)
           (mkPubKey "/home/${username}/.ssh/id_ed25519_sf.pub" publicData.ssh.id_ed25519_sf_pub)
+          (mkPubKey "/home/${username}/.ssh/id_ed25519_sign.pub" publicData.ssh.id_ed25519_sign_pub)
           (mkPubKey "/home/${username}/.ssh/gh_action_key.pub" publicData.ssh.gh_action_key_pub)
+          (mkPubKey allowedSignersFile allowedSignersContent)
           (mkPubKey "/home/${username}/.config/git/git_sign" gitSignConfigFile)
         ];
 
