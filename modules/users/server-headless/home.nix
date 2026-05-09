@@ -3,8 +3,6 @@
   ...
 }:
 let
-  inherit (inputs.self.lib) publicData;
-
   flake.modules.homeManager.server-headless =
     { config, pkgs, ... }:
     let
@@ -12,8 +10,6 @@ let
       desktopDir = "${homeDirectory}/Desktop";
       historyFile = "${desktopDir}/history";
       common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
-      gpgPublicKeyFile = pkgs.writeText "yubikey-gpg-public.asc" publicData.yubikey.gpg_public_key;
-      gpgSigningKeyFile = pkgs.writeText "signing-gpg-public.asc" publicData.gpg.signing_public_key;
     in
     {
       imports = [
@@ -63,24 +59,6 @@ let
       };
 
       programs = {
-        gpg = {
-          enable = true;
-          mutableKeys = false;
-          mutableTrust = false;
-          settings = {
-            no-autostart = true;
-          };
-          publicKeys = [
-            {
-              source = gpgPublicKeyFile;
-              trust = 5;
-            }
-            {
-              source = gpgSigningKeyFile;
-              trust = 5;
-            }
-          ];
-        };
         home-manager.enable = true;
         starship.enable = true;
         direnv = {
