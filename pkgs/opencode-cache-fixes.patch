@@ -1,0 +1,476 @@
+diff --git a/packages/core/src/flag/flag.ts b/packages/core/src/flag/flag.ts
+index 175c723c5..95dbf4cf4 100644
+--- a/packages/core/src/flag/flag.ts
++++ b/packages/core/src/flag/flag.ts
+@@ -73,6 +73,9 @@ export const Flag = {
+   OPENCODE_EXPERIMENTAL_PLAN_MODE: OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_PLAN_MODE"),
+   OPENCODE_EXPERIMENTAL_SCOUT: OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_SCOUT"),
+   OPENCODE_EXPERIMENTAL_MARKDOWN: !falsy("OPENCODE_EXPERIMENTAL_MARKDOWN"),
++  OPENCODE_EXPERIMENTAL_CACHE_STABILIZATION: truthy("OPENCODE_EXPERIMENTAL_CACHE_STABILIZATION"),
++  OPENCODE_EXPERIMENTAL_CACHE_1H_TTL: truthy("OPENCODE_EXPERIMENTAL_CACHE_1H_TTL"),
++  OPENCODE_CACHE_AUDIT: truthy("OPENCODE_CACHE_AUDIT"),
+   OPENCODE_ENABLE_PARALLEL: truthy("OPENCODE_ENABLE_PARALLEL") || truthy("OPENCODE_EXPERIMENTAL_PARALLEL"),
+   OPENCODE_MODELS_URL: process.env["OPENCODE_MODELS_URL"],
+   OPENCODE_MODELS_PATH: process.env["OPENCODE_MODELS_PATH"],
+diff --git a/packages/opencode/src/provider/transform.ts b/packages/opencode/src/provider/transform.ts
+index bd778dacc..8c343af02 100644
+--- a/packages/opencode/src/provider/transform.ts
++++ b/packages/opencode/src/provider/transform.ts
+@@ -339,10 +339,13 @@ function normalizeMessages(
+   return msgs
+ }
+ 
+-function applyCaching(msgs: ModelMessage[], model: Provider.Model): ModelMessage[] {
++function applyCaching(msgs: ModelMessage[], model: Provider.Model, extendedTTL?: boolean): ModelMessage[] {
+   const system = msgs.filter((msg) => msg.role === "system").slice(0, 2)
+   const final = msgs.filter((msg) => msg.role !== "system").slice(-2)
+ 
++  // Use 1h cache TTL on first system block (2x write cost vs 1.25x for default 5-min)
++  const anthropicCache = extendedTTL ? { type: "ephemeral", ttl: "1h" } : { type: "ephemeral" }
++
+   const providerOptions = {
+     anthropic: {
+       cacheControl: { type: "ephemeral" },
+@@ -365,6 +368,8 @@ function applyCaching(msgs: ModelMessage[], model: Provider.Model): ModelMessage
+   }
+ 
+   for (const msg of unique([...system, ...final])) {
++    const options =
++      msg === system[0] ? { ...providerOptions, anthropic: { cacheControl: anthropicCache } } : providerOptions
+     const useMessageLevelOptions =
+       model.providerID === "anthropic" ||
+       model.providerID.includes("bedrock") ||
+@@ -379,12 +384,12 @@ function applyCaching(msgs: ModelMessage[], model: Provider.Model): ModelMessage
+         lastContent.type !== "tool-approval-request" &&
+         lastContent.type !== "tool-approval-response"
+       ) {
+-        lastContent.providerOptions = mergeDeep(lastContent.providerOptions ?? {}, providerOptions)
++        lastContent.providerOptions = mergeDeep(lastContent.providerOptions ?? {}, options)
+         continue
+       }
+     }
+ 
+-    msg.providerOptions = mergeDeep(msg.providerOptions ?? {}, providerOptions)
++    msg.providerOptions = mergeDeep(msg.providerOptions ?? {}, options)
+   }
+ 
+   return msgs
+@@ -442,7 +447,7 @@ export function message(msgs: ModelMessage[], model: Provider.Model, options: Re
+       model.api.npm === "@ai-sdk/alibaba") &&
+     model.api.npm !== "@ai-sdk/gateway"
+   ) {
+-    msgs = applyCaching(msgs, model)
++    msgs = applyCaching(msgs, model, (options.extendedTTL as boolean) ?? Flag.OPENCODE_EXPERIMENTAL_CACHE_1H_TTL)
+   }
+ 
+   // Remap providerOptions keys from stored providerID to expected SDK key
+diff --git a/packages/opencode/src/session/instruction.ts b/packages/opencode/src/session/instruction.ts
+index 6629ce67b..3890cdffa 100644
+--- a/packages/opencode/src/session/instruction.ts
++++ b/packages/opencode/src/session/instruction.ts
+@@ -33,10 +33,13 @@ function extract(messages: MessageV2.WithParts[]) {
+   return paths
+ }
+ 
++export type SystemPaths = { global: Set<string>; project: Set<string> }
++export type SystemInstructions = { global: string[]; project: string[] }
++
+ export interface Interface {
+   readonly clear: (messageID: MessageID) => Effect.Effect<void>
+-  readonly systemPaths: () => Effect.Effect<Set<string>, AppFileSystem.Error>
+-  readonly system: () => Effect.Effect<string[], AppFileSystem.Error>
++  readonly systemPaths: () => Effect.Effect<SystemPaths, AppFileSystem.Error>
++  readonly system: () => Effect.Effect<SystemInstructions, AppFileSystem.Error>
+   readonly find: (dir: string) => Effect.Effect<string | undefined, AppFileSystem.Error>
+   readonly resolve: (
+     messages: MessageV2.WithParts[],
+@@ -68,6 +71,8 @@ export const layer: Layer.Layer<
+         Effect.succeed({
+           // Track which instruction files have already been attached for a given assistant message.
+           claims: new Map<MessageID, Set<string>>(),
++          // Memoized system instructions when cache stabilization is enabled.
++          systemCache: undefined as SystemInstructions | undefined,
+         }),
+       ),
+     )
+@@ -106,11 +111,12 @@ export const layer: Layer.Layer<
+     const systemPaths = Effect.fn("Instruction.systemPaths")(function* () {
+       const config = yield* cfg.get()
+       const ctx = yield* InstanceState.context
+-      const paths = new Set<string>()
++      const globalPaths = new Set<string>()
++      const projectPaths = new Set<string>()
+ 
+       for (const file of globalFiles) {
+         if (yield* fs.existsSafe(file)) {
+-          paths.add(path.resolve(file))
++          globalPaths.add(path.resolve(file))
+           break
+         }
+       }
+@@ -120,7 +126,7 @@ export const layer: Layer.Layer<
+         for (const file of FILES) {
+           const matches = yield* fs.findUp(file, ctx.directory, ctx.worktree)
+           if (matches.length > 0) {
+-            matches.forEach((item) => paths.add(path.resolve(item)))
++            matches.forEach((item) => projectPaths.add(path.resolve(item)))
+             break
+           }
+         }
+@@ -139,27 +145,43 @@ export const layer: Layer.Layer<
+                 })
+               : relative(instruction)
+           ).pipe(Effect.catch(() => Effect.succeed([] as string[])))
+-          matches.forEach((item) => paths.add(path.resolve(item)))
++          matches.forEach((item) => projectPaths.add(path.resolve(item)))
+         }
+       }
+ 
+-      return paths
++      return { global: globalPaths, project: projectPaths }
+     })
+ 
+     const system = Effect.fn("Instruction.system")(function* () {
++      const s = yield* InstanceState.get(state)
++      if (Flag.OPENCODE_EXPERIMENTAL_CACHE_STABILIZATION && s.systemCache) return s.systemCache
++
+       const config = yield* cfg.get()
+       const paths = yield* systemPaths()
+       const urls = (config.instructions ?? []).filter(
+         (item) => item.startsWith("https://") || item.startsWith("http://"),
+       )
+ 
+-      const files = yield* Effect.forEach(Array.from(paths), read, { concurrency: 8 })
++      const globalArr = Array.from(paths.global)
++      const projectArr = Array.from(paths.project)
++      const globalFilesContent = yield* Effect.forEach(globalArr, read, { concurrency: 8 })
++      const projectFilesContent = yield* Effect.forEach(projectArr, read, { concurrency: 8 })
+       const remote = yield* Effect.forEach(urls, fetch, { concurrency: 4 })
+ 
+-      return [
+-        ...Array.from(paths).flatMap((item, i) => (files[i] ? [`Instructions from: ${item}\n${files[i]}`] : [])),
+-        ...urls.flatMap((item, i) => (remote[i] ? [`Instructions from: ${item}\n${remote[i]}`] : [])),
+-      ]
++      const result: SystemInstructions = {
++        global: globalArr.flatMap((item, i) =>
++          globalFilesContent[i] ? [`Instructions from: ${item}\n${globalFilesContent[i]}`] : [],
++        ),
++        project: [
++          ...projectArr.flatMap((item, i) =>
++            projectFilesContent[i] ? [`Instructions from: ${item}\n${projectFilesContent[i]}`] : [],
++          ),
++          ...urls.flatMap((item, i) => (remote[i] ? [`Instructions from: ${item}\n${remote[i]}`] : [])),
++        ],
++      }
++
++      if (Flag.OPENCODE_EXPERIMENTAL_CACHE_STABILIZATION) s.systemCache = result
++      return result
+     })
+ 
+     const find = Effect.fn("Instruction.find")(function* (dir: string) {
+@@ -175,7 +197,8 @@ export const layer: Layer.Layer<
+       filepath: string,
+       messageID: MessageID,
+     ) {
+-      const sys = yield* systemPaths()
++      const sysPaths = yield* systemPaths()
++      const sys = new Set([...sysPaths.global, ...sysPaths.project])
+       const already = extract(messages)
+       const results: { filepath: string; content: string }[] = []
+       const s = yield* InstanceState.get(state)
+diff --git a/packages/opencode/src/session/llm.ts b/packages/opencode/src/session/llm.ts
+index c7990d1b3..c75544b0f 100644
+--- a/packages/opencode/src/session/llm.ts
++++ b/packages/opencode/src/session/llm.ts
+@@ -41,6 +41,7 @@ export type StreamInput = {
+   agent: Agent.Info
+   permission?: Permission.Ruleset
+   system: string[]
++  systemSplit?: number
+   messages: ModelMessage[]
+   small?: boolean
+   tools: Record<string, Tool>
+@@ -100,19 +101,23 @@ const live: Layer.Layer<
+       // TODO: move this to a proper hook
+       const isOpenaiOauth = item.id === "openai" && info?.type === "oauth"
+ 
+-      const system: string[] = []
+-      system.push(
+-        [
+-          // use agent prompt otherwise provider prompt
+-          ...(input.agent.prompt ? [input.agent.prompt] : SystemPrompt.provider(input.model)),
+-          // any custom prompt passed into this call
+-          ...input.system,
+-          // any custom prompt from last user message
+-          ...(input.user.system ? [input.user.system] : []),
+-        ]
+-          .filter((x) => x)
+-          .join("\n"),
+-      )
++      const prompt = input.agent.prompt ? [input.agent.prompt] : SystemPrompt.provider(input.model)
++      const split = input.systemSplit ?? input.system.length
++      const shouldSplit = (item.options as Record<string, unknown> | undefined)?.["splitSystemPrompt"] !== false
++      const system: string[] = shouldSplit
++        ? [
++            // block 1: provider/agent prompt + global instructions (stable across repos)
++            [...prompt, ...input.system.slice(0, split)].filter(Boolean).join("\n"),
++            // block 2: env + project instructions + any custom prompt from last user message (dynamic)
++            [...input.system.slice(split), ...(input.user.system ? [input.user.system] : [])]
++              .filter(Boolean)
++              .join("\n"),
++          ].filter(Boolean)
++        : [
++            [...prompt, ...input.system, ...(input.user.system ? [input.user.system] : [])]
++              .filter(Boolean)
++              .join("\n"),
++          ].filter(Boolean)
+ 
+       const header = system[0]
+       yield* plugin.trigger(
+@@ -121,7 +126,7 @@ const live: Layer.Layer<
+         { system },
+       )
+       // rejoin to maintain 2-part structure for caching if header unchanged
+-      if (system.length > 2 && system[0] === header) {
++      if (shouldSplit && system.length > 2 && system[0] === header) {
+         const rest = system.slice(1)
+         system.length = 0
+         system.push(header, rest.join("\n"))
+diff --git a/packages/opencode/src/session/prompt.ts b/packages/opencode/src/session/prompt.ts
+index 1d5e4055c..ab8c68665 100644
+--- a/packages/opencode/src/session/prompt.ts
++++ b/packages/opencode/src/session/prompt.ts
+@@ -1571,7 +1571,18 @@ NOTE: At any point in time through this workflow you should feel free to ask the
+               instruction.system().pipe(Effect.orDie),
+               MessageV2.toModelMessagesEffect(msgs, model),
+             ])
+-            const system = [...env, ...instructions, ...(skills ? [skills] : [])]
++            // Build system prompt: global instructions + global skills first
++            // (stable), then env + project instructions + project skills
++            // (dynamic). systemSplit is the count of stable items so llm.ts
++            // splits the system message into 2 cache-friendly blocks.
++            const system = [
++              ...instructions.global,
++              ...(skills.global ? [skills.global] : []),
++              ...env,
++              ...(skills.project ? [skills.project] : []),
++              ...instructions.project,
++            ]
++            const systemSplit = instructions.global.length + (skills.global ? 1 : 0)
+             const format = lastUser.format ?? { type: "text" as const }
+             if (format.type === "json_schema") system.push(STRUCTURED_OUTPUT_SYSTEM_PROMPT)
+             const result = yield* handle.process({
+@@ -1581,6 +1592,7 @@ NOTE: At any point in time through this workflow you should feel free to ask the
+               sessionID,
+               parentSessionID: session.parentID,
+               system,
++              systemSplit,
+               messages: [...modelMsgs, ...(isLastStep ? [{ role: "assistant" as const, content: MAX_STEPS }] : [])],
+               tools,
+               model,
+diff --git a/packages/opencode/src/session/session.ts b/packages/opencode/src/session/session.ts
+index 510d82a73..5c239f32c 100644
+--- a/packages/opencode/src/session/session.ts
++++ b/packages/opencode/src/session/session.ts
+@@ -395,6 +395,15 @@ export const getUsage = (input: { model: Provider.Model; usage: LanguageModelUsa
+     },
+   }
+ 
++  // OPENCODE_CACHE_AUDIT=1 emits per-call cache token accounting to the log.
++  if (Flag.OPENCODE_CACHE_AUDIT) {
++    const totalInput = tokens.input + tokens.cache.read + tokens.cache.write
++    const hit = totalInput > 0 ? ((tokens.cache.read / totalInput) * 100).toFixed(1) : "0.0"
++    log.info(
++      `[CACHE] ${input.model.id} input=${totalInput} (cache_read=${tokens.cache.read} cache_write=${tokens.cache.write} new=${tokens.input}) hit=${hit}% output=${tokens.output} total=${tokens.total ?? 0}`,
++    )
++  }
++
+   const costInfo =
+     input.model.cost?.experimentalOver200K && tokens.input + tokens.cache.read > 200_000
+       ? input.model.cost.experimentalOver200K
+diff --git a/packages/opencode/src/session/system.ts b/packages/opencode/src/session/system.ts
+index 06c71fa7d..5d5c8286b 100644
+--- a/packages/opencode/src/session/system.ts
++++ b/packages/opencode/src/session/system.ts
+@@ -1,6 +1,7 @@
+ import { Context, Effect, Layer } from "effect"
+ 
+ import { InstanceState } from "@/effect/instance-state"
++import { Flag } from "@opencode-ai/core/flag/flag"
+ 
+ import PROMPT_ANTHROPIC from "./prompt/anthropic.txt"
+ import PROMPT_DEFAULT from "./prompt/default.txt"
+@@ -34,7 +35,7 @@ export function provider(model: Provider.Model) {
+ 
+ export interface Interface {
+   readonly environment: (model: Provider.Model) => Effect.Effect<string[]>
+-  readonly skills: (agent: Agent.Info) => Effect.Effect<string | undefined>
++  readonly skills: (agent: Agent.Info) => Effect.Effect<{ global?: string; project?: string }>
+ }
+ 
+ export class Service extends Context.Service<Service, Interface>()("@opencode/SystemPrompt") {}
+@@ -44,9 +45,12 @@ export const layer = Layer.effect(
+   Effect.gen(function* () {
+     const skill = yield* Skill.Service
+ 
++    let cachedDate: Date | undefined
++
+     return Service.of({
+       environment: Effect.fn("SystemPrompt.environment")(function* (model: Provider.Model) {
+         const ctx = yield* InstanceState.context
++        const date = Flag.OPENCODE_EXPERIMENTAL_CACHE_STABILIZATION ? (cachedDate ??= new Date()) : new Date()
+         return [
+           [
+             `You are powered by the model named ${model.api.id}. The exact model ID is ${model.providerID}/${model.api.id}`,
+@@ -56,24 +60,33 @@ export const layer = Layer.effect(
+             `  Workspace root folder: ${ctx.worktree}`,
+             `  Is directory a git repo: ${ctx.project.vcs === "git" ? "yes" : "no"}`,
+             `  Platform: ${process.platform}`,
+-            `  Today's date: ${new Date().toDateString()}`,
++            `  Today's date: ${date.toDateString()}`,
+             `</env>`,
+           ].join("\n"),
+         ]
+       }),
+ 
+       skills: Effect.fn("SystemPrompt.skills")(function* (agent: Agent.Info) {
+-        if (Permission.disabled(["skill"], agent.permission).has("skill")) return
++        if (Permission.disabled(["skill"], agent.permission).has("skill")) return {}
+ 
+         const list = yield* skill.available(agent)
++        const globalSkills = list.filter((s) => s.scope === "global")
++        const projectSkills = list.filter((s) => s.scope === "project")
+ 
+-        return [
++        const preamble = [
+           "Skills provide specialized instructions and workflows for specific tasks.",
+           "Use the skill tool to load a skill when a task matches its description.",
+-          // the agents seem to ingest the information about skills a bit better if we present a more verbose
+-          // version of them here and a less verbose version in tool description, rather than vice versa.
+-          Skill.fmt(list, { verbose: true }),
+         ].join("\n")
++
++        const globalText =
++          globalSkills.length > 0 ? [preamble, Skill.fmt(globalSkills, { verbose: true })].join("\n") : undefined
++
++        const projectText =
++          projectSkills.length > 0
++            ? [...(globalSkills.length === 0 ? [preamble] : []), Skill.fmt(projectSkills, { verbose: true })].join("\n")
++            : undefined
++
++        return { global: globalText, project: projectText }
+       }),
+     })
+   }),
+diff --git a/packages/opencode/src/skill/index.ts b/packages/opencode/src/skill/index.ts
+index 3000406eb..9ba889f3c 100644
+--- a/packages/opencode/src/skill/index.ts
++++ b/packages/opencode/src/skill/index.ts
+@@ -30,6 +30,7 @@ export const Info = Schema.Struct({
+   description: Schema.optional(Schema.String),
+   location: Schema.String,
+   content: Schema.String,
++  scope: Schema.optional(Schema.Literal("global", "project")),
+ }).pipe(withStatics((s) => ({ zod: zod(s) })))
+ export type Info = Schema.Schema.Type<typeof Info>
+ 
+@@ -59,11 +60,13 @@ type State = {
+ type DiscoveryState = {
+   matches: string[]
+   dirs: string[]
++  scopes: Record<string, "global" | "project">
+ }
+ 
+ type ScanState = {
+   matches: Set<string>
+   dirs: Set<string>
++  scopes: Map<string, "global" | "project">
+ }
+ 
+ export interface Interface {
+@@ -73,7 +76,12 @@ export interface Interface {
+   readonly available: (agent?: Agent.Info) => Effect.Effect<Info[]>
+ }
+ 
+-const add = Effect.fnUntraced(function* (state: State, match: string, bus: Bus.Interface) {
++const add = Effect.fnUntraced(function* (
++  state: State,
++  match: string,
++  bus: Bus.Interface,
++  scope: "global" | "project" = "project",
++) {
+   const md = yield* Effect.tryPromise({
+     try: () => ConfigMarkdown.parse(match),
+     catch: (err) => err,
+@@ -110,6 +118,7 @@ const add = Effect.fnUntraced(function* (state: State, match: string, bus: Bus.I
+     description: parsed.data.description,
+     location: match,
+     content: md.content,
++    scope,
+   }
+ })
+ 
+@@ -117,7 +126,7 @@ const scan = Effect.fnUntraced(function* (
+   state: ScanState,
+   root: string,
+   pattern: string,
+-  opts?: { dot?: boolean; scope?: string },
++  opts?: { dot?: boolean; scope?: "global" | "project" },
+ ) {
+   const matches = yield* Effect.tryPromise({
+     try: () =>
+@@ -140,6 +149,7 @@ const scan = Effect.fnUntraced(function* (
+   for (const match of matches) {
+     state.matches.add(match)
+     state.dirs.add(path.dirname(match))
++    if (opts?.scope) state.scopes.set(match, opts.scope)
+   }
+ })
+ 
+@@ -151,7 +161,7 @@ const discoverSkills = Effect.fnUntraced(function* (
+   directory: string,
+   worktree: string,
+ ) {
+-  const state: ScanState = { matches: new Set(), dirs: new Set() }
++  const state: ScanState = { matches: new Set(), dirs: new Set(), scopes: new Map() }
+ 
+   const externalDirs: string[] = []
+   if (!Flag.OPENCODE_DISABLE_EXTERNAL_SKILLS) {
+@@ -175,7 +185,7 @@ const discoverSkills = Effect.fnUntraced(function* (
+ 
+   const configDirs = yield* config.directories()
+   for (const dir of configDirs) {
+-    yield* scan(state, dir, OPENCODE_SKILL_PATTERN)
++    yield* scan(state, dir, OPENCODE_SKILL_PATTERN, { scope: "global" })
+   }
+ 
+   const cfg = yield* config.get()
+@@ -187,24 +197,25 @@ const discoverSkills = Effect.fnUntraced(function* (
+       continue
+     }
+ 
+-    yield* scan(state, dir, SKILL_PATTERN)
++    yield* scan(state, dir, SKILL_PATTERN, { scope: "global" })
+   }
+ 
+   for (const url of cfg.skills?.urls ?? []) {
+     const pulledDirs = yield* discovery.pull(url)
+     for (const dir of pulledDirs) {
+-      yield* scan(state, dir, SKILL_PATTERN)
++      yield* scan(state, dir, SKILL_PATTERN, { scope: "global" })
+     }
+   }
+ 
+   return {
+     matches: Array.from(state.matches),
+     dirs: Array.from(state.dirs),
++    scopes: Object.fromEntries(state.scopes),
+   }
+ })
+ 
+ const loadSkills = Effect.fnUntraced(function* (state: State, discovered: DiscoveryState, bus: Bus.Interface) {
+-  yield* Effect.forEach(discovered.matches, (match) => add(state, match, bus), {
++  yield* Effect.forEach(discovered.matches, (match) => add(state, match, bus, discovered.scopes[match] ?? "project"), {
+     concurrency: "unbounded",
+     discard: true,
+   })

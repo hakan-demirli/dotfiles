@@ -30,22 +30,21 @@
           python312Packages = final.python312.pkgs;
 
           # https://github.com/anomalyco/opencode/pull/14743
-          # Pinned to a specific commit SHA (not refs/pull/14743/head) so upstream
-          # pushes to the PR branch don't silently change the build inputs.
           opencode = prev.opencode.overrideAttrs (
             finalAttrs: oldAttrs: {
-              version = "pr-14743";
+              version = "43b51f09-cache-fixes";
               src = prev.fetchFromGitHub {
-                owner = "bhagirathsinh-vaghela";
+                owner = "anomalyco";
                 repo = "opencode";
-                rev = "2e02781f4f6e61f8c673bc669e982810dc0268c1";
-                hash = "sha256-E6Z04kkmyku47Y4Oo7fH/idcLzIpJhH1XGFIBIczVro=";
+                rev = "43b51f09d095aadb3d851fde51031369be30d23f";
+                hash = "sha256-THteW4fG008rtLlOVVfGX1M80PjZgTUsAq7Vr/X3zng=";
               };
+              patches = (oldAttrs.patches or [ ]) ++ [
+                ../../../pkgs/opencode-cache-fixes.patch
+              ];
               node_modules = oldAttrs.node_modules.overrideAttrs (_: {
-                version = "pr-14743";
+                version = "43b51f09-cache-fixes";
                 inherit (finalAttrs) src;
-                # Upstream PR has an inconsistent bun.lock, so we can't use
-                # --frozen-lockfile. Let bun update the lockfile at build time.
                 buildPhase = ''
                   runHook preBuild
 
@@ -63,14 +62,14 @@
 
                   runHook postBuild
                 '';
-                outputHash = "sha256-/5tUPT885z7uJBh80WXj/69G86zg3Be1LjlhgRD9Ico=";
+                outputHash = "sha256-R0zHWi0GZFZafOMymopSGWjs3Bjm23d37dgep8oFc18=";
               });
 
               postInstall = (oldAttrs.postInstall or "") + ''
                 wrapProgram $out/bin/opencode \
                   --set OPENCODE_CACHE_AUDIT 1 \
                   --set OPENCODE_EXPERIMENTAL_CACHE_STABILIZATION 1 \
-                  --set OPENCODE_EXPERIMENTAL_CACHE_1H_TTL 0 
+                  --set OPENCODE_EXPERIMENTAL_CACHE_1H_TTL 0
               '';
             }
           );
