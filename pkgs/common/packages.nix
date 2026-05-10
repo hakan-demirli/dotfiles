@@ -42,6 +42,7 @@ let
     aichat
     opencode
     claude-code
+    (nurPkgs.opencode-plugins or null)
   ];
 
   lsp =

@@ -15,8 +15,8 @@
   "lsp": false,
   "formatter": false,
   "plugin": [
-    "opencode-claude-auth@latest",
     "opencode-gemini-auth@latest",
-    "@mohak34/opencode-notifier@latest"
+    "@mohak34/opencode-notifier@latest",
+    "./plugins/office"
   ]
 }
