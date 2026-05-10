@@ -11,7 +11,7 @@
           device = "nodev";
           useOSProber = true;
           default = "saved";
-          configurationLimit = 30;
+          configurationLimit = 6;
         };
       };
     };
