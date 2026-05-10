@@ -1,5 +1,6 @@
 {
   pkgs,
+  inputs ? null,
   desktopDir ? throw "Set this to your state dir",
   enablePortal ? true,
   ...
@@ -43,7 +44,6 @@
         "nix"
         "npm"
         "nwg"
-        "opencode"
         "claude"
         "parallel"
         # "piper" # not working, workaround below
@@ -89,6 +89,31 @@
         # "bash"
         # "gdb"
       ];
+
+      nurPkgs =
+        if inputs != null then inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { } else { };
+
+      opencodeConfigEntries =
+        let
+          opencodeConfigDir = ../../.config/opencode;
+          dotfileEntries = pkgs.lib.mapAttrsToList (name: _type: {
+            inherit name;
+            path = opencodeConfigDir + "/${name}";
+          }) (builtins.removeAttrs (builtins.readDir opencodeConfigDir) [ "plugins" ]);
+          pluginEntries = pkgs.lib.optional (nurPkgs ? opencode-plugins) {
+            name = "plugins";
+            path = "${nurPkgs.opencode-plugins}/plugins";
+          };
+        in
+        dotfileEntries ++ pluginEntries;
+
+      opencodeConfigFile = {
+        opencode = {
+          source = pkgs.linkFarm "opencode-config" opencodeConfigEntries;
+          recursive = true;
+        };
+      };
+
       # no such attribute file: config.lib.file.mkOutOfStoreSymlink
       #
       makeMutable = path: file: {
@@ -147,7 +172,7 @@
       );
     in
     {
-      configFile = mutableConfigFiles // immutableConfigFiles;
+      configFile = mutableConfigFiles // immutableConfigFiles // opencodeConfigFile;
 
       dataFile = mutableDataFiles // immutableDataFiles;
       stateFile = mutableStateFiles;
