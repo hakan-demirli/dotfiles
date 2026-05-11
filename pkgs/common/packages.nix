@@ -89,7 +89,6 @@ let
       (nurPkgs.dap or null)
       (nurPkgs.uncomment or null)
       (nurPkgs.flake-updater or null)
-      (nurPkgs.riveroftime or null)
       # mutagen
       ouch
       rsync
@@ -119,6 +118,7 @@ let
       (nurPkgs.auto_refresh or null)
       (pkgs.callPackage "${inputs.nur}/pkgs/hibat/default.nix" { })
       (nurPkgs.youtube_sync or null)
+      (nurPkgs.riveroftime or null)
       adb-sync
       android-tools
       libnotify
