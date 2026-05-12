@@ -72,7 +72,7 @@ buffer_name_current="$(basename "$buffer_path")"
 found_line_number=0
 current_line_number=0
 while IFS=':,' read -r tmux_window_e tmux_command_e buffer_name_e _cursor_row_e _cursor_col_e buffer_dir_e _tmux_pane_path_e; do
-  ((current_line_number++))
+  ((++current_line_number))
 
   if [[ $tmux_window_e == "$tmux_window_current" &&
     $tmux_command_e == "$tmux_command_current" &&
@@ -98,7 +98,7 @@ if [[ $found_line_number -gt 0 ]]; then
 
   current_line=0
   while IFS= read -r line; do
-    ((current_line++))
+    ((++current_line))
     if [[ $current_line -eq $found_line_number ]]; then
       echo "$new_line"
     else
