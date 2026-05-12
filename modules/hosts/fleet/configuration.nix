@@ -16,9 +16,20 @@ in
 mkFleet {
 
   ss0 = mkSharedServer {
-    cpu = "amd";
-    disk = "/dev/nvme0n1";
+    cpu = "intel";
+    disk = "/dev/disk/by-id/nvme-SK_hynix_BC711_HFM512GD3JX013N_FYC6N012211306C69";
     extraServices = [ "system-virtualisation" ];
+    extraTmpfilesRules = [
+      "d /persist/xilinx 0755 emre users -"
+    ];
+    extraConfig = {
+      system.impermanence.extraPersistentUserDirs = [
+        ".Xilinx"
+        "vivado-env"
+      ];
+
+      powerManagement.cpuFreqGovernor = "performance";
+    };
     users = {
       emre = {
         uid = 1000;
