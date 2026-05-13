@@ -10,6 +10,7 @@
           ControllerMode = "dual";
           FastConnectable = "true";
           Experimental = "true";
+          KernelExperimental = "true";
         };
         Policy = {
           AutoEnable = "false";
