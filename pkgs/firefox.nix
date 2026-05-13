@@ -168,6 +168,7 @@
         "general.autoScroll" = true; # Drag middle-mouse to scroll
         "extensions.pocket.enabled" = false;
         "media.ffmpeg.vaapi.enabled" = true; # Enable hardware video acceleration
+        "media.hardware-video-decoding.force-enabled" = true;
         "browser.aboutConfig.showWarning" = false;
         # To change: Customize ui, copy it from about:config and paste here.
         browser.uiCustomization.state = ''
