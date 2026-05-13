@@ -36,6 +36,7 @@
     "title",
     "volume",
     "backlight",
+    "buttons-grid#caffeine",
     "mpris",
     "dnd",
     "notifications"
@@ -67,6 +68,17 @@
       "device": "intel_backlight",
       "subsystem": "backlight",
       "min": 1
+    },
+    "buttons-grid#caffeine": {
+      "buttons-per-row": 1,
+      "actions": [
+        {
+          "label": "  Caffeinate",
+          "command": "$HOME/.local/bin/caffeinate-toggle swaync",
+          "type": "toggle",
+          "update-command": "$HOME/.local/bin/caffeinate-toggle status"
+        }
+      ]
     },
     "mpris": {
       "blacklist": [],
