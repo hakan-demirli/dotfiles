@@ -343,6 +343,45 @@
   margin: -8px;
 }
 
+.widget-buttons-grid {
+  margin: 8px;
+  padding: 10px;
+  background: @background;
+  border: 1px solid @accent;
+  border-radius: 8px;
+}
+
+.widget-buttons-grid flowbox {
+  background: transparent;
+}
+
+.widget-buttons-grid flowboxchild {
+  padding: 0;
+}
+
+.widget-buttons-grid flowboxchild > button {
+  min-height: 42px;
+  color: @foreground;
+  background: @current-line;
+  border: 1px solid @accent;
+  border-radius: 8px;
+  box-shadow: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.widget-buttons-grid flowboxchild > button:hover {
+  background: alpha(@accent, 0.35);
+}
+
+.widget-buttons-grid flowboxchild > button.toggle:checked,
+.widget-buttons-grid flowboxchild > button:checked,
+.widget-buttons-grid flowboxchild > button.active {
+  color: @background;
+  background: @accent;
+}
+
 .widget-volume .per-app-volume-row {
   margin-top: 6px;
   padding: 4px;
