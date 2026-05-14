@@ -40,9 +40,7 @@ let
   ai = with pkgs; [
     aider-chat
     aichat
-    opencode
     claude-code
-    (nurPkgs.opencode-plugins or null)
   ];
 
   lsp =
