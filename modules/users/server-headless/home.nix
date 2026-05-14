@@ -22,6 +22,7 @@ let
           inherit desktopDir;
           enablePortal = false;
         })
+        inputs.self.modules.homeManager.services-opencode
       ];
 
       targets.genericLinux = {
