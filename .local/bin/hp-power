@@ -1,51 +1,44 @@
 #!/usr/bin/env bash
-# Power profile control for HP OmniBook Ultra Flip 14 (board 8CDE, Lunar Lake).
-#
-# Writes:
-#   intel-rapl{,-mmio}:0 PL1/PL2, cpufreq governor, EPP.
-#
-# Sustained package power is capped at ~28W by the FIVR vr_tdc current limit#
+# Manual power control for HP OmniBook Ultra Flip 14 (board 8CDE, Core Ultra 7 258V).
+# Writes RAPL PL1/PL2, governor, EPP, platform_profile, EC AFAN (0x2D), HWP_REQUEST (MSR 0x774).
+# AFAN values from DSDT \_SB.PC00.UFID. HWP allowlist from HWP_CAPABILITIES (MSR 0x771).
+set -u
+set -o pipefail
 
-MSR=/sys/class/powercap/intel-rapl:0
+RAPL=/sys/class/powercap/intel-rapl:0
 MMIO=/sys/class/powercap/intel-rapl-mmio:0
 PLATFORM_PROFILE=/sys/firmware/acpi/platform_profile
-
+EC_IO=/sys/kernel/debug/ec/ec0/io
+EC_AFAN_OFFSET=45 # 0x2D
+EC_AFAN_VALID="00 11 22 33 44 55 66 77 88"
+MSR_HWP_REQUEST=0x774
+MSR_HWP_CAPS=0x771
+HWP_MAX_VALID="01 13 1a 26 30 37"
 
 ORIG_ARGS=("$@")
 
 need_root() {
-  if [ "$(id -u)" -ne 0 ]; then
-    exec sudo -E "$0" "${ORIG_ARGS[@]}"
-  fi
+  [ "$(id -u)" -eq 0 ] || exec sudo -E "$0" "${ORIG_ARGS[@]}"
 }
 
 write_to() {
-  local path=$1 val=$2
-  if [ ! -e "$path" ]; then
-    echo "  skip (no such file): $path"
-    return 0
-  fi
+  local path=$1 val=$2 actual
+  [ -e "$path" ] || { echo "  skip $path"; return 0; }
   if printf '%s\n' "$val" >"$path" 2>/dev/null; then
-    local actual
     actual=$(cat "$path" 2>/dev/null)
-    if [ "$actual" = "$val" ]; then
-      echo "  ok   $path = $val"
-    else
-      echo "  FAIL $path: wrote '$val' reads '$actual'"
-    fi
+    [ "$actual" = "$val" ] && echo "  ok   $path = $val" || echo "  FAIL $path: wrote '$val' reads '$actual'"
   else
     echo "  FAIL $path: write rejected"
   fi
 }
 
 set_rapl() {
-  local pl1_uw=$(($1 * 1000000))
-  local pl2_uw=$(($2 * 1000000))
-  echo "RAPL package PL1=${1}W PL2=${2}W:"
-  write_to "$MSR/constraint_0_power_limit_uw" "$pl1_uw"
-  write_to "$MSR/constraint_1_power_limit_uw" "$pl2_uw"
-  write_to "$MMIO/constraint_0_power_limit_uw" "$pl1_uw"
-  write_to "$MMIO/constraint_1_power_limit_uw" "$pl2_uw"
+  local pl1=$(($1 * 1000000)) pl2=$(($2 * 1000000))
+  echo "RAPL PL1=${1}W PL2=${2}W:"
+  write_to "$RAPL/constraint_0_power_limit_uw" "$pl1"
+  write_to "$RAPL/constraint_1_power_limit_uw" "$pl2"
+  write_to "$MMIO/constraint_0_power_limit_uw" "$pl1"
+  write_to "$MMIO/constraint_1_power_limit_uw" "$pl2"
 }
 
 set_governor() {
@@ -54,62 +47,127 @@ set_governor() {
     n=$((n + 1))
     printf '%s\n' "$gov" >"$p" 2>/dev/null || fail=$((fail + 1))
   done
-  echo "governor=$gov ($n policies):"
-  if [ "$fail" -eq 0 ]; then echo "  ok"; else echo "  FAIL on $fail policies"; fi
+  echo "governor=$gov ($n): $([ "$fail" -eq 0 ] && echo ok || echo "FAIL on $fail")"
 }
 
-# governor=performance pins EPP=performance and rejects further writes;
-# skip the write in that case to avoid spurious FAIL output.
+# governor=performance pins EPP and rejects further writes; skip to avoid spurious FAIL.
 set_epp() {
-  local epp=$1
-  local gov
+  local epp=$1 gov fail=0 n=0
   gov=$(cat /sys/devices/system/cpu/cpufreq/policy0/scaling_governor 2>/dev/null)
   if [ "$gov" = "performance" ]; then
     echo "EPP=performance (pinned by governor)"
     return 0
   fi
-  local fail=0 n=0
   for p in /sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference; do
     n=$((n + 1))
     printf '%s\n' "$epp" >"$p" 2>/dev/null || fail=$((fail + 1))
   done
-  echo "EPP=$epp ($n policies):"
-  if [ "$fail" -eq 0 ]; then echo "  ok"; else echo "  FAIL on $fail policies"; fi
+  echo "EPP=$epp ($n): $([ "$fail" -eq 0 ] && echo ok || echo "FAIL on $fail")"
 }
 
 set_platform_profile() {
   local profile=$1
   echo "platform_profile=$profile:"
-  if [ ! -e "$PLATFORM_PROFILE" ]; then
-    echo "  skip (no such file): $PLATFORM_PROFILE"
-    return 0
+  [ -e "$PLATFORM_PROFILE" ] || { echo "  skip $PLATFORM_PROFILE"; return 0; }
+  printf '%s\n' "$profile" >"$PLATFORM_PROFILE" 2>/dev/null \
+    && echo "  ok   <- $profile" \
+    || echo "  FAIL write rejected"
+}
+
+ensure_ec_sys() {
+  [ -e "$EC_IO" ] || modprobe ec_sys write_support=1 2>/dev/null || true
+  [ -w "$EC_IO" ] || { echo "  FAIL $EC_IO not writable (need ec_sys.write_support=1)" >&2; return 1; }
+}
+
+read_afan() {
+  [ -r "$EC_IO" ] || { echo "?"; return; }
+  dd if="$EC_IO" bs=1 count=1 skip="$EC_AFAN_OFFSET" 2>/dev/null | od -An -tx1 | tr -d ' \n'
+}
+
+# Writes EC byte 0x2D. Aborts on tampered offset, bad hex, value not in allowlist,
+# or unreadable EC. dd bs=1 count=1 bounds damage to 1 byte at offset 0x2D.
+set_afan() {
+  local hex=${1:-} ok=0 v before
+  [ "${EC_AFAN_OFFSET:-}" = "45" ] || { echo "  ABORT EC_AFAN_OFFSET tampered" >&2; return 99; }
+  [[ "$hex" =~ ^[0-9a-f]{2}$ ]] || { echo "  ABORT bad AFAN '$hex' (need 2 lowercase hex chars)" >&2; return 99; }
+  if [ "${HP_POWER_AFAN_ALLOW_ANY:-0}" != "1" ]; then
+    for v in $EC_AFAN_VALID; do [ "$hex" = "$v" ] && ok=1 && break; done
+    [ "$ok" -eq 1 ] || { echo "  ABORT '0x$hex' not in allowlist ($EC_AFAN_VALID); override with HP_POWER_AFAN_ALLOW_ANY=1" >&2; return 99; }
   fi
-  if printf '%s\n' "$profile" >"$PLATFORM_PROFILE" 2>/dev/null; then
-    echo "  ok   $PLATFORM_PROFILE <- $profile"
-  else
-    echo "  FAIL $PLATFORM_PROFILE: write rejected"
+  echo "EC AFAN (0x2D) <- 0x$hex:"
+  ensure_ec_sys || return 1
+  before=$(read_afan)
+  [[ "$before" =~ ^[0-9a-f]{2}$ ]] || { echo "  ABORT can't read current AFAN ('$before')" >&2; return 99; }
+  printf '%b' "\\x$hex" \
+    | dd of="$EC_IO" bs=1 count=1 seek="$EC_AFAN_OFFSET" conv=notrunc status=none 2>/dev/null \
+    || { echo "  FAIL write"; return 1; }
+  local actual=$(read_afan)
+  [ "$actual" = "$hex" ] && echo "  ok   AFAN = 0x$hex (was 0x$before)" \
+    || { echo "  FAIL wrote 0x$hex reads 0x$actual (was 0x$before)"; return 1; }
+}
+
+ensure_msr() {
+  [ -e /dev/cpu/0/msr ] || modprobe msr 2>/dev/null || true
+  [ -w /dev/cpu/0/msr ] || { echo "  FAIL /dev/cpu/0/msr not writable" >&2; return 1; }
+  command -v wrmsr >/dev/null && command -v rdmsr >/dev/null \
+    || { echo "  FAIL wrmsr/rdmsr missing (need msr-tools)" >&2; return 1; }
+}
+
+read_hwp_request() {
+  command -v rdmsr >/dev/null && [ -r /dev/cpu/0/msr ] || { echo "?"; return; }
+  rdmsr -p 0 "$MSR_HWP_REQUEST" 2>/dev/null || echo "?"
+}
+
+# Writes MSR 0x774 on every CPU. Forces min=0x01 EPP=0x00 act=0x00, max=<arg>.
+set_hwp() {
+  local max=${1:-} ok=0 v before after n=0 fail=0 c
+  [ "${MSR_HWP_REQUEST:-}" = "0x774" ] || { echo "  ABORT MSR_HWP_REQUEST tampered" >&2; return 99; }
+  [[ "$max" =~ ^[0-9a-f]{2}$ ]] || { echo "  ABORT bad HWP max '$max'" >&2; return 99; }
+  if [ "${HP_POWER_HWP_ALLOW_ANY:-0}" != "1" ]; then
+    for v in $HWP_MAX_VALID; do [ "$max" = "$v" ] && ok=1 && break; done
+    [ "$ok" -eq 1 ] || { echo "  ABORT '0x$max' not in allowlist ($HWP_MAX_VALID); override with HP_POWER_HWP_ALLOW_ANY=1" >&2; return 99; }
   fi
+  local val="0x00${max}01"
+  echo "HWP_REQUEST <- $val (min=01 max=$max EPP=00):"
+  ensure_msr || return 1
+  before=$(read_hwp_request)
+  for c in /dev/cpu/[0-9]*/msr; do
+    n=$((n + 1))
+    wrmsr -p "$(basename "$(dirname "$c")")" "$MSR_HWP_REQUEST" "$val" 2>/dev/null \
+      || fail=$((fail + 1))
+  done
+  after=$(read_hwp_request)
+  [ "$fail" -eq 0 ] && echo "  ok   $n CPUs, cpu0: 0x$before -> 0x$after" \
+    || { echo "  FAIL $fail/$n CPUs rejected (cpu0 0x$before -> 0x$after)"; return 1; }
 }
 
 read_w() { awk '{printf "%d", $1/1000000}' "$1" 2>/dev/null || echo "?"; }
 
 cmd_status() {
-  local ac
-  ac=$(cat /sys/class/power_supply/AC*/online 2>/dev/null | head -1)
-  : "${ac:=?}"
+  local ac hwp lo hmin hmax hepp mhz pp peak gt
+  ac=$(cat /sys/class/power_supply/AC*/online 2>/dev/null | head -1); : "${ac:=?}"
+  pp=$(cat "$PLATFORM_PROFILE" 2>/dev/null) || pp="(readback broken)"
   echo "AC online            : $ac"
-  echo "MSR  PL1 / PL2 (W)   : $(read_w $MSR/constraint_0_power_limit_uw) / $(read_w $MSR/constraint_1_power_limit_uw)"
+  echo "RAPL PL1 / PL2 (W)   : $(read_w $RAPL/constraint_0_power_limit_uw) / $(read_w $RAPL/constraint_1_power_limit_uw)"
   if [ -d "$MMIO" ]; then
-    local peak="?"
+    peak="?"
     [ -e "$MMIO/constraint_2_power_limit_uw" ] && peak=$(read_w "$MMIO/constraint_2_power_limit_uw")
     echo "MMIO PL1 / PL2 / Peak: $(read_w $MMIO/constraint_0_power_limit_uw) / $(read_w $MMIO/constraint_1_power_limit_uw) / $peak"
   fi
   echo "Governor (cpu0)      : $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null)"
   echo "EPP (cpu0)           : $(cat /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference 2>/dev/null)"
-  local _pp
-  _pp=$(cat "$PLATFORM_PROFILE" 2>/dev/null) || _pp="(readback broken – kernel driver conflict)"
-  echo "Platform profile     : $_pp"
-  local gt=/sys/class/drm/card0/device/tile0/gt0/freq0
+  echo "Platform profile     : $pp"
+  echo "EC AFAN (0x2D)       : 0x$(read_afan)"
+  hwp=$(read_hwp_request)
+  if [ "$hwp" != "?" ] && [ -n "$hwp" ]; then
+    lo=$(printf '%08x' "0x$hwp" 2>/dev/null || echo "????????")
+    hmin=${lo: -2}; hmax=${lo: -4:2}; hepp=${lo: -6:2}
+    mhz=$((16#$hmax * 100))
+    echo "HWP_REQUEST (0x774)  : min=0x$hmin max=0x$hmax (${mhz}MHz) EPP=0x$hepp"
+  else
+    echo "HWP_REQUEST (0x774)  : (rdmsr unavailable)"
+  fi
+  gt=/sys/class/drm/card0/device/tile0/gt0/freq0
   if [ -d "$gt" ]; then
     echo "GT0 max / cur (MHz)  : $(cat $gt/max_freq 2>/dev/null) / $(cat $gt/cur_freq 2>/dev/null)"
     echo "GT0 throttle reasons : $(cat $gt/throttle/reasons 2>/dev/null)"
@@ -117,53 +175,93 @@ cmd_status() {
 }
 
 apply() {
-  local mode=$1 pl1=$2 pl2=$3 gov=$4 epp=$5 profile=$6
-  echo "==> mode: $mode (PL1=${pl1}W PL2=${pl2}W governor=$gov EPP=$epp profile=$profile)"
+  local mode=$1 pl1=$2 pl2=$3 gov=$4 epp=$5 profile=$6 afan=$7 hwp_max=$8
+  echo "==> $mode: PL=${pl1}/${pl2}W gov=$gov EPP=$epp profile=$profile AFAN=0x$afan HWP=0x$hwp_max"
   set_rapl "$pl1" "$pl2"
   set_governor "$gov"
   set_epp "$epp"
   set_platform_profile "$profile"
+  set_afan "$afan"
+  set_hwp "$hwp_max"
   echo
   cmd_status
 }
 
-cmd_turbo() {
-  need_root
-  apply turbo 37 95 performance performance performance
+cmd_turbo()    { need_root; apply turbo    37 95 performance performance performance 77 37; }
+cmd_balanced() { need_root; apply balanced 28 55 performance performance balanced    44 1a; }
+cmd_silent()   { need_root; apply silent   15 25 powersave   power       cool        00 13; }
+
+parse_hex2() {
+  local hex=${1:-}
+  hex=${hex#0x}; hex=${hex#0X}
+  [[ "$hex" =~ ^[0-9a-fA-F]{1,2}$ ]] || { echo "bad hex: $1" >&2; return 2; }
+  [ ${#hex} -eq 1 ] && hex="0$hex"
+  printf '%s' "$hex" | tr 'A-F' 'a-f'
 }
-cmd_balanced() {
+
+cmd_afan() {
   need_root
-  apply balanced 28 55 performance performance balanced
+  if [ -z "${1:-}" ]; then
+    echo "EC AFAN (0x2D) = 0x$(read_afan)"
+    echo "valid: $EC_AFAN_VALID  (0x00=passive, higher nibble=more aggressive)"
+    return 0
+  fi
+  local hex
+  hex=$(parse_hex2 "$1") || return $?
+  set_afan "$hex"
 }
-cmd_silent() {
+
+cmd_hwp() {
   need_root
-  apply silent 15 25 powersave power cool
+  if [ -z "${1:-}" ]; then
+    local val=$(read_hwp_request) caps lo
+    echo "HWP_REQUEST (0x774, cpu0) = 0x$val"
+    if [ "$val" != "?" ] && [ -n "$val" ]; then
+      lo=$(printf '%08x' "0x$val" 2>/dev/null)
+      echo "  min=0x${lo: -2} max=0x${lo: -4:2} (~$((16#${lo: -4:2} * 100))MHz) EPP=0x${lo: -6:2}"
+    fi
+    if command -v rdmsr >/dev/null && [ -r /dev/cpu/0/msr ]; then
+      caps=$(rdmsr -p 0 "$MSR_HWP_CAPS" 2>/dev/null)
+      [ -n "$caps" ] && echo "HWP_CAPABILITIES (0x771) = 0x$caps"
+    fi
+    echo "valid max: $HWP_MAX_VALID  (01=~100M  13=~1.9G  1a=~2.6G  26=~3.8G  30=~4.8G  37=~5.5G)"
+    return 0
+  fi
+  local hex
+  hex=$(parse_hex2 "$1") || return $?
+  set_hwp "$hex"
 }
 
 cmd_help() {
   cat <<'EOF'
-usage: hp-power {status|turbo|balanced|silent|help}
+usage: hp-power {status|turbo|balanced|silent|afan|hwp|help}
 
-  status    show current state
-  turbo     PL1=37W PL2=95W,  governor=performance  profile=performance  [sudo]
-  balanced  PL1=28W PL2=55W,  governor=performance  profile=balanced     [sudo]
-  silent    PL1=15W PL2=25W,  governor=powersave     profile=cool         [sudo]
-  help      this message
+Manual override. No daemons, no auto. What you set stays set until next call or reboot.
 
-Platform profiles (via hp_wmi): cool quiet balanced performance
-Reboot reverts all writes. TLP may overwrite governor/EPP on AC plug events.
+  status                  current state
+  turbo      [sudo]       PL=37/95W perf perf perf  AFAN=0x77 HWP=0x37 (~5.5GHz)
+  balanced   [sudo]       PL=28/55W perf perf bal   AFAN=0x44 HWP=0x1a (~2.6GHz)
+  silent     [sudo]       PL=15/25W save power cool AFAN=0x00 HWP=0x13 (~1.9GHz)
+  afan [hex] [sudo]       read or write EC byte 0x2D. valid: 00 11 22 33 44 55 66 77 88
+  hwp  [hex] [sudo]       read or write MSR 0x774 max_perf. valid: 01 13 1a 26 30 37
+  help                    this
+
+Persistence:
+  AFAN  survives reboot, dies on EC reset (battery disconnect / deep S5).
+  RAPL/governor/EPP/HWP  reset on reboot, sometimes on S3 resume.
+  TLP may stomp governor/EPP on AC plug events; just re-run.
+
+Bypass allowlists: HP_POWER_AFAN_ALLOW_ANY=1 / HP_POWER_HWP_ALLOW_ANY=1
 EOF
 }
 
 case "${1:-status}" in
-status) cmd_status ;;
-turbo | t) cmd_turbo ;;
-balanced | b) cmd_balanced ;;
-silent | s | battery | bat) cmd_silent ;;
-help | -h | --help) cmd_help ;;
-*)
-  echo "unknown subcommand: $1" >&2
-  cmd_help >&2
-  exit 2
-  ;;
+  status)                       cmd_status ;;
+  turbo|t)                      cmd_turbo ;;
+  balanced|b)                   cmd_balanced ;;
+  silent|s|battery|bat)         cmd_silent ;;
+  afan)                  shift; cmd_afan "$@" ;;
+  hwp)                   shift; cmd_hwp "$@" ;;
+  help|-h|--help)               cmd_help ;;
+  *) echo "unknown subcommand: ${1:-}" >&2; cmd_help >&2; exit 2 ;;
 esac

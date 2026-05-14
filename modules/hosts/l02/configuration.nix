@@ -46,11 +46,28 @@ in
         kernelModules = [
           "kvm-intel"
           "intel_ishtp_hid"
+          # ec_sys exposes /sys/kernel/debug/ec/ec0/io so hp-power can
+          # write the AFAN byte (EC offset 0x2D) directly, bypassing the
+          # DPTF stack which has no userspace policy on this machine.
+          # AFAN values are reverse-engineered from the DSDT method
+          # \_SB.PC00.UFID. See ~/.local/bin/hp-power.
+          "ec_sys"
+          # msr exposes /dev/cpu/*/msr so hp-power can write HWP_REQUEST
+          # (MSR 0x774). intel_pstate pins max_perf=0x1a (~2.2GHz all-core)
+          # on this machine; writing max_perf=0x37 unlocks real turbo.
+          "msr"
         ];
+        extraModprobeConfig = ''
+          options ec_sys write_support=1
+        '';
         extraModulePackages = [ ];
       };
 
       networking.useDHCP = lib.mkDefault true;
+
+      # msr-tools provides rdmsr/wrmsr, used by hp-power to flip
+      # HWP_REQUEST.max_perf for real turbo unlock.
+      environment.systemPackages = [ pkgs.msr-tools ];
 
       hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
       hardware.sensor.iio.enable = true;
