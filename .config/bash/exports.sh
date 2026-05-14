@@ -110,5 +110,7 @@ export PDK_ROOT="${XDG_DATA_HOME}/pdk"
 export IPYTHONDIR="${XDG_DATA_HOME}/ipython"
 export JUPYTER_CONFIG_DIR="${XDG_CONFIG_HOME}/jupyter"
 
+export OPENCODE_URL="http://127.0.0.1:4096"
+
 # Shell behavior
 export IGNOREEOF="4"
