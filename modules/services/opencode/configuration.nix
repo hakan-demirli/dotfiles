@@ -12,9 +12,25 @@
     }:
     let
       cfg = config.services.opencode;
-      officeBin = "${
-        inputs.nur.packages.${pkgs.stdenv.hostPlatform.system}.opencode-plugins.opencode-office
-      }/bin/opencode-office";
+      nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { };
+      opencodePlugins = nurPkgs.opencode-plugins;
+      officeBin = "${opencodePlugins.opencode-office}/bin/opencode-office";
+
+      opencodeConfigEntries =
+        let
+          opencodeConfigDir = ../../../.config/opencode;
+          dotfileEntries = pkgs.lib.mapAttrsToList (name: _type: {
+            inherit name;
+            path = opencodeConfigDir + "/${name}";
+          }) (builtins.removeAttrs (builtins.readDir opencodeConfigDir) [ "plugins" ]);
+          pluginEntries = [
+            {
+              name = "plugins";
+              path = "${opencodePlugins}/plugins";
+            }
+          ];
+        in
+        dotfileEntries ++ pluginEntries;
     in
     {
       options.services.opencode = {
@@ -45,6 +61,16 @@
       };
 
       config = lib.mkIf cfg.enable {
+        home.packages = [
+          pkgs.opencode
+          opencodePlugins
+        ];
+
+        xdg.configFile.opencode = {
+          source = pkgs.linkFarm "opencode-config" opencodeConfigEntries;
+          recursive = true;
+        };
+
         systemd.user.services.opencode-serve = {
           Unit = {
             Description = "OpenCode shared HTTP server";
