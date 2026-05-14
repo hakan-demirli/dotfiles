@@ -109,6 +109,8 @@ export LM_LICENSE_FILE="${XDG_CONFIG_HOME}/mylib/questa_license.dat"
 export PDK_ROOT="${XDG_DATA_HOME}/pdk"
 export IPYTHONDIR="${XDG_DATA_HOME}/ipython"
 export JUPYTER_CONFIG_DIR="${XDG_CONFIG_HOME}/jupyter"
+export BUN_INSTALL="${XDG_DATA_HOME}/bun"
+export BUNFIG="${XDG_CONFIG_HOME}/bun/bunfig.toml"
 
 export OPENCODE_URL="http://127.0.0.1:4096"
 
