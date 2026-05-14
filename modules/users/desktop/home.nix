@@ -29,6 +29,7 @@ let
           bashConfigDir = inputs.self + /.config/bash;
           inherit historyFile;
         })
+        inputs.self.modules.homeManager.services-opencode
       ];
 
       dconf.settings = {

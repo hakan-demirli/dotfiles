@@ -41,6 +41,7 @@
               };
               patches = (oldAttrs.patches or [ ]) ++ [
                 ../../../pkgs/opencode-cache-fixes.patch
+                ../../../pkgs/opencode-continue-dummy-toast.patch
               ];
               node_modules = oldAttrs.node_modules.overrideAttrs (_: {
                 version = "43b51f09-cache-fixes";
