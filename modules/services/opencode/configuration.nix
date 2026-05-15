@@ -16,6 +16,11 @@
       opencodePlugins = nurPkgs.opencode-plugins;
       officeBin = "${opencodePlugins.opencode-office}/bin/opencode-office";
 
+      serviceEnvFile = "${config.home.homeDirectory}/.config/secrets/environment";
+      commonServiceEnv = [
+        "PATH=${config.home.homeDirectory}/.local/bin:${config.home.profileDirectory}/bin:/run/current-system/sw/bin"
+      ];
+
       opencodeConfigEntries =
         let
           opencodeConfigDir = ../../../.config/opencode;
@@ -81,6 +86,8 @@
           };
           Service = {
             Type = "simple";
+            EnvironmentFile = serviceEnvFile;
+            Environment = commonServiceEnv;
             ExecStart = "${pkgs.opencode}/bin/opencode serve --hostname ${cfg.hostname} --port ${toString cfg.port}";
             Restart = "on-failure";
             RestartSec = 2;
@@ -96,7 +103,8 @@
           };
           Service = {
             Type = "simple";
-            Environment = [
+            EnvironmentFile = serviceEnvFile;
+            Environment = commonServiceEnv ++ [
               "OPENCODE_URL=http://${cfg.hostname}:${toString cfg.port}"
             ];
             ExecStart = "${officeBin} daemon-run";
