@@ -36,12 +36,13 @@
               src = prev.fetchFromGitHub {
                 owner = "anomalyco";
                 repo = "opencode";
-                rev = "43b51f09d095aadb3d851fde51031369be30d23f";
-                hash = "sha256-THteW4fG008rtLlOVVfGX1M80PjZgTUsAq7Vr/X3zng=";
+                rev = "2662a4f955e563fd22cd5c4873ca350d21745275";
+                hash = "sha256-qVkOgLXUU/vaWDZIkBeR3Fhkcz7cPshpyQIkuxwKUEM=";
               };
               patches = (oldAttrs.patches or [ ]) ++ [
                 ../../../pkgs/opencode-cache-fixes.patch
                 ../../../pkgs/opencode-continue-dummy-toast.patch
+                ../../../pkgs/opencode-attach-event-scope.patch
               ];
               node_modules = oldAttrs.node_modules.overrideAttrs (_: {
                 version = "43b51f09-cache-fixes";
@@ -54,6 +55,7 @@
                     --filter ./packages/app \
                     --filter ./packages/desktop \
                     --filter ./packages/opencode \
+                    --filter ./packages/ui \
                     --ignore-scripts \
                     --no-progress \
                     --os="*"
@@ -63,7 +65,7 @@
 
                   runHook postBuild
                 '';
-                outputHash = "sha256-R0zHWi0GZFZafOMymopSGWjs3Bjm23d37dgep8oFc18=";
+                outputHash = "sha256-R929GTFSKntPaGf5gRizfVhKdYFJyDc9u9/SSlQu6XE=";
               });
 
               postInstall = (oldAttrs.postInstall or "") + ''

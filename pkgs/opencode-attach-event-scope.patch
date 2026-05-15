@@ -1,0 +1,13 @@
+diff --git a/packages/opencode/src/cli/cmd/tui/context/sdk.tsx b/packages/opencode/src/cli/cmd/tui/context/sdk.tsx
+--- a/packages/opencode/src/cli/cmd/tui/context/sdk.tsx
++++ b/packages/opencode/src/cli/cmd/tui/context/sdk.tsx
+@@ -57,7 +57,9 @@ export const { use: useSDK, provider: SDKProvider } = createSimpleContext({
+       })
+     }
+ 
+     const handleEvent = (event: GlobalEvent) => {
++      const dir = (event as { directory?: string }).directory
++      if (dir && dir !== "global" && props.directory && dir !== props.directory) return
+       queue.push(event)
+       const elapsed = Date.now() - last
+ 
