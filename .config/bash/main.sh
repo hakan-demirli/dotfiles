@@ -3,8 +3,9 @@
 
 privateEnvFile="$HOME/.config/secrets/environment"
 if [ -f "${privateEnvFile}" ] && [ -r "${privateEnvFile}" ]; then
-  # shellcheck disable=SC1090
+  set -a
   source "${privateEnvFile}"
+  set +a
 fi
 
 # kitty SSH issue workaround: https://wiki.archlinux.org/title/Kitty#Terminal_issues_with_SSH
