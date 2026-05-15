@@ -1,157 +1,306 @@
 #!/usr/bin/env python3
-import argparse
+"""
+git_cached: transparent local cache for `git clone`.
+
+Strategy: maintain a bare --mirror per remote URL under ~/.cache/git_cache.
+For `git clone`, pass --reference-if-able <mirror> --dissociate so git itself
+reuses local objects. All other git subcommands are exec'd through unchanged.
+
+User-visible behavior of `git` is unchanged. Set GIT_CACHE_DISABLE=1 to bypass.
+"""
+
+from __future__ import annotations
+
+import fcntl
+import hashlib
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
+import time
+from typing import Optional, Tuple
 from urllib.parse import urlparse
 
 GIT = "git"
+DEFAULT_TTL_SECONDS = 300
 
 
-def setup_logger():
-    cache_dir = create_cache_dir()
-    log_file = os.path.join(cache_dir, "git_cache.log")
+def cache_root() -> str:
+    xdg = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+    root = os.path.join(xdg, "git_cache")
+    os.makedirs(root, exist_ok=True)
+    os.makedirs(os.path.join(root, "locks"), exist_ok=True)
+    return root
+
+
+def setup_logger() -> None:
+    log_file = os.path.join(cache_root(), "git_cache.log")
     logging.basicConfig(
         filename=log_file,
         level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s",
+        format="%(asctime)s %(levelname)s %(message)s",
     )
 
 
-def create_cache_dir():
-    xdg_cache_dir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
-    cache_dir = os.path.join(xdg_cache_dir, "git_cache")
-    os.makedirs(cache_dir, exist_ok=True)
-    return cache_dir
+_SCP_RE = re.compile(r"^(?P<user>[^@/:]+@)?(?P<host>[^:/]+):(?P<path>[^/].*)$")
 
 
-def run_git(cmd_args, cwd=None, ignore_unshallow_error=False):
-    try:
-        result = subprocess.run(
-            [GIT, *cmd_args],
-            check=True,
-            cwd=cwd,
-            capture_output=True,
-            text=True,
-        )
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        output = (e.stdout or "") + (e.stderr or "")
-        if (
-            ignore_unshallow_error
-            and "fatal: --unshallow on a complete repository does not make sense"
-            in output
-        ):
-            return output
-        else:
-            sys.stderr.write(output)
-            sys.exit(e.returncode)
-
-
-def gitc_clone(
-    url, depth=None, branch=None, extra_args=None, dst_path=None, original_args=None
-):
+def normalize_url(url: str) -> Optional[Tuple[str, str]]:
     """
-    Clones the repository using a cache. If the destination already exists,
-    delegate to the underlying Git command to produce its standard error message.
+    Return (canonical_url_for_clone, cache_key_path) or None if not cacheable.
+
+    cache_key_path is a relative path like 'github.com/user/repo' used to
+    locate the bare mirror on disk. Local paths and file:// are not cached.
     """
-    extra_args = extra_args or []
-    cache_dir = create_cache_dir()
+    if not url:
+        return None
 
-    # Normalize URL by stripping trailing .git if present.
-    if url.endswith(".git"):
-        url = url[:-4]
+    if (
+        url.startswith("file://")
+        or url.startswith("/")
+        or url.startswith("./")
+        or url.startswith("../")
+    ):
+        return None
 
-    parsed_url = urlparse(url)
-    path_parts = parsed_url.path.strip("/").split("/")
-    if len(path_parts) < 2:
-        # If URL is not in the expected form, delegate to Git.
-        subprocess.run([GIT, *original_args])
-        return
+    host = None
+    path = None
 
-    # Build cache paths.
-    website_dir = os.path.join(cache_dir, parsed_url.netloc)
-    os.makedirs(website_dir, exist_ok=True)
-    user_dir = os.path.join(website_dir, path_parts[-2])
-    os.makedirs(user_dir, exist_ok=True)
-    repo_dir = os.path.join(user_dir, path_parts[-1])
-
-    # Update or create the cached repository.
-    if os.path.exists(repo_dir):
-        run_git(["-C", repo_dir, "fetch", "--unshallow"], ignore_unshallow_error=True)
-        run_git(["-C", repo_dir, "pull"])
-        run_git(["-C", repo_dir, "submodule", "update", "--recursive"])
-        logging.info("Repository cache exists; updated cache repository.")
+    m = _SCP_RE.match(url)
+    if m and "://" not in url:
+        host = m.group("host")
+        path = m.group("path")
     else:
-        clone_cmd = ["clone", "--recurse-submodules", "-j8"]
-        if branch:
-            clone_cmd += ["-b", branch]
-        if depth:
-            clone_cmd += ["--depth", str(depth)]
-        clone_cmd += [*extra_args, url, repo_dir]
-        run_git(clone_cmd)
-        logging.info("Repository cache created.")
+        parsed = urlparse(url)
+        if parsed.scheme not in ("http", "https", "ssh", "git"):
+            return None
+        host = parsed.hostname
+        path = parsed.path.lstrip("/")
 
-    if branch:
-        run_git(["-C", repo_dir, "checkout", branch])
-        run_git(["-C", repo_dir, "pull"])
-        logging.info("Checked out branch '%s' in cache.", branch)
+    if not host or not path:
+        return None
 
-    # Determine the destination directory.
-    dst_dir = (
-        os.path.join(os.getcwd(), path_parts[-1]) if dst_path is None else dst_path
+    key_path = path
+    if key_path.endswith(".git"):
+        key_path = key_path[:-4]
+    key_path = key_path.rstrip("/")
+    if not key_path or "/" not in key_path:
+        return None
+
+    host_l = host.lower()
+
+    parts = [p for p in key_path.split("/") if p and p != "."]
+    if any(p == ".." for p in parts):
+        return None
+
+    cache_key = os.path.join(host_l, *parts)
+    return url, cache_key
+
+
+def mirror_path(cache_key: str) -> str:
+    return os.path.join(cache_root(), cache_key + ".git")
+
+
+def lock_path(cache_key: str) -> str:
+    h = hashlib.sha1(cache_key.encode()).hexdigest()
+    return os.path.join(cache_root(), "locks", h + ".lock")
+
+
+def run_git_capture(args, cwd=None) -> Tuple[int, str, str]:
+    p = subprocess.run([GIT, *args], cwd=cwd, capture_output=True, text=True)
+    return p.returncode, p.stdout, p.stderr
+
+
+def exec_git_passthrough(args) -> int:
+    """Run git inheriting stdio so the user sees progress, return exit code."""
+    try:
+        return subprocess.call([GIT, *args])
+    except FileNotFoundError:
+        sys.stderr.write("git_cached: 'git' not found on PATH\n")
+        return 127
+
+
+class _FileLock:
+    def __init__(self, path: str):
+        self.path = path
+        self._fd: Optional[int] = None
+
+    def __enter__(self):
+        self._fd = os.open(self.path, os.O_CREAT | os.O_RDWR, 0o644)
+        fcntl.flock(self._fd, fcntl.LOCK_EX)
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        try:
+            fcntl.flock(self._fd, fcntl.LOCK_UN)
+        finally:
+            os.close(self._fd)
+            self._fd = None
+
+
+def _mirror_is_valid(path: str) -> bool:
+    if not os.path.isdir(path):
+        return False
+
+    return os.path.isfile(os.path.join(path, "HEAD")) and os.path.isdir(
+        os.path.join(path, "objects")
     )
 
-    # If the destination already exists, delegate to Git so that Git produces its error.
-    if os.path.exists(dst_dir):
-        subprocess.run([GIT, *original_args])
-        return
 
-    # Copy from the cache into the destination.
-    shutil.copytree(repo_dir, dst_dir, symlinks=True)
-    logging.info("Copied repository to destination %s.", dst_dir)
-    if branch:
-        run_git(["-C", dst_dir, "checkout", branch])
-
-
-def parse_clone_args(args):
-    parser = argparse.ArgumentParser(prog="git clone", add_help=False)
-    parser.add_argument("--depth", type=int, default=None)
-    parser.add_argument("-b", "--branch", dest="branch", default=None)
-    parser.add_argument("url", nargs="?", default=None)
-    parser.add_argument("dst", nargs="?", default=None)
-    parsed, unknown = parser.parse_known_args(args)
-    return parsed.depth, parsed.branch, parsed.url, parsed.dst, unknown
+def _mirror_age_seconds(path: str) -> float:
+    candidates = [
+        os.path.join(path, "FETCH_HEAD"),
+        os.path.join(path, "packed-refs"),
+        os.path.join(path, "HEAD"),
+    ]
+    newest = 0.0
+    for c in candidates:
+        try:
+            newest = max(newest, os.path.getmtime(c))
+        except OSError:
+            pass
+    if newest == 0.0:
+        return float("inf")
+    return time.time() - newest
 
 
-def git_command(args):
-    # For any non-clone command, simply delegate to Git.
-    if not args or args[0] != "clone":
-        subprocess.run([GIT, *args])
-        return
+def ensure_mirror(url: str, cache_key: str, ttl: int) -> Optional[str]:
+    """
+    Ensure a bare mirror exists and is reasonably fresh. Returns the mirror
+    path on success, or None if we should fall back to a plain clone.
+    """
+    mpath = mirror_path(cache_key)
+    os.makedirs(os.path.dirname(mpath), exist_ok=True)
 
-    # Parse clone arguments.
-    clone_args = args[1:]
-    depth, branch, url, dst, unknown = parse_clone_args(clone_args)
-    # If URL is missing or there are unknown arguments, delegate to Git.
-    if url is None or unknown:
-        subprocess.run([GIT, *args])
-        return
+    with _FileLock(lock_path(cache_key)):
+        if _mirror_is_valid(mpath):
+            age = _mirror_age_seconds(mpath)
+            if age < ttl:
+                logging.info("mirror fresh (%.0fs) %s", age, cache_key)
+                return mpath
+            logging.info("mirror stale (%.0fs) updating %s", age, cache_key)
+            rc, _, err = run_git_capture(["-C", mpath, "remote", "update", "--prune"])
+            if rc != 0:
+                logging.warning(
+                    "mirror update failed (%d) for %s: %s",
+                    rc,
+                    cache_key,
+                    err.strip().splitlines()[-1:] or "",
+                )
 
-    # Call our caching clone function and pass the original clone arguments
-    # so that we can delegate error-handling if necessary.
-    gitc_clone(url, depth, branch, extra_args=unknown, dst_path=dst, original_args=args)
+            try:
+                fh = os.path.join(mpath, "FETCH_HEAD")
+                open(fh, "a").close()
+                os.utime(fh, None)
+            except OSError:
+                pass
+            return mpath
+
+        if os.path.exists(mpath):
+            logging.warning("removing invalid mirror dir %s", mpath)
+            shutil.rmtree(mpath, ignore_errors=True)
+
+        logging.info("creating mirror %s", cache_key)
+
+        rc, _, err = run_git_capture(["clone", "--mirror", "--quiet", url, mpath])
+        if rc != 0:
+            logging.warning(
+                "mirror creation failed (%d) for %s: %s",
+                rc,
+                cache_key,
+                err.strip(),
+            )
+            shutil.rmtree(mpath, ignore_errors=True)
+            return None
+        return mpath
 
 
-def main():
+def find_clone_url(clone_args) -> Optional[str]:
+    """
+    Best-effort: find the first positional that looks like a URL/repo.
+    We don't need to fully parse clone's args — we just need the source.
+    """
+
+    value_flags = {
+        "-o",
+        "--origin",
+        "-b",
+        "--branch",
+        "-u",
+        "--upload-pack",
+        "--reference",
+        "--reference-if-able",
+        "--separate-git-dir",
+        "--depth",
+        "--shallow-since",
+        "--shallow-exclude",
+        "--template",
+        "--server-option",
+        "--filter",
+        "--bundle-uri",
+        "-c",
+        "--config",
+    }
+    i = 0
+    positionals = []
+    while i < len(clone_args):
+        a = clone_args[i]
+        if a == "--":
+            positionals.extend(clone_args[i + 1 :])
+            break
+        if a.startswith("--") and "=" in a:
+            i += 1
+            continue
+        if a in value_flags:
+            i += 2
+            continue
+        if a.startswith("-"):
+            i += 1
+            continue
+        positionals.append(a)
+        i += 1
+    return positionals[0] if positionals else None
+
+
+def handle_clone(args) -> int:
+    """args is the full argv after the leading 'clone'."""
+    if os.environ.get("GIT_CACHE_DISABLE") == "1":
+        return exec_git_passthrough(["clone", *args])
+
+    url = find_clone_url(args)
+    if not url:
+        return exec_git_passthrough(["clone", *args])
+
+    norm = normalize_url(url)
+    if norm is None:
+        logging.info("uncacheable url, passthrough: %s", url)
+        return exec_git_passthrough(["clone", *args])
+
+    canonical_url, cache_key = norm
+    ttl = int(os.environ.get("GIT_CACHE_TTL", DEFAULT_TTL_SECONDS))
+
+    mpath = ensure_mirror(canonical_url, cache_key, ttl)
+    if mpath is None:
+        logging.info("no mirror, plain clone: %s", cache_key)
+        return exec_git_passthrough(["clone", *args])
+
+    new_args = ["clone", "--reference-if-able", mpath, "--dissociate", *args]
+    logging.info("cached clone: %s", cache_key)
+    return exec_git_passthrough(new_args)
+
+
+def main() -> int:
     setup_logger()
-    try:
-        git_command(sys.argv[1:])
-    except KeyboardInterrupt:
-        sys.exit(130)
+    argv = sys.argv[1:]
+    if argv and argv[0] == "clone":
+        return handle_clone(argv[1:])
+    return exec_git_passthrough(argv)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(130)
