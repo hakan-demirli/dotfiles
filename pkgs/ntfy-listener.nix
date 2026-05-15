@@ -3,6 +3,7 @@
 {
   systemd.user.services.ntfy-listener = {
     description = "Ntfy Listener for Laptop Actions";
+    wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     wantedBy = [ "default.target" ];
 
@@ -18,7 +19,7 @@
         }:$PATH
 
         ${pkgs.ntfy-sh}/bin/ntfy sub -c /dev/null \
-          "http://100.64.0.1:8111/emre-$(uname -n)" \
+          "http://vm-oracle-aarch64:8111/emre-$(uname -n),emre-laptop" \
           'bash -c "ffplay -autoexit -nodisp -af volume=2.0 $HOME/.local/share/sounds/effects/nier_enter.mp3 > /dev/null 2>&1 & notify-send \"$t\" \"$m\""'
       '';
       Restart = "always";
