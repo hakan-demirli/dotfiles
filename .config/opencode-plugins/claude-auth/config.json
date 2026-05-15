@@ -1,0 +1,5 @@
+{
+  "autoSwitch": {
+    "order": ["home:~/.cache/claude-multi/work", "file"]
+  }
+}
