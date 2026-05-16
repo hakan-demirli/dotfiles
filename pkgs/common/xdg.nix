@@ -74,7 +74,6 @@
         "xremap"
         "yazi"
         "zathura"
-        "zsh"
       ];
 
       immutable_data = [

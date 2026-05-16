@@ -57,7 +57,6 @@ export FZF_DEFAULT_OPTS="${fzf_opts[*]}"
 export OPENER="xdg-open"
 export EDITOR="hx"
 export TERMINAL="kitty"
-export TERM="kitty"
 
 # Man pages
 export MANPAGER="less -R --use-color -Dd+r -Du+b"
