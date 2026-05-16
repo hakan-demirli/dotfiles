@@ -10,10 +10,7 @@
     "custom/left-arrow-dark",
     "clock#day",
     "custom/left-arrow-dark",
-    "clock#day-month",
-    "custom/left-arrow-dark",
-    "custom/left-arrow-dark",
-    "custom/left-arrow-dark"
+    "clock#day-month"
   ],
   "modules-right": [
     "memory",
@@ -117,7 +114,7 @@
     "format-icons": ["", "", "", "", "", "", "", "", ""],
     "on-scroll-up": "exec brightnessctl s 5%+",
     "on-scroll-down": "exec brightnessctl s 5%-",
-    "tooltip-format": "Brighntess {}%",
+    "tooltip-format": "Brightness {}%",
     "reverse-scrolling": 1
   },
   "battery": {

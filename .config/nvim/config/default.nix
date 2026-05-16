@@ -10,13 +10,13 @@
     ./lsp.nix
     ./nvim-cmp.nix
     ./gitsigns.nix
-    ./visuals.nix # <-- Add this line
+    ./visuals.nix
     ./web-devicons.nix
   ];
 
   colorschemes.dracula.enable = true;
 
-  globals.mapleader = " "; # Sets the leader key to comma
+  globals.mapleader = " "; # Sets the leader key to <Space>
 
   opts = {
     number = true; # Show line numbers
@@ -48,8 +48,8 @@
     {
       mode = "n";
       key = "<leader>/";
-      action.__raw = "fuzzyFindFiles()";
-      options.desc = "Fuzzy Find files";
+      action.__raw = "liveGrepInProject()";
+      options.desc = "Live grep in project";
     }
     {
       mode = "n";
@@ -67,7 +67,7 @@
 
   extraConfigLuaPre = # lua
     ''
-      function fuzzyFindFiles()
+      function liveGrepInProject()
         return function()
           require("telescope.builtin").grep_string({
             path_display = { 'smart' },
@@ -75,7 +75,7 @@
             word_match = "-w",
             search = "",
           })
-        end 
-      end 
+        end
+      end
     '';
 }
