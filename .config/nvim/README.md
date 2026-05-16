@@ -1,19 +1,11 @@
-# Nixvim template
+# nvim (nixvim)
 
-This template gives you a good starting point for configuring nixvim standalone.
+Standalone nixvim configuration. The entry point is
+[`config/default.nix`](./config/default.nix); add or modify nix files in
+`./config` and remember to import them from `default.nix`.
 
-## Configuring
-
-To start configuring, just add or modify the nix files in `./config`.
-If you add a new configuration file, remember to add it to the
-[`config/default.nix`](./config/default.nix) file
-
-## Testing your new configuration
-To test your configuration simply run the following command.
-To test your configuration simply run the following command
+## Testing
 
 ```
 nix run .
 ```
-# Live preview
-* inccommand = "split"

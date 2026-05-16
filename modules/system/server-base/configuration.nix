@@ -3,7 +3,7 @@
   ...
 }:
 {
-  # Server base system configuration - shared across all servers
+  # Server base system configuration - shared across all servers.
   config.flake.modules.nixos.system-server-base =
     {
       config,
@@ -16,7 +16,6 @@
       common-packages = inputs.self.lib.mkPackages { inherit pkgs inputs; };
     in
     {
-      # Server base system configuration - shared across all servers
       options.system.server = {
         enable = lib.mkOption {
           type = lib.types.bool;
