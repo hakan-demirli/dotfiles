@@ -46,15 +46,13 @@ _: {
         }
       ];
 
-      system.activationScripts.transmissionAccess.text = ''
-        ${pkgs.acl}/bin/setfacl -m u:transmission:x /home/${username}
-        ${pkgs.acl}/bin/setfacl -m u:transmission:rwx /home/${username}/Downloads
-        ${pkgs.acl}/bin/setfacl -R -m u:transmission:rwx ${incompleteDir}
-      '';
-
       systemd.tmpfiles.rules = [
         "d ${downloadDir} 0755 ${username} users -"
         "d ${incompleteDir} 0755 ${username} users -"
+        "a+ /home/${username} - - - - u:transmission:x"
+        "a+ ${downloadDir} - - - - u:transmission:rwx,m::rwx"
+        "A+ ${incompleteDir} - - - - u:transmission:rwx,m::rwx"
+        "a+ ${incompleteDir} - - - - d:u:transmission:rwx,d:m::rwx"
       ];
     };
 }
