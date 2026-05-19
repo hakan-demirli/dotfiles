@@ -12,9 +12,9 @@ _: {
 
       systemd.tmpfiles.rules = [
         "d /home/${username}/Downloads/media 0755 ${username} users -"
-        "a+ /home/${username} - - - - u:jellyfin:x"
-        "a+ /home/${username}/Downloads - - - - u:jellyfin:rx"
-        "A+ /home/${username}/Downloads/media - - - - u:jellyfin:rX"
+        "a+ /home/${username} - - - - u:jellyfin:x,m::x"
+        "a+ /home/${username}/Downloads - - - - u:jellyfin:rx,m::rwx"
+        "A+ /home/${username}/Downloads/media - - - - u:jellyfin:rX,m::r-x"
       ];
 
       environment.persistence."/persist/system".directories = [
