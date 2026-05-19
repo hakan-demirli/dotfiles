@@ -35,8 +35,6 @@ _: {
         }
       ];
 
-      environment.systemPackages = [ pkgs.acl ];
-
       environment.persistence."/persist/system".directories = [
         {
           directory = "/var/lib/transmission";
@@ -49,7 +47,7 @@ _: {
       systemd.tmpfiles.rules = [
         "d ${downloadDir} 0755 ${username} users -"
         "d ${incompleteDir} 0755 ${username} users -"
-        "a+ /home/${username} - - - - u:transmission:x"
+        "a+ /home/${username} - - - - u:transmission:x,m::x"
         "a+ ${downloadDir} - - - - u:transmission:rwx,m::rwx"
         "A+ ${incompleteDir} - - - - u:transmission:rwx,m::rwx"
         "a+ ${incompleteDir} - - - - d:u:transmission:rwx,d:m::rwx"
