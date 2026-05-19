@@ -39,6 +39,7 @@ let
 
   ai = with pkgs; [
     aider-chat
+    (nurPkgs.raider or null)
     aichat
     claude-code
   ];
