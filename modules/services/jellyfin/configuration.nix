@@ -1,6 +1,6 @@
 _: {
   flake.modules.nixos.services-jellyfin =
-    { pkgs, config, ... }:
+    { config, ... }:
     let
       inherit (config.system.user) username;
     in
@@ -10,13 +10,12 @@ _: {
         openFirewall = true;
       };
 
-      environment.systemPackages = [ pkgs.acl ];
-
-      system.activationScripts.jellyfinAccess.text = ''
-        ${pkgs.acl}/bin/setfacl -m u:jellyfin:x /home/${username}
-        ${pkgs.acl}/bin/setfacl -m u:jellyfin:rx /home/${username}/Downloads
-        ${pkgs.acl}/bin/setfacl -R -m u:jellyfin:rX /home/${username}/Downloads/media
-      '';
+      systemd.tmpfiles.rules = [
+        "d /home/${username}/Downloads/media 0755 ${username} users -"
+        "a+ /home/${username} - - - - u:jellyfin:x"
+        "a+ /home/${username}/Downloads - - - - u:jellyfin:rx"
+        "A+ /home/${username}/Downloads/media - - - - u:jellyfin:rX"
+      ];
 
       environment.persistence."/persist/system".directories = [
         {
