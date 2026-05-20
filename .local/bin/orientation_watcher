@@ -440,7 +440,9 @@ def main() -> int:
     scale = load_scale(accel)
     log(f"mount_matrix={matrix} scale={scale} poll={POLL_S * 1000:.0f}ms")
 
-    write_text(LOCK_STATE_FILE, "0")
+    if not os.path.exists(LOCK_STATE_FILE):
+        write_text(LOCK_STATE_FILE, "0")
+    log(f"initial rotation lock = {'on' if is_locked() else 'off'}")
     signal_waybar()
 
     prev_orient = ORIENT_UNDEFINED
