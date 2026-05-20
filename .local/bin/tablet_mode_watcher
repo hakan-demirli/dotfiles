@@ -21,6 +21,17 @@ EVENT_SIZE = struct.calcsize(EVENT_FMT)
 
 _SW_BUFLEN = 8
 
+STATE_DIR = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+TABLET_LOCK_FILE = os.path.join(STATE_DIR, "tablet_mode_lock")
+
+
+def is_tablet_locked() -> bool:
+    try:
+        with open(TABLET_LOCK_FILE) as f:
+            return f.read().strip() == "1"
+    except OSError:
+        return False
+
 
 def _ioc(direction: int, type_char: str, nr: int, size: int) -> int:
     return (direction << 30) | (size << 16) | (ord(type_char) << 8) | nr
@@ -99,6 +110,9 @@ _current_state = False
 
 def set_state(new: bool, *, force: bool = False) -> None:
     global _current_state
+    if not force and is_tablet_locked():
+        log(f"tablet lock on: ignoring hinge event (would set {'on' if new else 'off'})")
+        return
     if not force and new == _current_state:
         return
     _current_state = new
@@ -106,9 +120,25 @@ def set_state(new: bool, *, force: bool = False) -> None:
     apply(new)
 
 
+_resync_fds: dict[int, str] = {}
+
+
 def on_sigusr1(_signum, _frame):
     log("SIGUSR1 received: toggling")
     set_state(not _current_state, force=True)
+
+
+def on_sigusr2(_signum, _frame):
+    if not _resync_fds:
+        log("SIGUSR2 received but no devices open; ignoring")
+        return
+    physical = False
+    for fd, dev in _resync_fds.items():
+        state = query_initial_state(fd)
+        log(f"SIGUSR2 resync: {dev} SW_TABLET_MODE={int(state)}")
+        if state:
+            physical = True
+    set_state(physical, force=True)
 
 
 def on_exit(_signum, _frame):
@@ -136,9 +166,13 @@ def main() -> int:
         log("failed to open any SW_TABLET_MODE device")
         return 1
 
+    _resync_fds.update(fds)
+
     signal.signal(signal.SIGUSR1, on_sigusr1)
+    signal.signal(signal.SIGUSR2, on_sigusr2)
     signal.signal(signal.SIGTERM, on_exit)
     signal.signal(signal.SIGINT, on_exit)
+    log(f"initial tablet lock = {'on' if is_tablet_locked() else 'off'}")
 
     initial = False
     for fd, dev in fds.items():
@@ -165,6 +199,7 @@ def main() -> int:
                     poll.unregister(fd)
                     os.close(fd)
                     del fds[fd]
+                    _resync_fds.pop(fd, None)
                     if not fds:
                         log("all devices gone")
                         return 1
