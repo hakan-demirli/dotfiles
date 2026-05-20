@@ -36,7 +36,7 @@
     "title",
     "volume",
     "backlight",
-    "buttons-grid#caffeine",
+    "buttons-grid#toggles",
     "mpris",
     "dnd",
     "notifications"
@@ -69,14 +69,26 @@
       "subsystem": "backlight",
       "min": 1
     },
-    "buttons-grid#caffeine": {
-      "buttons-per-row": 1,
+    "buttons-grid#toggles": {
+      "buttons-per-row": 3,
       "actions": [
         {
-          "label": "  Caffeinate",
+          "label": " 󰷛  Awake",
           "command": "$HOME/.local/bin/caffeinate-toggle swaync",
           "type": "toggle",
           "update-command": "$HOME/.local/bin/caffeinate-toggle status"
+        },
+        {
+          "label": " 󰑥  Rotation",
+          "command": "$HOME/.local/bin/rotation-lock-toggle swaync",
+          "type": "toggle",
+          "update-command": "$HOME/.local/bin/rotation-lock-toggle status"
+        },
+        {
+          "label": " 󰓶  Tablet",
+          "command": "$HOME/.local/bin/tablet-lock-toggle swaync",
+          "type": "toggle",
+          "update-command": "$HOME/.local/bin/tablet-lock-toggle status"
         }
       ]
     },

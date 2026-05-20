@@ -62,25 +62,9 @@ toggle_wvkbd() {
   fi
 }
 
-start_orientation_watcher() {
-  if pgrep -f orientation_watcher > /dev/null 2>&1; then
-    return 0
-  fi
-  mkdir -p ~/.local/state
-  setsid -f orientation_watcher >> ~/.local/state/orientation_watcher.log 2>&1
-  sleep 0.05
-  pgrep -f orientation_watcher > /dev/null 2>&1 \
-    || log "orientation_watcher failed to start"
-}
-
-stop_orientation_watcher() {
-  pkill -TERM -f orientation_watcher 2> /dev/null || true
-}
-
 apply_on() {
   log "entering tablet mode"
   echo on > "$STATE_FILE"
-  start_orientation_watcher
   signal_waybar
   notify "Tablet mode" "On"
 }
@@ -88,7 +72,6 @@ apply_on() {
 apply_off() {
   log "leaving tablet mode"
   hide_wvkbd
-  stop_orientation_watcher
   echo off > "$STATE_FILE"
   signal_waybar
   notify "Laptop mode" "On"

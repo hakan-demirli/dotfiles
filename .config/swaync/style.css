@@ -361,6 +361,7 @@
 
 .widget-buttons-grid flowboxchild > button {
   min-height: 42px;
+  margin: 0 3px;
   color: @foreground;
   background: @current-line;
   border: 1px solid @accent;
