@@ -70,11 +70,30 @@ mkFleet {
     disk = "/dev/nvme0n1";
     serverId = 1;
     additionalDisks = [ "/dev/nvme1n1" ];
-    extraConfig = _: {
-      networking.networkmanager.enable = true;
-      programs.nix-ld.enable = true;
-      boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-    };
+    extraConfig =
+      { ... }:
+      {
+        imports = with inputs.self.modules.nixos; [
+          system-amd-graphics
+          system-sound
+          services-remotedesktop
+        ];
+
+        networking.networkmanager.enable = true;
+        programs.nix-ld.enable = true;
+        boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
+        system.impermanence.extraPersistentUserDirs = [
+          ".config/sunshine"
+        ];
+
+        services.remotedesktop = {
+          enable = true;
+          headless = true;
+          connector = "DP-1";
+          resolution = "1920x1080@60";
+        };
+      };
   };
 
   s02 = mkPersonalServer {
