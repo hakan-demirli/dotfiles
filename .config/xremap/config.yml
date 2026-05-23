@@ -119,6 +119,13 @@ keymap:
       KEY_MINUS: reserved
       KEY_EQUAL: reserved
 
+  - name: moonlight
+    application:
+      only: [ com.moonlight_stream.Moonlight, Moonlight ]
+    remap:
+      Ctrl-Shift-b: Ctrl-Shift-Alt-q
+      Ctrl-Shift-Alt-q: Ctrl-Shift-Alt-q
+
   - name: .virt-manager-wrapped
     application:
       only: [ .virt-manager-wrapped ]

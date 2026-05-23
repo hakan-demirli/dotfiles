@@ -129,6 +129,20 @@ let
       xremap
     ];
 
+  remotedesktop-host = with pkgs; [
+    sunshine
+    libva-utils
+    mesa-demos
+    vulkan-tools
+    wayland-utils
+  ];
+
+  remotedesktop-client = with pkgs; [
+    moonlight-qt
+  ];
+
+  remotedesktop = remotedesktop-host ++ remotedesktop-client;
+
   gui =
     with pkgs;
     lib.filter (x: x != null) [
@@ -172,6 +186,7 @@ let
       wlr-randr
       wttrbar
       dragon-drop
+      moonlight-qt
     ];
 
 in
@@ -183,6 +198,9 @@ in
     editors
     gui
     lsp
+    remotedesktop
+    remotedesktop-host
+    remotedesktop-client
     server-cli
     tools-cli
     gaming
