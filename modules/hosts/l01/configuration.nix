@@ -52,6 +52,8 @@ in
           system-laptop-base
           system-hibernation
           services-slurm-client
+          services-remotedesktop
+          services-ssh
           l01-hardware
           system-nvidia
         ]
@@ -102,6 +104,10 @@ in
       };
 
       services = {
+        remotedesktop.enable = true;
+
+        ssh.rootSshKeys = [ publicData.ssh.id_ed25519_proton_pub ];
+
         tailscale.loginServerHost = "sshr.polarbearvuzi.com";
 
         slurm-client = {
