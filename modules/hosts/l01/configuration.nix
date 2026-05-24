@@ -91,7 +91,19 @@ in
           hashedPassword = publicData.passwords.l01;
           useHomeManager = true;
           extraGroups = [ "kvm" ];
-          homeManagerImports = [ inputs.self.modules.homeManager.desktop ];
+          homeManagerImports = [
+            inputs.self.modules.homeManager.desktop
+            (_: {
+              xdg.configFile."sunshine/sunshine.conf".text = ''
+                adapter_name = /dev/dri/renderD129
+              '';
+
+              xdg.configFile."systemd/user/sunshine.service.d/override.conf".text = ''
+                [Service]
+                Environment=LIBVA_DRIVER_NAME=radeonsi
+              '';
+            })
+          ];
         };
       };
 
