@@ -8,6 +8,11 @@ if [ -f "${privateEnvFile}" ] && [ -r "${privateEnvFile}" ]; then
   set +a
 fi
 
+privateBinDir="$HOME/.local/bin/private"
+if [ -d "$privateBinDir" ]; then
+  export PATH="$privateBinDir:$PATH"
+fi
+
 # kitty SSH issue workaround: https://wiki.archlinux.org/title/Kitty#Terminal_issues_with_SSH
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 

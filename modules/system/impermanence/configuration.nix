@@ -33,6 +33,7 @@
             "Videos"
             ".cache"
             ".local/share"
+            ".local/bin/private"
             ".local/state/opencode"
             ".config/opencode"
             ".antigravity"
