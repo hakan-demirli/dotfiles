@@ -16,9 +16,9 @@ function finish {
 trap finish EXIT
 
 if hash gdate 2> /dev/null; then
-  GNU_DATE=gdate
+  GNU_DATE="gdate"
 elif date --version | grep 'GNU coreutils' > /dev/null; then
-  GNU_DATE=$(date)
+  GNU_DATE="date"
 fi
 
 function datef {
