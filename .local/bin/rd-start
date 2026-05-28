@@ -4,8 +4,8 @@ set -euo pipefail
 SUNSHINE_USER_UNIT="sunshine"
 HEADLESS_SYSTEM_UNIT="remotedesktop"
 
-if sudo -n systemctl is-active --quiet "$HEADLESS_SYSTEM_UNIT" 2>/dev/null || \
-   systemctl --user is-active --quiet "$SUNSHINE_USER_UNIT" 2>/dev/null; then
+if sudo -n systemctl is-active --quiet "$HEADLESS_SYSTEM_UNIT" 2> /dev/null \
+  || systemctl --user is-active --quiet "$SUNSHINE_USER_UNIT" 2> /dev/null; then
   echo "Remote desktop is already running."
   rd-status
   exit 0
@@ -19,7 +19,7 @@ if [ -n "${WAYLAND_DISPLAY:-}" ] || [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; t
   exit 0
 fi
 
-if sudo -n systemctl cat "$HEADLESS_SYSTEM_UNIT" &>/dev/null; then
+if sudo -n systemctl cat "$HEADLESS_SYSTEM_UNIT" &> /dev/null; then
   echo "No graphical session. Starting headless Hyprland + Sunshine..."
   sudo -n systemctl start "$HEADLESS_SYSTEM_UNIT"
   sleep 3

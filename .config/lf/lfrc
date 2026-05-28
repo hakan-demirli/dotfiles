@@ -61,7 +61,7 @@ cmd trash ${{
     done
 
     echo "$file"
-    trash-put "$(basename "$file")"
+    trash-put "$file"
 
     if [ "$files" = "$file" ]; then
       files=''
@@ -86,7 +86,7 @@ cmd delete_for_real ${{
     done
 
     echo "$file"
-    rm -rf  "$(basename "$file")"
+    rm -rf "$file"
 
     if [ "$files" = "$file" ]; then
       files=''

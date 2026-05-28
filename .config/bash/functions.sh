@@ -75,10 +75,9 @@ gitexplode() {
 
   mkdir -p .temp_files
 
-  (
-    shopt -s extglob dotglob
-    eval 'mv !(.git|.temp_files) .temp_files/ 2> /dev/null'
-  )
+  find . -mindepth 1 -maxdepth 1 \
+    ! -name '.git' ! -name '.temp_files' \
+    -exec mv -t .temp_files/ {} +
 
   mv .git .bare
   cd .bare || return 1
@@ -88,7 +87,7 @@ gitexplode() {
   if ! git --git-dir=.bare worktree add -f "$current_branch" "$current_branch"; then
     echo "Error: Failed to create worktree. Attempting to revert..."
     mv .bare .git
-    mv .temp_files/* .
+    find .temp_files -mindepth 1 -maxdepth 1 -exec mv -t . {} +
     rmdir .temp_files
     return 1
   fi
