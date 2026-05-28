@@ -7,25 +7,25 @@ LOCK_FILE="$STATE_DIR/tablet_mode_lock"
 WATCHER_PATTERN="tablet_mode_watcher"
 
 notify() {
-  command -v notify-send >/dev/null 2>&1 || return 0
+  command -v notify-send > /dev/null 2>&1 || return 0
   notify-send -a tablet-lock -t 2000 \
     -h string:x-canonical-private-synchronous:tablet-lock \
-    "$1" "${2:-}" 2>/dev/null || true
+    "$1" "${2:-}" 2> /dev/null || true
 }
 
 watcher_running() {
-  pgrep -f "$WATCHER_PATTERN" >/dev/null 2>&1
+  pgrep -f "$WATCHER_PATTERN" > /dev/null 2>&1
 }
 
 read_state() {
   local v
-  v="$(cat "$LOCK_FILE" 2>/dev/null || true)"
-  [[ "$v" == "1" ]] && printf 'on\n' || printf 'off\n'
+  v="$(cat "$LOCK_FILE" 2> /dev/null || true)"
+  [[ $v == "1" ]] && printf 'on\n' || printf 'off\n'
 }
 
 write_state() {
   mkdir -p "$STATE_DIR"
-  printf '%s' "$1" >"$LOCK_FILE"
+  printf '%s' "$1" > "$LOCK_FILE"
 }
 
 lock_on() {
@@ -42,7 +42,7 @@ lock_off() {
   fi
   write_state 0
   if watcher_running; then
-    pkill -USR2 -f "$WATCHER_PATTERN" 2>/dev/null || true
+    pkill -USR2 -f "$WATCHER_PATTERN" 2> /dev/null || true
   fi
   notify "Tablet mode unlocked" "Hinge events will be honored again"
 }
@@ -65,7 +65,7 @@ status() {
 
 from_toggle_state() {
   case "${SWAYNC_TOGGLE_STATE:-}" in
-    true | TRUE | 1)  lock_on  ;;
+    true | TRUE | 1) lock_on ;;
     false | FALSE | 0) lock_off ;;
     *)
       printf 'SWAYNC_TOGGLE_STATE must be true or false, got [%s]\n' \
@@ -76,13 +76,13 @@ from_toggle_state() {
 }
 
 case "${1:-toggle}" in
-  true | TRUE | 1)  lock_on  ;;
+  true | TRUE | 1) lock_on ;;
   false | FALSE | 0) lock_off ;;
-  swaync)          from_toggle_state ;;
-  on | lock)       lock_on  ;;
-  off | unlock)    lock_off ;;
-  status)          status   ;;
-  toggle)          toggle   ;;
+  swaync) from_toggle_state ;;
+  on | lock) lock_on ;;
+  off | unlock) lock_off ;;
+  status) status ;;
+  toggle) toggle ;;
   *)
     printf 'Usage: %s [toggle|on|off|status|swaync|true|false]\n' "$0" >&2
     exit 2

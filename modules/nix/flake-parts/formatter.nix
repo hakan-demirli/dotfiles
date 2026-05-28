@@ -7,6 +7,25 @@ _: {
           ${pkgs.statix}/bin/statix fix "$path"
         done
       '';
+
+      shfmt-wrapper = pkgs.writeShellApplication {
+        name = "shfmt-shell-only";
+        runtimeInputs = [ pkgs.shfmt ];
+        text = ''
+          for f in "$@"; do
+            case "$f" in
+              *.sh | *.bash) ;;
+              *)
+                if ! head -n1 "$f" 2> /dev/null \
+                  | grep -Eq '^#!(/usr/bin/env[[:space:]]+(bash|sh)|/bin/(ba)?sh)([[:space:]]|$)'; then
+                  continue
+                fi
+                ;;
+            esac
+            shfmt -i 2 -ln bash -s -ci -bn -sr -w "$f"
+          done
+        '';
+      };
     in
     {
       formatter = pkgs.treefmt.withConfig {
@@ -43,21 +62,12 @@ _: {
             };
 
             shfmt = {
-              command = "shfmt";
-              options = [
-                "-i"
-                "2"
-                "-ln"
-                "bash"
-                "-s"
-                "-ci"
-                "-bn"
-                "-sr"
-                "-w"
-              ];
+              command = "${shfmt-wrapper}/bin/shfmt-shell-only";
               includes = [
                 "*.sh"
                 "*.bash"
+                ".local/bin/**"
+                ".config/lf/**"
               ];
             };
 

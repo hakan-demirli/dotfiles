@@ -48,7 +48,7 @@ if [ $create_new -eq 1 ]; then
   fi
 
   if ! git -C "$current_path" worktree add -b "$target_name" "$target_path"; then
-    read -pr "Git error. Press Enter..."
+    read -rp "Git error. Press Enter..." _
     exit 1
   fi
 

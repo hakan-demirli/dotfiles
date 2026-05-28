@@ -2,13 +2,13 @@
 
 state_dir="${XDG_RUNTIME_DIR:-/run/user/$UID}"
 
-if [[ $(hostname 2>/dev/null) != "l02" ]] ||
-  ! pgrep -f orientation_watcher >/dev/null 2>&1; then
+if [[ $(hostname 2> /dev/null) != "l02" ]] \
+  || ! pgrep -f orientation_watcher > /dev/null 2>&1; then
   printf '{"text":"","tooltip":"","class":"orient-hidden","alt":"hidden"}\n'
   exit 0
 fi
 
-locked="$(cat "$state_dir/orientation_lock" 2>/dev/null)"
+locked="$(cat "$state_dir/orientation_lock" 2> /dev/null)"
 
 if [[ $locked == "1" ]]; then
   printf '{"text":"\uf023","tooltip":"Rotation locked (click to auto-rotate)","class":"orient-lock","alt":"lock"}\n'
