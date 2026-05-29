@@ -6,7 +6,7 @@ echo "$is_running"
 
 if [ -n "$is_running" ]; then
   echo "just togglespecialworkspace"
-  hyprctl dispatch togglespecialworkspace plan
+  hyprctl dispatch 'hl.dsp.workspace.toggle_special("plan")'
 else
   echo "just plan"
   cd "${HOME}/Desktop/state/" && kitty --title "my_plan" txh &
