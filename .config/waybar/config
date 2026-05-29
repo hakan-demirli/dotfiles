@@ -43,8 +43,8 @@
   },
   "hyprland/workspaces": {
     "format": "{}",
-    "on-scroll-up": "hyprctl dispatch workspace -1",
-    "on-scroll-down": "hyprctl dispatch workspace r+1",
+    "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'",
+    "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
     "on-click": "activate",
     "disable-scroll-wraparound": true,
     "justify": "center",

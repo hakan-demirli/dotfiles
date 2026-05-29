@@ -6,7 +6,7 @@ echo "$is_running"
 
 if [ -n "$is_running" ]; then
   echo "just togglespecialworkspace"
-  hyprctl dispatch togglespecialworkspace todo
+  hyprctl dispatch 'hl.dsp.workspace.toggle_special("todo")'
 else
   echo "just todo"
   cd "${HOME}/.local/share/scratchpads/" && kitty --title "my_todo" txh &

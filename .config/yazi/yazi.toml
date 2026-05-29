@@ -81,14 +81,14 @@ prepend_previewers = [{ url = "*.opus", run = "opus-preview" }]
 prepend_preloaders = [{ url = "*.opus", run = "opus-preview" }]
 
 [[plugin.prepend_fetchers]]
-id  = "git"
-url = "*"
-run = "git"
+url   = "*"
+run   = "git"
+group = "git"
 
 [[plugin.prepend_fetchers]]
-id  = "git"
-url = "*/"
-run = "git"
+url   = "*/"
+run   = "git"
+group = "git"
 
 [input]
 # cd
