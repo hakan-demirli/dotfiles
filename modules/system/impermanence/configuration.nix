@@ -35,6 +35,7 @@
             ".local/share"
             ".local/bin/private"
             ".local/state/opencode"
+            ".local/state/raider"
             ".config/opencode"
             ".antigravity"
             ".claude"
