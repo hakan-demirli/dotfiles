@@ -76,7 +76,7 @@ _: {
               start_all()
 
               cache_server.wait_for_unit("harmonia-keygen.service")
-              cache_server.wait_for_unit("harmonia.service")
+              cache_server.wait_for_unit("harmonia.socket")
               cache_server.wait_for_open_port(5000)
 
               cache_server.succeed("curl -sf http://localhost:5000/nix-cache-info | grep 'StoreDir: /nix/store'")
