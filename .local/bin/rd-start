@@ -11,7 +11,9 @@ if sudo -n systemctl is-active --quiet "$HEADLESS_SYSTEM_UNIT" 2> /dev/null \
   exit 0
 fi
 
-if [ -n "${WAYLAND_DISPLAY:-}" ] || [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+if [ -n "${WAYLAND_DISPLAY:-}" ] \
+  || [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ] \
+  || systemctl --user is-active --quiet graphical-session.target 2> /dev/null; then
   echo "Graphical session detected. Starting Sunshine for current display..."
   systemctl --user start "$SUNSHINE_USER_UNIT"
   sleep 1

@@ -21,7 +21,6 @@
         services-hyprland
         services-tailscale
         services-docker
-        services-warp
         services-earlyoom
         services-yubikey
         services-sops

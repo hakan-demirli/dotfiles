@@ -89,6 +89,7 @@ in
           username = "emre";
           uid = 1000;
           hashedPassword = publicData.passwords.l01;
+          authorizedKeys = [ publicData.ssh.id_ed25519_proton_pub ];
           useHomeManager = true;
           extraGroups = [ "kvm" ];
           homeManagerImports = [
@@ -96,11 +97,17 @@ in
             (_: {
               xdg.configFile."sunshine/sunshine.conf".text = ''
                 adapter_name = /dev/dri/renderD129
+                audio_sink = sink-sunshine-stereo.monitor
               '';
 
               xdg.configFile."systemd/user/sunshine.service.d/override.conf".text = ''
                 [Service]
                 Environment=LIBVA_DRIVER_NAME=radeonsi
+                Environment=XDG_RUNTIME_DIR=/run/user/1000
+                Environment=PULSE_SERVER=unix:/run/user/1000/pulse/native
+                Environment=PULSE_COOKIE=%h/.config/pulse/cookie
+                Environment=WAYLAND_DISPLAY=wayland-1
+                Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
               '';
             })
           ];
