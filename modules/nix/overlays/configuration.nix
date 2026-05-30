@@ -65,7 +65,7 @@
 
                   runHook postBuild
                 '';
-                outputHash = "sha256-R929GTFSKntPaGf5gRizfVhKdYFJyDc9u9/SSlQu6XE=";
+                outputHash = "sha256-w8yHW5UebW6O5I1zVTdMTmcMJ7MkdLILhwWyMYoHlMg=";
               });
 
               postInstall = (oldAttrs.postInstall or "") + ''
