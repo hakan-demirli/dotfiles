@@ -48,7 +48,7 @@ cmd touch $touch -p "$(echo $* | tr ' ' '\ ')"
 
 cmd trash ${{
   files=$(printf "$fx" | tr '\n' ';')
-  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles" "$HOME/Desktop/mibench" "$HOME/Desktop/qmk")
+  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/infra/dotfiles" "$HOME/Desktop/mibench" "$HOME/Desktop/qmk")
   
   while [ "$files" ]; do
     file=${files%%;*}
@@ -73,7 +73,7 @@ cmd trash ${{
 
 cmd delete_for_real ${{
   files=$(printf "$fx" | tr '\n' ';')
-  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/dotfiles" "$HOME/Desktop/mibench" "$HOME/Desktop/qmk")
+  forbidden_files=("$HOME/Desktop/np" "$HOME/Desktop/infra/dotfiles" "$HOME/Desktop/mibench" "$HOME/Desktop/qmk")
   
   while [ "$files" ]; do
     file=${files%%;*}
@@ -137,7 +137,7 @@ cmd yank_path &{{
 
 
 cmd fzf_jump ${{
-    res="$(find ~/Desktop /mnt/second/rep -maxdepth 1 | fzf --reverse --header='Jump to location' | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    res="$(find ~/Desktop ~/Desktop/infra /mnt/second/rep -maxdepth 1 | fzf --reverse --header='Jump to location' | sed 's/\\/\\\\/g;s/"/\\"/g')"
     if [ -d "$res" ] ; then
         cmd="cd"
     elif [ -f "$res" ] ; then
@@ -191,7 +191,7 @@ map gm cd /tmp/mtp
 # map gm cd /run/user/1000/gvfs
 
 # Bookmark
-map bd cd ~/Desktop/dotfiles
+map bd cd ~/Desktop/infra/dotfiles
 map bs cd /mnt/second/school
 map bp cd /mnt/second/rep/personal_repo
 map bt cd /mnt/second/rep/personal_repo/notes/personal_notes/todo

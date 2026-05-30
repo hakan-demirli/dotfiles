@@ -37,7 +37,7 @@ if [[ -z $TMUX ]]; then
     raw_input=$(
       {
         echo "$HOME"
-        find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
+        find -L "$HOME/Desktop" "$HOME/Desktop/infra" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
       } \
         | sed "s|^${HOME}|~|" \
         | awk "$COLORIZER_AWK" \

@@ -5,7 +5,7 @@ let
 
   inherit (config.system.user) username;
   userHome = "/home/${username}";
-  repoPath = "${userHome}/Desktop/state";
+  repoPath = "${userHome}/Desktop/infra/state";
   logBranch = "nocon";
 
   scriptPath = pkgs.lib.makeBinPath [

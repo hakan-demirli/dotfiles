@@ -3,7 +3,7 @@ submission_target = "local"
 default_scheduler = "local"
 [targets]
   [targets.local]
-  base_path = "~/Desktop/repx-store"
+  base_path = "~/.local/share/repx-store"
   default_scheduler = "local"
   default_execution_type = "bwrap"
     [targets.local.local]
@@ -15,7 +15,7 @@ default_scheduler = "local"
 
   [targets.tailscale-s01]
   address = "tailscale-s01"
-  base_path = "~/Desktop/repx-store"
+  base_path = "~/.local/share/repx-store"
   default_scheduler = "slurm"
   default_execution_type = "bwrap"
     [targets.tailscale-s01.local]

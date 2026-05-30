@@ -23,7 +23,7 @@ in
         "GHORG_SCM_TYPE=github"
         "GHORG_CLONE_TYPE=user"
         "GHORG_BASE_URL=https://api.github.com/"
-        "GHORG_ABSOLUTE_PATH_TO_CLONE_TO=${userHome}/Desktop/backup"
+        "GHORG_ABSOLUTE_PATH_TO_CLONE_TO=${userHome}/Desktop/infra/backup"
         "GHORG_CLONE_WIKI=true"
         "GHORG_PRUNE=true"
         "GHORG_PRUNE_NO_CONFIRM=true"
