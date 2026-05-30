@@ -4,6 +4,9 @@
   enablePortal ? true,
   ...
 }:
+let
+  infraDir = "${desktopDir}/infra";
+in
 {
   xdg =
     let
@@ -94,7 +97,7 @@
       makeMutable = path: file: {
         target = file;
         source = pkgs.runCommand "${file}-dotfiles" { } ''
-          ln -s "${desktopDir}/dotfiles/${path}/${file}" $out
+          ln -s "${infraDir}/dotfiles/${path}/${file}" $out
         '';
         # source = pkgs.linkFarm "${file}-dotfiles" [
         #   {
@@ -202,15 +205,15 @@
       source = pkgs.linkFarm "gdrive-links" [
         {
           name = "bash";
-          path = "${desktopDir}/state/.local/state/bash";
+          path = "${infraDir}/state/.local/state/bash";
         }
         {
           name = "gdb";
-          path = "${desktopDir}/state/.local/state/gdb";
+          path = "${infraDir}/state/.local/state/gdb";
         }
         {
           name = "qalculate";
-          path = "${desktopDir}/state/.local/state/qalculate";
+          path = "${infraDir}/state/.local/state/qalculate";
         }
       ];
       recursive = true;
@@ -220,11 +223,11 @@
       source = pkgs.linkFarm "gdrive-links" [
         {
           name = "sounds";
-          path = "${desktopDir}/sounds";
+          path = "${infraDir}/sounds";
         }
         {
           name = "scratchpads";
-          path = "${desktopDir}/state/scratchpads";
+          path = "${infraDir}/state/scratchpads";
         }
         {
           name = "notify-scheduler";

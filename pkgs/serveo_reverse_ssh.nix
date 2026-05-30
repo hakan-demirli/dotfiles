@@ -3,7 +3,7 @@
 let
   scriptUser = config.system.user.username;
   scriptHome = "/home/${scriptUser}";
-  gitRepoPath = "${scriptHome}/Desktop/serveo";
+  gitRepoPath = "${scriptHome}/.local/share/serveo";
 
   reverseSshScript = ../.local/bin/create_reverse_ssh;
   warpConnectScript = ../.local/bin/connect_warp;

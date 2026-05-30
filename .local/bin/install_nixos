@@ -11,7 +11,7 @@ cleanup() {
 trap cleanup EXIT
 
 decrypt_git_crypt_key() {
-  local encrypted_key="$HOME/Desktop/dotfiles/secrets/git-crypt-key"
+  local encrypted_key="$HOME/Desktop/infra/dotfiles/secrets/git-crypt-key"
 
   if ! head -c8 "$encrypted_key" | grep -q '^Salted__'; then
     echo "File does not appear encrypted." >&2
@@ -34,8 +34,8 @@ decrypt_git_crypt_key() {
 
 decrypt_secrets() {
   git-crypt unlock "$KEY_FILE"
-  ln -sf "$HOME/Desktop/dotfiles/secrets/git_tokens" "$HOME/.config/git/git_tokens"
-  ln -sf "$HOME/Desktop/dotfiles/secrets/git_users" "$HOME/.config/git/git_users"
+  ln -sf "$HOME/Desktop/infra/dotfiles/secrets/git_tokens" "$HOME/.config/git/git_tokens"
+  ln -sf "$HOME/Desktop/infra/dotfiles/secrets/git_users" "$HOME/.config/git/git_users"
 }
 
 disko_format() {

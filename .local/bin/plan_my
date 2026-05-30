@@ -9,5 +9,5 @@ if [ -n "$is_running" ]; then
   hyprctl dispatch 'hl.dsp.workspace.toggle_special("plan")'
 else
   echo "just plan"
-  cd "${HOME}/Desktop/state/" && kitty --title "my_plan" txh &
+  cd "${HOME}/Desktop/infra/state/" && kitty --title "my_plan" txh &
 fi
