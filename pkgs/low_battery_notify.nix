@@ -54,7 +54,6 @@ in
       Unit = "low_battery_notify.service";
       OnCalendar = "*:0/2";
       Persistent = true;
-      AccuracySec = "1s";
     };
     Install = {
       WantedBy = [ "timers.target" ];

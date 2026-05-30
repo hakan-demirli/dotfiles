@@ -24,6 +24,8 @@
       '';
       Restart = "always";
       RestartSec = "10";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300";
     };
   };
 }
