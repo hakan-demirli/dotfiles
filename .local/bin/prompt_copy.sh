@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-PROMPTS_PATH="${PROMPTS_PATH:-$HOME/Desktop/notes/notes/work/topics/ai/prompts/}"
+PROMPTS_PATH="${PROMPTS_PATH:-$HOME/Desktop/infra/notes/notes/work/topics/ai/prompts/}"
 
 if [[ ! -d $PROMPTS_PATH ]]; then
   echo "Error: Prompts directory not found at '$PROMPTS_PATH'" >&2

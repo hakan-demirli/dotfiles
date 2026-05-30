@@ -12,7 +12,7 @@ else
     TODO_PANE=$(tmux list-panes -F "#{pane_id} #{pane_title}" | grep "todo-sidebar$" | cut -d' ' -f1)
     tmux break-pane -d -s "${TODO_PANE}" -n "todo-hidden"
   else
-    tmux split-window -h -l 30% -c "#{pane_current_path}" "hx ~/Desktop/state/scratchpads/todo.md"
+    tmux split-window -h -l 30% -c "#{pane_current_path}" "hx ~/Desktop/infra/state/scratchpads/todo.md"
     tmux select-pane -T "todo-sidebar"
   fi
 fi

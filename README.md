@@ -31,7 +31,7 @@
 *  ```sudo nixos-rebuild switch --flake ./.#l01```
 
 ### Build without switch
-* ```sudo nixos-rebuild build --flake ~/Desktop/dotfiles/#l01```
+* ```sudo nixos-rebuild build --flake ~/Desktop/infra/dotfiles/#l01```
 
 ### Build an iso or qcow2
 * ```nix run github:nix-community/nixos-generators -- --flake .#vm_oracle_aarch64 --format iso```
@@ -83,7 +83,7 @@
     * Copy the system and disko to VPS:
         * ```nix copy --to ssh://root@140.238.223.249?ssh-key=/home/emre/.ssh/id_ed25519_proton $DISKO_LOCAL_STORE_PATH```
         * ```nix copy --to ssh://root@VPS_IP?ssh-key=/home/YOUR_USER/.ssh/id_ed25519_proton $SYSTEM_LOCAL_STORE_PATH```
-        * ```scp -i ~/.ssh/id_ed25519_proton /home/emre/Desktop/dotfiles/hosts/vm_oracle/hardware/disko.nix root@140.238.223.249:/tmp/disko.nix```
+        * ```scp -i ~/.ssh/id_ed25519_proton /home/emre/Desktop/infra/dotfiles/hosts/vm_oracle/hardware/disko.nix root@140.238.223.249:/tmp/disko.nix```
     * Format the disk using disko:
         * ```REMOTE_DISKO_BIN_PATH=$(echo $DISKO_LOCAL_STORE_PATH | sed 's|^/nix/store/||') # Get the hash-name part```
         * ```REMOTE_DISKO_BIN_PATH="/nix/store/$REMOTE_DISKO_BIN_PATH/bin/disko"```

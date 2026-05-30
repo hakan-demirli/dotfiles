@@ -23,7 +23,7 @@ let
         (inputs.self + /pkgs/low_battery_notify.nix)
         (inputs.self.factory.xdg {
           inherit pkgs inputs config;
-          desktopDir = "${homeDirectory}/Desktop/";
+          desktopDir = "${homeDirectory}/Desktop";
         })
         (inputs.self.factory.bash {
           bashConfigDir = inputs.self + /.config/bash;

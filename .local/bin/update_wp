@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mapfile -d '' files < <(find "$HOME/Desktop/images/art/pc_wp" -maxdepth 1 -type f -print0 | sort -z)
+mapfile -d '' files < <(find "$HOME/Desktop/infra/images/art/pc_wp" -maxdepth 1 -type f -print0 | sort -z)
 
 if [ ${#files[@]} -eq 0 ]; then
-  echo "No images found in $HOME/Desktop/images/art/pc_wp"
+  echo "No images found in $HOME/Desktop/infra/images/art/pc_wp"
   exit 1
 fi
 

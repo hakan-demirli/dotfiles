@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-notesPath="${CHEATSHEETNOTESPATH:-$HOME/Desktop/notes/notes/work/coding/cheatsheet/}"
-linuxNotesPath="${CHEATSHEETLINUXNOTESPATH:-$HOME/Desktop/dotfiles/doc/notes/}"
+notesPath="${CHEATSHEETNOTESPATH:-$HOME/Desktop/infra/notes/notes/work/coding/cheatsheet/}"
+linuxNotesPath="${CHEATSHEETLINUXNOTESPATH:-$HOME/Desktop/infra/dotfiles/doc/notes/}"
 linuxNoteExtension=".md"
 EDITOR="${EDITOR:-vim}"
 
