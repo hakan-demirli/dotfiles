@@ -10,7 +10,7 @@ MMIO=/sys/class/powercap/intel-rapl-mmio:0
 PLATFORM_PROFILE=/sys/firmware/acpi/platform_profile
 EC_IO=/sys/kernel/debug/ec/ec0/io
 EC_AFAN_OFFSET=45 # 0x2D
-EC_AFAN_VALID="00 11 22 33 44 55 66 77 88"
+EC_AFAN_VALID="11 22 33 44 55 66 77 88"
 MSR_HWP_REQUEST=0x774
 MSR_HWP_CAPS=0x771
 HWP_MAX_VALID="01 13 1a 26 30 37"
@@ -251,7 +251,7 @@ cmd_balanced() {
 }
 cmd_silent() {
   need_root
-  apply silent 15 25 powersave power cool 00 13
+  apply silent 15 25 powersave power cool 11 13
 }
 
 parse_hex2() {
@@ -308,8 +308,8 @@ Manual override. No daemons, no auto. What you set stays set until next call or 
   status                  current state
   turbo      [sudo]       PL=37/95W perf perf perf  AFAN=0x77 HWP=0x37 (~5.5GHz)
   balanced   [sudo]       PL=28/55W perf perf bal   AFAN=0x44 HWP=0x1a (~2.6GHz)
-  silent     [sudo]       PL=15/25W save power cool AFAN=0x00 HWP=0x13 (~1.9GHz)
-  afan [hex] [sudo]       read or write EC byte 0x2D. valid: 00 11 22 33 44 55 66 77 88
+  silent     [sudo]       PL=15/25W save power cool AFAN=0x11 HWP=0x13 (~1.9GHz)
+  afan [hex] [sudo]       read or write EC byte 0x2D. valid: 11 22 33 44 55 66 77 88
   hwp  [hex] [sudo]       read or write MSR 0x774 max_perf. valid: 01 13 1a 26 30 37
   help                    this
 
