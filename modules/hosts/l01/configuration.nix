@@ -43,6 +43,7 @@ in
   flake.modules.nixos.l01 =
     {
       pkgs,
+      lib,
       ...
     }:
     {
@@ -83,6 +84,7 @@ in
             ".local/state/pipewire"
             ".local/state/wireplumber"
             ".config/mozilla"
+            ".config/sunshine"
           ];
         };
         user = {
@@ -92,25 +94,7 @@ in
           authorizedKeys = [ publicData.ssh.id_ed25519_proton_pub ];
           useHomeManager = true;
           extraGroups = [ "kvm" ];
-          homeManagerImports = [
-            inputs.self.modules.homeManager.desktop
-            (_: {
-              xdg.configFile."sunshine/sunshine.conf".text = ''
-                adapter_name = /dev/dri/renderD129
-                audio_sink = sink-sunshine-stereo.monitor
-              '';
-
-              xdg.configFile."systemd/user/sunshine.service.d/override.conf".text = ''
-                [Service]
-                Environment=LIBVA_DRIVER_NAME=radeonsi
-                Environment=XDG_RUNTIME_DIR=/run/user/1000
-                Environment=PULSE_SERVER=unix:/run/user/1000/pulse/native
-                Environment=PULSE_COOKIE=%h/.config/pulse/cookie
-                Environment=WAYLAND_DISPLAY=wayland-1
-                Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
-              '';
-            })
-          ];
+          homeManagerImports = [ inputs.self.modules.homeManager.desktop ];
         };
       };
 
@@ -123,8 +107,6 @@ in
       };
 
       services = {
-        remotedesktop.enable = true;
-
         ssh.rootSshKeys = [ publicData.ssh.id_ed25519_proton_pub ];
 
         tailscale.loginServerHost = "sshr.polarbearvuzi.com";
@@ -138,6 +120,23 @@ in
           HandleLidSwitch = "ignore";
           HandleLidSwitchExternalPower = "ignore";
           HandleLidSwitchDocked = "ignore";
+        };
+      };
+
+      specialisation.sunshine.configuration = {
+        environment.etc."specialization".text = "sunshine";
+
+        services.displayManager.sddm.enable = lib.mkForce false;
+        services.xserver.enable = lib.mkForce false;
+
+        services.remotedesktop = {
+          enable = true;
+          headless = true;
+          connector = "HDMI-A-1";
+          resolution = "2880x1800@60";
+          drmDevice = "/dev/dri/card1";
+          # l02 eDP-1 panel (Samsung Display 0x41AA, 16:10 2880x1800).
+          edidBase64 = "AP///////wBMg6pBAAAAAAAgAQS1HhN4A8/RrlE+tiMLUFQAAAABAQEBAQEBAQEBAQEBAQEBy/5AZLAIGHAgCIgALr0QAAAby/5AZLAIyHogCIgALr0QAAAbAAAA/QAweNraQgEAAAAAAAAAAAAAAgABAAAZlsg6FUbIAAAAAT1wIHkCACAADLpBWapBAAAAAAAWACEAHbgLbAdACwgHAO7qUOzTtj1CCwFFVEBe0GAYECN4JgAJBwYDAAAAUAAAIgAU5/MJhT8LYwAfAAcABwcXAAcABwCBAB9zGgAAAwMweACgdAJgAngAAAAAjeMFgADmBgUBdGACAAAAAAAJkA==";
         };
       };
 
