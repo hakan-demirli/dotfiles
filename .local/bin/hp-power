@@ -1,7 +1,22 @@
 #!/usr/bin/env bash
 # Manual power control for HP OmniBook Ultra Flip 14 (board 8CDE, Core Ultra 7 258V).
 # Writes RAPL PL1/PL2, governor, EPP, platform_profile, EC AFAN (0x2D), HWP_REQUEST (MSR 0x774).
-# AFAN values from DSDT \_SB.PC00.UFID. HWP allowlist from HWP_CAPABILITIES (MSR 0x771).
+#
+# AFAN (EC offset 0x2D) selects the EC's autonomous fan profile. Values from
+# DSDT \_SB.PC00.UFID, verified by brute-force probing (see hp-afan-probe).
+#   - EC only accepts low nibble 0-9; values with low nibble A-F are rejected
+#     (rounded up to next x0).
+#   - 0x00 = max cooling (~3400/4000 RPM steady).  Not "passive".
+#   - 0x88 = most passive DSDT value.  Both fans reach 964 RPM (tach 0xFF,
+#     effectively off) when CPU ≤35C.  CPU fan stays ~2961 RPM above ~37C.
+#   - Values above 0x88 (0x90, 0x99, ...) wrap/alias to aggressive modes;
+#     they do NOT become more passive.
+#   - 0x08, 0x18, 0x28 also reach both-fans-off but are non-DSDT values.
+#   - 0x33 briefly shows both-min then GPU fan spins back up (transient only).
+#   - The EC continuously overwrites FTGC/FT2C (fan target registers); writing
+#     them from userspace has no lasting effect.
+#
+# HWP allowlist from HWP_CAPABILITIES (MSR 0x771).
 set -u
 set -o pipefail
 
@@ -10,7 +25,9 @@ MMIO=/sys/class/powercap/intel-rapl-mmio:0
 PLATFORM_PROFILE=/sys/firmware/acpi/platform_profile
 EC_IO=/sys/kernel/debug/ec/ec0/io
 EC_AFAN_OFFSET=45 # 0x2D
-EC_AFAN_VALID="11 22 33 44 55 66 77 88"
+# DSDT-approved values (UFID method) plus 08/18/28 which also achieve both-fans-off.
+# EC rejects low nibble >= 0xA.  See header comment for full probing results.
+EC_AFAN_VALID="00 08 11 18 22 28 33 44 55 66 77 88"
 MSR_HWP_REQUEST=0x774
 MSR_HWP_CAPS=0x771
 HWP_MAX_VALID="01 13 1a 26 30 37"
@@ -243,7 +260,8 @@ apply() {
 
 cmd_turbo() {
   need_root
-  apply turbo 37 95 performance performance performance 77 37
+  # AFAN=0x00: max cooling, both fans ~3400/4000 RPM steady-state.
+  apply turbo 37 95 performance performance performance 00 37
 }
 cmd_balanced() {
   need_root
@@ -251,7 +269,10 @@ cmd_balanced() {
 }
 cmd_silent() {
   need_root
-  apply silent 15 25 powersave power cool 11 13
+  # AFAN=0x88: most passive DSDT profile.  At PL1=15W the CPU stays ≤35C and
+  # both fans reach tach 0xFF (~964 RPM, effectively off).  If CPU exceeds ~37C
+  # the EC spins the CPU fan back to ~2961 RPM.
+  apply silent 15 25 powersave power cool 88 13
 }
 
 parse_hex2() {
@@ -270,7 +291,7 @@ cmd_afan() {
   need_root
   if [ -z "${1:-}" ]; then
     echo "EC AFAN (0x2D) = 0x$(read_afan)"
-    echo "valid: $EC_AFAN_VALID  (0x00=passive, higher nibble=more aggressive)"
+    echo "valid: $EC_AFAN_VALID  (0x00=max fans, 0x88=most passive, see hp-power help)"
     return 0
   fi
   local hex
@@ -299,19 +320,151 @@ cmd_hwp() {
   set_hwp "$hex"
 }
 
+# --- Fan probing helpers ---------------------------------------------------
+
+EC_FRDC_OFF=46  # 0x2E  CPU fan tach
+EC_FTGC_OFF=47  # 0x2F  CPU fan target (EC-set)
+EC_FR2C_OFF=53  # 0x35  GPU fan tach
+EC_FT2C_OFF=54  # 0x36  GPU fan target (EC-set)
+EC_CRZN_OFF=34  # 0x22  cooling zone selector
+EC_TEMP_OFF=38  # 0x26  temp for selected zone
+
+read_ec_byte() {
+  dd if="$EC_IO" bs=1 count=1 skip="$1" 2> /dev/null | od -An -tx1 | tr -d ' \n'
+}
+
+read_ec_byte_dec() {
+  dd if="$EC_IO" bs=1 count=1 skip="$1" 2> /dev/null | od -An -tu1 | tr -d ' \n'
+}
+
+write_ec_byte() {
+  printf '%b' "\\x$2" \
+    | dd of="$EC_IO" bs=1 count=1 seek="$1" conv=notrunc status=none 2> /dev/null
+}
+
+tach_to_rpm() {
+  local t=$((16#$1))
+  [ "$t" -eq 0 ] && echo "0" || echo $(( (0x3C000 + t / 2) / t ))
+}
+
+read_cpu_temp() {
+  write_ec_byte $EC_CRZN_OFF "01"
+  sleep 0.05
+  read_ec_byte_dec $EC_TEMP_OFF
+}
+
+probe_header() {
+  printf "%-8s  %-5s  %-7s  %-6s  %-7s  %-6s\n" \
+    "AFAN" "TempC" "CPU RPM" "FTGC" "GPU RPM" "FT2C"
+  printf "%-8s  %-5s  %-7s  %-6s  %-7s  %-6s\n" \
+    "------" "-----" "-------" "------" "-------" "------"
+}
+
+probe_row() {
+  local afan=$1 temp frdc fr2c ftgc ft2c rpm1 rpm2
+  temp=$(read_cpu_temp)
+  frdc=$(read_ec_byte $EC_FRDC_OFF)
+  fr2c=$(read_ec_byte $EC_FR2C_OFF)
+  ftgc=$(read_ec_byte $EC_FTGC_OFF)
+  ft2c=$(read_ec_byte $EC_FT2C_OFF)
+  rpm1=$(tach_to_rpm "$frdc")
+  rpm2=$(tach_to_rpm "$fr2c")
+  printf "0x%-6s  %-5s  %-7s  0x%-4s  %-7s  0x%-4s" \
+    "$afan" "$temp" "$rpm1" "$ftgc" "$rpm2" "$ft2c"
+  if [ "$rpm1" -le 964 ] && [ "$rpm2" -le 964 ]; then
+    printf "  ** BOTH MIN **"
+  elif [ "$rpm1" -le 964 ] || [ "$rpm2" -le 964 ]; then
+    printf "  * one min *"
+  fi
+  printf "\n"
+}
+
+# Sweep AFAN values high→low (passive first so system stays cool).
+# Usage: cmd_probe [--all | LO HI]
+cmd_probe() {
+  need_root
+  ensure_ec_sys || return 1
+
+  local lo=0 hi=0x88 settle=4
+  if [[ "${1:-}" == "--all" ]]; then
+    hi=0xff
+  elif [ -n "${1:-}" ] && [ -n "${2:-}" ]; then
+    lo=$((16#$1))
+    hi=$((16#$2))
+    [ "$lo" -le "$hi" ] || { echo "LO must be <= HI" >&2; return 2; }
+  fi
+
+  local orig=$(read_afan)
+  echo "Original AFAN=0x$orig  CPU temp=$(read_cpu_temp)C"
+  echo "Sweeping 0x$(printf '%02x' "$hi") -> 0x$(printf '%02x' "$lo") (passive first, ${settle}s settle)"
+  echo ""
+  probe_header
+
+  local cleanup_afan=$orig
+  trap 'echo ""; echo "Restoring AFAN=0x$cleanup_afan ..."; write_ec_byte $EC_AFAN_OFFSET "$cleanup_afan"; echo "Done."; trap - EXIT' EXIT
+
+  local i v rb
+  for (( i=hi; i>=lo; i-- )); do
+    v=$(printf '%02x' "$i")
+    write_ec_byte $EC_AFAN_OFFSET "$v"
+    rb=$(read_ec_byte $EC_AFAN_OFFSET)
+    if [ "$rb" != "$v" ]; then
+      printf "0x%-6s  *** EC rejected (reads 0x%s) ***\n" "$v" "$rb"
+      continue
+    fi
+    sleep "$settle"
+    probe_row "$v"
+  done
+}
+
+# Live-monitor fans at a given AFAN value. Ctrl-C to stop.
+# Usage: cmd_monitor [hex]
+cmd_monitor() {
+  need_root
+  ensure_ec_sys || return 1
+
+  local hex
+  hex=$(parse_hex2 "${1:-88}") || return $?
+
+  local orig=$(read_afan)
+  trap 'echo ""; echo "Restoring AFAN=0x$orig ..."; write_ec_byte $EC_AFAN_OFFSET "$orig"; echo "Done."; trap - EXIT' EXIT
+
+  write_ec_byte $EC_AFAN_OFFSET "$hex"
+  echo "Monitoring AFAN=0x$hex (was 0x$orig).  Ctrl-C to stop."
+  echo ""
+  probe_header
+  while true; do
+    probe_row "$(read_ec_byte $EC_AFAN_OFFSET)"
+    sleep 2
+  done
+}
+
 cmd_help() {
   cat << 'EOF'
-usage: hp-power {status|turbo|balanced|silent|afan|hwp|help}
+usage: hp-power {status|turbo|balanced|silent|afan|hwp|probe|monitor|help}
 
 Manual override. No daemons, no auto. What you set stays set until next call or reboot.
 
   status                  current state
-  turbo      [sudo]       PL=37/95W perf perf perf  AFAN=0x77 HWP=0x37 (~5.5GHz)
+  turbo      [sudo]       PL=37/95W perf perf perf  AFAN=0x00 HWP=0x37 (~5.5GHz)
   balanced   [sudo]       PL=28/55W perf perf bal   AFAN=0x44 HWP=0x1a (~2.6GHz)
-  silent     [sudo]       PL=15/25W save power cool AFAN=0x11 HWP=0x13 (~1.9GHz)
-  afan [hex] [sudo]       read or write EC byte 0x2D. valid: 11 22 33 44 55 66 77 88
+  silent     [sudo]       PL=15/25W save power cool AFAN=0x88 HWP=0x13 (~1.9GHz)
+  afan [hex] [sudo]       read or write EC byte 0x2D
   hwp  [hex] [sudo]       read or write MSR 0x774 max_perf. valid: 01 13 1a 26 30 37
+  probe      [sudo]       sweep AFAN 0x88->0x00 showing fan RPM + temps
+  probe --all             sweep full range 0xff->0x00
+  probe LO HI             sweep hex range (e.g. probe 70 90)
+  monitor [hex] [sudo]    live-watch fans at AFAN=hex (default 0x88). Ctrl-C to stop
   help                    this
+
+AFAN values (EC offset 0x2D, from DSDT + probing):
+  0x00       max cooling, both fans ~3400/4000 RPM
+  0x08/18/28 both fans off at ≤37C (non-DSDT but stable)
+  0x33       both fans briefly off then GPU returns (unstable)
+  0x44       moderate, both fans ~3200 RPM
+  0x77       CPU ~2961, GPU off
+  0x88       most passive; both fans off at ≤35C (CPU fan returns above ~37C)
+  0x90+      wraps to aggressive modes (louder, not quieter)
 
 Persistence:
   AFAN  survives reboot, dies on EC reset (battery disconnect / deep S5).
@@ -334,6 +487,14 @@ case "${1:-status}" in
   hwp)
     shift
     cmd_hwp "$@"
+    ;;
+  probe | p)
+    shift
+    cmd_probe "$@"
+    ;;
+  monitor | m)
+    shift
+    cmd_monitor "$@"
     ;;
   help | -h | --help) cmd_help ;;
   *)
