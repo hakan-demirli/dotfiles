@@ -67,9 +67,8 @@ mkFleet {
 
   s01 = mkPersonalServer {
     cpu = "amd";
-    disk = "/dev/nvme0n1";
+    disk = "/dev/disk/by-id/nvme-Lexar_SSD_NM790_4TB_QKP899R000033P2202";
     serverId = 1;
-    additionalDisks = [ "/dev/nvme1n1" ];
     extraConfig =
       { ... }:
       {
