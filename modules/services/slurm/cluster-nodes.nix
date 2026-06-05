@@ -11,7 +11,7 @@ _: {
         {
           hostName = "s01";
           cores = 16;
-          ramMb = 62000;
+          ramMb = 58000;
         }
         {
           hostName = "s02";
