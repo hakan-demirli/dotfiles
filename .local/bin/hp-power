@@ -322,12 +322,12 @@ cmd_hwp() {
 
 # --- Fan probing helpers ---------------------------------------------------
 
-EC_FRDC_OFF=46  # 0x2E  CPU fan tach
-EC_FTGC_OFF=47  # 0x2F  CPU fan target (EC-set)
-EC_FR2C_OFF=53  # 0x35  GPU fan tach
-EC_FT2C_OFF=54  # 0x36  GPU fan target (EC-set)
-EC_CRZN_OFF=34  # 0x22  cooling zone selector
-EC_TEMP_OFF=38  # 0x26  temp for selected zone
+EC_FRDC_OFF=46 # 0x2E  CPU fan tach
+EC_FTGC_OFF=47 # 0x2F  CPU fan target (EC-set)
+EC_FR2C_OFF=53 # 0x35  GPU fan tach
+EC_FT2C_OFF=54 # 0x36  GPU fan target (EC-set)
+EC_CRZN_OFF=34 # 0x22  cooling zone selector
+EC_TEMP_OFF=38 # 0x26  temp for selected zone
 
 read_ec_byte() {
   dd if="$EC_IO" bs=1 count=1 skip="$1" 2> /dev/null | od -An -tx1 | tr -d ' \n'
@@ -344,7 +344,7 @@ write_ec_byte() {
 
 tach_to_rpm() {
   local t=$((16#$1))
-  [ "$t" -eq 0 ] && echo "0" || echo $(( (0x3C000 + t / 2) / t ))
+  [ "$t" -eq 0 ] && echo "0" || echo $(((0x3C000 + t / 2) / t))
 }
 
 read_cpu_temp() {
@@ -386,12 +386,15 @@ cmd_probe() {
   ensure_ec_sys || return 1
 
   local lo=0 hi=0x88 settle=4
-  if [[ "${1:-}" == "--all" ]]; then
+  if [[ ${1:-} == "--all" ]]; then
     hi=0xff
   elif [ -n "${1:-}" ] && [ -n "${2:-}" ]; then
     lo=$((16#$1))
     hi=$((16#$2))
-    [ "$lo" -le "$hi" ] || { echo "LO must be <= HI" >&2; return 2; }
+    [ "$lo" -le "$hi" ] || {
+      echo "LO must be <= HI" >&2
+      return 2
+    }
   fi
 
   local orig=$(read_afan)
@@ -404,7 +407,7 @@ cmd_probe() {
   trap 'echo ""; echo "Restoring AFAN=0x$cleanup_afan ..."; write_ec_byte $EC_AFAN_OFFSET "$cleanup_afan"; echo "Done."; trap - EXIT' EXIT
 
   local i v rb
-  for (( i=hi; i>=lo; i-- )); do
+  for ((i = hi; i >= lo; i--)); do
     v=$(printf '%02x' "$i")
     write_ec_byte $EC_AFAN_OFFSET "$v"
     rb=$(read_ec_byte $EC_AFAN_OFFSET)
