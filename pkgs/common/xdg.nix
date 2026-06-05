@@ -47,7 +47,6 @@ in
         "npm"
         "nwg"
         "claude"
-        "opencode-plugins"
         "parallel"
         # "piper" # not working, workaround below
         "qalculate"

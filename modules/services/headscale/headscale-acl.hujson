@@ -10,7 +10,8 @@
     "tag:phone":    ["group:emre"],
     "tag:exitnode": ["group:emre"],
     "tag:shared-server": ["group:emre", "group:um"],
-    "tag:sshable":  ["group:emre"]
+    "tag:sshable":  ["group:emre"],
+    "tag:external": ["group:emre"]
   },
 
   "autoApprovers": {
@@ -35,6 +36,11 @@
       "action": "accept",
       "src": ["um@"],
       "dst": ["um@:*", "tag:shared-server:*"]
+    },
+    {
+      "action": "accept",
+      "src": ["tag:external"],
+      "dst": ["tag:shared-server:*"]
     }
   ],
 
