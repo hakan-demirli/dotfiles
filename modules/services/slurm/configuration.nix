@@ -78,6 +78,9 @@ _: {
             extraConfig = ''
               AuthType=auth/none
               CryptoType=crypto/none
+              SelectType=select/cons_tres
+              SelectTypeParameters=CR_CPU_Memory
+              DefMemPerCPU=512
             '';
           };
         };
