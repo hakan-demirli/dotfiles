@@ -14,7 +14,6 @@
       cfg = config.services.opencode;
       nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { };
       opencodePlugins = nurPkgs.opencode-plugins;
-      goalBin = "${opencodePlugins.opencode-goal}/bin/opencode-goal";
 
       serviceEnvFile = "${config.home.homeDirectory}/.config/secrets/environment";
       commonServiceEnv = [
@@ -39,7 +38,7 @@
     in
     {
       options.services.opencode = {
-        enable = lib.mkEnableOption "OpenCode shared HTTP serve and global goal daemon" // {
+        enable = lib.mkEnableOption "OpenCode shared HTTP serve" // {
           default = true;
         };
 
@@ -56,12 +55,6 @@
           type = lib.types.port;
           default = 4096;
           description = "Port the shared ``opencode serve`` binds to.";
-        };
-
-        goal = {
-          enable = lib.mkEnableOption "global goal daemon (judge supervisor)" // {
-            default = true;
-          };
         };
       };
 
@@ -89,25 +82,6 @@
             EnvironmentFile = serviceEnvFile;
             Environment = commonServiceEnv;
             ExecStart = "${pkgs.opencode}/bin/opencode serve --hostname ${cfg.hostname} --port ${toString cfg.port}";
-            Restart = "on-failure";
-            RestartSec = 2;
-          };
-          Install.WantedBy = [ "default.target" ];
-        };
-
-        systemd.user.services.opencode-goal-daemon = lib.mkIf cfg.goal.enable {
-          Unit = {
-            Description = "OpenCode goal daemon (judge supervisor)";
-            After = [ "opencode-serve.service" ];
-            Requires = [ "opencode-serve.service" ];
-          };
-          Service = {
-            Type = "simple";
-            EnvironmentFile = serviceEnvFile;
-            Environment = commonServiceEnv ++ [
-              "OPENCODE_URL=http://${cfg.hostname}:${toString cfg.port}"
-            ];
-            ExecStart = "${goalBin} daemon-run";
             Restart = "on-failure";
             RestartSec = 2;
           };
