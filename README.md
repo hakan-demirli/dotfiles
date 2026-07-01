@@ -1,163 +1,150 @@
 <img width="1921" height="1081" alt="Image" src="https://github.com/user-attachments/assets/3922fbba-ec02-4a65-9da7-54690810e899" />
 
-|   |   |
-|---|---|
-| **Distro**      | NixOS        |
-| **WM**          | Hyprland     |
-| **Bar**         | Waybar       |
-| **Editor**      | Helix + Tmux |
-| **FileManager** | yazi         |
-| **WP-Manager**  | swww         |
-| **Keyboard**    | [tbk_mini](https://github.com/Bastardkb/TBK-Mini)-[QMK](https://github.com/hakan-demirli/dotfiles/tree/main/.local/share/qmk) |
+|          |                                                         |
+| -------- | ------------------------------------------------------- |
+| Distro   | NixOS                                                   |
+| Desktop  | Hyprland + Waybar                                       |
+| Editor   | Helix + Tmux                                            |
+| Files    | Yazi                                                    |
+| Keyboard | [TBK Mini](https://github.com/Bastardkb/TBK-Mini) + QMK |
 
-<!--toc:start-->
-- [Installation and Deployment](#installation-and-deployment)
-  - [Generic](#generic)
-    - [Switch to a new config](#switch-to-a-new-config)
-    - [Build without switch](#build-without-switch)
-    - [Build an iso or qcow2](#build-an-iso-or-qcow2)
-  - [Pick your poison](#pick-your-poison)
-    - [Using minimal ISO](#using-minimal-iso)
-    - [Oracle VPS ARM](#oracle-vps-arm)
-    - [Oracle VPS x86 (1GB RAM)](#oracle-vps-x86-1gb-ram)
-    - [ARM QEMU VM using nixos-anywhere](#arm-qemu-vm-using-nixos-anywhere)
-- [Tailscale/Headscale](#tailscaleheadscale)
-- [Deploy Secrets](#deploy-secrets)
-<!--toc:end-->
+## Layout
 
-# Installation and Deployment
-## Generic
-### Switch to a new config
-*  ```sudo nixos-rebuild switch --flake ./.#l01```
+| Path                               | Purpose                                                      |
+| ---------------------------------- | ------------------------------------------------------------ |
+| `inventory/`                       | Users, access tiers, roles, hosts, clusters, and alert facts |
+| `modules/hosts/`                   | Host-specific NixOS modules                                  |
+| `modules/{roles,services,system}/` | Reusable NixOS behavior                                      |
+| `modules/home/`                    | Rootless, standalone Home Manager tree                       |
+| `modules/devices/`                 | Self-contained non-NixOS device builds                       |
+| `modules/nix/`                     | Flake outputs, checks, installers, and codegen               |
+| `secrets/`                         | SOPS-encrypted data and age identity envelopes               |
 
-### Build without switch
-* ```sudo nixos-rebuild build --flake ~/Desktop/infra/dotfiles/#l01```
+Inventory entries are Nix modules. `_defaults.nix` is merged into every entity
+in its directory. To add an entity, copy the closest entry, change its `id` and
+facts, reference it from the relevant cluster/host, then run `nix flake check`.
+Role module references resolve through this repo first and then `infra-lib`.
+missing references fail evaluation.
 
-### Build an iso or qcow2
-* ```nix run github:nix-community/nixos-generators -- --flake .#vm_oracle_aarch64 --format iso```
+## Develop And Inspect
 
-## Pick your poison
+```bash
+nix develop
+nix flake check
+nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
+nix run .#inventory-dump
+nix build .#intent-report
+nix build .#diagrams
+```
 
-### Using minimal ISO
-  * Boot a nixos ISO.
-    * ```sudo cp ./nixos-minimal-24.11.714287.a45fa362d887-x86_64-linux.iso /dev/sdb```
-  * Become a root user:
-    * ```sudo su```
-  * Go to home:
-    * ```cd```
-  * Get this repo.
-      * ```git clone https://github.com/hakan-demirli/dotfiles```
-  * Ensure the disk label is correct and matches with the disko config
-    * ```lsblk```
-  * Format the disk using disko:
-    * ```sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko --flake ./dotfiles/#vm```
-  * Obtain a new hardware-configuration.nix for your device
-    * Generate nixos config:
-      * ```sudo nixos-generate-config --no-filesystems --root .```
-  * Transfer the changes to an existing host or create a new host.
-  * Install nixos:
-    * ```nixos-install --root /mnt --flake ./dotfiles/.#vm```
-  * Reboot
-    * ```reboot```
+Generated outputs include `sops-yaml`, `headscale-acl`, `matchbox`, `kea`, and
+`kexec`. Build one with `nix build .#<name>`. Generated SOPS policy is applied
+with `cp -f result secrets/.sops.yaml`, followed by `sops updatekeys` for each
+affected encrypted file.
 
-### Oracle VPS ARM
-* Set authorizedKeys in ./kexec.nix
-* ```nix build .#kexec --system aarch64-linux```
-* ```scp -i ~/.ssh/id_ed25519_proton ./result ubuntu@140.238.223.249:/tmp/kexec```
-* ```ssh ubuntu@140.238.223.249 -i ~/.ssh/id_ed25519_proton -t sudo /tmp/kexec```
-* Wait for it to load kexec.
-* ```ssh root@140.238.223.249 -i ~/.ssh/id_ed25519_proton```
-* Continue as if you have booted the minimal iso
+## NixOS
 
-### Oracle VPS x86 (1GB RAM)
-* Follow `Oracle VPS ARM` installation guide (remove `--system aarch64-linux` from nix-build) and boot the kexec image.
-* Compile everything local and send it to vm:
-    * Prepare disko:
-        * ```nix build --extra-experimental-features "nix-command flakes" github:nix-community/disko#disko --print-out-paths > /tmp/disko-path.txt```
-        * ```DISKO_LOCAL_STORE_PATH=$(cat /tmp/disko-path.txt)```
-        * ```echo "Disko built locally at: $DISKO_LOCAL_STORE_PATH"```
-    * Prepare the system:
-        * ```nix build .#nixosConfigurations.vm_oracle_x86.config.system.build.toplevel --extra-experimental-features "nix-command flakes"  --print-out-paths > /tmp/system-path.txt```
-        * ```SYSTEM_LOCAL_STORE_PATH=$(cat /tmp/system-path.txt)```
-        * ```echo "System built locally at: $SYSTEM_LOCAL_STORE_PATH"```
-    * Copy the system and disko to VPS:
-        * ```nix copy --to ssh://root@140.238.223.249?ssh-key=/home/emre/.ssh/id_ed25519_proton $DISKO_LOCAL_STORE_PATH```
-        * ```nix copy --to ssh://root@VPS_IP?ssh-key=/home/YOUR_USER/.ssh/id_ed25519_proton $SYSTEM_LOCAL_STORE_PATH```
-        * ```scp -i ~/.ssh/id_ed25519_proton /home/emre/Desktop/infra/dotfiles/hosts/vm_oracle/hardware/disko.nix root@140.238.223.249:/tmp/disko.nix```
-    * Format the disk using disko:
-        * ```REMOTE_DISKO_BIN_PATH=$(echo $DISKO_LOCAL_STORE_PATH | sed 's|^/nix/store/||') # Get the hash-name part```
-        * ```REMOTE_DISKO_BIN_PATH="/nix/store/$REMOTE_DISKO_BIN_PATH/bin/disko"```
-        * ```ssh root@140.238.223.249 -i ~/.ssh/id_ed25519_proton "$REMOTE_DISKO_BIN_PATH --mode disko /tmp/disko.nix --arg device '\"/dev/sda\"'"```
-    * Activate the system:
-        * ```REMOTE_SYSTEM_STORE_PATH=$(echo $SYSTEM_LOCAL_STORE_PATH | sed 's|^/nix/store/||') # Get the hash-name part```
-        * ```REMOTE_SYSTEM_STORE_PATH="/nix/store/$REMOTE_SYSTEM_STORE_PATH"```
-        * 
-        ```bash
-        ssh root@VPS_IP -i ~/.ssh/id_ed25519_proton <<EOF
-        mkdir -p /mnt/nix/var/nix/profiles/
+```bash
+sudo nixos-rebuild switch --flake .#laptop-1
+nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
+```
 
-        nix-env --profile /mnt/nix/var/nix/profiles/system --set $REMOTE_SYSTEM_STORE_PATH
-        NIXOS_INSTALL_BOOTLOADER=1 /mnt/nix/var/nix/profiles/system/bin/switch-to-configuration boot
+### Fresh Install
 
-        echo "Activation finished."
-        EOF
-        ```
-        * reboot
+1. Boot a NixOS ISO, clone this repository, and verify the target disk with
+   `lsblk` against `inventory/hosts/<zone>/<host>.nix`.
+2. Partition it: `nix run github:nix-community/disko -- --mode disko --flake .#<host>`.
+3. Install the mandatory password identity, optionally including Tailscale:
+   `nix run .#bootstrap-deploy -- /mnt [--with-tailscale]`.
+4. Install: `nixos-install --root /mnt --flake .#<host> --no-root-passwd`.
+5. Reboot only after bootstrap deployment and installation both succeed.
 
-### ARM QEMU VM using nixos-anywhere
-* Boot minimal iso in qemu and allow ssh access
-* On your pc: ```nix-shell -p nixos-anywhere```
-* ```nixos-anywhere  --flake .#vm_oracle_aarch64 root@192.168.1.128```
+Managed Disko hosts also expose `nix run .#install-<host>`, which validates the
+inventory disk and requires typing `WIPE <host>` before destructive work.
 
-# Tailscale/Headscale
-* On each clean installation of the Headscale server:
-  * Ensure the users specified in the ACL policy exist:
-    * ```sudo headscale users list```
-    * If not create them:
-      * ```sudo headscale users create emre```
-  * Create a new tailscale-key:
-    * ```sudo headscale preauthkeys create --user 1 --reusable --expiration 1752000h --tags tag:bootstrap```
-      * Add it to `./secrets/secrets.yaml`
-  * git pull and switch to the new key on all hosts.
-  * Ensure the node has a correct tag for its purpose, listed here: `/modules/services/headscale/headscale-acl.hujson`
-  * Configure the exit nodes:
-    * Get the ID of the node you want to use as an exit node:
-      * ```sudo headscale nodes routes list```
-    * Allow the routing through that node:
-      * ```sudo headscale nodes approve-routes -i 1 -r "0.0.0.0/0,::/0"```
-      * Check if it is approved:
-        * ```sudo headscale nodes routes list```
-    * Assign exit node tag for the ACL policy:
-      * Find the host you want to use as an exit node:
-        * ```sudo headscale nodes list```
-      * Assign exitnode tag:
-        * ```sudo headscale nodes tag -i 1 -t tag:exitnode```
-* [Optional QOL] 
-  * Remove unused nodes: ```sudo headscale nodes delete --identifier 4```
-  * Rename hostnames: ```sudo headscale nodes rename l01 -i 6```
+For takeover from a foreign ARM Linux host, build
+`nix build .#kexec --system aarch64-linux`, copy `result` to the host, run it as
+root, then follow the fresh install flow.
 
-# Deploy Secrets
+## Home Manager
 
-Personal infra uses `secrets/secrets.yaml` (one age key).
-Fleet machines use per-tenant files under `secrets/tenants/` (separate age keys).
+Profiles are `user-0@desktop`, `user-0@desktop-nvidia`, and `user-0@headless`:
 
-## Setup (One-time per machine)
-1. **Decrypt the age key**:
-   * Personal infra:
-     * ```AGE_KEY="$(age -d secrets/age-personal.key.enc)" || { echo "decrypt failed"; }```
-   * Fleet machines:
-     * ```AGE_KEY="$(age -d secrets/age-fleet.key.enc)" || { echo "decrypt failed"; }```
-2. **Deploy the key**:
-   * ```sudo mkdir -p /var/lib/sops-nix```
-   * ```echo "$AGE_KEY" | sudo tee /var/lib/sops-nix/key.txt > /dev/null```
-   * ```sudo chmod 600 /var/lib/sops-nix/key.txt```
-3. **Install/Switch**:
-   * ```sudo nixos-rebuild switch --flake .#hostname```
+```bash
+home-manager switch --flake '.#user-0@desktop'
+nix run path:.#deploy-home-secrets
+```
 
-## Shared servers (no sops by default)
-   * ```sudo nixos-rebuild switch --flake .#ss0```
-   * Register tailscale manually: ```sudo tailscale up --login-server=https://xxxxxxxx --advertise-tags=tag:shared-server```
+Home Manager is rootless and independent from NixOS. `homeStorage` currently
+uses a temporary home by default while persisting the paths declared in
+`modules/home/users/user-0/default.nix`. On first NixOS enablement, switch NixOS,
+switch Home Manager, verify `~/.storage/control/current`, then reboot.
 
-## Editing Secrets
-* ```export SOPS_AGE_KEY="$(age -d secrets/age-personal.key.enc)" || exit 1```
-* ```sops --config secrets/.sops.yaml secrets/secrets.yaml```
+For a Linux target without Nix:
+
+```bash
+nix build '.#homeConfigurations."user-0@headless".config.home.portablehome'
+./result/deploy.sh --dry-run user@host
+./result/deploy.sh user@host
+```
+
+## Secrets
+
+| Area              | Encrypted data                                   | Identity source                              | Installed key                                              |
+| ----------------- | ------------------------------------------------ | -------------------------------------------- | ---------------------------------------------------------- |
+| Login bootstrap   | `secrets/bootstrap/password.yaml`                | `secrets/bootstrap/password.age.key.enc`     | `/persist/system/var/lib/sops-nix/bootstrap-password.key`  |
+| Tailnet bootstrap | `secrets/bootstrap/tailscale.yaml`               | `secrets/bootstrap/tailscale.age.key.enc`    | `/persist/system/var/lib/sops-nix/bootstrap-tailscale.key` |
+| System services   | `secrets/system.yaml`                            | `secrets/system.age.key.enc`                 | `/persist/system/var/lib/sops-nix/key.txt`                 |
+| Home Manager      | `modules/home/users/user-0/secrets/secrets.yaml` | `secrets/identities/home-user-0.age.key.enc` | `~/.config/sops/age/keys.txt`                              |
+| Laptop Wi-Fi      | `secrets/wifi/credentials.yaml`                  | external backup                              | `~/.config/sops/age/wifi.key`                              |
+
+Deploy Home Manager and NixOS secrets separately, as the target user:
+
+```bash
+nix run path:.#deploy-home-secrets
+nix run path:.#deploy-system-secrets
+```
+
+Edit an envelope-backed file without writing its identity to disk:
+
+```bash
+export SOPS_AGE_KEY="$(age --decrypt secrets/system.age.key.enc)" || exit 1
+sops --config secrets/.sops.yaml secrets/system.yaml
+unset SOPS_AGE_KEY
+```
+
+Use the matching bootstrap envelope/config for bootstrap files. Wi-Fi and Home
+Manager files use `SOPS_AGE_KEY_FILE` with their installed keys and local
+`.sops.yaml`.
+
+## Tailnet
+
+Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`. For a new
+server, create user `user-0`, create a reusable preauth key tagged
+`tag:bootstrap`, store it in `secrets/bootstrap/tailscale.yaml`, and redeploy.
+Promote a verified node with `sudo headscale nodes tag -i <id> -t <tag>`.
+Approve exit routes with `headscale nodes approve-routes` before assigning
+`tag:exitnode`.
+
+`laptop-1` exposes a write-only rsync inbox on `tailscale0` to approved senders:
+
+```bash
+nix profile install path:.#send-to-laptop
+send-to-laptop FILE...
+```
+
+## Non-NixOS Devices
+
+Directories containing `modules/devices/<id>/default.nix` are auto-discovered.
+Their `packages` become `<id>-<name>` flake packages. Deployment overlay APIs
+are exposed under `devices.<id>.lib`. Keep devices self-contained.
+
+| Device                  | Build                                                    | Deployment                                                   |
+| ----------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+| GL.iNet `router-0`      | `nix build --option sandbox relaxed .#router-0-firmware` | Flash the sysupgrade image and push config overlays over SSH |
+| Sipeed `kvm-desk-0`     | `nix build .#kvm-desk-0-config-overlay-empty`            | Flash vendor firmware manually and push overlays over SSH    |
+| Pebble `pebble-round-2` | `nix build .#pebble-round-2-firmware`                    | Sideload `result/firmware.pbz` through the mobile app        |
+
+Router and KVM overlay arguments are defined in each device's
+`nix/config-overlay.nix`. The router's empty overlay enables the public
+`bootstrap`/`bootstrap` AP. Replace it promptly.

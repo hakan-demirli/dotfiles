@@ -1,0 +1,77 @@
+#!/bin/sh
+# shellcheck disable=SC1091
+# r01 fan safety watchdog. Started by /etc/init.d/r01-fan via procd.
+#
+# Polls hwmon temps every <r01.fan.safety_interval> seconds. When fan mode
+# is 'quiet' or 'manual' and any monitored temp reaches >= r01.fan.safety_temp
+# (millicelsius), override pwm1_enable to 2 (kernel auto) and drop a marker
+# file at /var/run/r01-fan.override. The init.d script reads UCI. The
+# watchdog re-reads it each cycle so live mode changes from LuCI take effect
+# without a service restart.
+#
+# Suppressed lints:
+#   SC1091: /lib/r01-fan-modes.sh lives on the router, not in the repo
+
+. /lib/r01-fan-modes.sh
+
+OVERRIDE_FLAG=/var/run/r01-fan.override
+
+TEMP_PATHS="/sys/class/thermal/thermal_zone0/temp \
+/sys/class/hwmon/hwmon1/temp1_input \
+/sys/class/hwmon/hwmon3/temp1_input \
+/sys/class/hwmon/hwmon4/temp1_input \
+/sys/class/hwmon/hwmon5/temp1_input"
+
+max_temp() {
+	max=0
+	for p in $TEMP_PATHS; do
+		[ -r "$p" ] || continue
+		t=$(cat "$p" 2>/dev/null)
+		[ -z "$t" ] && continue
+		[ "$t" -gt "$max" ] 2>/dev/null && max="$t"
+	done
+	echo "$max"
+}
+
+rm -f "$OVERRIDE_FLAG"
+
+while :; do
+	mode=$(uci -q get r01.fan.mode 2>/dev/null)
+	manual_pwm=$(uci -q get r01.fan.manual_pwm 2>/dev/null)
+	safety_temp=$(uci -q get r01.fan.safety_temp 2>/dev/null)
+	interval=$(uci -q get r01.fan.safety_interval 2>/dev/null)
+
+	[ -z "$interval" ] && interval=5
+	[ -z "$mode" ] && mode=auto
+	[ -z "$safety_temp" ] && safety_temp=85000
+
+	sleep "$interval"
+
+	# 0 disables the watchdog entirely.
+	[ "$safety_temp" = "0" ] && continue
+
+	# Safe modes - drop any override and let the user's choice stand.
+	if [ "$mode" = "auto" ] || [ "$mode" = "aggressive" ]; then
+		if [ -e "$OVERRIDE_FLAG" ]; then
+			r01_fan_apply_mode "$mode" "$manual_pwm"
+			rm -f "$OVERRIDE_FLAG"
+			logger -t r01-fan "watchdog: temps OK, restored mode=$mode"
+		fi
+		continue
+	fi
+
+	tmax=$(max_temp)
+	if [ "$tmax" -ge "$safety_temp" ] 2>/dev/null; then
+		if [ ! -e "$OVERRIDE_FLAG" ]; then
+			logger -t r01-fan "watchdog: temp ${tmax}mC >= ${safety_temp}mC. Overriding to auto (user mode=$mode)"
+			echo 2 > "$R01_PWM_DIR/pwm1_enable" 2>/dev/null
+			touch "$OVERRIDE_FLAG"
+		fi
+	else
+		if [ -e "$OVERRIDE_FLAG" ]; then
+			logger -t r01-fan "watchdog: temp ${tmax}mC back below ${safety_temp}mC. Restoring mode=$mode"
+			r01_fan_apply_mode "$mode" "$manual_pwm"
+			rm -f "$OVERRIDE_FLAG"
+		fi
+	fi
+done

@@ -1,0 +1,107 @@
+#tabbrowser-tabs {
+  visibility: collapse !important;
+}
+
+#nav-bar {
+  margin-top: -29px;
+  margin-right: 35vw;
+  margin-bottom: 0px;
+  margin-left: 0px;
+}
+
+@media screen and (max-width: 1700px) {
+  #urlbar-container {
+    min-width: unset !important;
+  }
+  #navigator-toolbox > #nav-bar {
+    margin-right: 30vw !important;
+  }
+}
+
+@media screen and (max-width: 950px) {
+  #urlbar-container {
+    min-width: unset !important;
+  }
+  #navigator-toolbox > #nav-bar {
+    margin-right: 20vw !important;
+  }
+}
+
+#sidebar-box {
+  min-width: 1px !important;
+}
+
+#sidebar-header {
+  display: none;
+}
+
+tooltip {
+  -moz-appearance: none !important;
+  background: #232323 !important;
+  color: #ededed;
+}
+
+#urlbar[usertyping] .urlbarView-row:not([type]):first-child,
+#urlbar[usertyping] .urlbarView-row[type="search"]:first-child,
+.urlbarView-row[type="tabtosearch"] {
+  display: none !important;
+}
+
+#urlbar-container {
+  padding-block: 0px !important;
+}
+.titlebar-buttonbox-container {
+  -moz-box-align: start !important;
+}
+
+#navigator-toolbox {
+  border-bottom: none !important;
+}
+
+#context-navigation,
+#context-sep-navigation {
+  display: none !important;
+}
+
+#navigator-toolbox {
+  --toolbarbutton-inner-padding: 5px;
+}
+#urlbar-container {
+  --urlbar-container-height: 25px !important;
+  padding-block: 1px !important;
+}
+toolbarbutton.bookmark-item:not(.subviewbutton) {
+  margin: 0px !important;
+  padding-block: 0 !important;
+}
+
+#star-button-box {
+  display: none !important;
+}
+
+#context-openlinkinusercontext-menu,
+#context-sep-open,
+#context-bookmarklink,
+#context-savelink,
+#context-savelinktopocket,
+#context-sendlinktodevice,
+#context-sep-sendlinktodevice,
+#context-sep-copylink,
+#frame-sep {
+  display: none !important;
+}
+
+#context-stripOnShareLink[disabled="true"],
+#strip-on-share[disabled="true"] {
+  display: none !important;
+}
+
+#context-stripOnShareLink::before,
+#strip-on-share::before {
+  content: "Copy Link" !important;
+}
+
+#context-copylink:has(+ #context-stripOnShareLink:not([disabled="true"])),
+menuitem[label="Copy Link"]:has(+ #strip-on-share:not([disabled="true"])) {
+  display: none !important;
+}

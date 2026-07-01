@@ -1,0 +1,46 @@
+# Declarative network configuration for r01.
+#
+# Layout:
+#   lan    -> br-lan over eth1, 192.168.69.1/24 (static)
+#   wan    -> eth0, DHCP    (unused unless cable plugged in)
+#   wan6   -> eth0, DHCPv6  (unused unless cable plugged in)
+#   wwan   -> wifi STA to eth-5, DHCP (the primary uplink in the dorm)
+#
+# Routing priority is via the 'metric' option: lower wins.
+#   wan      metric 10
+#   wwan     metric 20
+# So wired wan takes precedence whenever the cable is plugged in.
+
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	list ipaddr '127.0.0.1/8'
+
+config globals 'globals'
+	option ula_prefix 'fdd5:202d:8fc::/48'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'eth1'
+
+config interface 'lan'
+	option device 'br-lan'
+	option proto 'static'
+	option ipaddr '192.168.69.1'
+	option netmask '255.255.255.0'
+	option ip6assign '60'
+
+config interface 'wan'
+	option device 'eth0'
+	option proto 'dhcp'
+	option metric '10'
+
+config interface 'wan6'
+	option device 'eth0'
+	option proto 'dhcpv6'
+	option metric '10'
+
+config interface 'wwan'
+	option proto 'dhcp'
+	option metric '20'

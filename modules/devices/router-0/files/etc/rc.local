@@ -1,0 +1,13 @@
+#!/bin/sh -e
+# /etc/rc.local runs at the end of boot, before the login prompt.
+# Lives in the firmware image via the files/ overlay (declarative).
+
+# Switch CPU scaling to schedutil (kernel-driven, drops idle to ~800 MHz).
+# Works on both per-policy and per-cpu cpufreq layouts.
+for g in /sys/devices/system/cpu/cpufreq/policy*/scaling_governor \
+         /sys/devices/system/cpu/cpu[0-9]*/cpufreq/scaling_governor; do
+	[ -w "$g" ] || continue
+	echo schedutil > "$g" 2>/dev/null || true
+done
+
+exit 0

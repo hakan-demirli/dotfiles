@@ -1,0 +1,21 @@
+[Unit]
+Description=Register kvm-desk-0 with headscale on first boot
+After=network-online.target tailscaled.service
+Wants=network-online.target tailscaled.service
+ConditionPathExists=/etc/tailscale/authkey
+ConditionPathExists=/etc/tailscale/login-server
+ConditionPathExists=/etc/tailscale/tag
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/kvm-tailscale-bootstrap
+ProtectSystem=strict
+ProtectHome=true
+NoNewPrivileges=true
+ReadWritePaths=/var/lib/tailscale /etc/tailscale
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

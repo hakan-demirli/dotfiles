@@ -1,0 +1,361 @@
+From c79fb2dc2ea430f294b744871cdddd9541a06f40 Mon Sep 17 00:00:00 2001
+From: GLiNet-Tech <glrouter@gl-inet.com>
+Date: Thu, 19 Mar 2026 09:34:51 +0800
+Subject: [PATCH] mediatek: filogic: add support for GL.iNet BE10000
+
+This patch adds support for GL.iNet BE10000(Slate 7 Pro)
+The GL.iNet BE10000 is a portable device with Wi-Fi 7, featuring two
+2.5G Ethernet ports, one of which is a LAN port
+and the other a WAN port.
+
+Hardware Specification:
+ - SoC: MediaTek MT7987A (Quad-core ARM Cortex-A53 2.0 GHz)
+ - RAM: 1024 MiB DDR4
+ - Flash: 512 MiB SPI-NAND
+ - WiFi: MediaTek MT7995AV (WiFi 7)
+   - 2.4GHz: b/g/n/ax/be (2x2 MIMO)
+   - 5GHz: a/n/ac/ax/be (3x3 MIMO)
+   - 6GHz: ax/be (3x3 MIMO)
+ - Ethernet:
+   - 1x 10/100/1000/2500 Mbps WAN (Realtek RTL8221 PHY)
+   - 1x 10/100/1000/2500 Mbps LAN (SoC internal PHY)
+ - Buttons: Reset,Switch
+ - UART: 115200 8n1 (VCC, RX, TX, GND)
+
+Flash Layout:
+ - 0x0~0x100000 : bl2
+ - 0x100000~0x180000 : u-boot-env
+ - 0x180000~0x580000 : Factory
+ - 0x580000~0x880000 : fip
+ - 0x880000~0x8c0000 : log
+ - 0x8c0000~0x900000 : CFG
+ - 0x900000~0x1e000000 : ubi
+
+MAC Addresses:
+ - Base MAC located at Factory partition offset 0x4000
+ - gmac0 (WAN) : Base - 0 (Label MAC)
+ - gmac1 (LAN) : Base - 1
+
+Installation:
+ 1.You can directly upgrade using the
+ openwrt-mediatek-filogic-glinet_gl-be10000-squashfs-sysupgrade.bin
+ image on the official GL firmware upgrade page.
+ 2.Access the device and use the sysupgrade command to upgrade.Note:
+ When upgrading from official firmware,
+ use the -n parameter to preserve no configuration.
+
+Signed-off-by: GLiNet-Tech <glrouter@gl-inet.com>
+(cherry picked from commit 219125c45b465e6d545f7a7291da765170ef546b)
+---
+ .../dts/mt7987a-glinet-gl-be10000.dts         | 239 ++++++++++++++++++
+ .../filogic/base-files/etc/board.d/02_network |   1 +
+ .../base-files/lib/preinit/75_rootfs_prepare  |   1 +
+ target/linux/mediatek/image/filogic.mk        |  22 ++
+ 4 files changed, 263 insertions(+)
+ create mode 100644 target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+
+diff --git a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+new file mode 100644
+index 0000000000..52a3a4a75a
+--- /dev/null
++++ b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+@@ -0,0 +1,239 @@
++/dts-v1/;
++#include "mt7987a.dtsi"
++#include <dt-bindings/input/input.h>
++
++/ {
++	model = "GL.iNet GL-BE10000";
++	compatible = "glinet,gl-be10000", "mediatek,mt7987a", "mediatek,mt7987";
++
++	aliases {
++		label-mac-device = &gmac0;
++	};
++
++	chosen {
++		bootargs = "console=ttyS0,115200n1 \
++			    earlycon=uart8250,mmio32,0x11000000 \
++			    pci=pcie_bus_perf";
++		stdout-path = "serial0:115200n8";
++	};
++
++	gpio-keys {
++		compatible = "gpio-keys";
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		switch {
++			label = "switch";
++			linux,code = <BTN_0>;
++			gpios = <&pio 3 GPIO_ACTIVE_HIGH>;
++			debounce-interval = <10>;
++			linux,input-type = <EV_SW>;
++		};
++	};
++
++	gpio-export {
++		compatible = "gpio-export";
++
++		usb_power {
++			gpio-export,name = "usb_power";
++			gpio-export,output = <0>;
++			gpios = <&pio 23 GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	usb-control {
++		compatible = "usb-control";
++
++		control-gpio = <&pio 24 GPIO_ACTIVE_HIGH>;
++		usb-power-path = "/sys/class/gpio/usb_power/value";
++		power-gpio-default-output = <1>;
++	};
++
++	fan_3v: regulator-fan-3p3v {
++		compatible = "regulator-fixed";
++		regulator-name = "fan";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&pio 6 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++};
++
++&spi2 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi2_flash_pins>;
++	status = "okay";
++
++	flash@0 {
++		compatible = "spi-nand";
++		reg = <0>;
++		spi-max-frequency = <52000000>;
++		spi-rx-bus-width = <4>;
++		spi-tx-bus-width = <4>;
++		mediatek,nmbm;
++		mediatek,bmt-max-ratio = <1>;
++		mediatek,bmt-max-reserved-blocks = <64>;
++
++		partitions: partitions@0 {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "bl2";
++				reg = <0x00000 0x0100000>;
++				read-only;
++			};
++
++			partition@100000 {
++				label = "u-boot-env";
++				reg = <0x0100000 0x0080000>;
++			};
++
++			factory: partition@180000 {
++				label = "Factory";
++				reg = <0x180000 0x0400000>;
++
++				nvmem-layout {
++					compatible = "fixed-layout";
++					#address-cells = <1>;
++					#size-cells = <1>;
++
++					eeprom_factory_0: eeprom@0 {
++						reg = <0x0 0x2000>;
++					};
++
++					macaddr_factory_4: macaddr@4000 {
++						reg = <0x4000 0x6>;
++						compatible = "mac-base";
++						#nvmem-cell-cells = <1>;
++					};
++				};
++			};
++
++			partition@580000 {
++				label = "fip";
++				reg = <0x580000 0x0300000>;
++			};
++
++			partition@880000 {
++				label = "log";
++				reg = <0x880000 0x0040000>;
++			};
++
++			partition@8C0000 {
++				label = "CFG";
++				reg = <0x8C0000 0x0040000>;
++			};
++
++			partition@900000 {
++				label = "ubi";
++				reg = <0x900000 0x1D700000>;
++			};
++		};
++	};
++};
++
++&gmac0 {
++	phy-mode = "2500base-x";
++	phy-handle = <&phy7>;
++	status = "okay";
++	nvmem-cells = <&macaddr_factory_4 0>;
++	nvmem-cell-names = "mac-address";
++};
++
++&gmac1 {
++	mac-type = "xgdm";
++	phy-mode = "internal";
++	phy-handle = <&phy15>;
++	status = "okay";
++	nvmem-cells = <&macaddr_factory_4 1>;
++	nvmem-cell-names = "mac-address";
++};
++
++&mdio {
++	reset-gpios = <&pio 0 GPIO_ACTIVE_LOW>;
++	reset-delay-us = <10000>;
++
++	phy7: phy@7 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <7>;
++		reset-assert-us = <100000>;
++		reset-deassert-us = <100000>;
++		reset-gpios = <&pio 42 GPIO_ACTIVE_LOW>;
++		interrupt-controller;
++		#interrupt-cells = <1>;
++		interrupt-parent = <&pio>;
++		interrupts = <41 IRQ_TYPE_LEVEL_LOW>;
++	};
++
++	phy15: phy@15 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <15>;
++		pinctrl-names = "i2p5gbe-led";
++		pinctrl-0 = <&i2p5gbe_led0_pins>;
++		phy-mode = "internal";
++	};
++};
++
++&pcie0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pcie0_pins>;
++	status = "okay";
++
++	pcie@0,0 {
++		reg = <0x0000 0 0 0 0>;
++
++		mt7992@0,0 {
++			compatible = "mediatek,mt76";
++			reg = <0x0000 0 0 0 0>;
++
++			nvmem-cells = <&eeprom_factory_0>;
++			nvmem-cell-names = "eeprom";
++
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			ieee80211-freq-limit = <2400000 2500000>,
++					       <5170000 5835000>,
++					       <5945000 7125000>;
++
++			band@0 {
++				reg = <0>;
++				nvmem-cells = <&macaddr_factory_4 2>;
++				nvmem-cell-names = "mac-address";
++			};
++
++			band@1 {
++				reg = <1>;
++				nvmem-cells = <&macaddr_factory_4 3>;
++				nvmem-cell-names = "mac-address";
++			};
++
++			band@2 {
++				reg = <2>;
++				nvmem-cells = <&macaddr_factory_4 4>;
++				nvmem-cell-names = "mac-address";
++			};
++		};
++	};
++};
++
++&ssusb {
++	status = "okay";
++};
++
++&tphyu3port0 {
++	status = "okay";
++};
++
++&uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart0_pins>;
++	status = "okay";
++};
+diff --git a/target/linux/mediatek/filogic/base-files/etc/board.d/02_network b/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
+index 8fcbcce3d3..4fe40ebcdd 100644
+--- a/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
++++ b/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
+@@ -151,6 +151,7 @@ mediatek_setup_interfaces()
+ 	cudy,tr3000-256mb-v1|\
+ 	cudy,tr3000-v1|\
+ 	cudy,tr3000-v1-ubootmod|\
++	glinet,gl-be10000|\
+ 	glinet,gl-mt2500|\
+ 	glinet,gl-mt2500-airoha|\
+ 	glinet,gl-mt3000|\
+diff --git a/target/linux/mediatek/filogic/base-files/lib/preinit/75_rootfs_prepare b/target/linux/mediatek/filogic/base-files/lib/preinit/75_rootfs_prepare
+index 0a32073e0b..5eba3cfcc5 100644
+--- a/target/linux/mediatek/filogic/base-files/lib/preinit/75_rootfs_prepare
++++ b/target/linux/mediatek/filogic/base-files/lib/preinit/75_rootfs_prepare
+@@ -21,6 +21,7 @@ rootfs_create() {
+ 
+ rootfs_prepare() {
+ 	case $(board_name) in
++	glinet,gl-be10000|\
+ 	netgear,wax220)
+ 		if ! ubinfo /dev/ubi0 -N rootfs_data &>/dev/null; then
+ 			echo "Creating \"rootfs_data\" UBI volume"
+diff --git a/target/linux/mediatek/image/filogic.mk b/target/linux/mediatek/image/filogic.mk
+index 2eb91e2c7f..f8e84845be 100644
+--- a/target/linux/mediatek/image/filogic.mk
++++ b/target/linux/mediatek/image/filogic.mk
+@@ -1642,6 +1642,28 @@ define Device/gatonetworks_gdsp
+ endef
+ TARGET_DEVICES += gatonetworks_gdsp
+ 
++define Device/glinet_gl-be10000
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-BE10000
++  DEVICE_DTS := mt7987a-glinet-gl-be10000
++  DEVICE_DTS_DIR := ../dts
++  DEVICE_DTC_FLAGS := --pad 4096
++  DEVICE_DTS_LOADADDR := 0x4ff00000
++  DEVICE_PACKAGES := mt7987-2p5g-phy-firmware kmod-mt7992-firmware kmod-mt7996-firmware kmod-mt7996-233-firmware kmod-hwmon-pwmfan
++  UBINIZE_OPTS := -E 5
++  BLOCKSIZE := 256k
++  PAGESIZE := 4096
++ifeq ($(IB),)
++ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
++  ARTIFACTS := initramfs-factory.ubi initramfs-GL-BE10000-factory.bin
++  ARTIFACT/initramfs-factory.ubi := append-image-stage initramfs-kernel.bin | ubinize-kernel
++  ARTIFACT/initramfs-GL-BE10000-factory.bin := append-image-stage initramfs-kernel.bin | sysupgrade-tar | append-metadata
++endif
++endif
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
++endef
++TARGET_DEVICES += glinet_gl-be10000
++
+ define Device/glinet_gl-mt2500
+   DEVICE_VENDOR := GL.iNet
+   DEVICE_MODEL := GL-MT2500
+-- 
+2.54.0
+

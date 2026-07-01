@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fgb() {
+  local -r LIST_LOCAL_CMD="git branch --all --color --format=\$'%(HEAD) %(color:yellow)%(refname:short)\t%(color:green)%(committerdate:short)\t%(color:blue)%(subject)' | column --table --separator=\$'\t'"
+  local -r LIST_REMOTE_CMD="git ls-remote --heads origin | awk '{print \$2}' | sed 's|refs/heads/||' \
+    | grep -v '^master\$' \
+    | grep -v '^veridian\$' \
+    | awk '{print \"remotes/origin/\"\$1}'"
+
+  local -r PREVIEW_COMMITS=$(
+    cat << 'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+if [ -n "$raw_ref" ]; then
+  git log "$raw_ref" --graph --color --format='%C(white)%h - %C(green)%cs - %C(blue)%s %C(red)%d'
+else
+  echo "No branch selected."
+fi
+EOF
+  )
+
+  local -r PREVIEW_DIFF=$(
+    cat << 'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+if [ -n "$raw_ref" ]; then
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  git diff --color "$current_branch..$raw_ref"
+else
+  echo "No branch selected."
+fi
+EOF
+  )
+
+  local -r SHOW_SUBSHELL=$(
+    cat << 'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+if [ -n "$raw_ref" ]; then
+  git show --color "$raw_ref" | less -R
+fi
+EOF
+  )
+
+  local -r CHECKOUT_BRANCH=$(
+    cat << 'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
+if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
+  git fetch origin "$local_branch":"$local_branch"
+fi
+git checkout "$local_branch"
+EOF
+  )
+
+  local -r MERGE_BRANCH=$(
+    cat << 'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
+if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
+  git fetch origin "$local_branch":"$local_branch"
+fi
+git merge "$local_branch"
+EOF
+  )
+
+  local -r REBASE_BRANCH=$(
+    cat << 'EOF'
+raw_ref=$(echo {} | sed 's/^[* ]\+//' | awk '{print $1}')
+local_branch=$(echo "$raw_ref" | sed 's|^remotes/origin/||')
+if [ "$raw_ref" != "$local_branch" ] && ! git show-ref --quiet "refs/heads/$local_branch"; then
+  git fetch origin "$local_branch":"$local_branch"
+fi
+git rebase "$local_branch"
+EOF
+  )
+
+  local -r HEADER=$(
+    cat << 'EOF'
+> [Enter]         Checkout branch (auto-fetch if remote)
+> [Ctrl-P]        Merge selected branch into current
+> [Ctrl-R]        Rebase current onto selected
+> [Ctrl-F]        Show diff vs current
+> [Ctrl-G]        Show HEAD commit of selected in less
+> [Ctrl-I]        Switch preview back to commits
+EOF
+  )
+
+  (
+    eval "$LIST_LOCAL_CMD"
+    eval "$LIST_REMOTE_CMD" | while read -r branch; do
+      local_name="${branch#remotes/origin/}"
+      if ! git show-ref --quiet "refs/heads/$local_name"; then
+        echo "$branch"
+      fi
+    done
+  ) | fzf \
+    --ansi \
+    --reverse \
+    --no-sort \
+    --header-first \
+    --header="$HEADER" \
+    --preview-label '[Commits]' \
+    --preview "$PREVIEW_COMMITS" \
+    --bind "enter:execute($CHECKOUT_BRANCH)+reload($LIST_LOCAL_CMD)" \
+    --bind "ctrl-p:execute($MERGE_BRANCH)+reload($LIST_LOCAL_CMD)" \
+    --bind "ctrl-r:execute($REBASE_BRANCH)+reload($LIST_LOCAL_CMD)" \
+    --bind "ctrl-g:execute($SHOW_SUBSHELL)" \
+    --bind "ctrl-f:change-preview-label([Diff])" \
+    --bind "ctrl-f:+change-preview($PREVIEW_DIFF)" \
+    --bind "ctrl-i:change-preview-label([Commits])" \
+    --bind "ctrl-i:+change-preview($PREVIEW_COMMITS)" \
+    --bind 'f1:toggle-header' \
+    --bind 'f2:toggle-preview' \
+    --bind 'ctrl-y:preview-up' \
+    --bind 'ctrl-e:preview-down' \
+    --bind 'ctrl-u:preview-half-page-up' \
+    --bind 'ctrl-d:preview-half-page-down'
+}
+
+fgb
