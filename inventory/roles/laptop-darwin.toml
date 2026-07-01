@@ -1,0 +1,7 @@
+id = "laptop-darwin"
+description = "macOS/Darwin laptop. Uses nix-darwin instead of NixOS."
+kind = "darwin"
+arch = "aarch64-darwin"
+node_role = "personal"
+modules = []
+boot = "image"

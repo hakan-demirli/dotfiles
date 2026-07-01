@@ -1,0 +1,16 @@
+id = "lab-fpga-dev"
+description = "FPGA dev node with AMD V80 card; runs Vivado + vendor drivers"
+kind = "nixos"
+node_role = "compute"
+modules = [
+  "system/base",
+  "system/server-base",
+  "system/impermanence",
+  "system/ephemeral-root",
+]
+
+[tunables]
+"fpga.vendor" = "amd-xilinx"
+"fpga.tree" = "bootstrap/vendor/aved"
+"vivado.onBox" = true
+"vivado.version" = "2025.1"

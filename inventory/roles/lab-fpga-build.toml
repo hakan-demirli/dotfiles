@@ -1,0 +1,15 @@
+id = "lab-fpga-build"
+description = "FPGA build farm node (Vivado, no FPGA card)"
+kind = "nixos"
+node_role = "compute"
+modules = [
+  "system/base",
+  "system/server-base",
+  "system/impermanence",
+  "system/ephemeral-root",
+]
+
+[tunables]
+"vivado.onBox" = true
+"vivado.version" = "2025.1"
+"buildbot.worker" = true

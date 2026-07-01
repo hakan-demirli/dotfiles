@@ -1,0 +1,215 @@
+[[language]]
+name = "python"
+roots = ["pyproject.toml", "."]
+language-servers = ["pyright", "ruff", { name = "uwu_colors" }]
+
+auto-format = false
+
+[[language]]
+name = "verilog"
+auto-format = true
+formatter = { command = 'verible-verilog-format', args = [
+  "--wrap_spaces",
+  "3",
+  "--indentation_spaces",
+  "3",
+  "-",
+] }
+language-servers = ["veridian"]
+indent = { tab-width = 3, unit = "   " }
+
+[[language]]
+name = "nix"
+formatter = { command = 'nixfmt', args = [] }
+language-servers = ["nixd"]
+auto-format = true
+
+[[language]]
+name = "scala"
+auto-format = true
+
+[[language]]
+name = "html"
+formatter = { command = 'prettier', args = ["--parser", "html"] }
+language-servers = ["html-preview-lsp"]
+
+[[language]]
+name = "json"
+formatter = { command = 'prettier', args = ["--parser", "json"] }
+
+[[language]]
+name = "css"
+formatter = { command = 'prettier', args = ["--parser", "css"] }
+language-servers = [{ name = "uwu_colors" }]
+
+[[language]]
+name = "java"
+language-servers = ["jdtls"]
+formatter = { command = "google-java-format", args = ["-"] }
+auto-format = true
+
+[[language]]
+name = "javascript"
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
+auto-format = true
+
+[[language]]
+name = "typescript"
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
+auto-format = true
+
+[[language]]
+name = "markdown"
+formatter = { command = 'prettier', args = ["--parser", "markdown"] }
+language-servers = ["marksman", "markdown-countdown-lsp"]
+
+[[language]]
+name = "toml"
+auto-format = false
+language-servers = [{ name = "uwu_colors" }]
+
+[[language]]
+name = "cpp"
+auto-format = false
+language-servers = ["clangd"]
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "c"
+auto-format = false
+language-servers = ["clangd"]
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "latex"
+language-servers = ["texlab"]
+auto-format = true
+
+[[language]]
+name = "rust"
+auto-format = false
+[language.formatter]
+command = "rustfmt"
+
+[[language]]
+name = "gas"
+scope = "source.llvm"
+roots = ["Makefile"]
+file-types = ["S", "s"]
+comment-token = "#"
+indent = { tab-width = 4, unit = "    " }
+language-servers = ["asm-lsp"]
+auto-format = true
+
+[[language]]
+name = "git-commit"
+language-servers = ["typos", "vale", "ltex"]
+
+
+[language-server.uwu_colors]
+command = "uwu_colors"
+
+[language-server.rust-analyzer.config.check]
+command = "clippy"
+
+[language-server.clangd]
+command = "clangd"
+args = [
+  "--background-index",
+  "--clang-tidy",
+  "--all-scopes-completion",
+  "--completion-style=detailed",
+  "--header-insertion=iwyu",
+  "--function-arg-placeholders",
+  "--pch-storage=memory",
+  "--offset-encoding=utf-8",
+  "--fallback-style=LLVM",
+  "--compile-commands-dir=build",
+]
+
+[language-server.texlab]
+command = "texlab"
+cleanArtifacts = true
+
+[language-server.texlab.config.texlab.build]
+args = ["-shell-escape", "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f"]
+onSave = true
+forwardSearchAfter = true
+
+
+[language-server.texlab.config.texlab.forwardSearch]
+executable = "sioyek"
+args = [
+  "--reuse-window",
+  "--nofocus",
+  "--execute-command",
+  "toggle_synctex",
+  "--inverse-search",
+  "texlab inverse-search -i \"%%1\" -l %%2",
+  "--forward-search-file",
+  "%f",
+  "--forward-search-line",
+  "%l",
+  "%p",
+]
+
+[language-server.texlab.config.texlab.chktex]
+onEdit = true
+
+
+[language-server.markdown-countdown-lsp]
+command = "markdown-countdown-lsp"
+
+[language-server.veridian]
+command = "veridian"
+
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
+[language-server.nixd]
+command = "nixd"
+
+[language-server.vale]
+command = "vale-ls"
+
+[language-server.typos]
+command = "typos-lsp"
+
+[language-server.ltex]
+command = "ltex-ls"
+
+[language-server.mdpls]
+command = "mdpls"
+config = { markdown.preview.serveStatic = true, markdown.preview.codeTheme = "github", markdown.preview.auto = true, markdown.preview.browser = "firefox" }
+
+[language-server.html-preview-lsp]
+command = "html-preview-lsp"
+
+[language-server.jdtls]
+command = "jdtls"
+args = [
+  "-data",
+  "/home/emre/.cache/jdtls/workspace",
+  "-configuration",
+  "/home/emre/.cache/jdtls/config",
+]
+
+[language-server.jdtls.config.java]
+"jdt.ls.vmargs" = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx8G -Xms1G -XX:+UseG1GC -XX:+UseStringDeduplication"
+"contentProvider.preferred" = "fernflower"
+"signatureHelp.enabled" = true
+"completion.favoriteStaticMembers" = [
+  "org.junit.Assert.*",
+  "org.junit.Assume.*",
+  "org.junit.jupiter.api.Assertions.*",
+  "org.junit.jupiter.api.Assumptions.*",
+  "org.junit.jupiter.api.DynamicContainer.*",
+  "org.junit.jupiter.api.DynamicTest.*",
+]
+"completion.importOrder" = ["java", "javax", "com", "org"]
+"sources.organizeImports.starThreshold" = 9999
+"sources.organizeImports.staticStarThreshold" = 9999
+"codeGeneration.useBlocks" = true
+"codeGeneration.generateComments" = false
+"server.launchMode" = "Standard"

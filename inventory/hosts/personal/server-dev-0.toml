@@ -1,0 +1,34 @@
+id = "server-dev-0"
+role = "personal-server"
+state = "provisioned"
+slurm_features = ["amd", "gpu-amd"]
+slurm_weight = 100
+
+[location]
+kind = "workstation"
+
+[ownership]
+class = "personal"
+owner = "user-0"
+operator = "user-0"
+custodian = "user-0"
+
+[hardware]
+cpu_vendor = "amd"
+arch = "x86_64-linux"
+gpu = "amd"
+
+[disko]
+root_disk = "/dev/nvme0n1"
+layout = "btrfs-lvm"
+managed = true
+swap_size = "32G"
+
+[impermanence]
+enable = true
+rollback_backend = "btrfs"
+persisted_paths = ["/var/lib/libvirt", "/var/log", "/var/lib/bluetooth"]
+
+[labels]
+legacy = "dotfiles/s01"
+tailscale_authority = "true"

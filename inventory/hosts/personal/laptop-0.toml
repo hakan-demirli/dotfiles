@@ -1,0 +1,38 @@
+id = "laptop-0"
+role = "personal-laptop"
+state = "provisioned"
+slurm_features = ["amd", "gpu-nvidia", "laptop"]
+slurm_weight = 10
+
+[location]
+kind = "laptop"
+
+[ownership]
+class = "personal"
+owner = "user-0"
+operator = "user-0"
+custodian = "user-0"
+
+[hardware]
+cpu_vendor = "amd"
+arch = "x86_64-linux"
+gpu = "amd+nvidia"
+
+[disko]
+root_disk = "/dev/disk/by-id/nvme-KIOXIA-EXCERIA_SSD_X26FC0ZVF4M3"
+layout = "btrfs-lvm"
+managed = true
+swap_size = "32G"
+
+[impermanence]
+enable = true
+rollback_backend = "btrfs"
+persisted_paths = ["/var/lib/libvirt", "/var/log", "/var/lib/bluetooth"]
+
+[labels]
+legacy = "dotfiles/l01"
+sunshine = "true"
+gpu_amd_bus_id = "PCI:6:0:0"
+gpu_nvidia_bus_id = "PCI:1:0:0"
+hibernation = "true"
+tailscale_authority = "true"

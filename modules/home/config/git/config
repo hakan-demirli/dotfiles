@@ -1,0 +1,32 @@
+[include]
+    path = ./git_users
+
+[core]
+	fileMode = true
+	autocrlf = false
+	eol = lf
+	sshCommand = ssh -i ~/.ssh/id_ed25519 -F /dev/null
+	editor = hx
+    excludesfile = ~/.config/git/ignore
+[safe]
+	directory = *
+	directory = ///wsl$/Ubuntu-22.04/home/*
+	directory = ///wsl$/Ubuntu-22.04/home/emre/*
+	directory = ///wsl.localhost/Ubuntu-22.04/home/*
+	directory = ///wsl.localhost/docker-desktop/home/*
+	directory = ///wsl.localhost/docker-desktop-data/home/*
+
+[init]
+	defaultBranch = main
+
+[push]
+    autoSetupRemote = true
+
+[include]
+    path = ./git_tokens
+
+[include]
+    path = ./git_sign
+
+[http]
+	postBuffer = 1048576000

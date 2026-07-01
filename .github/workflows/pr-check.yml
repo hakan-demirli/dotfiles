@@ -2,10 +2,10 @@ name: "PR Check"
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  checks:
+  fast-checks:
     strategy:
       fail-fast: false
       matrix:
@@ -19,29 +19,139 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
-      - name: Run Flake Checks
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - name: Run fast checks
         run: |
-          # See: https://github.com/actions/partner-runner-images/issues/147
-          checks=$(nix flake show --json 2>/dev/null | jq -r '.checks."${{ matrix.system }}" // {} | keys[]')
+          checks=$(nix flake show --json 2>/dev/null \
+            | jq -r '.checks."${{ matrix.system }}" // {} | keys[] | select(startswith("test-") or startswith("host-") | not)')
           for check in $checks; do
             if [[ "${{ matrix.system }}" == "aarch64-linux" && "$check" == "ephemeral-root" ]]; then
               echo "Skipping $check on aarch64-linux (requires KVM)"
               continue
             fi
             echo "Building checks.${{ matrix.system }}.$check"
-            nix build .#checks.${{ matrix.system }}.$check
+            nix build ".#checks.${{ matrix.system }}.$check"
           done
+
+  discover-vm-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      tests: ${{ steps.list.outputs.tests }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - id: list
+        run: |
+          tests=$(nix eval --json '.#checks.x86_64-linux' --apply 'builtins.attrNames' \
+            | jq -c 'map(select(startswith("test-")))')
+          echo "tests=$tests" >> "$GITHUB_OUTPUT"
+          echo "discovered: $tests"
+
+  vm-tests:
+    needs: [discover-vm-tests]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: ${{ fromJson(needs.discover-vm-tests.outputs.tests) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        uses: BRAINSia/free-disk-space@7048ffbf50819342ac964ef3998a51c2564a8a75
+        with:
+          tool-cache: false
+          mandb: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - name: Run ${{ matrix.test }}
+        run: nix build .#checks.x86_64-linux.${{ matrix.test }}
+
+  discover-hosts:
+    runs-on: ubuntu-latest
+    outputs:
+      hosts-x86: ${{ steps.list.outputs.hosts-x86 }}
+      hosts-arm: ${{ steps.list.outputs.hosts-arm }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - id: list
+        run: |
+          # shellcheck disable=SC2016
+          # Inventory-driven split into x86 / arm buckets via one nix eval.
+          buckets=$(nix eval --json '.#lib.inventory.hosts' --apply '
+            cfgs:
+            let
+              keys = builtins.attrNames cfgs;
+              pick = arch: builtins.filter (n: cfgs.${n}.hardware.arch == arch) keys;
+            in
+            { x86 = pick "x86_64-linux"; arm = pick "aarch64-linux"; }')
+          built=$(nix eval --json '.#nixosConfigurations' --apply 'builtins.attrNames')
+          x86=$(jq -nc --argjson b "$buckets" --argjson built "$built" \
+            '$b.x86 | map(select(. as $h | $built | index($h)))')
+          arm=$(jq -nc --argjson b "$buckets" --argjson built "$built" \
+            '$b.arm | map(select(. as $h | $built | index($h)))')
+          echo "hosts-x86=$x86" >> "$GITHUB_OUTPUT"
+          echo "hosts-arm=$arm" >> "$GITHUB_OUTPUT"
+          echo "x86: $x86"
+          echo "arm: $arm"
+
+  build-hosts-x86:
+    needs: [discover-hosts]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        host: ${{ fromJson(needs.discover-hosts.outputs.hosts-x86) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        uses: BRAINSia/free-disk-space@7048ffbf50819342ac964ef3998a51c2564a8a75
+        with:
+          tool-cache: false
+          mandb: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - name: Build ${{ matrix.host }}
+        run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
+
+  build-hosts-arm:
+    needs: [discover-hosts]
+    runs-on: ubuntu-22.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        host: ${{ fromJson(needs.discover-hosts.outputs.hosts-arm) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - name: Build ${{ matrix.host }}
+        run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
 
   flake-check:
     name: flake-check
-    needs: [checks]
+    needs: [fast-checks, vm-tests, build-hosts-x86, build-hosts-arm]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Verify all checks passed
+      - name: Verify all jobs passed
         run: |
-          if [[ "${{ needs.checks.result }}" != "success" ]]; then
-            echo "One or more flake checks failed"
-            exit 1
-          fi
+          for r in \
+            "fast-checks=${{ needs.fast-checks.result }}" \
+            "vm-tests=${{ needs.vm-tests.result }}" \
+            "build-hosts-x86=${{ needs.build-hosts-x86.result }}" \
+            "build-hosts-arm=${{ needs.build-hosts-arm.result }}"
+          do
+            name="${r%=*}"; result="${r#*=}"
+            echo "$name: $result"
+            if [[ "$result" != "success" ]]; then exit 1; fi
+          done

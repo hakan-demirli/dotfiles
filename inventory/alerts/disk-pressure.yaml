@@ -1,0 +1,34 @@
+groups:
+  - name: disk_pressure
+    interval: 30s
+    rules:
+      - alert: DiskSpaceLow
+        expr: |
+          (
+            node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"}
+              /
+            node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"}
+          ) < 0.10
+        for: 5m
+        labels:
+          severity: warning
+          category: capacity
+        annotations:
+          summary: '{{ $labels.instance }}: {{ $labels.mountpoint }} <10% free'
+          description: |
+            Filesystem at {{ $labels.mountpoint }} on {{ $labels.instance }}
+            has been below 10% free for >5m. Current: {{ $value | printf "%.2f" }}.
+
+      - alert: DiskSpaceCritical
+        expr: |
+          (
+            node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"}
+              /
+            node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"}
+          ) < 0.05
+        for: 1m
+        labels:
+          severity: critical
+          category: capacity
+        annotations:
+          summary: '{{ $labels.instance }}: {{ $labels.mountpoint }} <5% free'

@@ -1,0 +1,5 @@
+id = "viewer"
+description = "Read-only access (status, logs, sinfo); no shell, no submit"
+
+[ssh]
+allowed = false

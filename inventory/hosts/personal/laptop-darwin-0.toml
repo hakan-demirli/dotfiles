@@ -1,0 +1,25 @@
+id = "laptop-darwin-0"
+roles = ["laptop-darwin"]
+state = "planned"
+slurm_features = []
+slurm_weight = 1
+
+[location]
+kind = "laptop"
+
+[ownership]
+class = "personal"
+owner = "user-0"
+operator = "user-0"
+custodian = "user-0"
+
+[hardware]
+cpu_vendor = "arm"
+arch = "aarch64-darwin"
+os = "darwin"
+mainboard = "macbook-m1"
+gpu = "apple-silicon"
+simd_arch = "apple-m-series"
+
+[labels]
+legacy = "dotfiles/macbook"

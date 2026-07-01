@@ -1,0 +1,7 @@
+id = "mgmt-bmc"
+purpose = "out-of-band BMC/IPMI network, isolated from data"
+vlan_id = 4000
+prefix_v4 = "10.99.0.0/16"
+gateway_v4 = "10.99.0.1"
+vrf = "mgmt-bmc"
+qos_class = "best-effort"

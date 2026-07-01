@@ -1,0 +1,126 @@
+theme = "dracula"
+
+[keys.normal]
+esc = ["collapse_selection", "keep_primary_selection"]
+y = ["yank_main_selection_to_clipboard", ":clipboard-yank-join"]
+p = "paste_clipboard_before"
+X = ["extend_line_up", "extend_to_line_bounds"]
+D = "delete_char_backward"
+J = ["extend_to_line_bounds", "delete_selection", "paste_after"]
+K = [
+  "extend_to_line_bounds",
+  "delete_selection",
+  "move_line_up",
+  "paste_before",
+]
+L = "join_selections"
+C-u = ["page_cursor_half_up", "align_view_center"]
+C-d = ["page_cursor_half_down", "align_view_center"]
+
+"A-u" = [
+  ":sh tmux_harpoon_update.sh >/dev/null 2>&1 </dev/null &",
+  ":open %sh{tmux_harpoon_echo.sh 1}",
+]
+"A-i" = [
+  ":sh tmux_harpoon_update.sh >/dev/null 2>&1 </dev/null &",
+  ":open %sh{tmux_harpoon_echo.sh 2}",
+]
+"A-o" = [
+  ":sh tmux_harpoon_update.sh >/dev/null 2>&1 </dev/null &",
+  ":open %sh{tmux_harpoon_echo.sh 3}",
+]
+"A-p" = [
+  ":sh tmux_harpoon_update.sh >/dev/null 2>&1 </dev/null &",
+  ":open %sh{tmux_harpoon_echo.sh 4}",
+]
+
+"+" = 'expand_selection'
+"-" = 'shrink_selection'
+
+[keys.normal.space]
+"/" = [":pipe-to tmux_harpoon_update.sh", ":pipe-to live-grep-in-split-tmux"]
+"f" = [":pipe-to tmux_harpoon_update.sh", "file_picker"]
+"F" = [":pipe-to tmux_harpoon_update.sh", "file_picker_in_current_directory"]
+"b" = [":pipe-to tmux_harpoon_update.sh", "buffer_picker"]
+"6" = [
+  ":pipe-to tmux_harpoon_update.sh",
+  ":open %sh{tmux display-popup -w 80%% -E 'yazi --chooser-file /tmp/yazi-chooser-file' && cat /tmp/yazi-chooser-file}",
+]
+"e" = [
+  ':sh rm -f /tmp/unique-file',
+  ':insert-output yazi %{buffer_name} --chooser-file=/tmp/unique-file',
+  ':insert-output echo "\x1b[?1049h\x1b[?2004h" > /dev/tty',
+  ':open %sh{cat /tmp/unique-file}',
+  ':redraw',
+  ':set mouse false',
+  ':set mouse true',
+]
+
+[keys.normal.g]
+l = ["collapse_selection", "extend_to_line_end"]
+h = ["collapse_selection", "extend_to_line_start"]
+s = [
+  "collapse_selection",
+  "select_mode",
+  "goto_first_nonwhitespace",
+  "exit_select_mode",
+]
+
+"n" = [":pipe-to tmux_harpoon_update.sh", "goto_next_buffer"]
+"p" = [":pipe-to tmux_harpoon_update.sh", "goto_previous_buffer"]
+"d" = [":pipe-to tmux_harpoon_update.sh", "goto_definition"]
+"y" = [":pipe-to tmux_harpoon_update.sh", "goto_type_definition"]
+"r" = [":pipe-to tmux_harpoon_update.sh", "goto_reference"]
+
+[keys.normal.m]
+s.a = "surround_add"
+s.r = "surround_replace"
+s.d = "surround_delete"
+r = "no_op"
+d = "no_op"
+
+[keys.select.m]
+s.a = "surround_add"
+s.r = "surround_replace"
+s.d = "surround_delete"
+r = "no_op"
+d = "no_op"
+
+[keys.select]
+y = "yank_main_selection_to_clipboard"
+
+[editor]
+jump-label-alphabet = "dfghjkieruwonvls"
+true-color = true
+line-number = "relative"
+mouse = false
+bufferline = "always"
+rulers = [80]
+idle-timeout = 0
+completion-trigger-len = 1
+scrolloff = 8
+
+[editor.cursor-shape]
+insert = "bar"
+
+[editor.whitespace.render]
+space = "all"
+tab = "all"
+newline = "all"
+
+[editor.indent-guides]
+render = true
+character = "╎"
+skip-levels = 1
+
+[editor.file-picker]
+hidden = true
+
+[editor.soft-wrap]
+enable = false
+
+[editor.statusline]
+center = ["primary-selection-length"]
+
+[editor.lsp]
+display-inlay-hints = true

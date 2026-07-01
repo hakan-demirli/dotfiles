@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import os
+import subprocess
+from abc import ABC, abstractmethod
+
+
+class WindowManager(ABC):
+    def __init__(self):
+        super().__init__()
+
+    @abstractmethod
+    def launch_or_focus_app(self, app_title, command=None):
+        pass
+
+    @staticmethod
+    def find_desktop_file(desktop_path, app_title):
+        desktop_files = []
+        if os.path.exists(desktop_path):
+            for root, _, files in os.walk(desktop_path):
+                for file in files:
+                    if file.endswith(".desktop"):
+                        desktop_files.append(os.path.join(root, file))
+        for desktop_file in desktop_files:
+            with open(desktop_file) as file:
+                content = file.read()
+                if f"Name={app_title}" in content:
+                    return desktop_file
+        return None
+
+    @staticmethod
+    def get_exec_command_from_desktop(desktop_file_path):
+        if desktop_file_path:
+            with open(desktop_file_path) as file:
+                for line in file:
+                    if line.startswith("Exec="):
+                        return line.strip()[5:]
+            return None
+        else:
+            return None
+
+
+class Hyprland(WindowManager):
+    def __init__(self):
+        super().__init__()
+
+    def _get_window_list(self):
+        result = subprocess.run(
+            ["hyprctl", "clients", "-j"], capture_output=True, text=True
+        )
+        window_list_json = result.stdout.strip()
+        return json.loads(window_list_json)
+
+    def launch_or_focus_app(self, app_title, command=None):
+        window_list = self._get_window_list()
+        for window in window_list:
+            if window["title"] == app_title:
+                subprocess.run(
+                    ["hyprctl", "dispatch", "focuswindow", f"title:{app_title}"]
+                )
+                return
+        if command:
+            subprocess.Popen(
+                command,
+                shell=True,
+                stdin=None,
+                stdout=None,
+                stderr=None,
+                close_fds=True,
+            )
+            print(f"Launching {app_title} with custom command in the background.")
+        else:
+            xdg_data_home = os.getenv(
+                "XDG_DATA_HOME", os.path.expanduser("~/.local/share")
+            )
+            user_desktop_path = os.path.join(xdg_data_home, "applications")
+            desktop_file_path = self.find_desktop_file(user_desktop_path, app_title)
+            exec_command = self.get_exec_command_from_desktop(desktop_file_path)
+            if not exec_command:
+                desktop_file_path = self.find_desktop_file(
+                    os.path.expanduser("~/.nix-profile/share/applications"), app_title
+                )
+                exec_command = self.get_exec_command_from_desktop(desktop_file_path)
+            if not exec_command:
+                desktop_file_path = self.find_desktop_file(
+                    os.path.expanduser("/usr/share/applications"), app_title
+                )
+                exec_command = self.get_exec_command_from_desktop(desktop_file_path)
+            if exec_command:
+                subprocess.Popen(
+                    exec_command,
+                    shell=True,
+                    stdin=None,
+                    stdout=None,
+                    stderr=None,
+                    close_fds=True,
+                )
+                print(f"Launching {app_title} in the background.")
+            else:
+                print(
+                    f"Error: Unable to extract Exec command from .desktop file {desktop_file_path} for {app_title}"
+                )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Launch or focus on an application.")
+    parser.add_argument(
+        "--title",
+        dest="app_title",
+        type=str,
+        help="Title of the application to launch or focus",
+        required=True,
+    )
+    parser.add_argument(
+        "--command", dest="command", type=str, help="Command to launch the application"
+    )
+    args = parser.parse_args()
+
+    active_window_manager = os.getenv("XDG_CURRENT_DESKTOP", "unknown")
+    if active_window_manager == "Hyprland":
+        launcher = Hyprland()
+        launcher.launch_or_focus_app(args.app_title, args.command)
+    else:
+        print(f"Unknown window manager: {active_window_manager}.")
+        print("Ensure $XDG_CURRENT_DESKTOP is set.")

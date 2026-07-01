@@ -1,0 +1,38 @@
+id = "sw-be10000-1"
+description = "EdgeCore BE10000 100G leaf-1 (lab core, redundant pair with sw-be10000-0)."
+role = "leaf"
+state = "provisioned"
+
+mgmt_ipv4 = "10.99.0.11/16"
+mgmt_network = "mgmt-bmc"
+
+[location]
+kind = "switch-rack"
+rack = "rack-0"
+site = "dc1"
+
+[ownership]
+class = "personal"
+owner = "user-0"
+
+[hardware]
+vendor = "edgecore"
+model = "BE10000"
+os = "openwrt"
+os_version = "4.8.4-release1"
+firmware_image = "openwrt-be10000"
+
+[bgp]
+asn = 65002
+loopback_v4 = "10.99.255.11/32"
+
+[ports.eth32]
+name = "eth32"
+speed_gbps = 100
+role = "uplink"
+peer = "sw-be10000-0"
+peer_port = "eth32"
+description = "uplink to leaf-0"
+
+[labels]
+purpose = "lab-core"

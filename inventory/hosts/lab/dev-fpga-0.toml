@@ -1,0 +1,50 @@
+id = "dev-fpga-0"
+roles = ["dev-fpga"]
+state = "provisioned"
+
+[location]
+kind = "workstation"
+site = "dc1"
+
+[ownership]
+class = "company"
+team = "team-dev-box"
+operator = "user-0"
+custodian = "user-0"
+
+[lifecycle]
+provisioned_at = "2026-06-07"
+
+[hardware]
+cpu_vendor = "intel"
+cpu_sockets = 1
+ram_gib = 64
+arch = "x86_64-linux"
+
+[[hardware.fpgas]]
+vendor = "amd-xilinx"
+model = "v80"
+pci = "01:00.0"
+
+[disko]
+root_disk = "/dev/disk/by-id/nvme-SAMSUNG_MZVL21T0HCLR-00B00_S676NS0X123456"
+layout = "btrfs-lvm"
+managed = true
+swap_size = "32G"
+
+[impermanence]
+enable = true
+rollback_backend = "btrfs"
+persisted_paths = ["/var/lib/libvirt", "/var/log", "/var/lib/bluetooth"]
+
+[boot]
+kernel_package = "linuxPackages_5_15"
+
+[ssh_trust]
+emre = ["user-0", "user-1"]
+sahand = ["user-1"]
+root = ["user-0", "user-1"]
+
+[labels]
+purpose = "dev-build"
+notes = "validates schema gap fills (ssh_trust + boot.kernel_package)"

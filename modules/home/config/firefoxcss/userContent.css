@@ -1,0 +1,84 @@
+@-moz-document url("about:newtab"), url("about:home") {
+  body {
+    overflow: hidden !important;
+  }
+  #root {
+  }
+  .logo-and-wordmark {
+    visibility: hidden !important;
+  }
+  #newtab-search-text,
+  #searchSubmit {
+    border-radius: 50px !important;
+  }
+  .search-wrapper .search-inner-wrapper {
+    margin: 10px !important;
+  }
+  .search-wrapper {
+    padding-top: 9px !important;
+  }
+}
+
+@-moz-document url-prefix(about:newtab) {
+  .top-site-outer .title {
+  }
+  .top-site-outer .title {
+    font-size: 100px;
+  }
+  .top-site-outer .title {
+    font-weight: bold;
+  }
+  .top-site-outer .top-site-inner {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  .top-site-outer .tile {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+.top-site-outer:is(.active, :focus, :hover) {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+@-moz-document url("about:home"), url("about:newtab") {
+  .tile > .icon-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .icon-pin-small {
+    display: none !important;
+  }
+}
+
+@-moz-document regexp(".+\.pdf$") {
+  .pdfViewer .page {
+    background: #38383d !important;
+  }
+  .loadingIcon + .canvasWrapper {
+    visibility: hidden;
+  }
+}
+@-moz-document regexp("^(?!.*\\.pdf\\?n).*") {
+  #sidebarContainer > #sidebarContent > #thumbnailView {
+    --sidebaritem-bg-color: #38383d;
+  }
+
+  #viewerContainer > #viewer .page > .canvasWrapper > canvas {
+    filter: grayscale(10%) invert(90%);
+  }
+
+  #sidebarContainer > #sidebarContent > #thumbnailView .thumbnailImage {
+    filter: grayscale(10%) invert(90%);
+    box-shadow:
+      0 0 0 1px hsla(0, 0%, 100%, 0.5),
+      0 2px 8px hsla(0, 0%, 100%, 0.3) !important;
+  }
+}
+
+:root {
+  scrollbar-color: rgb(210, 210, 210) rgb(42, 42, 46);
+}
+* {
+  scrollbar-width: thin;
+}

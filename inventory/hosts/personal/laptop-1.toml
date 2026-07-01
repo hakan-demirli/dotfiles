@@ -1,0 +1,43 @@
+id = "laptop-1"
+role = "personal-laptop"
+state = "provisioned"
+slurm_features = ["intel", "laptop"]
+slurm_weight = 10
+
+[location]
+kind = "laptop"
+
+[ownership]
+class = "personal"
+owner = "user-0"
+operator = "user-0"
+custodian = "user-0"
+
+[hardware]
+cpu_vendor = "intel"
+arch = "x86_64-linux"
+mainboard = "lunarlake-hp"
+
+[disko]
+root_disk = "/dev/disk/by-id/nvme-PC_SN8000S_SDEPNRG-2T00-1006_25290K800525"
+layout = "btrfs-lvm"
+managed = true
+swap_size = "32G"
+
+[impermanence]
+enable = true
+rollback_backend = "btrfs"
+persisted_paths = [
+  "/var/lib/libvirt",
+  "/var/log",
+  "/var/lib/bluetooth",
+  "/var/lib/fprint",
+]
+
+[labels]
+legacy = "dotfiles/l02"
+vendor = "hp"
+hibernation = "true"
+fingerprint = "true"
+tablet = "true"
+tailscale_authority = "true"

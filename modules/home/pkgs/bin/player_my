@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+is_running=$(pgrep -f "my_player" || true)
+echo "$is_running"
+
+if [ -n "$is_running" ]; then
+  echo "just togglespecialworkspace"
+  hyprctl dispatch 'hl.dsp.workspace.toggle_special()'
+else
+  echo "just kitty"
+  kitty --title "my_player" yazi "${HOME}/.local/share/sounds_deployed/music" &
+fi

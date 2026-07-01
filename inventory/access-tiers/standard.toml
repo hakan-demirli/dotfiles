@@ -1,0 +1,9 @@
+id = "standard"
+description = "Regular cluster user: full submit rights, no admin"
+
+[ssh]
+allowed = true
+
+[slurm_qos]
+max_wall = "24:00:00"
+priority = 500

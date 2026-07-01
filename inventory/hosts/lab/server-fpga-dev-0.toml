@@ -1,0 +1,50 @@
+id = "server-fpga-dev-0"
+role = "lab-fpga-dev"
+state = "provisioned"
+slurm_features = ["intel", "fpga", "v80"]
+slurm_gres = ["fpga:v80:1"]
+slurm_weight = 100
+
+[location]
+kind = "workstation"
+site = "dc1"
+
+[ownership]
+class = "company"
+owner = "user-0"
+operator = "user-0"
+custodian = "user-0"
+
+[lifecycle]
+provisioned_at = "2026-05-26"
+
+[[nics]]
+name = "enp6s0"
+mac = "08:bf:b8:73:94:f5"
+network = "data"
+role = "data"
+
+[hardware]
+cpu_vendor = "intel"
+cpu_sockets = 1
+ram_gib = 64
+arch = "x86_64-linux"
+
+[[hardware.fpgas]]
+vendor = "amd-xilinx"
+model = "v80"
+pci = "01:00.0"
+
+[disko]
+root_disk = "/dev/disk/by-id/nvme-WD_BLACK_SN7100_1TB_25422J805576"
+layout = "btrfs-lvm"
+managed = true
+swap_size = "32G"
+
+[impermanence]
+enable = true
+rollback_backend = "btrfs"
+persisted_paths = ["/var/lib/libvirt", "/var/log", "/var/lib/bluetooth"]
+
+[labels]
+legacy = "dotfiles/ss1"

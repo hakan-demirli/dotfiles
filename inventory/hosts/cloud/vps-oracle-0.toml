@@ -1,0 +1,37 @@
+id = "vps-oracle-0"
+roles = ["cloud-vps-control", "mgmt-observability"]
+state = "provisioned"
+
+[location]
+kind = "cloud-vm"
+provider = "oracle"
+
+[ownership]
+class = "leased"
+owner = "user-0"
+operator = "user-0"
+custodian = "user-0"
+
+[hardware]
+arch = "aarch64-linux"
+cpu_vendor = "arm"
+
+[disko]
+root_disk = "/dev/sda"
+layout = "btrfs-lvm"
+managed = true
+swap_size = "1G"
+
+[impermanence]
+enable = true
+rollback_backend = "btrfs"
+persisted_paths = ["/var/lib/libvirt", "/var/log"]
+
+[keys]
+ssh = []
+age = ["age150jk42s86el4wdr2w02heydgmqqu3gtuk4ypyxkwpftfmfcs94jqhzzuf4"]
+
+[labels]
+legacy = "dotfiles/vm-oracle-aarch64"
+services = "headscale,reverse-ssh,slurm-master,ntfy,homepage,jellyfin,transmission,docker-registry,harmonia,victoriametrics,grafana"
+nix_cache_public_key = "binary-cache-key:YUqGpOpjoO0zIREJVH0PAdjy9L3DWi917Z8/eFqQqy8="

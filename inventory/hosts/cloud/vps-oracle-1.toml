@@ -1,0 +1,33 @@
+id = "vps-oracle-1"
+role = "kvm-guest"
+state = "provisioned"
+
+[location]
+kind = "cloud-vm"
+provider = "oracle"
+
+[ownership]
+class = "leased"
+owner = "user-0"
+operator = "user-0"
+custodian = "user-0"
+
+[hardware]
+arch = "x86_64-linux"
+
+[disko]
+root_disk = "/dev/sda"
+layout = "btrfs-lvm"
+managed = true
+swap_size = "4G"
+
+[impermanence]
+enable = true
+rollback_backend = "btrfs"
+persisted_paths = ["/var/log"]
+
+[labels]
+legacy = "dotfiles/vm_oracle_x86"
+
+[lifecycle]
+last_audited_at = "2026-06-03"

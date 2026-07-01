@@ -1,0 +1,10 @@
+id = "limited"
+description = "Newcomers, node and wall caps"
+
+[ssh]
+allowed = true
+
+[slurm_qos]
+max_nodes = 50
+max_wall = "08:00:00"
+priority = 100

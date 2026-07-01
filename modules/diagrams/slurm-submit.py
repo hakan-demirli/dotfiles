@@ -1,0 +1,377 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import json
+import math
+import sys
+from dataclasses import dataclass, field
+
+import svgwrite
+
+
+ROW_GAP = 1.2       
+NODE_W = 3.6        
+NODE_H = 1.2        
+NODE_GAP = 0.4      
+PANEL_PAD = 0.8
+PANEL_HEAD = 1.8
+PANEL_GAP = 2.5     
+TARGET_ASPECT = 16 / 9
+
+USER_COLOR = ("#fce7f3", "#be185d")    
+SUBMIT_COLOR = ("#bfdbfe", "#1d4ed8")  
+CTRL_COLOR = ("#fed7aa", "#c2410c")    
+PART_COLOR = ("#fef08a", "#a16207")    
+COMPUTE_COLOR = ("#bbf7d0", "#15803d") 
+PANEL_BG = ("#f8fafc", "#cbd5e1")
+
+EDGE_SBATCH = "#1d4ed8"
+EDGE_DISPATCH = "#15803d"
+EDGE_NO_SUBMIT = "#dc2626"
+SLURMCTLD = "#c2410c"
+
+
+@dataclass
+class Row:
+    label: str
+    nodes: list[str]  
+    fill: str
+    border: str
+    keys: list[str] = field(default_factory=list)  
+
+
+@dataclass
+class Panel:
+    cid: str
+    title: str
+    rows: list[Row]
+    edges: list[tuple[str, str, str]] = field(default_factory=list)
+    width: float = 0.0
+    height: float = 0.0
+    x: float = 0.0
+    y: float = 0.0
+
+
+def text_card(dwg, x, y, w, h, label, fill, border, font_size=0.32, weight="bold"):
+    dwg.add(
+        dwg.rect(
+            insert=(x, y), size=(w, h),
+            rx=0.18, ry=0.18,
+            fill=fill, stroke=border, stroke_width=0.06,
+        )
+    )
+    if len(label) > 30:
+        label = label[:28] + "…"
+    dwg.add(
+        dwg.text(
+            label,
+            insert=(x + w / 2, y + h / 2 + font_size * 0.35),
+            text_anchor="middle",
+            font_family="Helvetica, Arial, sans-serif",
+            font_size=font_size,
+            font_weight=weight,
+            fill="#111827",
+        )
+    )
+
+
+def layout_row(panel_x, panel_y_for_row, panel_w, cells):
+    n = len(cells)
+    if n == 0:
+        return []
+    total_w = n * NODE_W + (n - 1) * NODE_GAP
+    start_x = panel_x + (panel_w - total_w) / 2
+    return [(start_x + i * (NODE_W + NODE_GAP), panel_y_for_row) for i in range(n)]
+
+
+def main() -> None:
+    facts = json.load(sys.stdin)
+    hosts = facts["hosts"]
+    clusters = facts["clusters"]
+    users = facts["users"]
+    teams = facts["teams"]
+    hosts_by_cluster = facts["hostsByCluster"]
+    hosts_with_slurm_client = set(facts.get("hostsWithSlurmClient", []))
+    ssh_grants = facts.get("sshGrants", [])
+    slurm_grants = facts.get("slurmSubmitGrants", [])
+    violations = {
+        v["user"]: v
+        for v in facts.get("intentViolations", [])
+        if v.get("kind") == "slurm-no-client-host"
+    }
+
+    user_hosts: dict[str, set[str]] = {}
+    for g in ssh_grants:
+        if g.get("account") and not g.get("archived", False):
+            user_hosts.setdefault(g["user"], set()).add(g["host"])
+
+    slurm_cids = sorted(
+        [
+            cid
+            for cid, c in clusters.items()
+            if c.get("scheduler_kind") == "slurm" and c.get("state") != "retired"
+        ],
+        key=lambda cid: (-len(hosts_by_cluster.get(cid, [])), cid),
+    )
+    if not slurm_cids:
+        dwg = svgwrite.Drawing(
+            size=("100%", "100%"), viewBox="0 0 20 6",
+            preserveAspectRatio="xMidYMid meet",
+        )
+        dwg.add(dwg.rect(insert=(0, 0), size=(20, 6), fill="#ffffff"))
+        dwg.add(dwg.text(
+            "no slurm clusters in inventory",
+            insert=(10, 3), text_anchor="middle",
+            font_family="Helvetica, Arial, sans-serif", font_size=0.9, fill="#374151",
+        ))
+        sys.stdout.write(dwg.tostring())
+        return
+
+    panels: list[Panel] = []
+    for cid in slurm_cids:
+        c = clusters[cid]
+        members = sorted(hosts_by_cluster.get(cid, []))
+
+        users_here: set[str] = set()
+        for sg in slurm_grants:
+            if sg["toCluster"] == cid:
+                users_here.add(sg["user"])
+        cluster_team_grants = [
+            g["team"] for g in [] 
+        ]
+        for v in facts.get("intentViolations", []):
+            if v.get("kind") == "slurm-no-client-host" and v.get("cluster") == cid:
+                users_here.add(v["user"])
+
+        users_here_sorted = sorted(users_here)
+
+        row_users = Row(
+            label="users with grant",
+            nodes=[
+                (users[u]["username"] or u) + (
+                    "  (no submit host)" if u in violations else ""
+                )
+                for u in users_here_sorted
+            ],
+            fill=USER_COLOR[0], border=USER_COLOR[1],
+            keys=[f"u:{u}" for u in users_here_sorted],
+        )
+
+        submit_hosts_set: set[str] = set()
+        for u in users_here_sorted:
+            uh = user_hosts.get(u, set())
+            submit_hosts_set |= uh & hosts_with_slurm_client
+        submit_hosts = sorted(submit_hosts_set)
+        row_submit = Row(
+            label="sbatch source hosts (have services/slurm-client)",
+            nodes=submit_hosts if submit_hosts else ["(none)"],
+            fill=SUBMIT_COLOR[0], border=SUBMIT_COLOR[1],
+            keys=[f"s:{h}" for h in submit_hosts] if submit_hosts else ["s:none"],
+        )
+
+        ctrls = c.get("scheduler_controllers") or []
+        row_ctrl = Row(
+            label="slurmctld controllers",
+            nodes=[h + "  [slurmctld]" for h in ctrls] if ctrls else ["(no controller)"],
+            fill=CTRL_COLOR[0], border=CTRL_COLOR[1],
+            keys=[f"c:{h}" for h in ctrls] if ctrls else ["c:none"],
+        )
+
+        partitions = c.get("partitions") or {}
+        part_names = sorted(partitions.keys())
+        row_part = Row(
+            label="partitions",
+            nodes=[
+                pname + ("  (default)" if partitions[pname].get("default") else "")
+                + (
+                    f"  gres={partitions[pname]['gres']}"
+                    if partitions[pname].get("gres") else ""
+                )
+                for pname in part_names
+            ] if part_names else ["(no partitions declared)"],
+            fill=PART_COLOR[0], border=PART_COLOR[1],
+            keys=[f"p:{cid}:{pname}" for pname in part_names] if part_names else ["p:none"],
+        )
+
+        compute_nodes_ordered: list[str] = []
+        compute_seen: set[str] = set()
+        for pname in part_names:
+            for n in partitions[pname].get("nodes") or []:
+                if n not in compute_seen:
+                    compute_seen.add(n)
+                    compute_nodes_ordered.append(n)
+        row_compute = Row(
+            label="compute nodes",
+            nodes=compute_nodes_ordered if compute_nodes_ordered else ["(no nodes)"],
+            fill=COMPUTE_COLOR[0], border=COMPUTE_COLOR[1],
+            keys=[f"n:{h}" for h in compute_nodes_ordered] if compute_nodes_ordered
+                 else ["n:none"],
+        )
+
+        rows = [row_users, row_submit, row_ctrl, row_part, row_compute]
+
+        edges: list[tuple[str, str, str]] = []
+        for u in users_here_sorted:
+            for h in sorted(user_hosts.get(u, set()) & hosts_with_slurm_client):
+                edges.append((f"u:{u}", f"s:{h}", "sbatch"))
+            if u in violations:
+                edges.append((f"u:{u}", "s:none", "missing"))
+        for h in submit_hosts:
+            for ctrl in ctrls:
+                edges.append((f"s:{h}", f"c:{ctrl}", "sbatch"))
+        for ctrl in ctrls:
+            for pname in part_names:
+                edges.append((f"c:{ctrl}", f"p:{cid}:{pname}", "assign"))
+        for pname in part_names:
+            for n in partitions[pname].get("nodes") or []:
+                edges.append((f"p:{cid}:{pname}", f"n:{n}", "dispatch"))
+
+        max_cells = max(len(r.nodes) for r in rows)
+        panel_w = (
+            max_cells * NODE_W + (max_cells - 1) * NODE_GAP + 2 * PANEL_PAD
+        )
+        panel_w = max(panel_w, 18.0)  
+        panel_h = PANEL_HEAD + len(rows) * (NODE_H + ROW_GAP) + PANEL_PAD - ROW_GAP
+
+        title = (
+            f"{cid}   ·   {len(members)} member hosts   ·   "
+            f"controllers: {', '.join(ctrls) if ctrls else 'none'}"
+        )
+        panels.append(Panel(cid=cid, title=title, rows=rows, edges=edges,
+                            width=panel_w, height=panel_h))
+
+    total_area = sum(p.width * p.height for p in panels)
+    widest = max(p.width for p in panels)
+    target_w = math.sqrt(total_area * TARGET_ASPECT * 1.4)
+    canvas_w = max(widest, target_w)
+    x = 0.0
+    y = 0.0
+    shelf_h = 0.0
+    for p in panels:
+        if x > 0 and x + p.width > canvas_w + 1e-6:
+            y += shelf_h + PANEL_GAP
+            x = 0.0
+            shelf_h = 0.0
+        p.x = x
+        p.y = y
+        x += p.width + PANEL_GAP
+        shelf_h = max(shelf_h, p.height)
+    canvas_h = y + shelf_h
+
+    dwg = svgwrite.Drawing(
+        size=("100%", "100%"),
+        viewBox=f"0 0 {canvas_w:.4f} {canvas_h:.4f}",
+        preserveAspectRatio="xMidYMid meet",
+    )
+    dwg.add(dwg.rect(insert=(0, 0), size=(canvas_w, canvas_h), fill="#ffffff"))
+
+    arrow = dwg.marker(
+        id="ss_arrow", insert=(6, 3), size=(7, 6),
+        orient="auto", markerUnits="strokeWidth",
+    )
+    arrow.add(dwg.path(d="M0,0 L0,6 L6,3 z", fill=EDGE_SBATCH))
+    dwg.defs.add(arrow)
+
+    arrow_red = dwg.marker(
+        id="ss_arrow_red", insert=(6, 3), size=(7, 6),
+        orient="auto", markerUnits="strokeWidth",
+    )
+    arrow_red.add(dwg.path(d="M0,0 L0,6 L6,3 z", fill=EDGE_NO_SUBMIT))
+    dwg.defs.add(arrow_red)
+
+    arrow_g = dwg.marker(
+        id="ss_arrow_g", insert=(6, 3), size=(7, 6),
+        orient="auto", markerUnits="strokeWidth",
+    )
+    arrow_g.add(dwg.path(d="M0,0 L0,6 L6,3 z", fill=EDGE_DISPATCH))
+    dwg.defs.add(arrow_g)
+
+    key_pos: dict[str, tuple[float, float, float, float]] = {}  
+
+    for p in panels:
+        dwg.add(
+            dwg.rect(
+                insert=(p.x, p.y), size=(p.width, p.height),
+                rx=0.5, ry=0.5,
+                fill=PANEL_BG[0], stroke=PANEL_BG[1], stroke_width=0.10,
+            )
+        )
+        dwg.add(
+            dwg.text(
+                p.title,
+                insert=(p.x + PANEL_PAD, p.y + 1.0),
+                font_family="Helvetica, Arial, sans-serif",
+                font_size=0.55, font_weight="bold", fill="#1f2937",
+            )
+        )
+
+        for ri, row in enumerate(p.rows):
+            row_y = p.y + PANEL_HEAD + ri * (NODE_H + ROW_GAP)
+            dwg.add(
+                dwg.text(
+                    row.label,
+                    insert=(p.x + PANEL_PAD, row_y - 0.1),
+                    font_family="Helvetica, Arial, sans-serif",
+                    font_size=0.30, fill="#475569",
+                )
+            )
+
+            cells_xy = layout_row(p.x, row_y + 0.15, p.width, row.nodes)
+            for ci, (cx, cy) in enumerate(cells_xy):
+                label = row.nodes[ci]
+                key = row.keys[ci]
+                is_missing = label.endswith("(none)") or "(no" in label or label == "(none)"
+                fill = "#ffffff" if is_missing else row.fill
+                border = EDGE_NO_SUBMIT if is_missing else row.border
+                text_card(dwg, cx, cy, NODE_W, NODE_H, label, fill, border,
+                          font_size=0.30)
+                key_pos[key] = (cx, cy, NODE_W, NODE_H)
+
+        for src_key, dst_key, kind in p.edges:
+            sp = key_pos.get(src_key)
+            dp = key_pos.get(dst_key)
+            if not sp or not dp:
+                continue
+            sx, sy, sw, sh = sp
+            dx, dy, dw, dh = dp
+            x0, y0 = sx + sw / 2, sy + sh
+            x2, y2 = dx + dw / 2, dy
+            mx, my = (x0 + x2) / 2, (y0 + y2) / 2
+            ctrlx = mx
+            ctrly = my
+            if kind == "sbatch":
+                color = EDGE_SBATCH
+                marker = "url(#ss_arrow)"
+                dash = None
+                width = 0.12
+            elif kind == "missing":
+                color = EDGE_NO_SUBMIT
+                marker = "url(#ss_arrow_red)"
+                dash = "0.35,0.25"
+                width = 0.14
+            elif kind == "assign":
+                color = SLURMCTLD
+                marker = "url(#ss_arrow)"
+                dash = "0.45,0.30"
+                width = 0.10
+            else:  
+                color = EDGE_DISPATCH
+                marker = "url(#ss_arrow_g)"
+                dash = None
+                width = 0.10
+            d = f"M{x0:.3f},{y0:.3f} Q{ctrlx:.3f},{ctrly:.3f} {x2:.3f},{y2:.3f}"
+            attrs = dict(
+                d=d, fill="none",
+                stroke=color, stroke_width=width,
+                marker_end=marker,
+            )
+            if dash:
+                attrs["stroke_dasharray"] = dash
+            dwg.add(dwg.path(**attrs))
+
+    sys.stdout.write(dwg.tostring())
+
+
+if __name__ == "__main__":
+    main()

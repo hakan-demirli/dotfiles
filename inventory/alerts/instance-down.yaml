@@ -1,0 +1,15 @@
+groups:
+  - name: instance_down
+    interval: 15s
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: 'instance {{ $labels.instance }} ({{ $labels.job }}) is down'
+          description: |
+            The node_exporter on {{ $labels.instance }} stopped reporting more
+            than 30s ago. Last known job: {{ $labels.job }}.

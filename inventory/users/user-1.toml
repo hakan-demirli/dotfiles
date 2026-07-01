@@ -1,0 +1,18 @@
+id = "user-1"
+kind = "human"
+cohort = "staff"
+headscale_user = "user-1"
+allowed_hosts = ["all"]
+
+[system_account]
+username = "sahand"
+uid = 1001
+shell = "bash"
+groups = []
+home = "/home/sahand"
+
+[keys]
+ssh = [
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN29d0vak6zCImShsS7vgBpkruf9WV6Sj+8vNhBDJ56B user-1",
+]
+age = []

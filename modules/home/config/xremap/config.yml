@@ -1,0 +1,139 @@
+default_mode: insert
+
+keymap:
+  - name: Default
+    remap:
+      KEY_GRAVE: reserved
+      KEY_RIGHTBRACE: reserved
+      KEY_BACKSLASH: reserved
+      KEY_LEFTBRACE: KEY_BACKSPACE
+      Ctrl-KEY_LEFTBRACE: Ctrl-KEY_BACKSPACE
+      Alt-KEY_LEFTBRACE: KEY_BACKSPACE
+      Shift-KEY_LEFTBRACE: KEY_DELETE
+      Alt-Shift-KEY_LEFTBRACE: Shift-KEY_MINUS
+      KEY_BACKSPACE: reserved
+      KEY_ENTER: reserved
+      KEY_APOSTROPHE: KEY_ENTER
+
+      Shift-Alt-y: KEY_APOSTROPHE
+      Shift-Alt-u: Shift-KEY_LEFTBRACE
+      Shift-Alt-i: Shift-KEY_RIGHTBRACE
+      Shift-Alt-o: Shift-KEY_4
+      Shift-Alt-p: KEY_PASTE
+
+      Shift-Alt-h: KEY_HOME
+      Shift-Alt-j: KEY_KPLEFTPAREN
+      Shift-Alt-k: KEY_KPRIGHTPAREN
+      Shift-Alt-l: KEY_END
+      Shift-Alt-KEY_SEMICOLON: reserved
+
+      Shift-Alt-n: Shift-KEY_APOSTROPHE
+      Shift-Alt-m: KEY_LEFTBRACE
+      Shift-Alt-comma: KEY_RIGHTBRACE
+      Shift-Alt-dot: reserved
+      Shift-Alt-slash: reserved
+
+      Alt-KEY_SPACE: KEY_SPACE
+
+      Alt-h: KEY_LEFT
+      Alt-j: KEY_DOWN
+      Alt-k: KEY_UP
+      Alt-l: KEY_RIGHT
+      Ctrl-Alt-h: Ctrl-KEY_LEFT
+      Ctrl-Alt-j: Ctrl-KEY_DOWN
+      Ctrl-Alt-k: Ctrl-KEY_UP
+      Ctrl-Alt-l: Ctrl-KEY_RIGHT
+      Alt-KEY_SEMICOLON: reserved
+
+
+      Shift-Alt-q: reserved
+      Shift-Alt-w: Shift-KEY_7
+      Shift-Alt-e: Shift-KEY_8
+      Shift-Alt-r: Shift-KEY_6
+      Shift-Alt-t: Shift-KEY_2
+
+      Shift-Alt-a: Shift-KEY_1
+      Shift-Alt-s: KEY_MINUS
+      Shift-Alt-d: Shift-KEY_EQUAL
+      Shift-Alt-f: KEY_EQUAL
+      Shift-Alt-g: Shift-KEY_3
+
+      Shift-Alt-z: KEY_BACKSLASH
+      Shift-Alt-x: Shift-KEY_GRAVE
+      Shift-Alt-c: KEY_GRAVE
+      Shift-Alt-v: Shift-KEY_5
+      Shift-Alt-b: Shift-KEY_BACKSLASH
+
+      Alt-w: KEY_7
+      Alt-e: KEY_8
+      Alt-r: KEY_9
+      Alt-t: KEY_0
+
+      Alt-s: KEY_4
+      Alt-d: KEY_5
+      Alt-f: KEY_6
+
+      Alt-x: KEY_1
+      Alt-c: KEY_2
+      Alt-v: KEY_3
+
+
+      KEY_1: reserved
+      KEY_2: reserved
+      KEY_3: reserved
+      KEY_4: reserved
+      KEY_5: reserved
+      KEY_6: reserved
+      KEY_7: reserved
+      KEY_8: reserved
+      KEY_9: reserved
+      KEY_0: reserved
+      KEY_MINUS: reserved
+      KEY_EQUAL: reserved
+
+  - name: moonlight
+    application:
+      only: [ com.moonlight_stream.Moonlight, Moonlight ]
+    remap:
+      Ctrl-Shift-b: Ctrl-Shift-Alt-q
+      Ctrl-Shift-Alt-q: Ctrl-Shift-Alt-q
+
+  - name: .virt-manager-wrapped
+    application:
+      only: [ .virt-manager-wrapped ]
+    remap:
+      CapsLock: esc
+      Shift-KEY_LEFTALT-j: KEY_KPLEFTPAREN
+      Shift-KEY_LEFTALT-k: KEY_KPRIGHTPAREN
+      Shift-KEY_LEFTALT: reserved
+      Shift-KEY_RIGHTALT-j: KEY_KPLEFTPAREN
+      Shift-KEY_RIGHTALT-k: KEY_KPRIGHTPAREN
+      Shift-KEY_RIGHTALT: reserved
+
+  - name: firefox
+    application:
+      only: [ firefox ]
+    remap:
+      CTRL-i: KEY_F6
+      CTRL-o: Ctrl-t
+      CTRL-b: reserved
+      CTRL-k: Ctrl-Shift-KEY_TAB
+      CTRL-j: Ctrl-KEY_TAB
+
+  - name: helix
+    application:
+      only: helix
+    remap:
+      KEY_BACKSPACE: reserved
+
+  - name: Xschem
+    application:
+      only: Xschem
+    remap:
+      Alt-1: insert
+
+  - name: Code
+    application:
+      only: [ Code ]
+    remap:
+      CapsLock: esc

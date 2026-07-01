@@ -1,0 +1,32 @@
+@define-color background #282a36;
+@define-color foreground #f8f8f2;
+@define-color accent     #bd93f9;
+
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  color: @foreground;
+}
+
+#window {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+box#main {
+  background-color: alpha(@background, 0.9);
+  border: 2px solid @accent;
+  border-radius: 12px;
+  padding: 8px;
+}
+
+list#main,
+list#plugin {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+label#match-desc {
+  font-size: 10px;
+}
+
+label#plugin {
+  font-size: 14px;
+}

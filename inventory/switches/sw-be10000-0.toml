@@ -1,0 +1,52 @@
+id = "sw-be10000-0"
+description = "EdgeCore BE10000 100G leaf-0 (lab core). OpenWrt-based; UCI codegen drives config."
+role = "leaf"
+state = "provisioned"
+
+mgmt_ipv4 = "10.99.0.10/16"
+mgmt_network = "mgmt-bmc"
+
+[location]
+kind = "switch-rack"
+rack = "rack-0"
+site = "dc1"
+
+[ownership]
+class = "personal"
+owner = "user-0"
+
+[hardware]
+vendor = "edgecore"
+model = "BE10000"
+os = "openwrt"
+os_version = "4.8.4-release1"
+firmware_image = "openwrt-be10000_1"
+
+[bgp]
+asn = 65001
+loopback_v4 = "10.99.255.10/32"
+
+[ports.eth1]
+name = "eth1"
+speed_gbps = 100
+role = "downlink-host"
+peer = "server-fpga-dev-0"
+description = "to FPGA dev host"
+
+[ports.eth2]
+name = "eth2"
+speed_gbps = 100
+role = "downlink-host"
+peer = "server-fpga-build-0"
+description = "to FPGA build host"
+
+[ports.eth32]
+name = "eth32"
+speed_gbps = 100
+role = "uplink"
+peer = "sw-be10000-1"
+peer_port = "eth32"
+description = "uplink to leaf-1"
+
+[labels]
+purpose = "lab-core"
