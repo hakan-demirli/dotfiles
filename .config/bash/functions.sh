@@ -154,9 +154,9 @@ gwd() {
   git worktree remove --force "$target_dir"
 }
 
-opencode() {
-  case "${1:-}" in
-    "" | -*) command opencode attach "${OPENCODE_URL:-http://127.0.0.1:4096}" --dir "$PWD" --continue "$@" ;;
-    *) command opencode "$@" ;;
-  esac
-}
+# opencode() {
+#   case "${1:-}" in
+#     "" | -*) command opencode attach "${OPENCODE_URL:-http://127.0.0.1:4096}" --dir "$PWD" --continue "$@" ;;
+#     *) command opencode "$@" ;;
+#   esac
+# }
