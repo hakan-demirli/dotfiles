@@ -125,7 +125,10 @@ in
       boot = {
         loader.efi.canTouchEfiVariables = true;
         loader.grub.efiInstallAsRemovable = false;
-        binfmt.emulatedSystems = [ "x86_64-linux" ];
+        binfmt.emulatedSystems = [
+          "x86_64-linux"
+          "riscv64-linux"
+        ];
       };
     };
 }

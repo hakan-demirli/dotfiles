@@ -80,7 +80,10 @@ mkFleet {
 
         networking.networkmanager.enable = true;
         programs.nix-ld.enable = true;
-        boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+        boot.binfmt.emulatedSystems = [
+          "aarch64-linux"
+          "riscv64-linux"
+        ];
 
         system.impermanence.extraPersistentUserDirs = [
           ".config/sunshine"
