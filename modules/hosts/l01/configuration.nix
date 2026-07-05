@@ -143,7 +143,10 @@ in
       };
 
       boot = {
-        binfmt.emulatedSystems = [ "aarch64-linux" ];
+        binfmt.emulatedSystems = [
+          "aarch64-linux"
+          "riscv64-linux"
+        ];
         kernel.sysctl = {
           "net.ipv4.ip_forward" = 1;
           "fs.file-max" = "20480000";
