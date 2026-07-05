@@ -14,8 +14,10 @@
   "autoupdate": false,
   "lsp": false,
   "formatter": false,
+  "snapshot": false,
   "plugin": [
     "opencode-gemini-auth@latest",
+    "opencode-antigravity-auth-updated@latest",
     "@mohak34/opencode-notifier@latest",
     "./plugins/office"
   ]
