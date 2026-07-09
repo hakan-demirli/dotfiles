@@ -9,20 +9,39 @@
 | **Keyboard**    | [tbk_mini](https://github.com/Bastardkb/TBK-Mini)-[QMK](./modules/home/config/qmk) |
 
 <!--toc:start-->
+- [Repo layout](#repo-layout)
 - [Build](#build)
 - [Installation and Deployment](#installation-and-deployment)
-  - [Switch to a new config](#switch-to-a-new-config)
-  - [Build without switch](#build-without-switch)
-  - [Build an iso or qcow2](#build-an-iso-or-qcow2)
-  - [Using minimal ISO](#using-minimal-iso)
-  - [Oracle VPS ARM (kexec)](#oracle-vps-arm-kexec)
-  - [Oracle VPS x86 (1GB RAM)](#oracle-vps-x86-1gb-ram)
-  - [ARM QEMU VM using nixos-anywhere](#arm-qemu-vm-using-nixos-anywhere)
 - [Tailscale/Headscale](#tailscaleheadscale)
 - [Deploy Secrets](#deploy-secrets)
 - [Home-manager](#home-manager)
 - [Inventory artifacts](#inventory-artifacts)
 <!--toc:end-->
+
+# Repo layout
+
+This flake covers two independent surfaces:
+
+| Surface       | Scope         | Auth needed | Entry point                        |
+|---------------|---------------|-------------|------------------------------------|
+| **System**    | `/`, kernel, services, users, boot | root/sudo | `nixosConfigurations.<host>` (`nixos-rebuild switch`) |
+| **Home**      | `$HOME`, dotfiles, user services   | user       | `homeConfigurations."emre-*"` (`home-manager switch`) |
+
+They are kept fully separate on purpose:
+
+- The **system side** is driven by `inventory/` (Nix facts) + `modules/` (role
+  and host closures). One host = one `nixos-rebuild`. It needs sudo, wipes and
+  re-creates activation atomically, and is expected to run on NixOS boxes.
+- The **home side** is standalone: `home-manager switch --flake .#emre-<variant>`
+  runs as the user, edits `$HOME` only, and works on NixOS *or* any other
+  distro (linux) where you already have `home-manager` installed. It never
+  touches system paths and does not require sudo.
+
+Currently modeled hosts (aggressive intro-one-by-one philosophy — reintroduce
+the rest as they come back online):
+
+- `laptop-0`  — daily-driver laptop
+- `vps-oracle-0` — ARM VPS: headscale + slurm master + observability
 
 # Build
 
@@ -31,16 +50,21 @@
 * ```nix run .#test-codegen-smoke```
 
 # Installation and Deployment
-## Switch to a new config
+
+## Switch to a new system config
+
 * ```sudo nixos-rebuild switch --flake ./.#laptop-0```
 
 ## Build without switch
+
 * ```sudo nixos-rebuild build --flake ~/Desktop/infra/dotfiles/#laptop-0```
 
 ## Build an iso or qcow2
+
 * ```nix run github:nix-community/nixos-generators -- --flake .#vps-oracle-0 --format iso```
 
 ## Using minimal ISO
+
   * Boot a nixos ISO.
     * ```sudo cp ./nixos-minimal-*.iso /dev/sdb```
   * Become a root user:
@@ -59,6 +83,7 @@
     * ```reboot```
 
 ## Oracle VPS ARM (kexec)
+
 * ```nix build .#kexec --system aarch64-linux```
 * ```scp -i ~/.ssh/id_ed25519_proton ./result ubuntu@<IP>:/tmp/kexec```
 * ```ssh ubuntu@<IP> -i ~/.ssh/id_ed25519_proton -t sudo /tmp/kexec```
@@ -66,33 +91,8 @@
 * ```ssh root@<IP> -i ~/.ssh/id_ed25519_proton```
 * Continue as if you have booted the minimal iso.
 
-## Oracle VPS x86 (1GB RAM)
-* Follow `Oracle VPS ARM` (drop `--system aarch64-linux`) and boot the kexec.
-* Compile locally and push:
-    * Disko:
-        * ```nix build github:nix-community/disko#disko --extra-experimental-features "nix-command flakes" --print-out-paths > /tmp/disko-path.txt```
-        * ```DISKO_LOCAL_STORE_PATH=$(cat /tmp/disko-path.txt)```
-    * System:
-        * ```nix build .#nixosConfigurations.vps-oracle-1.config.system.build.toplevel --extra-experimental-features "nix-command flakes" --print-out-paths > /tmp/system-path.txt```
-        * ```SYSTEM_LOCAL_STORE_PATH=$(cat /tmp/system-path.txt)```
-    * Copy to VPS:
-        * ```nix copy --to ssh://root@<IP>?ssh-key=/home/emre/.ssh/id_ed25519_proton $DISKO_LOCAL_STORE_PATH```
-        * ```nix copy --to ssh://root@<IP>?ssh-key=/home/emre/.ssh/id_ed25519_proton $SYSTEM_LOCAL_STORE_PATH```
-    * Format the disk:
-        * ```REMOTE_DISKO_BIN=$(echo $DISKO_LOCAL_STORE_PATH | sed 's|^/nix/store/||')```
-        * ```ssh root@<IP> -i ~/.ssh/id_ed25519_proton "/nix/store/$REMOTE_DISKO_BIN/bin/disko --mode disko /tmp/disko.nix --arg device '\"/dev/sda\"'"```
-    * Activate:
-        * ```REMOTE_SYSTEM=$(echo $SYSTEM_LOCAL_STORE_PATH | sed 's|^/nix/store/||')```
-        * ```bash
-          ssh root@<IP> -i ~/.ssh/id_ed25519_proton <<EOF
-          mkdir -p /mnt/nix/var/nix/profiles/
-          nix-env --profile /mnt/nix/var/nix/profiles/system --set /nix/store/$REMOTE_SYSTEM
-          NIXOS_INSTALL_BOOTLOADER=1 /mnt/nix/var/nix/profiles/system/bin/switch-to-configuration boot
-          EOF
-          ```
-        * reboot
-
 ## ARM QEMU VM using nixos-anywhere
+
 * Boot minimal iso in qemu and allow ssh access.
 * ```nix-shell -p nixos-anywhere```
 * ```nixos-anywhere --flake .#vps-oracle-0 root@192.168.1.128```
@@ -122,10 +122,12 @@ Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`. Every host
 The host's age identity = shared bootstrap key in `secrets/age-bootstrap.key.enc` (passphrase-encrypted). Per-host age via ssh-to-age is optional and not required for first boot.
 
 ## Fleet bring-up (one-time)
+
 * ```bash secrets/gen-bootstrap-key.sh```
 * ```nix build .#sops-yaml && cp -f result secrets/.sops.yaml```
 
 ## Setup (one-time per machine)
+
 1. **Decrypt the age key**:
    * ```AGE_KEY="$(age -d secrets/age-bootstrap.key.enc)" || { echo "decrypt failed"; }```
 2. **Deploy the key**:
@@ -135,25 +137,22 @@ The host's age identity = shared bootstrap key in `secrets/age-bootstrap.key.enc
 3. **Install/Switch**:
    * ```sudo nixos-rebuild switch --flake .#hostname```
 
-## Shared servers (no sops by default)
-   * Set `[labels].tailscale_auth_key = "false"` in `inventory/hosts/.../<id>.toml`.
-   * ```sudo nixos-rebuild switch --flake .#<id>```
-   * ```sudo tailscale up --login-server=https://sshr.polarbearvuzi.com --advertise-tags=tag:shared-server```
-
 ## Editing Secrets
+
 * ```export SOPS_AGE_KEY="$(age -d secrets/age-bootstrap.key.enc)" || exit 1```
 * ```sops --config secrets/.sops.yaml secrets/secrets.yaml```
 
-## Migration from dotfiles
-* ```bash secrets/migrate-from-dotfiles.sh```
-
 # Home-manager
 
-Standalone (not wired into nixos hosts). Pick the entry matching the host:
+`$HOME`-only, no sudo. Pick the entry matching your host:
 
-* ```home-manager switch --flake .#emre```           — desktop, no nvidia
+* ```home-manager switch --flake .#emre```           — generic desktop, no nvidia
 * ```home-manager switch --flake .#emre-nvidia```    — desktop with nvidia (laptop-0)
 * ```home-manager switch --flake .#emre-headless```  — servers / alien distros
+
+These are decoupled from `nixosConfigurations` on purpose: the same
+home closure works on a bare Ubuntu box or inside a container, so long as
+`home-manager` is on `PATH`.
 
 # Inventory artifacts
 
@@ -164,4 +163,4 @@ Standalone (not wired into nixos hosts). Pick the entry matching the host:
 * ```nix build .#kexec```             — kexec bootstrap bundle
 * ```nix run   .#inventory-dump```    — pretty-print resolved inventory
 * ```nix run   .#intent-report```     — drift between inventory + nixos config
-* ```nix build .#diagrams```          — topology PNGs
+* ```nix build .#diagrams```          — topology SVGs

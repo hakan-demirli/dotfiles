@@ -1,8 +1,0 @@
-id = "fpga-storage"
-purpose = "isolated storage path for FPGA traffic; PFC-enabled for RoCE"
-prefix_v4 = "10.43.0.0/16"
-prefix_v6 = "fd43:cafe::/48"
-gateway_v4 = "10.43.0.1"
-bgp_asn = 65000
-vrf = "fpga-storage"
-qos_class = "lossless"

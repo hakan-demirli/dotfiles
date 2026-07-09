@@ -3,11 +3,6 @@
   services = {
     tailscale.loginServerHost = "sshr.polarbearvuzi.com";
 
-    slurm-client = {
-      enable = true;
-      masterHostname = "vps-oracle-0";
-    };
-
     yubikey.pamOrigin = "pam://emre-sudo";
 
     displayManager.sddm.theme = "sddm-astronaut-theme";

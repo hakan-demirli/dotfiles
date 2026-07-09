@@ -2,7 +2,9 @@
 {
   flake.homeConfigurations =
     let
-      lib = inputs.nixpkgs.lib;
+      inherit (inputs.nixpkgs) lib;
+
+      homeRoot = ../home/users;
 
       mkPkgs =
         system:
@@ -37,64 +39,54 @@
       mkHome =
         {
           name,
-          username,
-          homeDirectory,
+          user,
           system ? "x86_64-linux",
           profile ? "desktop",
           hasNvidia ? false,
-          facts ? stubFacts { inherit name system hasNvidia; },
-          extraModules ? [ ],
         }:
         let
-          profileModule =
-            if profile == "desktop" then
-              ../home/desktop.nix
-            else if profile == "headless" then
-              ../home/headless.nix
-            else
-              throw "home: unknown profile '${profile}'";
+          facts = stubFacts { inherit name system hasNvidia; };
         in
         inputs.home-manager.lib.homeManagerConfiguration {
           pkgs = mkPkgs system;
           extraSpecialArgs = {
-            inherit inputs facts;
+            inherit inputs facts profile;
           };
-          modules = [
-            ../home/default.nix
-            profileModule
-            (_: {
-              home = {
-                inherit username homeDirectory;
-                stateVersion = "26.11";
-              };
-            })
-          ]
-          ++ extraModules;
+          modules = [ (homeRoot + "/${user}") ];
         };
 
-      entries = {
-        emre = {
-          username = "emre";
-          homeDirectory = "/home/emre";
-          system = "x86_64-linux";
+      profiles = {
+        "desktop" = {
           profile = "desktop";
+          hasNvidia = false;
         };
-
-        emre-nvidia = {
-          username = "emre";
-          homeDirectory = "/home/emre";
-          system = "x86_64-linux";
+        "desktop-nvidia" = {
           profile = "desktop";
           hasNvidia = true;
         };
-
-        emre-headless = {
-          username = "emre";
-          homeDirectory = "/home/emre";
-          system = "x86_64-linux";
+        "headless" = {
           profile = "headless";
+          hasNvidia = false;
         };
       };
+
+      discoveredUsers =
+        if !builtins.pathExists homeRoot then
+          [ ]
+        else
+          lib.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir homeRoot));
+
+      entries = lib.listToAttrs (
+        lib.concatMap (
+          uid:
+          lib.mapAttrsToList (pname: pcfg: {
+            name = "${uid}@${pname}";
+            value = pcfg // {
+              user = uid;
+            };
+          }) profiles
+        ) discoveredUsers
+      );
     in
     lib.mapAttrs (name: cfg: mkHome (cfg // { inherit name; })) entries;
 }

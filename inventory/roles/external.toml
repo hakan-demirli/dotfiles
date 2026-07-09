@@ -1,5 +1,0 @@
-id = "external"
-description = "Operator-managed host outside the cluster-config closure builder"
-kind = "nixos"
-node_role = "external"
-modules = []

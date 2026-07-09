@@ -2,39 +2,42 @@
 
 Per-role NixOS module implementations.
 
-Each role declared in `inventory/roles/<id>.toml` may have a matching
-`modules/roles/<id>.nix` here. `lib/mkRole.nix` looks it up by name; missing
-modules are silently skipped so a role can exist as inventory-only.
+Each role declared in `inventory/roles/<id>.nix` lists Nix modules under
+its `modules` array. `lib/mkRole.nix` resolves each ref against a fixed
+search path (roles → services → common → top-level, consumer repo first,
+then infra-lib). A ref that resolves to no file is a hard error: the eval
+throws with the full search path so you see exactly where it looked. No
+silent skips.
+
+If you want an inventory role without a matching `modules/roles/<id>.nix`
+here, keep the sister file out and let the role's behaviour come purely
+from the other modules it lists — but every listed ref must exist somewhere
+in the search path.
 
 ## Present today
 
-- `personal-laptop.nix` -- tailscale client + slurm-client wiring for
-  `laptop-*` hosts (l01/l02 in the dotfiles era).
-- `personal-server.nix` -- tailscale client + slurm-client wiring for
-  `server-dev-*` general-purpose home servers.
+- `personal-laptop.nix` -- tailscale client + slurm-client + yubikey +
+  sddm astronaut theme wiring for `laptop-0`.
 - `cloud-vps-control.nix` -- headscale server + tailscale client +
-  reverse-ssh-server + ntfy + docker-registry for the Oracle Cloud
+  reverse-ssh-server + slurm master + transmission for the Oracle Cloud
   control-plane VPS (`vps-oracle-0`).
 
-The remaining roles in `inventory/roles/` (e.g. `dev-fpga`,
-`lab-fpga-*`, `mgmt-observability`, `kvm-guest`, `external`,
-`laptop-darwin`) are inventory-only today and get their behaviour
-purely from the modules they reference in their `modules` list.
+`mgmt-observability` is declared in `inventory/roles/` but has no sister
+`.nix` here; its behaviour comes entirely from the modules referenced in
+its `modules` list (`services/victoriametrics`, `services/grafana`,
+`services/vmalert`, `services/alertmanager`) sourced from `infra-lib`.
 
 ## How a role's behaviour is assembled
 
-- `modules/common/{role-identity,sshd,auto-upgrade}.nix` (referenced via
-  `inventory/roles/<id>.toml#modules`).
+- Modules listed in `inventory/roles/<id>.nix#modules` are resolved via:
+  ```
+  modules/roles/<id>.nix     <- preferred
+  modules/services/<id>.nix
+  modules/common/<id>.nix
+  modules/<id>.nix
+  ```
 - The role's `tunables` block (free-form data the closure reads).
-- Optionally, the sister file in this directory (this README's list).
+- Optionally, the sister file in this directory (list above).
 
 To add a new role implementation: write `modules/roles/<id>.nix`, then
-reference it in `inventory/roles/<id>.toml#modules` as `roles/<id>`. The
-resolver finds it via:
-
-```
-modules/roles/<id>.nix     <- preferred
-modules/services/<id>.nix
-modules/common/<id>.nix
-modules/<id>.nix
-```
+reference it in `inventory/roles/<id>.nix#modules` as `roles/<id>`.

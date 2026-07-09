@@ -13,6 +13,28 @@ let
   downloadDir = "${primaryHome}/Downloads";
   incompleteDir = "${downloadDir}/.incomplete";
   mediaDir = "${downloadDir}/media";
+
+  hostCluster =
+    if cluster.hostToCluster ? ${host.id} then
+      cluster.clusters.${cluster.hostToCluster.${host.id}}
+    else
+      throw "cloud-vps-control: host '${host.id}' is not attached to any cluster.";
+
+  nodeAttrsFor =
+    hid:
+    let
+      h = cluster.hosts.${hid};
+    in
+    {
+      hostName = hid;
+      sockets = h.hardware.cpu_sockets;
+      coresPerSocket = h.hardware.cpu_cores_per_socket;
+      threadsPerCore = h.hardware.cpu_threads_per_core;
+      cpuLogicalCount = h.hardware.cpu_logical_count;
+      ramMb = h.hardware.ram_gib * 1024;
+    };
+
+  clusterNodes = map nodeAttrsFor cluster.hostsByCluster.${hostCluster.id};
 in
 {
   services = {
@@ -47,23 +69,7 @@ in
       enable = true;
       isMaster = true;
       masterHostname = host.id;
-      clusterNodes = [
-        {
-          hostName = host.id;
-          cores = 4;
-          ramMb = 21000;
-        }
-        {
-          hostName = "server-dev-0";
-          cores = 16;
-          ramMb = 58000;
-        }
-        {
-          hostName = "server-dev-1";
-          cores = 8;
-          ramMb = 14500;
-        }
-      ];
+      inherit clusterNodes;
     };
 
     transmission-cluster = {
@@ -77,6 +83,10 @@ in
         url = "http://100.64.0.1:9091/transmission/web/";
       }
     ];
+
+    cluster-harmonia.signKey.source = "sops";
+
+    cluster-victoriametrics.targetDomain = "ts.sshr.polarbearvuzi.com";
   };
 
   systemd.tmpfiles.rules = [

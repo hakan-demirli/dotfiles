@@ -1,5 +1,0 @@
-id = "rack-0"
-site = "dc1"
-position = "row-A col-1"
-power_kw = 15
-switch_id = "router-0"

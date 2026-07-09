@@ -1,0 +1,43 @@
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 15
+    Compression yes
+    StrictHostKeyChecking no
+    ForwardAgent yes
+
+Host vm-oracle-aarch64
+    HostName sshr.polarbearvuzi.com
+    User emre
+    IdentityFile ~/.ssh/id_ed25519_proton
+
+Host tailscale-vm-oracle-aarch64
+    HostName 100.64.0.1
+    User emre
+    IdentityFile ~/.ssh/id_ed25519_proton
+
+Host safari
+    HostName safari-proxy.ethz.ch
+    User demirlie
+    IdentityFile ~/.ssh/id_ed25519_sf
+
+Host safari0
+    HostName safari-proxy.ethz.ch
+    User edemirli
+    IdentityFile ~/.ssh/id_ed25519_sf
+
+Host server-dev-1
+    HostName 192.168.1.115
+    User emre
+    IdentityFile ~/.ssh/id_ed25519_proton
+
+Host server-dev-1-via-jump
+    HostName localhost
+    Port 42001
+    User emre
+    IdentityFile ~/.ssh/id_ed25519_proton
+    ProxyJump vm-oracle-aarch64
+
+Host tailscale-server-dev-1
+    HostName 100.64.0.2
+    User emre
+    IdentityFile ~/.ssh/id_ed25519_proton

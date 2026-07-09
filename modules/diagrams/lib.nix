@@ -13,7 +13,6 @@ let
     teams
     clusters
     users
-    roles
     hostToCluster
     hostsByCluster
     hostNodeRoles
@@ -36,26 +35,15 @@ let
 
   lbl = lines: concatStringsSep "\\n" (map q (filter (l: l != null) lines));
 
-  sortedAttrNames = attrs: sort lessThan (attrNames attrs);
-
-  palette = {
-    switch = "#dbeafe";
-    host = "#dcfce7";
-    hostPlanned = "#fef9c3";
-    hostRetired = "#fecaca";
-    network = "#fef3c7";
-    user = "#fce7f3";
-    team = "#f3e8ff";
-    cluster = "#e2e8f0";
-    site = "#ffedd5";
-    rack = "#f3f4f6";
-    external = "#ffffff";
-    edgeUplink = "#1d4ed8";
-    edgeDownlink = "#15803d";
-    edgeMlag = "#b91c1c";
-    edgeMgmt = "#6b21a8";
-    edgeDefault = "#374151";
-  };
+  theme = import ./theme.nix;
+  inherit (theme)
+    palette
+    fleetPalette
+    fleetSolo
+    fontSize
+    ;
+  fontFamily = theme.fontFamilyGraphviz;
+  fleetSoloColor = fleetSolo;
 
   hostFill =
     h:
@@ -170,7 +158,7 @@ let
           ];
           color = portEdgeColor p.role;
         in
-        "  ${i p.switch} -- ${i p.peer} [label=\"${label}\", color=\"${color}\", fontsize=9];";
+        "  ${i p.switch} -- ${i p.peer} [label=\"${label}\", color=\"${color}\", fontsize=${toString fontSize.edge}];";
 
       groupBlock =
         cls: ids:
@@ -201,10 +189,10 @@ let
     in
     ''
       graph "topology_${topo.id}" {
-        labelloc="t"; fontsize=18;
+        labelloc="t"; fontsize=${toString fontSize.title};
         label="Topology: ${topo.id}\n${topo.kind}\n${topo.description}";
         rankdir=TB; splines=true; overlap=false;
-        node [fontname="Helvetica"]; edge [fontname="Helvetica"];
+        graph [fontname="${fontFamily}"]; node [fontname="${fontFamily}"]; edge [fontname="${fontFamily}"];
 
       ${spineBlock}
       ${leafBlock}
@@ -243,7 +231,7 @@ let
             let
               ipPart = if nic.ipv4 == null then "" else " ${nic.ipv4}";
             in
-            "  ${i hid} -- ${i "net:${nic.network}"} [label=\"${q nic.name}\\n${q nic.role}${q ipPart}\", fontsize=9];";
+            "  ${i hid} -- ${i "net:${nic.network}"} [label=\"${q nic.name}\\n${q nic.role}${q ipPart}\", fontsize=${toString fontSize.edge}];";
         in
         map mkEdge attached;
 
@@ -253,7 +241,7 @@ let
           [ ]
         else
           [
-            "  ${i hid} -- ${i "net:${h.bmc.network}"} [label=\"bmc/${q h.bmc.vendor}\", style=dashed, fontsize=9, color=\"${palette.edgeMgmt}\"];"
+            "  ${i hid} -- ${i "net:${h.bmc.network}"} [label=\"bmc/${q h.bmc.vendor}\", style=dashed, fontsize=${toString fontSize.edge}, color=\"${palette.edgeMgmt}\"];"
           ];
 
       switchMgmtEdges =
@@ -262,7 +250,7 @@ let
           [ ]
         else
           [
-            "  ${i "sw:${sid}"} -- ${i "net:${s.mgmt_network}"} [label=\"mgmt\", style=dashed, fontsize=9, color=\"${palette.edgeMgmt}\"];"
+            "  ${i "sw:${sid}"} -- ${i "net:${s.mgmt_network}"} [label=\"mgmt\", style=dashed, fontsize=${toString fontSize.edge}, color=\"${palette.edgeMgmt}\"];"
           ];
 
       hostNode =
@@ -296,9 +284,9 @@ let
     in
     ''
       graph "network_l3" {
-        labelloc="t"; fontsize=18; label="Networks / L3 attachments";
+        labelloc="t"; fontsize=${toString fontSize.title}; label="Networks / L3 attachments";
         rankdir=LR; splines=true; overlap=false;
-        node [fontname="Helvetica"]; edge [fontname="Helvetica"];
+        graph [fontname="${fontFamily}"]; node [fontname="${fontFamily}"]; edge [fontname="${fontFamily}"];
 
       ${netBlock}
       ${hostBlock}
@@ -327,51 +315,11 @@ let
       if la != lb then la > lb else a < b
     ) (attrNames activeClusters);
 
-  fleetPalette = [
-    {
-      fill = "#bfdbfe";
-      border = "#1d4ed8";
-    }
-    {
-      fill = "#bbf7d0";
-      border = "#15803d";
-    }
-    {
-      fill = "#fed7aa";
-      border = "#c2410c";
-    }
-    {
-      fill = "#ddd6fe";
-      border = "#6d28d9";
-    }
-    {
-      fill = "#fef08a";
-      border = "#a16207";
-    }
-    {
-      fill = "#fbcfe8";
-      border = "#be185d";
-    }
-    {
-      fill = "#a7f3d0";
-      border = "#047857";
-    }
-    {
-      fill = "#fda4af";
-      border = "#be123c";
-    }
-  ];
-
   paletteAt = idx: elemAt fleetPalette (mod idx (length fleetPalette));
 
   multiHostClusters = filter (cid: length (hostsByCluster.${cid} or [ ]) > 1) clustersBySize;
 
   fleetColors = listToAttrs (imap0 (i: cid: nameValuePair cid (paletteAt i)) multiHostClusters);
-
-  fleetSoloColor = {
-    fill = "#f1f5f9";
-    border = "#94a3b8";
-  };
 
   fleetColorFor = cid: fleetColors.${cid} or fleetSoloColor;
 
@@ -452,7 +400,7 @@ let
         "  ${i "cluster:${cid}"} [label=\"${label}\", shape=box, style=\"filled,rounded\","
         + " width=${width}, height=0.7,"
         + " fillcolor=\"${col.fill}\", color=\"${col.border}\", penwidth=2,"
-        + " fontsize=11];";
+        + " fontsize=${toString fontSize.label}];";
 
       hostNode =
         hid:
@@ -469,7 +417,7 @@ let
         "  ${i "host:${hid}"} [label=\"${label}\", shape=${hostShapeFor hid},"
         + " style=\"${hostStyleFor hid}\","
         + " fillcolor=\"${col.fill}\", color=\"${col.border}\", penwidth=1.5,"
-        + " fontsize=10];";
+        + " fontsize=${toString fontSize.body}];";
 
       teamMemberEdges =
         tid:
@@ -480,7 +428,8 @@ let
           [ ]
         else
           map (
-            m: "  ${i "user:${m.user}"} -> ${i "team:${tid}"} [label=\"${q m.role}\", fontsize=9];"
+            m:
+            "  ${i "user:${m.user}"} -> ${i "team:${tid}"} [label=\"${q m.role}\", fontsize=${toString fontSize.edge}];"
           ) t.members;
 
       teamClusterEdges =
@@ -490,7 +439,7 @@ let
         in
         map (
           g:
-          "  ${i "team:${g.team}"} -> ${i "cluster:${cid}"} [label=\"${q (tierLabel g.tier)}\", color=\"${palette.edgeUplink}\", fontsize=9];"
+          "  ${i "team:${g.team}"} -> ${i "cluster:${cid}"} [label=\"${q (tierLabel g.tier)}\", color=\"${palette.edgeUplink}\", fontsize=${toString fontSize.edge}];"
         ) c.access.teams;
 
       userClusterEdges =
@@ -500,7 +449,7 @@ let
         in
         map (
           g:
-          "  ${i "user:${g.user}"} -> ${i "cluster:${cid}"} [label=\"${q g.tier}\", color=\"${palette.edgeMlag}\", style=dashed, fontsize=9];"
+          "  ${i "user:${g.user}"} -> ${i "cluster:${cid}"} [label=\"${q g.tier}\", color=\"${palette.edgeMlag}\", style=dashed, fontsize=${toString fontSize.edge}];"
         ) c.access.users;
 
       clusterHostEdges =
@@ -533,10 +482,10 @@ let
     in
     ''
       digraph "cluster_access" {
-        labelloc="t"; fontsize=18;
+        labelloc="t"; fontsize=${toString fontSize.title};
         label="Cluster access: users -> teams -> clusters -> hosts";
         rankdir=LR; splines=true; concentrate=true; overlap=false;
-        node [fontname="Helvetica"]; edge [fontname="Helvetica"];
+        graph [fontname="${fontFamily}"]; node [fontname="${fontFamily}"]; edge [fontname="${fontFamily}"];
 
         subgraph "cluster_users"    { label="users";    style="rounded,filled"; fillcolor="#fff7fb";
       ${userBlock}
@@ -560,131 +509,200 @@ let
 
   ownershipDot =
     let
-      assets =
-        (mapAttrsToList (id: h: {
-          kind = "host";
-          inherit id;
-          entity = h;
-        }) hosts)
-        ++ (mapAttrsToList (id: s: {
-          kind = "switch";
-          inherit id;
-          entity = s;
-        }) switches);
+      hostAssets = mapAttrsToList (id: h: {
+        kind = "host";
+        inherit id;
+        entity = h;
+      }) hosts;
+      switchAssets = mapAttrsToList (id: s: {
+        kind = "switch";
+        inherit id;
+        entity = s;
+      }) switches;
+      allAssets = hostAssets ++ switchAssets;
 
-      assetsByClass = foldl' (
-        acc: a:
+      ownersOf =
+        a:
         let
-          c = a.entity.ownership.class;
+          o = a.entity.ownership or { };
         in
-        acc // { ${c} = (acc.${c} or [ ]) ++ [ a ]; }
-      ) { } assets;
+        {
+          owner = o.owner or null;
+          team = o.team or null;
+          operator = o.operator or null;
+          custodian = o.custodian or null;
+          class = o.class or "-";
+        };
+
+      kindOrder =
+        k:
+        {
+          host = 0;
+          switch = 1;
+        }
+        .${k} or 9;
+      sortedAssets = sort (
+        a: b:
+        let
+          ca = (ownersOf a).class;
+          cb = (ownersOf b).class;
+        in
+        if ca != cb then
+          ca < cb
+        else if a.kind != b.kind then
+          kindOrder a.kind < kindOrder b.kind
+        else
+          a.id < b.id
+      ) allAssets;
 
       principalsReferenced =
         let
           fromAsset =
             a:
+            let
+              o = ownersOf a;
+            in
             filter (x: x != null) [
-              a.entity.ownership.owner
-              a.entity.ownership.team
-              (a.entity.ownership.operator or null)
-              (a.entity.ownership.custodian or null)
+              o.owner
+              o.team
+              o.operator
+              o.custodian
             ];
-          allRefs = concatLists (map fromAsset assets);
         in
-        unique allRefs;
+        unique (concatLists (map fromAsset allAssets));
 
-      principalNode =
-        pid:
-        if users ? ${pid} then
-          let
-            u = users.${pid};
-            label = lbl [
-              pid
-              "user (${u.cohort})"
-            ];
-          in
-          "  ${i "p:${pid}"} [label=\"${label}\", shape=box, style=\"filled,rounded\", fillcolor=\"${palette.user}\"];"
-        else if teams ? ${pid} then
-          let
-            t = teams.${pid};
-            label = lbl [
-              pid
-              "team"
-              "members: ${toString (length t.members)}"
-            ];
-          in
-          "  ${i "p:${pid}"} [label=\"${label}\", shape=box, style=\"filled,rounded\", fillcolor=\"${palette.team}\"];"
-        else
-          "  ${i "p:${pid}"} [label=\"${q pid}\\nunknown\", shape=box, style=dashed];";
+      userPrincipals = sort lessThan (filter (p: users ? ${p}) principalsReferenced);
+      teamPrincipals = sort lessThan (filter (p: teams ? ${p}) principalsReferenced);
+      unknownPrincipals = sort lessThan (
+        filter (p: !(users ? ${p}) && !(teams ? ${p})) principalsReferenced
+      );
+      orderedPrincipals = userPrincipals ++ teamPrincipals ++ unknownPrincipals;
+      nCols = length sortedAssets;
+      totalCols = 1 + nCols;
 
-      assetNode =
+      assetHeaderCell =
         a:
         let
-          fill = if a.kind == "switch" then palette.switch else hostFill a.entity;
-          shape = if a.kind == "switch" then "box" else "box";
-          rolesLine =
-            if a.kind == "switch" then
-              "role=${a.entity.role}"
+          o = ownersOf a;
+          bg =
+            if a.kind == "host" then
+              (fleetColorFor (hostToCluster.${a.id} or "-")).fill
+            else if a.kind == "switch" then
+              palette.switch
             else
-              "roles=${concatStringsSep "," a.entity.roles}";
-          label = lbl [
-            a.id
-            "${a.kind} (${a.entity.state})"
-            rolesLine
-          ];
+              palette.panelBg;
         in
-        "    ${i "a:${a.kind}:${a.id}"} [label=\"${label}\", shape=${shape}, style=\"filled,rounded\", fillcolor=\"${fill}\"];";
+        "<TD BGCOLOR=\"${bg}\"><B>${xml a.id}</B><BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textMuted}\">${xml a.kind} &#183; ${xml o.class}</FONT></TD>";
 
-      classBlock =
-        cls:
+      ownSlot =
+        present: color: sym:
+        if present then
+          "<FONT COLOR=\"${color}\"><B>${sym}</B></FONT>&#160;"
+        else
+          "<FONT COLOR=\"${palette.textFaint}\">.</FONT>&#160;";
+
+      ownCell =
+        pid: a:
         let
-          aset = assetsByClass.${cls};
-          inside = concatStringsSep "\n" (map assetNode aset);
+          o = ownersOf a;
+          isTeamPrincipal = teams ? ${pid};
+          isOwner = if isTeamPrincipal then o.team == pid else o.owner == pid;
+          isOperator = o.operator == pid;
+          isCustodian = o.custodian == pid;
+          line =
+            "<FONT FACE=\"DejaVu Sans Mono\">"
+            + (ownSlot isOwner palette.edgeUplink "O")
+            + (ownSlot isOperator palette.edgeDownlink "P")
+            + (ownSlot isCustodian palette.edgeMgmt "C")
+            + "</FONT>";
+        in
+        "<TD ALIGN=\"CENTER\">${line}</TD>";
+
+      principalRow =
+        pid:
+        let
+          nameCell =
+            if users ? ${pid} then
+              let
+                u = users.${pid};
+                uname =
+                  if u.system_account != null && u.system_account.username != null then
+                    u.system_account.username
+                  else
+                    "-";
+                cohort = u.cohort or "";
+                sub = if cohort == "" then "user" else "user &#183; ${xml cohort}";
+              in
+              "<B>${xml uname}</B><BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textFaint}\">${sub}</FONT>"
+            else if teams ? ${pid} then
+              let
+                t = teams.${pid};
+                desc = t.description or "";
+                n = length (t.members or [ ]);
+                sub = "team &#183; ${toString n} members";
+              in
+              "<B>${
+                xml (if desc == "" then "-" else desc)
+              }</B><BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textFaint}\">${sub}</FONT>"
+            else
+              "<B>-</B><BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textFaint}\">unknown</FONT>";
+        in
+        "<TR>"
+        + "<TD ALIGN=\"LEFT\"><B>${xml pid}</B></TD>"
+        + "<TD ALIGN=\"LEFT\">${nameCell}</TD>"
+        + concatStringsSep "" (map (ownCell pid) sortedAssets)
+        + "</TR>";
+
+      headerRow =
+        "<TR>"
+        + "<TD BGCOLOR=\"${palette.panelBg}\"><B>Principal ID</B></TD>"
+        + "<TD BGCOLOR=\"${palette.panelBg}\"><B>Name</B></TD>"
+        + concatStringsSep "" (map assetHeaderCell sortedAssets)
+        + "</TR>";
+
+      mainTable = ''
+        <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD COLSPAN="${toString (totalCols + 1)}" BGCOLOR="${palette.host}"><B>Ownership matrix</B></TD></TR>
+        ${headerRow}
+        ${concatStringsSep "\n" (map principalRow orderedPrincipals)}
+        </TABLE>>
+      '';
+
+      legendTable =
+        let
+          ownMarkerRow =
+            colorHex: label: sym:
+            "<TR><TD ALIGN=\"CENTER\"><FONT FACE=\"DejaVu Sans Mono\" COLOR=\"${colorHex}\"><B>${sym}</B></FONT></TD><TD ALIGN=\"LEFT\">${label}</TD></TR>";
+          classes = unique (map (a: (ownersOf a).class) sortedAssets);
+          sortedClasses = sort lessThan classes;
+          classCountsRow =
+            cls:
+            let
+              n = length (filter (a: (ownersOf a).class == cls) sortedAssets);
+            in
+            "<TR><TD ALIGN=\"LEFT\"><B>${xml cls}</B></TD><TD ALIGN=\"CENTER\">${toString n}</TD></TR>";
         in
         ''
-          subgraph "cluster_class_${cls}" {
-            label="ownership.class=${cls}"; style="rounded,filled"; fillcolor="${palette.rack}";
-          ${inside}
-          }'';
-
-      ownerEdges =
-        a:
-        let
-          o = a.entity.ownership;
-          mk =
-            field: style: color:
-            if o.${field} or null == null then
-              [ ]
-            else
-              [
-                "  ${i "p:${o.${field}}"} -> ${i "a:${a.kind}:${a.id}"} [label=\"${field}\", style=\"${style}\", color=\"${color}\", fontsize=9];"
-              ];
-        in
-        (if o.owner != null then mk "owner" "solid" palette.edgeUplink else [ ])
-        ++ (if o.team != null then mk "team" "solid" palette.edgeMlag else [ ])
-        ++ mk "operator" "dotted" palette.edgeDownlink
-        ++ mk "custodian" "dashed" palette.edgeMgmt;
-
-      principalBlock = concatStringsSep "\n" (map principalNode principalsReferenced);
-      classesBlock = concatStringsSep "\n" (map classBlock (sortedAttrNames assetsByClass));
-      edgeBlock = concatStringsSep "\n" (concatLists (map ownerEdges assets));
+          <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+          <TR><TD COLSPAN="2" BGCOLOR="${palette.panelBg}"><B>Legend</B></TD></TR>
+          <TR><TD COLSPAN="2" BGCOLOR="${palette.network}"><B>Markers</B></TD></TR>
+          ${ownMarkerRow palette.edgeUplink "owner (user or team)" "O"}
+          ${ownMarkerRow palette.edgeDownlink "operator" "P"}
+          ${ownMarkerRow palette.edgeMgmt "custodian" "C"}
+          <TR><TD ALIGN="CENTER"><FONT FACE="DejaVu Sans Mono" COLOR="${palette.textFaint}">.</FONT></TD><TD ALIGN="LEFT">absent slot</TD></TR>
+          <TR><TD COLSPAN="2" BGCOLOR="${palette.network}"><B>ownership.class counts</B></TD></TR>
+          ${concatStringsSep "\n" (map classCountsRow sortedClasses)}
+          </TABLE>>
+        '';
     in
     ''
       digraph "ownership" {
-        labelloc="t"; fontsize=18;
-        label="Ownership / operator / custodian relationships";
-        rankdir=LR; splines=true; concentrate=true; overlap=false;
-        node [fontname="Helvetica"]; edge [fontname="Helvetica"];
-
-        subgraph "cluster_principals" {
-          label="principals (users + teams)"; style="rounded,filled"; fillcolor="#f8fafc";
-      ${principalBlock}
-        }
-
-      ${classesBlock}
-
-      ${edgeBlock}
+        graph [fontname="${fontFamily}", rankdir=TB, nodesep=0.4, ranksep=0.4];
+        node [fontname="${fontFamily}", shape=plaintext];
+        edge [fontname="${fontFamily}"];
+        matrix [label=${mainTable}];
+        legend [label=${legendTable}];
+        matrix -> legend [style=invis];
       }
     '';
 
@@ -712,8 +730,18 @@ let
 
       gpu = if h.hardware.gpu == null then "-" else h.hardware.gpu;
       fpgaCount = toString (length h.hardware.fpgas);
-      ram = "${toString h.hardware.ram_gib} GiB";
-      cpu = "${h.hardware.cpu_vendor} x${toString h.hardware.cpu_sockets}";
+      ram = "${toString h.hardware.ram_gib} GB";
+      cpu =
+        let
+          s = h.hardware.cpu_sockets;
+          c = h.hardware.cpu_cores_per_socket;
+          t = h.hardware.cpu_threads_per_core;
+          physical = s * c;
+          derived = physical * t;
+          logical = if h.hardware.cpu_logical_count == null then derived else h.hardware.cpu_logical_count;
+          hybridMark = if h.hardware.cpu_logical_count == null then "" else " hybrid";
+        in
+        "${h.hardware.cpu_vendor} (${toString s}s / ${toString physical}c / ${toString logical}t${hybridMark})";
 
       disko = if h.disko == null then "n/a" else "${h.disko.layout} (${h.disko.root_disk})";
 
@@ -734,19 +762,29 @@ let
           " rack=${h.location.rack}"
           + (if h.location.slot == null then "" else " slot=${toString h.location.slot}");
 
+      kvRow =
+        k1: v1: k2: v2:
+        "<TR><TD><B>${k1}</B></TD><TD>${v1}</TD><TD><B>${k2}</B></TD><TD COLSPAN=\"2\">${v2}</TD></TR>";
+      infoRows = concatStringsSep "\n" [
+        (kvRow "State" (xml h.state) "Roles" (xml (concatStringsSep ", " h.roles)))
+        (kvRow "Arch" (xml h.hardware.arch) "OS" (xml h.hardware.os))
+        (kvRow "CPU" (xml cpu) "RAM" (xml ram))
+        (kvRow "GPU" (xml gpu) "FPGAs" (xml fpgaCount))
+        (kvRow "Cluster" (xml cluster) "Location" (
+          xml h.location.kind + xml rackInfo + "<BR/>" + xml siteOrHost
+        ))
+        (kvRow "Owner" (xml (orNull h.ownership.owner "-")) "Team" (xml (orNull h.ownership.team "-")))
+        (kvRow "Operator" (xml (orNull h.ownership.operator "-")) "Custodian" (
+          xml (orNull h.ownership.custodian "-")
+        ))
+        (kvRow "Class" (xml h.ownership.class) "Disko" (xml disko))
+      ];
       table = ''
         <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
         <TR><TD COLSPAN="5" BGCOLOR="${palette.host}"><B>${xml h.id}</B></TD></TR>
-        <TR><TD>state</TD><TD>${xml h.state}</TD><TD>roles</TD><TD COLSPAN="2">${xml (concatStringsSep ", " h.roles)}</TD></TR>
-        <TR><TD>arch</TD><TD>${xml h.hardware.arch}</TD><TD>os</TD><TD COLSPAN="2">${xml h.hardware.os}</TD></TR>
-        <TR><TD>cpu</TD><TD>${xml cpu}</TD><TD>ram</TD><TD COLSPAN="2">${xml ram}</TD></TR>
-        <TR><TD>gpu</TD><TD>${xml gpu}</TD><TD>fpgas</TD><TD COLSPAN="2">${xml fpgaCount}</TD></TR>
-        <TR><TD>cluster</TD><TD>${xml cluster}</TD><TD>location</TD><TD COLSPAN="2">${xml h.location.kind}${xml rackInfo}<BR/>${xml siteOrHost}</TD></TR>
-        <TR><TD>owner</TD><TD>${xml (orNull h.ownership.owner "-")}</TD><TD>team</TD><TD COLSPAN="2">${xml (orNull h.ownership.team "-")}</TD></TR>
-        <TR><TD>operator</TD><TD>${xml (orNull h.ownership.operator "-")}</TD><TD>custodian</TD><TD COLSPAN="2">${xml (orNull h.ownership.custodian "-")}</TD></TR>
-        <TR><TD>class</TD><TD>${xml h.ownership.class}</TD><TD>disko</TD><TD COLSPAN="2">${xml disko}</TD></TR>
+        ${infoRows}
         <TR><TD COLSPAN="5" BGCOLOR="${palette.network}"><B>NICs</B></TD></TR>
-        <TR><TD><B>name</B></TD><TD><B>role</B></TD><TD><B>network</B></TD><TD><B>prefix / ip</B></TD><TD><B>mac</B></TD></TR>
+        <TR><TD><B>Name</B></TD><TD><B>Role</B></TD><TD><B>Network</B></TD><TD><B>Prefix / IP</B></TD><TD><B>MAC</B></TD></TR>
         ${concatStringsSep "\n" nicRows}
         ${bmcRow}
         </TABLE>>
@@ -754,17 +792,396 @@ let
     in
     ''
       digraph "host_${h.id}" {
-        labelloc="t"; fontsize=14;
-        label="Host card: ${h.id}";
-        node [fontname="Helvetica"];
+        graph [fontname="${fontFamily}"]; node [fontname="${fontFamily}"]; edge [fontname="${fontFamily}"];
         ${i h.id} [shape=plaintext, label=${table}];
+      }
+    '';
+
+  sshMatrixDot =
+    let
+      activeClusterIds = attrNames (filterAttrs (_: c: c.state != "retired") clusters);
+      hostCountOf = cid: length (hostsByCluster.${cid} or [ ]);
+      multiCids = sort (
+        a: b: if hostCountOf a != hostCountOf b then hostCountOf a > hostCountOf b else a < b
+      ) (filter (cid: hostCountOf cid > 1) activeClusterIds);
+      soloCids = sort lessThan (filter (cid: hostCountOf cid <= 1) activeClusterIds);
+      orderedCids = multiCids ++ soloCids;
+
+      cols = concatMap (
+        cid: map (hid: { inherit hid cid; }) (sort lessThan (hostsByCluster.${cid} or [ ]))
+      ) orderedCids;
+      nCols = length cols;
+      totalCols = 1 + nCols;
+
+      activeUsers = filterAttrs (
+        _: u: u.system_account != null && u.system_account.username != null && !u.archived
+      ) users;
+      userIds = sort lessThan (attrNames activeUsers);
+
+      liveGrants = filter (g: !(g.archived or false) && g.account != null) intent.sshGrants;
+      grantsAt = uid: hid: filter (g: g.user == uid && g.host == hid) liveGrants;
+
+      violations = intent.intentViolations or [ ];
+      hasViolation = uid: hid: any (v: (v.user or null) == uid && (v.host or null) == hid) violations;
+
+      slot =
+        present: color: sym:
+        if present then
+          "<FONT COLOR=\"${color}\"><B>${sym}</B></FONT>&#160;"
+        else
+          "<FONT COLOR=\"${palette.textFaint}\">.</FONT>&#160;";
+
+      marker =
+        uid: col:
+        let
+          gs = grantsAt uid col.hid;
+          accts = map (g: g.account) gs;
+          srcs = map (g: g.source or "") gs;
+          tiers = filter (t: t != "" && t != null) (unique (map (g: g.tier or "") gs));
+          hasRoot = elem "root" accts || elem "cohort:admin" srcs;
+          hasTrust = elem "ssh_trust" srcs;
+          hasReg = any (a: a != "root") accts;
+          hasViol = hasViolation uid col.hid;
+
+          markerLine =
+            "<FONT FACE=\"DejaVu Sans Mono\">"
+            + (slot hasRoot palette.danger "R")
+            + (slot hasReg palette.text "A")
+            + (slot hasTrust palette.partitionBorder "T")
+            + (slot hasViol palette.danger "!")
+            + "</FONT>";
+
+          tierLine =
+            if tiers == [ ] then
+              ""
+            else
+              "<BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textMuted}\">${xml (concatStringsSep ", " tiers)}</FONT>";
+        in
+        "<TD ALIGN=\"CENTER\">${markerLine}${tierLine}</TD>";
+
+      hostHeaderRow =
+        "<TR>"
+        + "<TD BGCOLOR=\"${palette.panelBg}\"><B>User ID</B></TD>"
+        + "<TD BGCOLOR=\"${palette.panelBg}\"><B>Username</B></TD>"
+        + concatStringsSep "" (
+          map (
+            col:
+            let
+              c = fleetColorFor col.cid;
+            in
+            "<TD BGCOLOR=\"${c.fill}\"><B>${xml col.hid}</B><BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textMuted}\">${xml col.cid}</FONT></TD>"
+          ) cols
+        )
+        + "</TR>";
+
+      userRow =
+        uid:
+        let
+          u = users.${uid};
+          uname =
+            if u.system_account != null && u.system_account.username != null then
+              u.system_account.username
+            else
+              "-";
+          cohort = u.cohort or "";
+        in
+        "<TR>"
+        + "<TD ALIGN=\"LEFT\"><B>${xml uid}</B></TD>"
+        + "<TD ALIGN=\"LEFT\"><B>${xml uname}</B>${
+          if cohort == "" then
+            ""
+          else
+            "<BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textFaint}\">${xml cohort}</FONT>"
+        }</TD>"
+        + concatStringsSep "" (map (marker uid) cols)
+        + "</TR>";
+
+      mainTable = ''
+        <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD COLSPAN="${toString (totalCols + 1)}" BGCOLOR="${palette.host}"><B>SSH access matrix</B></TD></TR>
+        ${hostHeaderRow}
+        ${concatStringsSep "\n" (map userRow userIds)}
+        </TABLE>>
+      '';
+
+      legendTable =
+        let
+          markerRow =
+            colorHex: label: sym:
+            "<TR><TD ALIGN=\"CENTER\"><FONT FACE=\"DejaVu Sans Mono\" COLOR=\"${colorHex}\"><B>${sym}</B></FONT></TD><TD ALIGN=\"LEFT\">${label}</TD></TR>";
+          clusterRow =
+            cid:
+            let
+              c = fleetColorFor cid;
+              members = concatStringsSep ", " (hostsByCluster.${cid} or [ ]);
+            in
+            "<TR><TD BGCOLOR=\"${c.fill}\"><B>${xml cid}</B></TD><TD ALIGN=\"LEFT\">${xml members}</TD></TR>";
+        in
+        ''
+          <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+          <TR><TD COLSPAN="2" BGCOLOR="${palette.panelBg}"><B>Legend</B></TD></TR>
+          <TR><TD COLSPAN="2" BGCOLOR="${palette.network}"><B>Markers</B></TD></TR>
+          ${markerRow palette.danger "root account (uid=0)" "R"}
+          ${markerRow palette.text "user account grant" "A"}
+          ${markerRow palette.partitionBorder "ssh_trust overlay" "T"}
+          <TR><TD ALIGN="CENTER"><FONT FACE="DejaVu Sans Mono" COLOR="${palette.textFaint}">.</FONT></TD><TD ALIGN="LEFT">absent slot</TD></TR>
+          ${markerRow palette.danger "headscale intent violation" "!"}
+          <TR><TD COLSPAN="2" BGCOLOR="${palette.network}"><B>Clusters</B></TD></TR>
+          ${concatStringsSep "\n" (map clusterRow orderedCids)}
+          </TABLE>>
+        '';
+    in
+    ''
+      digraph "ssh_matrix" {
+        graph [fontname="${fontFamily}", rankdir=TB, nodesep=0.4, ranksep=0.4];
+        node [fontname="${fontFamily}", shape=plaintext];
+        edge [fontname="${fontFamily}"];
+        matrix [label=${mainTable}];
+        legend [label=${legendTable}];
+        matrix -> legend [style=invis];
+      }
+    '';
+
+  tailnetDot =
+    let
+      activeClusterIds = attrNames (filterAttrs (_: c: c.state != "retired") clusters);
+      hostCountOf = cid: length (hostsByCluster.${cid} or [ ]);
+      multiCids = sort (
+        a: b: if hostCountOf a != hostCountOf b then hostCountOf a > hostCountOf b else a < b
+      ) (filter (cid: hostCountOf cid > 1) activeClusterIds);
+      soloCids = sort lessThan (filter (cid: hostCountOf cid <= 1) activeClusterIds);
+      orderedCids = multiCids ++ soloCids;
+
+      hostTags =
+        h:
+        let
+          cid = hostToCluster.${h.id} or null;
+          cluster = if cid == null then null else clusters.${cid} or null;
+          clusterTag =
+            if cluster == null then
+              null
+            else if (cluster.network.tailscale_tag or null) != null then
+              cluster.network.tailscale_tag
+            else
+              "tag:${cid}";
+          stripTag = t: removePrefix "tag:" t;
+          base = if clusterTag == null then null else stripTag clusterTag;
+
+          isIn = bucket: elem h.id (bucket.${cid} or [ ]);
+          categories =
+            optional (isIn (inventory.loginNodesOfCluster or { })) "login"
+            ++ optional (isIn (inventory.computeNodesOfCluster or { })) "compute"
+            ++ optional (isIn (inventory.storageNodesOfCluster or { })) "storage"
+            ++ optional (isIn (inventory.controllerNodesOfCluster or { })) "controller";
+          roleTags = if base == null then [ ] else map (r: "tag:${base}-${r}") categories;
+        in
+        (if clusterTag == null then [ ] else [ clusterTag ]) ++ roleTags;
+
+      hostRow =
+        h:
+        let
+          cid = hostToCluster.${h.id} or "-";
+          c = if cid == "-" then fleetSoloColor else fleetColorFor cid;
+          tags = hostTags h;
+          tagStr = if tags == [ ] then "-" else concatStringsSep "<BR/>" (map xml tags);
+          roles = if h.roles == [ ] then "-" else concatStringsSep ", " h.roles;
+          nrs = hostNodeRoles.${h.id} or [ ];
+          nrsStr = if nrs == [ ] then "-" else concatStringsSep ", " nrs;
+        in
+        "<TR>"
+        + "<TD ALIGN=\"LEFT\"><B>${xml h.id}</B></TD>"
+        + "<TD BGCOLOR=\"${c.fill}\" ALIGN=\"LEFT\">${xml cid}</TD>"
+        + "<TD ALIGN=\"LEFT\">${xml h.state}</TD>"
+        + "<TD ALIGN=\"LEFT\">${xml h.hardware.arch}</TD>"
+        + "<TD ALIGN=\"LEFT\">${xml roles}</TD>"
+        + "<TD ALIGN=\"LEFT\">${xml nrsStr}</TD>"
+        + "<TD ALIGN=\"LEFT\">${tagStr}</TD>"
+        + "</TR>";
+
+      rowsByCluster = concatMap (
+        cid:
+        let
+          hs = sort lessThan (hostsByCluster.${cid} or [ ]);
+        in
+        map (hid: hosts.${hid}) hs
+      ) orderedCids;
+
+      unclustered = filter (h: !(hasAttr h.id hostToCluster)) (attrValues hosts);
+      allRows = rowsByCluster ++ (sort (a: b: a.id < b.id) unclustered);
+
+      table = ''
+        <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD COLSPAN="7" BGCOLOR="${palette.host}"><B>Tailnet fleet</B></TD></TR>
+        <TR>
+          <TD BGCOLOR="${palette.panelBg}"><B>Host</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Cluster</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>State</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Arch</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Roles</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Node roles</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Tailscale tag</B></TD>
+        </TR>
+        ${concatStringsSep "\n" (map hostRow allRows)}
+        </TABLE>>
+      '';
+
+    in
+    ''
+      digraph "tailnet" {
+        graph [fontname="${fontFamily}", rankdir=TB, nodesep=0.4, ranksep=0.4];
+        node [fontname="${fontFamily}", shape=plaintext];
+        edge [fontname="${fontFamily}"];
+        fleet [label=${table}];
+      }
+    '';
+
+  slurmSubmitDot =
+    let
+      grants = intent.slurmSubmitGrants or [ ];
+      sortedGrants = sort (
+        a: b:
+        if a.user != b.user then
+          a.user < b.user
+        else if a.fromHost != b.fromHost then
+          a.fromHost < b.fromHost
+        else
+          (a.toCluster or "") < (b.toCluster or "")
+      ) grants;
+
+      grantRow =
+        g:
+        let
+          cid = g.toCluster or "-";
+          c = if cid == "-" then fleetSoloColor else fleetColorFor cid;
+        in
+        "<TR>"
+        + "<TD ALIGN=\"LEFT\"><B>${xml g.user}</B></TD>"
+        + "<TD ALIGN=\"LEFT\">${xml g.fromHost}</TD>"
+        + "<TD BGCOLOR=\"${c.fill}\" ALIGN=\"LEFT\">${xml cid}</TD>"
+        + "</TR>";
+
+      grantsTable =
+        if sortedGrants == [ ] then
+          ''
+            <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+            <TR><TD BGCOLOR="${palette.host}"><B>Slurm submit grants</B></TD></TR>
+            <TR><TD ALIGN="LEFT"><I>none</I></TD></TR>
+            </TABLE>>
+          ''
+        else
+          ''
+            <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+            <TR><TD COLSPAN="3" BGCOLOR="${palette.host}"><B>Slurm submit grants</B></TD></TR>
+            <TR>
+              <TD BGCOLOR="${palette.panelBg}"><B>User</B></TD>
+              <TD BGCOLOR="${palette.panelBg}"><B>From host</B></TD>
+              <TD BGCOLOR="${palette.panelBg}"><B>To cluster</B></TD>
+            </TR>
+            ${concatStringsSep "\n" (map grantRow sortedGrants)}
+            </TABLE>>
+          '';
+    in
+    ''
+      digraph "slurm_submit" {
+        graph [fontname="${fontFamily}", rankdir=TB, nodesep=0.4, ranksep=0.4];
+        node [fontname="${fontFamily}", shape=plaintext];
+        edge [fontname="${fontFamily}"];
+        grants [label=${grantsTable}];
+      }
+    '';
+
+  clusterRolesDot =
+    let
+      activeClusters = filterAttrs (_: c: c.state != "retired") clusters;
+      orderedCids = sort lessThan (attrNames activeClusters);
+
+      clientHosts = inventory.hostsWithSlurmClient or [ ];
+
+      partitionNodesFor = c: unique (concatLists (mapAttrsToList (_: p: p.nodes) c.scheduler.partitions));
+
+      hostSlot =
+        present: color: sym:
+        if present then
+          "<FONT COLOR=\"${color}\"><B>${sym}</B></FONT>&#160;"
+        else
+          "<FONT COLOR=\"${palette.textFaint}\">.</FONT>&#160;";
+
+      hostRow =
+        cid: hid:
+        let
+          c = activeClusters.${cid};
+          isController = elem hid c.scheduler.controllers;
+          isCompute = elem hid (partitionNodesFor c);
+          isSubmit = elem hid clientHosts;
+          cc = fleetColorFor cid;
+          rolesLine =
+            "<FONT FACE=\"DejaVu Sans Mono\">"
+            + (hostSlot isController palette.controllerBorder "C")
+            + (hostSlot isCompute palette.computeBorder "N")
+            + (hostSlot isSubmit palette.submitBorder "S")
+            + "</FONT>";
+        in
+        "<TR>"
+        + "<TD BGCOLOR=\"${cc.fill}\" ALIGN=\"LEFT\"><B>${xml cid}</B></TD>"
+        + "<TD ALIGN=\"LEFT\"><B>${xml hid}</B></TD>"
+        + "<TD ALIGN=\"CENTER\">${rolesLine}</TD>"
+        + "</TR>";
+
+      clusterRows =
+        cid:
+        let
+          c = activeClusters.${cid};
+          members = hostsByCluster.${cid} or [ ];
+          participants = unique (members ++ c.scheduler.controllers);
+          hosts' = sort lessThan participants;
+        in
+        map (hid: hostRow cid hid) hosts';
+
+      allRows = concatLists (map clusterRows orderedCids);
+
+      table = ''
+        <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+        <TR><TD COLSPAN="3" BGCOLOR="${palette.host}"><B>Cluster roles</B></TD></TR>
+        <TR>
+          <TD BGCOLOR="${palette.panelBg}"><B>Cluster</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Host</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>C N S</B></TD>
+        </TR>
+        ${concatStringsSep "\n" allRows}
+        </TABLE>>
+      '';
+
+      legendTable =
+        let
+          markerRow =
+            colorHex: label: sym:
+            "<TR><TD ALIGN=\"CENTER\"><FONT FACE=\"DejaVu Sans Mono\" COLOR=\"${colorHex}\"><B>${sym}</B></FONT></TD><TD ALIGN=\"LEFT\">${label}</TD></TR>";
+        in
+        ''
+          <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+          <TR><TD COLSPAN="2" BGCOLOR="${palette.panelBg}"><B>Legend</B></TD></TR>
+          ${markerRow palette.controllerBorder "controller (runs slurmctld)" "C"}
+          ${markerRow palette.computeBorder "compute node (runs slurmd; in a partition)" "N"}
+          ${markerRow palette.submitBorder "submit client (can sbatch)" "S"}
+          <TR><TD ALIGN="CENTER"><FONT FACE="DejaVu Sans Mono" COLOR="${palette.textFaint}">.</FONT></TD><TD ALIGN="LEFT">absent slot</TD></TR>
+          </TABLE>>
+        '';
+    in
+    ''
+      digraph "cluster_roles" {
+        graph [fontname="${fontFamily}", rankdir=TB, nodesep=0.4, ranksep=0.4];
+        node [fontname="${fontFamily}", shape=plaintext];
+        edge [fontname="${fontFamily}"];
+        roles [label=${table}];
+        legend [label=${legendTable}];
+        roles -> legend [style=invis];
       }
     '';
 
   banner = name: ''
     // AUTO-GENERATED by infra-lib diagrams codegen. Do not edit.
     // Diagram: ${name}
-    // Derived from inventory/*.toml -- regenerate with `nix build .#diagrams-*`.
+    // Derived from inventory/*.nix -- regenerate with `nix build .#diagrams-*`.
   '';
 
   renderOne =
@@ -774,6 +1191,9 @@ let
         nativeBuildInputs = [ pkgs.graphviz ];
         dotSource = banner name + dotText;
         passAsFile = [ "dotSource" ];
+        FONTCONFIG_FILE = pkgs.makeFontsConf {
+          fontDirectories = [ pkgs.dejavu_fonts ];
+        };
       }
       ''
         dot -Tsvg "$dotSourcePath" -o $out
@@ -805,107 +1225,35 @@ let
       inherit dot svg;
     };
 
-  layeredFactsJson =
-    let
-      stripHost = h: {
-        inherit (h) id state;
-        inherit (h) roles;
-        ownership_owner = h.ownership.owner;
-        ownership_team = h.ownership.team;
-        ownership_class = h.ownership.class;
-        arch = h.hardware.arch;
-        os = h.hardware.os;
-        gpu = h.hardware.gpu;
-      };
-      stripCluster = c: {
-        inherit (c)
-          id
-          kind
-          state
-          synthesised
-          description
-          ;
-        scheduler_kind = c.scheduler.kind;
-        scheduler_controllers = c.scheduler.controllers;
-        partitions = mapAttrs (_: p: {
-          inherit (p)
-            nodes
-            default
-            max_time
-            gres
-            ;
-        }) c.scheduler.partitions;
-        intra_cluster = c.network.intra_cluster;
-      };
-      stripUser = u: {
-        inherit (u)
-          id
-          kind
-          cohort
-          archived
-          ;
-        username = if u.system_account == null then null else u.system_account.username;
-      };
-      stripTeam = t: {
-        inherit (t) id description;
-        members = map (m: { inherit (m) user role; }) t.members;
-        synthesised = (t.labels.synthesised or "") == "true";
-      };
-      intentFacts = {
-        inherit (intent) sshGrants slurmSubmitGrants intentViolations;
-      };
-    in
-    builtins.toJSON (
-      {
-        hosts = mapAttrs (_: stripHost) hosts;
-        clusters = mapAttrs (_: stripCluster) clusters;
-        teams = mapAttrs (_: stripTeam) teams;
-        users = mapAttrs (_: stripUser) users;
-        inherit hostsByCluster;
-        inherit hostNodeRoles;
-        inherit hostToCluster;
-        hostsWithSlurmClient = inventory.hostsWithSlurmClient or [ ];
-      }
-      // intentFacts
-    );
-
 in
 {
   tailnet =
     { pkgs }:
     let
-      pyEnv = pkgs.python3.withPackages (ps: [ ps.svgwrite ]);
-      inv = pkgs.writeText "layered-facts.json" layeredFactsJson;
+      items = [ (mkItem pkgs "tailnet" "tailnet" tailnetDot) ];
     in
-    pkgs.runCommand "diagrams-tailnet" { nativeBuildInputs = [ pyEnv ]; } ''
-      mkdir -p $out
-      ${pyEnv}/bin/python3 ${./tailnet.py} < ${inv} > $out/tailnet.svg
-      cp ${inv} $out/layered-facts.json
-    '';
+    collect pkgs "diagrams-tailnet" items;
 
   sshMatrix =
     { pkgs }:
     let
-      pyEnv = pkgs.python3.withPackages (ps: [ ps.svgwrite ]);
-      inv = pkgs.writeText "layered-facts.json" layeredFactsJson;
+      items = [ (mkItem pkgs "ssh-matrix" "ssh-matrix" sshMatrixDot) ];
     in
-    pkgs.runCommand "diagrams-ssh-matrix" { nativeBuildInputs = [ pyEnv ]; } ''
-      mkdir -p $out
-      ${pyEnv}/bin/python3 ${./ssh-matrix.py} < ${inv} > $out/ssh-matrix.svg
-      cp ${inv} $out/layered-facts.json
-    '';
+    collect pkgs "diagrams-ssh-matrix" items;
 
   slurmSubmit =
     { pkgs }:
     let
-      pyEnv = pkgs.python3.withPackages (ps: [ ps.svgwrite ]);
-      inv = pkgs.writeText "layered-facts.json" layeredFactsJson;
+      items = [ (mkItem pkgs "slurm-submit" "slurm-submit" slurmSubmitDot) ];
     in
-    pkgs.runCommand "diagrams-slurm-submit" { nativeBuildInputs = [ pyEnv ]; } ''
-      mkdir -p $out
-      ${pyEnv}/bin/python3 ${./slurm-submit.py} < ${inv} > $out/slurm-submit.svg
-      cp ${inv} $out/layered-facts.json
-    '';
+    collect pkgs "diagrams-slurm-submit" items;
+
+  clusterRoles =
+    { pkgs }:
+    let
+      items = [ (mkItem pkgs "cluster-roles" "cluster-roles" clusterRolesDot) ];
+    in
+    collect pkgs "diagrams-cluster-roles" items;
 
   topology =
     { pkgs }:
@@ -940,7 +1288,58 @@ in
   host =
     { pkgs }:
     let
+      normalizer =
+        pkgs.writers.writePython3 "normalize-host-cards"
+          {
+            flakeIgnore = [
+              "E501"
+              "E203"
+            ];
+          }
+          ''
+            import glob
+            import re
+            import sys
+
+            open_re = re.compile(
+                r'(<svg[^>]*width=")([\d.]+)(pt"[^>]*height=")([\d.]+)(pt"[^>]*viewBox=")([^"]+)(")',
+                re.DOTALL,
+            )
+
+            paths = sorted(glob.glob(sys.argv[1] + "/hosts/*.svg"))
+            parsed = []
+            for path in paths:
+                with open(path) as fh:
+                    content = fh.read()
+                m = open_re.search(content)
+                if not m:
+                    continue
+                width = float(m.group(2))
+                height = float(m.group(4))
+                parsed.append((path, content, m, width, height))
+
+            if not parsed:
+                sys.exit(0)
+
+            max_w = max(width for (_, _, _, width, _) in parsed)
+            max_h = max(height for (_, _, _, _, height) in parsed)
+
+            for path, content, m, _, _ in parsed:
+                replacement = (
+                    f"{m.group(1)}{max_w:g}{m.group(3)}{max_h:g}"
+                    f'{m.group(5)}0 0 {max_w:g} {max_h:g}{m.group(7)}'
+                )
+                new_content = content[: m.start()] + replacement + content[m.end():]
+                with open(path, "w") as fh:
+                    fh.write(new_content)
+          '';
       items = mapAttrsToList (hid: h: mkItem pkgs "hosts/${hid}" "host-${hid}" (hostCardDot h)) hosts;
+      raw = collect pkgs "diagrams-host-raw" items;
     in
-    collect pkgs "diagrams-host" items;
+    pkgs.runCommand "diagrams-host" { } ''
+      mkdir -p $out
+      cp -r ${raw}/. $out/
+      chmod -R u+w $out
+      ${normalizer} $out
+    '';
 }

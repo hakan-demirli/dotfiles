@@ -1,9 +1,0 @@
-[default]
-poll_time = 60
-hosts = 'google.com,cloudflare.com'
-port = 80
-
-[testing]
-poll_time = 5
-hosts = 'localhost'
-port = 8080

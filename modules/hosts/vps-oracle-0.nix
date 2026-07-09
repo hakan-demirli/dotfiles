@@ -14,7 +14,10 @@
       "usbhid"
     ];
     initrd.kernelModules = [ "dm-snapshot" ];
-    binfmt.emulatedSystems = [ "x86_64-linux" ];
+    binfmt.emulatedSystems = [
+      "x86_64-linux"
+      "riscv64-linux"
+    ];
     loader.efi.canTouchEfiVariables = true;
     loader.grub.efiInstallAsRemovable = false;
   };

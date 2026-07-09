@@ -1,0 +1,569 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import json
+import math
+import sys
+from dataclasses import dataclass, field
+
+import svgwrite
+
+with open(sys.argv[1]) as _f:
+    THEME = json.load(_f)
+PALETTE = THEME["palette"]
+FONT_FAMILY = THEME["fontFamily"]
+FLEET_PALETTE = [(p["fill"], p["border"]) for p in THEME["fleetPalette"]]
+SOLO_COLOR = (THEME["fleetSolo"]["fill"], THEME["fleetSolo"]["border"])
+GRANT_COLOR = PALETTE["edgeMgmt"]
+ADMIN_COLOR = PALETTE["danger"]
+
+NODE_W = 2.4
+NODE_H = 1.6
+CLOSE_GAP = 0.5
+BIG_GAP = 2.4
+CLUSTER_PAD = 0.7
+CLUSTER_HEAD = 1.5
+TARGET_ASPECT = 16 / 9
+ASPECT_WASTE_BUDGET = 1.6
+
+
+@dataclass
+class ClusterBox:
+    cid: str
+    cw: float
+    ch: float
+    cols: int
+    rows: int
+    fill: str
+    border: str
+    members: list[str]
+    is_solo: bool = False
+    has_admin: bool = False
+    x: float = 0.0
+    y: float = 0.0
+
+
+def size_cluster(cid, members, fill, border, is_solo=False, has_admin=False):
+    k = max(1, len(members))
+    cols = max(1, math.ceil(math.sqrt(k)))
+    rows = math.ceil(k / cols)
+    inner_w = cols * NODE_W + max(0, cols - 1) * CLOSE_GAP
+    inner_h = rows * NODE_H + max(0, rows - 1) * CLOSE_GAP
+    cw = inner_w + 2 * CLUSTER_PAD
+    ch = inner_h + 2 * CLUSTER_PAD + CLUSTER_HEAD
+    return ClusterBox(
+        cid=cid,
+        cw=cw,
+        ch=ch,
+        cols=cols,
+        rows=rows,
+        fill=fill,
+        border=border,
+        members=list(members),
+        is_solo=is_solo,
+        has_admin=has_admin,
+    )
+
+
+def shelf_pack(boxes):
+    if not boxes:
+        return (10.0, 10.0)
+    total_area = sum(b.cw * b.ch for b in boxes)
+    widest = max(b.cw for b in boxes)
+    target_w = math.sqrt(total_area * TARGET_ASPECT * ASPECT_WASTE_BUDGET)
+    canvas_w = max(widest, target_w)
+    x = 0.0
+    y = 0.0
+    shelf_h = 0.0
+    for b in boxes:
+        if x > 0 and x + b.cw > canvas_w + 1e-6:
+            y += shelf_h + BIG_GAP
+            x = 0.0
+            shelf_h = 0.0
+        b.x, b.y = x, y
+        x += b.cw + BIG_GAP
+        shelf_h = max(shelf_h, b.ch)
+    return (canvas_w, y + shelf_h)
+
+
+def node_pos(b, idx):
+    r = idx // b.cols
+    c = idx % b.cols
+    return (
+        b.x + CLUSTER_PAD + c * (NODE_W + CLOSE_GAP),
+        b.y + CLUSTER_HEAD + CLUSTER_PAD + r * (NODE_H + CLOSE_GAP),
+    )
+
+
+def node_center(b, idx):
+    hx, hy = node_pos(b, idx)
+    return (hx + NODE_W / 2, hy + NODE_H / 2)
+
+
+def main() -> None:
+    facts = json.load(sys.stdin)
+    hosts = facts["hosts"]
+    clusters = facts["clusters"]
+    teams = facts["teams"]
+    users = facts["users"]
+    hosts_by_cluster = facts["hostsByCluster"]
+    node_roles = facts["hostNodeRoles"]
+    acl_rules = facts.get("aclRules", [])
+
+    live_cids = [cid for cid, c in clusters.items() if c.get("state") != "retired"]
+
+    multi_cids = sorted(
+        [cid for cid in live_cids if len(hosts_by_cluster.get(cid, [])) > 1],
+        key=lambda cid: (-len(hosts_by_cluster[cid]), cid),
+    )
+    solo_cids = [cid for cid in live_cids if len(hosts_by_cluster.get(cid, [])) <= 1]
+    solo_hosts = sorted(h for cid in solo_cids for h in hosts_by_cluster.get(cid, []))
+
+    color_of_cluster: dict[str, tuple[str, str]] = {}
+    for i, cid in enumerate(multi_cids):
+        color_of_cluster[cid] = FLEET_PALETTE[i % len(FLEET_PALETTE)]
+
+    boxes: list[ClusterBox] = []
+    cid_to_box: dict[str, ClusterBox] = {}
+    for cid in multi_cids:
+        fill, border = color_of_cluster[cid]
+        members = sorted(hosts_by_cluster[cid])
+        b = size_cluster(cid, members, fill, border, is_solo=False, has_admin=True)
+        boxes.append(b)
+        cid_to_box[cid] = b
+    if solo_hosts:
+        fill, border = SOLO_COLOR
+        b = size_cluster(
+            "__solos__", solo_hosts, fill, border, is_solo=True, has_admin=True
+        )
+        boxes.append(b)
+        cid_to_box["__solos__"] = b
+
+    LEGEND_W = 12.0
+    LEGEND_H = 5.0
+    LEGEND_MARGIN = 0.5
+
+    canvas_w, canvas_h = shelf_pack(boxes)
+    canvas_w = max(canvas_w, LEGEND_W + 2 * LEGEND_MARGIN)
+    canvas_h = canvas_h + LEGEND_H + 2 * LEGEND_MARGIN
+
+    legend_x = canvas_w - LEGEND_W - LEGEND_MARGIN
+    legend_y = canvas_h - LEGEND_H - LEGEND_MARGIN
+
+    host_to_box: dict[str, ClusterBox] = {}
+    host_slot: dict[str, int] = {}
+    for b in boxes:
+        for idx, hid in enumerate(b.members):
+            host_to_box[hid] = b
+            host_slot[hid] = idx
+
+    dwg = svgwrite.Drawing(
+        size=("100%", "100%"),
+        viewBox=f"0 0 {canvas_w:.4f} {canvas_h:.4f}",
+        preserveAspectRatio="xMidYMid meet",
+    )
+    dwg.add(dwg.rect(insert=(0, 0), size=(canvas_w, canvas_h), fill="#ffffff"))
+
+    grant_arrow = dwg.marker(
+        id="t_grant",
+        insert=(6, 3),
+        size=(7, 6),
+        orient="auto",
+        markerUnits="strokeWidth",
+    )
+    grant_arrow.add(dwg.path(d="M0,0 L0,6 L6,3 z", fill=GRANT_COLOR))
+    dwg.defs.add(grant_arrow)
+
+    for b in boxes:
+        rect = dwg.rect(
+            insert=(b.x, b.y),
+            size=(b.cw, b.ch),
+            rx=0.45,
+            ry=0.45,
+            fill=b.fill,
+            stroke=b.border,
+            stroke_width=0.16,
+        )
+        if b.is_solo:
+            rect["stroke-dasharray"] = "0.6,0.35"
+        dwg.add(rect)
+        head_parts = [b.cid if not b.is_solo else "solo hosts"]
+        head_parts.append(f"{len(b.members)} hosts")
+        if not b.is_solo:
+            c = clusters.get(b.cid) or {}
+            if c.get("intra_cluster") == "mesh":
+                head_parts.append("mesh")
+            if c.get("scheduler_kind") == "slurm":
+                head_parts.append("slurm")
+        dwg.add(
+            dwg.text(
+                "  ·  ".join(head_parts),
+                insert=(b.x + CLUSTER_PAD, b.y + CLUSTER_HEAD - 0.45),
+                font_family=FONT_FAMILY,
+                font_size=0.85,
+                font_weight="bold",
+                fill=b.border,
+            )
+        )
+        if not b.is_solo:
+            chip_w = 2.6
+            chip_h = 0.55
+            cx = b.x + b.cw - chip_w - CLUSTER_PAD
+            cy = b.y + 0.35
+            dwg.add(
+                dwg.rect(
+                    insert=(cx, cy),
+                    size=(chip_w, chip_h),
+                    rx=0.12,
+                    ry=0.12,
+                    fill=ADMIN_COLOR,
+                )
+            )
+            dwg.add(
+                dwg.text(
+                    "ADMINS REACH",
+                    insert=(cx + chip_w / 2, cy + chip_h - 0.13),
+                    text_anchor="middle",
+                    font_family=FONT_FAMILY,
+                    font_size=0.32,
+                    font_weight="bold",
+                    fill="#ffffff",
+                )
+            )
+
+    for b in boxes:
+        if b.is_solo:
+            continue
+        c = clusters.get(b.cid) or {}
+        if c.get("intra_cluster") != "mesh":
+            continue
+        if len(b.members) < 2:
+            continue
+        cx_, cy_ = b.x + b.cw / 2, b.y + CLUSTER_HEAD + (b.ch - CLUSTER_HEAD) / 2
+        for i, h1 in enumerate(b.members):
+            for j in range(i + 1, len(b.members)):
+                h2 = b.members[j]
+                (x1, y1) = node_center(b, i)
+                (x2, y2) = node_center(b, j)
+                mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+                cx, cy = (mx + cx_) / 2, (my + cy_) / 2
+                dwg.add(
+                    dwg.path(
+                        d=f"M{x1:.3f},{y1:.3f} Q{cx:.3f},{cy:.3f} {x2:.3f},{y2:.3f}",
+                        fill="none",
+                        stroke=b.border,
+                        stroke_width=0.10,
+                        stroke_opacity=0.6,
+                    )
+                )
+
+    grant_edges: list[tuple[str, str]] = []
+    for sg in facts.get("slurmSubmitGrants", []):
+        src_h = sg["fromHost"]
+        dst_c = sg["toCluster"]
+        if src_h not in host_to_box or dst_c not in cid_to_box:
+            continue
+        sb = host_to_box[src_h]
+        db = cid_to_box[dst_c]
+        if sb is db:
+            continue
+        grant_edges.append((src_h, dst_c))
+
+    seen = set()
+    for src_h, dst_c in grant_edges:
+        if (src_h, dst_c) in seen:
+            continue
+        seen.add((src_h, dst_c))
+        sb = host_to_box[src_h]
+        sx, sy = node_center(sb, host_to_box[src_h].members.index(src_h))
+        db = cid_to_box[dst_c]
+        dx = db.x + db.cw / 2
+        dy = db.y + db.ch / 2
+        mx, my = (sx + dx) / 2, (sy + dy) / 2
+        dwg.add(
+            dwg.path(
+                d=f"M{sx:.3f},{sy:.3f} Q{mx:.3f},{my:.3f} {dx:.3f},{dy:.3f}",
+                fill="none",
+                stroke=GRANT_COLOR,
+                stroke_width=0.10,
+                stroke_dasharray="0.5,0.3",
+                marker_end="url(#t_grant)",
+            )
+        )
+
+    for b in boxes:
+        for idx, hid in enumerate(b.members):
+            hx, hy = node_pos(b, idx)
+            h = hosts.get(hid, {})
+            nrs = node_roles.get(hid, ["personal"])
+            state = h.get("state", "")
+            roles_str = ",".join(h.get("roles") or [])
+            if len(roles_str) > 22:
+                roles_str = roles_str[:20] + "…"
+            dwg.add(
+                dwg.rect(
+                    insert=(hx, hy),
+                    size=(NODE_W, NODE_H),
+                    rx=0.16,
+                    ry=0.16,
+                    fill="#ffffff",
+                    stroke=b.border,
+                    stroke_width=0.08,
+                )
+            )
+            dwg.add(
+                dwg.rect(
+                    insert=(hx, hy),
+                    size=(NODE_W, 0.25),
+                    rx=0.16,
+                    ry=0.16,
+                    fill=b.border,
+                )
+            )
+            chip = (
+                "ctrl"
+                if "controller" in nrs
+                else "mgmt"
+                if "mgmt" in nrs
+                else "compute"
+                if "compute" in nrs
+                else "login"
+                if "login" in nrs
+                else "ext"
+                if "external" in nrs
+                else "host"
+            )
+            dwg.add(
+                dwg.text(
+                    chip.upper(),
+                    insert=(hx + 0.10, hy + 0.20),
+                    font_family=FONT_FAMILY,
+                    font_size=0.20,
+                    font_weight="bold",
+                    fill="#ffffff",
+                )
+            )
+            if state and state != "provisioned":
+                dwg.add(
+                    dwg.text(
+                        state,
+                        insert=(hx + NODE_W - 0.10, hy + 0.20),
+                        text_anchor="end",
+                        font_family=FONT_FAMILY,
+                        font_size=0.20,
+                        font_weight="bold",
+                        fill="#ffffff",
+                        fill_opacity=0.9,
+                    )
+                )
+            dwg.add(
+                dwg.text(
+                    hid,
+                    insert=(hx + NODE_W / 2, hy + 0.70),
+                    text_anchor="middle",
+                    font_family=FONT_FAMILY,
+                    font_size=0.30,
+                    font_weight="bold",
+                    fill="#111827",
+                )
+            )
+            if roles_str:
+                dwg.add(
+                    dwg.text(
+                        roles_str,
+                        insert=(hx + NODE_W / 2, hy + 1.10),
+                        text_anchor="middle",
+                        font_family=FONT_FAMILY,
+                        font_size=0.22,
+                        fill="#374151",
+                    )
+                )
+            arch = h.get("arch", "")
+            if arch:
+                dwg.add(
+                    dwg.text(
+                        arch,
+                        insert=(hx + NODE_W / 2, hy + 1.45),
+                        text_anchor="middle",
+                        font_family=FONT_FAMILY,
+                        font_size=0.20,
+                        fill="#6b7280",
+                    )
+                )
+
+    dwg.add(
+        dwg.rect(
+            insert=(legend_x, legend_y),
+            size=(LEGEND_W, LEGEND_H),
+            rx=0.4,
+            ry=0.4,
+            fill="#ffffff",
+            stroke="#94a3b8",
+            stroke_width=0.10,
+        )
+    )
+    dwg.add(
+        dwg.text(
+            "Tailnet ACL — legend",
+            insert=(legend_x + 0.5, legend_y + 0.85),
+            font_family=FONT_FAMILY,
+            font_size=0.50,
+            font_weight="bold",
+            fill="#1f2937",
+        )
+    )
+    dwg.add(
+        dwg.line(
+            start=(legend_x + 0.4, legend_y + 1.10),
+            end=(legend_x + LEGEND_W - 0.4, legend_y + 1.10),
+            stroke="#cbd5e1",
+            stroke_width=0.04,
+        )
+    )
+
+    CELL_PAD = 0.4
+    grid_x0 = legend_x + CELL_PAD
+    grid_y0 = legend_y + 1.30
+    grid_w = LEGEND_W - 2 * CELL_PAD
+    grid_h = LEGEND_H - 1.30 - CELL_PAD
+    CELL_W = grid_w / 3.0
+    CELL_H = grid_h / 2.0
+
+    def cell(row, col):
+        return (grid_x0 + col * CELL_W, grid_y0 + row * CELL_H)
+
+    def label(cx, cy, text):
+        dwg.add(
+            dwg.text(
+                text,
+                insert=(cx + CELL_W / 2, cy + CELL_H - 0.12),
+                text_anchor="middle",
+                font_family=FONT_FAMILY,
+                font_size=0.28,
+                fill="#374151",
+            )
+        )
+
+    cx, cy = cell(0, 0)
+    dwg.add(
+        dwg.rect(
+            insert=(cx + 0.4, cy + 0.1),
+            size=(CELL_W - 0.8, CELL_H - 0.7),
+            rx=0.18,
+            ry=0.18,
+            fill="#dbeafe",
+            stroke="#1d4ed8",
+            stroke_width=0.12,
+        )
+    )
+    label(cx, cy, "cluster halo")
+
+    cx, cy = cell(0, 1)
+    sw, sh = 1.8, 1.0
+    sx = cx + (CELL_W - sw) / 2
+    sy = cy + 0.15
+    dwg.add(
+        dwg.rect(
+            insert=(sx, sy),
+            size=(sw, sh),
+            rx=0.14,
+            ry=0.14,
+            fill="#ffffff",
+            stroke="#1d4ed8",
+            stroke_width=0.08,
+        )
+    )
+    dwg.add(dwg.rect(insert=(sx, sy), size=(sw, 0.2), rx=0.14, ry=0.14, fill="#1d4ed8"))
+    dwg.add(
+        dwg.text(
+            "host-0",
+            insert=(sx + sw / 2, sy + 0.65),
+            text_anchor="middle",
+            font_family=FONT_FAMILY,
+            font_size=0.26,
+            font_weight="bold",
+            fill="#111827",
+        )
+    )
+    label(cx, cy, "host node")
+
+    cx, cy = cell(0, 2)
+    chip_w = 1.8
+    chip_h = 0.5
+    sx = cx + (CELL_W - chip_w) / 2
+    sy = cy + 0.25
+    dwg.add(
+        dwg.rect(
+            insert=(sx, sy), size=(chip_w, chip_h), rx=0.12, ry=0.12, fill=ADMIN_COLOR
+        )
+    )
+    dwg.add(
+        dwg.text(
+            "ADMINS REACH",
+            insert=(sx + chip_w / 2, sy + chip_h - 0.13),
+            text_anchor="middle",
+            font_family=FONT_FAMILY,
+            font_size=0.26,
+            font_weight="bold",
+            fill="#ffffff",
+        )
+    )
+    label(cx, cy, "admin reach chip")
+
+    cx, cy = cell(1, 0)
+    midy = cy + CELL_H / 2
+    x0, x1 = cx + 0.4, cx + CELL_W - 0.4
+    mx, my = (x0 + x1) / 2, midy - 0.35
+    dwg.add(
+        dwg.path(
+            d=f"M{x0:.2f},{midy:.2f} Q{mx:.2f},{my:.2f} {x1:.2f},{midy:.2f}",
+            fill="none",
+            stroke="#1d4ed8",
+            stroke_width=0.13,
+        )
+    )
+    dwg.add(dwg.circle(center=(x0, midy), r=0.13, fill="#1d4ed8"))
+    dwg.add(dwg.circle(center=(x1, midy), r=0.13, fill="#1d4ed8"))
+    label(cx, cy, "intra-cluster mesh")
+
+    cx, cy = cell(1, 1)
+    midy = cy + CELL_H / 2
+    x0, x1 = cx + 0.4, cx + CELL_W - 0.7
+    mx, my = (x0 + x1) / 2, midy - 0.35
+    dwg.add(
+        dwg.path(
+            d=f"M{x0:.2f},{midy:.2f} Q{mx:.2f},{my:.2f} {x1:.2f},{midy:.2f}",
+            fill="none",
+            stroke=GRANT_COLOR,
+            stroke_width=0.12,
+            stroke_dasharray="0.5,0.3",
+            marker_end="url(#t_grant)",
+        )
+    )
+    dwg.add(dwg.circle(center=(x0, midy), r=0.13, fill=GRANT_COLOR))
+    label(cx, cy, "submit grant")
+
+    cx, cy = cell(1, 2)
+    rect_w = CELL_W - 1.4
+    rect_h = CELL_H - 0.7
+    sx = cx + 0.7
+    sy = cy + 0.1
+    rr = dwg.rect(
+        insert=(sx, sy),
+        size=(rect_w, rect_h),
+        rx=0.18,
+        ry=0.18,
+        fill=SOLO_COLOR[0],
+        stroke=SOLO_COLOR[1],
+        stroke_width=0.12,
+    )
+    rr["stroke-dasharray"] = "0.5,0.3"
+    dwg.add(rr)
+    label(cx, cy, "solo pen")
+
+    sys.stdout.write(dwg.tostring())
+
+
+if __name__ == "__main__":
+    main()

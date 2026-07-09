@@ -1,4 +1,0 @@
-id = "dc1"
-location = "primary datacenter"
-power_budget_kw = 1400
-cooling = "hybrid"

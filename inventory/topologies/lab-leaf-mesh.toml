@@ -1,7 +1,0 @@
-id = "lab-leaf-mesh"
-description = "Two-leaf BE10000 mesh in the lab. Spineless: leaves peer directly via 100G uplinks. Grows to spine-leaf when a third switch arrives."
-kind = "leaf-leaf-mesh"
-leaves = ["sw-be10000-0", "sw-be10000-1"]
-
-[labels]
-phase = "phase-0-bootstrap"

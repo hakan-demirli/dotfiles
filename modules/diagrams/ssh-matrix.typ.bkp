@@ -1,0 +1,374 @@
+// AUTO-rendered by infra-lib diagrams codegen.
+// Layout uses Typst's grid: cells auto-size to content, colspan handles cluster
+// headers, no overflow ever. All colors are sourced from theme.json.
+
+#let facts = json("layered-facts.json")
+#let theme = json("theme.json")
+
+#let palette = theme.palette
+#let fleet-palette = theme.fleetPalette
+#let fleet-solo = theme.fleetSolo
+#let font-family = theme.fontFamilyGraphviz
+
+#let clusters = facts.clusters
+#let users = facts.users
+#let hosts-by-cluster = facts.hostsByCluster
+#let ssh-grants = facts.at("sshGrants", default: ())
+#let violations = facts.at("intentViolations", default: ())
+
+// ---------- data prep ----------
+
+#let live-cids = {
+  let a = ()
+  for pair in clusters.pairs() {
+    let cid = pair.at(0)
+    let c = pair.at(1)
+    if c.at("state", default: "active") != "retired" { a.push(cid) }
+  }
+  a
+}
+
+#let multi-cids = (
+  live-cids
+    .filter(cid => hosts-by-cluster.at(cid, default: ()).len() > 1)
+    .sorted(key: cid => (-hosts-by-cluster.at(cid).len(), cid))
+)
+
+#let solo-cids = (
+  live-cids
+    .filter(cid => hosts-by-cluster.at(cid, default: ()).len() <= 1)
+    .sorted()
+)
+
+#let ordered-cids = multi-cids + solo-cids
+
+#let color-of = {
+  let m = (:)
+  for i in range(multi-cids.len()) {
+    m.insert(multi-cids.at(i), fleet-palette.at(calc.rem(i, fleet-palette.len())))
+  }
+  for cid in solo-cids { m.insert(cid, fleet-solo) }
+  m
+}
+
+#let columns = {
+  let a = ()
+  for cid in ordered-cids {
+    for hid in hosts-by-cluster.at(cid, default: ()).sorted() {
+      a.push((hid: hid, cid: cid))
+    }
+  }
+  a
+}
+
+#let groups = {
+  let a = ()
+  if columns.len() > 0 {
+    let start = 0
+    let cur = columns.at(0).cid
+    for i in range(columns.len()) {
+      let cid = columns.at(i).cid
+      if cid != cur {
+        a.push((cid: cur, start: start, count: i - start))
+        cur = cid
+        start = i
+      }
+    }
+    a.push((cid: cur, start: start, count: columns.len() - start))
+  }
+  a
+}
+
+#let user-rows = {
+  let a = ()
+  for pair in users.pairs() {
+    let uid = pair.at(0)
+    let u = pair.at(1)
+    if u.at("username", default: none) != none and not u.at("archived", default: false) {
+      a.push(uid)
+    }
+  }
+  a.sorted()
+}
+
+#let grant-cells = {
+  let m = (:)
+  for g in ssh-grants {
+    if g.at("archived", default: false) { continue }
+    if g.at("account", default: none) == none { continue }
+    let key = g.user + "|" + g.host
+    let entry = m.at(key, default: (accounts: (), tiers: (), sources: ()))
+    if g.account not in entry.accounts { entry.accounts.push(g.account) }
+    let t = g.at("tier", default: "")
+    if t != "" and t not in entry.tiers { entry.tiers.push(t) }
+    let s = g.at("source", default: "")
+    if s != "" and s not in entry.sources { entry.sources.push(s) }
+    m.insert(key, entry)
+  }
+  m
+}
+
+#let viol-cells = {
+  let m = (:)
+  for v in violations {
+    let u = v.at("user", default: none)
+    let h = v.at("host", default: none)
+    if u != none and h != none { m.insert(u + "|" + h, true) }
+  }
+  m
+}
+
+// ---------- theme-derived typography + strokes ----------
+
+#let fs = theme.fontSize
+#let sw = theme.strokeWidthPt
+
+// ---------- style ----------
+
+#set page(width: auto, height: auto, margin: 20pt, fill: rgb(palette.background))
+#set text(font: font-family, size: (fs.body * 1pt), fill: rgb(palette.text))
+
+#let cell-w = 34pt
+#let cell-h = 34pt
+
+#let empty-cell = box(
+  width: cell-w, height: cell-h,
+  stroke: (sw.hairline * 1pt) + rgb(palette.gridLine),
+)[]
+
+#let render-cell(uid, hid, cid) = {
+  let key = uid + "|" + hid
+  let has-violation = key in viol-cells
+
+  let inner = if key in grant-cells {
+    let c = grant-cells.at(key)
+    let has-root = "root" in c.accounts or "is_root_anywhere" in c.sources
+    let has-trust = "ssh_trust" in c.sources
+    let has-regular = c.accounts.filter(a => a != "root").len() > 0
+    let col = color-of.at(cid)
+
+    if has-root {
+      box(
+        width: cell-w, height: cell-h,
+        fill: rgb(palette.danger),
+        radius: 5pt,
+        inset: 4pt,
+        align(center + horizon)[
+          #text(fill: rgb(palette.background), weight: "bold", size: (fs.subtitle * 1pt))[R]
+        ],
+      )
+    } else if has-regular {
+      let tier = c.tiers.at(0, default: "")
+      box(
+        width: cell-w, height: cell-h,
+        fill: rgb(col.fill),
+        stroke: (sw.medium * 1pt) + rgb(col.border),
+        radius: 5pt,
+        inset: 3pt,
+        align(center + horizon)[
+          #text(fill: rgb(col.border), weight: "bold", size: (fs.label * 1pt))[A]
+          #if tier != "" [
+            \
+            #text(size: (fs.tiny * 1pt), fill: rgb(palette.textMuted))[#tier]
+          ]
+        ],
+      )
+    } else if has-trust {
+      box(
+        width: cell-w, height: cell-h,
+        fill: rgb(palette.background),
+        stroke: (sw.thick * 1pt) + rgb(palette.partitionBorder),
+        radius: 5pt,
+        inset: 4pt,
+        align(center + horizon)[
+          #text(fill: rgb(palette.partitionBorder), weight: "bold", size: (fs.label * 1pt))[T]
+        ],
+      )
+    } else {
+      empty-cell
+    }
+  } else {
+    empty-cell
+  }
+
+  if has-violation {
+    box(width: cell-w, height: cell-h)[
+      #inner
+      #place(
+        top + right, dx: 2pt, dy: -2pt,
+        circle(
+          radius: 4pt,
+          fill: rgb(palette.danger),
+          stroke: (sw.thin * 1pt) + rgb(palette.background),
+        ),
+      )
+    ]
+  } else {
+    inner
+  }
+}
+
+// ---------- build grid ----------
+
+// Host header: rotated hostname on a cluster-tinted background so the column's
+// cluster affiliation is visible at a glance.
+#let host-header-cell(col) = {
+  let cc = color-of.at(col.cid)
+  grid.cell(
+    fill: rgb(cc.fill),
+    stroke: (sw.hairline * 1pt) + rgb(cc.border),
+    inset: (top: 6pt, bottom: 4pt, left: 2pt, right: 2pt),
+    align(bottom + center)[
+      #rotate(-55deg, reflow: true, origin: bottom + center)[
+        #text(weight: "bold", size: (fs.edge * 1pt), fill: rgb(cc.border))[
+          #col.hid
+        ]
+      ]
+    ],
+  )
+}
+
+#let user-info-cell(uid) = {
+  let u = users.at(uid)
+  let username = u.at("username", default: uid)
+  let cohort = u.at("cohort", default: "")
+  align(left + horizon)[
+    #box(inset: (right: 10pt))[
+      #text(weight: "bold", size: (fs.body * 1pt))[#uid] \
+      #text(size: (fs.tiny * 1pt), fill: rgb(palette.textMuted))[
+        #username #if cohort != "" [ (#cohort)]
+      ]
+    ]
+  ]
+}
+
+#let grid-cells = {
+  let arr = ()
+
+  // Row 1: rotated host headers (cluster-tinted)
+  arr.push([])
+  for col in columns { arr.push(host-header-cell(col)) }
+
+  // Data rows
+  for uid in user-rows {
+    arr.push(user-info-cell(uid))
+    for col in columns { arr.push(render-cell(uid, col.hid, col.cid)) }
+  }
+
+  arr
+}
+
+// ---------- output ----------
+
+#align(left)[
+  #text(size: (fs.subtitle * 1pt), weight: "bold")[SSH access matrix]
+  #h(6pt)
+  #text(size: (fs.small * 1pt), fill: rgb(palette.textFaint))[· users × hosts]
+]
+
+#v(14pt)
+
+#grid(
+  columns: (auto,) + (cell-w,) * columns.len(),
+  column-gutter: 4pt,
+  row-gutter: 4pt,
+  ..grid-cells
+)
+
+#v(16pt)
+
+// ---------- legend ----------
+
+#let marker-swatch(fill, stroke-color, stroke-width, label, glyph, glyph-fill) = {
+  grid(
+    columns: (24pt, auto),
+    column-gutter: 6pt,
+    align: (center + horizon, left + horizon),
+    box(
+      width: 20pt, height: 20pt,
+      fill: fill,
+      stroke: if stroke-color != none { (stroke-width * 1pt) + stroke-color } else { none },
+      radius: 3pt,
+      align(center + horizon)[
+        #text(fill: glyph-fill, weight: "bold", size: (fs.body * 1pt))[#glyph]
+      ],
+    ),
+    text(size: (fs.edge * 1pt))[#label],
+  )
+}
+
+#let cluster-swatch(cid) = {
+  let cc = color-of.at(cid)
+  grid(
+    columns: (24pt, auto),
+    column-gutter: 6pt,
+    align: (center + horizon, left + horizon),
+    box(
+      width: 20pt, height: 12pt,
+      fill: rgb(cc.fill),
+      stroke: (sw.normal * 1pt) + rgb(cc.border),
+      radius: 2pt,
+    ),
+    text(size: (fs.edge * 1pt))[#cid],
+  )
+}
+
+#let marker-rows = (
+  marker-swatch(
+    rgb(palette.danger), none, 0,
+    "root account", "R", rgb(palette.background),
+  ),
+  marker-swatch(
+    rgb(palette.gridLine),
+    rgb(palette.textFaint), sw.normal,
+    "user account grant", "A",
+    rgb(palette.textFaint),
+  ),
+  marker-swatch(
+    rgb(palette.background),
+    rgb(palette.partitionBorder), sw.thick,
+    "ssh_trust overlay", "T",
+    rgb(palette.partitionBorder),
+  ),
+  grid(
+    columns: (24pt, auto),
+    column-gutter: 6pt,
+    align: (center + horizon, left + horizon),
+    align(center + horizon)[
+      #circle(
+        radius: 5pt,
+        fill: rgb(palette.danger),
+        stroke: (sw.thin * 1pt) + rgb(palette.background),
+      )
+    ],
+    text(size: (fs.edge * 1pt))[headscale intent violation],
+  ),
+)
+
+#let cluster-rows = ordered-cids.map(cid => cluster-swatch(cid))
+
+#box(
+  width: auto,
+  stroke: (sw.thin * 1pt) + rgb(palette.legendBorder),
+  radius: 4pt,
+  inset: 10pt,
+)[
+  #text(weight: "bold", size: (fs.body * 1pt))[Legend]
+  #v(6pt)
+  #grid(
+    columns: (auto, auto),
+    column-gutter: 24pt,
+    row-gutter: 10pt,
+    align: (top + left, top + left),
+    [
+      #text(size: (fs.tiny * 1pt), fill: rgb(palette.textFaint), weight: "bold")[MARKERS]
+      #v(4pt)
+      #grid(columns: 1, row-gutter: 6pt, ..marker-rows)
+    ],
+    [
+      #text(size: (fs.tiny * 1pt), fill: rgb(palette.textFaint), weight: "bold")[CLUSTERS]
+      #v(4pt)
+      #grid(columns: 1, row-gutter: 6pt, ..cluster-rows)
+    ],
+  )
+]
