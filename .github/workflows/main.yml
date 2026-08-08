@@ -21,16 +21,21 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
       - name: Run fast checks
         run: |
-          checks=$(nix flake show --json 2>/dev/null \
-            | jq -r '.checks."${{ matrix.system }}" // {} | keys[] | select(startswith("test-") or startswith("host-") | not)')
-          for check in $checks; do
+          set -euo pipefail
+          checks=$(nix eval --json ".#checks.${{ matrix.system }}" --apply 'builtins.attrNames' \
+            | jq -r '.[] | select((startswith("test-") or startswith("host-")) | not)')
+          if [[ -z $checks ]]; then
+            echo "No fast checks found for ${{ matrix.system }}"
+            exit 1
+          fi
+          while IFS= read -r check; do
             if [[ "${{ matrix.system }}" == "aarch64-linux" && "$check" == "ephemeral-root" ]]; then
               echo "Skipping $check on aarch64-linux (requires KVM)"
               continue
             fi
             echo "Building checks.${{ matrix.system }}.$check"
             nix build ".#checks.${{ matrix.system }}.$check"
-          done
+          done <<< "$checks"
   discover-vm-tests:
     runs-on: ubuntu-latest
     outputs:
