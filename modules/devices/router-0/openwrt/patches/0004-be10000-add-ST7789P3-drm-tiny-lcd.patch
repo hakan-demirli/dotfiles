@@ -1,0 +1,535 @@
+From 156b46ba7bf42e3c546bbeb557f4c23edd8de9f8 Mon Sep 17 00:00:00 2001
+From: hakan-demirli <ehdemirli@proton.me>
+Date: Wed, 3 Jun 2026 21:06:41 +0200
+Subject: [PATCH] be10000: add ST7789P3 LCD support (DRM-tiny)
+
+Adds ST7789P3 240x320 SPI panel support via the DRM-tiny driver
+(drivers/gpu/drm/tiny/st7789p3.c) plus:
+
+  - MediaTek DTS wiring: spi bus + panel node + panel-supply regulator
+  - config-6.18: DRM + DRM_TINY + DRM_ST7789P3, DRM_KMS_HELPER on-y
+  - kernel packaging: kmod-drm-st7789p3 in linux/modules/video.mk
+  - bindings: sitronix,st7789p3.yaml devicetree schema doc
+
+Enables the on-device 240x320 touchscreen (touch controller wired by
+patch 0002) as /dev/fb0 for the r01-ui touchscreen application.
+
+Signed-off-by: hakan-demirli <ehdemirli@proton.me>
+---
+ package/kernel/linux/modules/video.mk         |  21 +
+ .../dts/mt7987a-glinet-gl-be10000.dts         |  37 ++
+ target/linux/mediatek/filogic/config-6.18     |  15 +
+ .../998-drm-tiny-add-st7789p3.patch           | 399 ++++++++++++++++++
+ 4 files changed, 472 insertions(+)
+ create mode 100644 target/linux/mediatek/patches-6.18/998-drm-tiny-add-st7789p3.patch
+
+diff --git a/package/kernel/linux/modules/video.mk b/package/kernel/linux/modules/video.mk
+index ad7c533d71..d774b8d5e3 100644
+--- a/package/kernel/linux/modules/video.mk
++++ b/package/kernel/linux/modules/video.mk
+@@ -280,6 +280,27 @@ endef
+ $(eval $(call KernelPackage,fb-tft-ili9486))
+ 
+ 
++define KernelPackage/drm-st7789p3
++  SUBMENU:=$(VIDEO_MENU)
++  TITLE:=DRM driver for Sitronix ST7789P3 display panels
++  DEPENDS:=+kmod-drm-mipi-dbi +kmod-drm-dma-helper
++  KCONFIG:=CONFIG_DRM_ST7789P3 \
++	CONFIG_DRM_FBDEV_EMULATION=y \
++	CONFIG_DRM_FBDEV_OVERALLOC=100
++  FILES:=$(LINUX_DIR)/drivers/gpu/drm/tiny/st7789p3.ko
++  AUTOLOAD:=$(call AutoProbe,st7789p3)
++endef
++
++define KernelPackage/drm-st7789p3/description
++  DRM driver for the Sitronix ST7789P3 240x320 IPS TFT LCD controller
++  using MIPI DBI Type C Option 3 (SPI + D/C GPIO).  Used on the GL.iNet
++  GL-BE10000 (Slate 7) front-panel display.  Provides /dev/fb0 via DRM
++  fbdev emulation.
++endef
++
++$(eval $(call KernelPackage,drm-st7789p3))
++
++
+ define KernelPackage/cec-core
+   SUBMENU:=$(VIDEO_MENU)
+   TITLE:=CEC framework
+diff --git a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+index 321a81fe08..ea896a24e0 100644
+--- a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
++++ b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+@@ -289,3 +289,40 @@
+ 	pinctrl-0 = <&uart0_pins>;
+ 	status = "okay";
+ };
++
++/*
++ * Front-panel LCD: Sitronix ST7789P3, 240x320 IPS, 4-wire SPI DBI.
++ * Stock pinmap (be10000-stock.dts):
++ *   SPI bus  : spi@11008800   (mainline &spi1, mediatek,ipm-spi-single)
++ *   Pinmux   : spi1_1 group   (UART1_RTS / PCM_CLK_I2S_BCLK / SPI2_CS pads)
++ *   RESET    : pio 10, active-low
++ *   DC       : pio 22, active-high
++ *   TE       : pio 9,  active-high (tearing-effect line for VSYNC sync)
++ *   Backlight: pwm-backlight (PWM ch2, declared above)
++ * SPI clock: start conservative at 16 MHz. Stock runs 52 MHz, but we
++ * ramp after bring-up verifies signal integrity.
++ */
++&spic_pins {
++	mux {
++		function = "spi";
++		groups = "spi1_1";
++	};
++};
++
++&spi1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&spic_pins>;
++	status = "okay";
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	panel@0 {
++		compatible = "sitronix,st7789p3";
++		reg = <0>;
++		spi-max-frequency = <16000000>;
++		rotation = <0>;
++		backlight = <&backlight>;
++		reset-gpios = <&pio 10 GPIO_ACTIVE_LOW>;
++		dc-gpios = <&pio 22 GPIO_ACTIVE_HIGH>;
++	};
++};
+diff --git a/target/linux/mediatek/filogic/config-6.18 b/target/linux/mediatek/filogic/config-6.18
+index 13a33012d2..d20b2e501e 100644
+--- a/target/linux/mediatek/filogic/config-6.18
++++ b/target/linux/mediatek/filogic/config-6.18
+@@ -56,6 +56,21 @@ CONFIG_ATA=y
+ CONFIG_AUDIT_ARCH_COMPAT_GENERIC=y
+ CONFIG_BACKLIGHT_CLASS_DEVICE=y
+ CONFIG_BACKLIGHT_PWM=y
++CONFIG_DMA_SHARED_BUFFER=y
++CONFIG_DRM=m
++CONFIG_DRM_CLIENT_LIB=m
++CONFIG_DRM_CLIENT_SELECTION=y
++CONFIG_DRM_GEM_DMA_HELPER=m
++CONFIG_DRM_KMS_HELPER=m
++CONFIG_DRM_MIPI_DBI=m
++CONFIG_DRM_ST7789P3=m
++CONFIG_DRM_FBDEV_EMULATION=y
++CONFIG_DRM_FBDEV_OVERALLOC=100
++CONFIG_FB=y
++CONFIG_FB_DEVICE=y
++CONFIG_FRAMEBUFFER_CONSOLE=y
++CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
++CONFIG_FRAMEBUFFER_CONSOLE_ROTATION=y
+ CONFIG_BLK_DEV_LOOP=y
+ CONFIG_BLK_DEV_SD=y
+ CONFIG_BLK_PM=y
+diff --git a/target/linux/mediatek/patches-6.18/998-drm-tiny-add-st7789p3.patch b/target/linux/mediatek/patches-6.18/998-drm-tiny-add-st7789p3.patch
+new file mode 100644
+index 0000000000..d060384828
+--- /dev/null
++++ b/target/linux/mediatek/patches-6.18/998-drm-tiny-add-st7789p3.patch
+@@ -0,0 +1,399 @@
++From: Emre Demirli <ehdemirli@proton.me>
++Subject: [PATCH] drm/tiny: add ST7789P3 display driver
++
++Add a DRM tiny driver for the Sitronix ST7789P3 240x320 IPS TFT LCD
++controller, using the MIPI DBI Type C Option 3 (SPI + D/C GPIO)
++interface via the drm_mipi_dbi helper framework.
++
++The ST7789P3 is a variant of the ST7789 family with a distinct init
++sequence: different gamma curves, a characteristic two-write PWCTRL1
++pattern (0xD0 0xA7; 0xD0 0xA4 0xA1), and different LCMCTRL/VCOMS/VRHS
++values compared to the ST7789V.
++
++Used on the GL.iNet GL-BE10000 (Slate 7) router front-panel LCD wired
++to MT7987 SPI1.
++
++Includes DT binding documentation.
++
++Signed-off-by: Emre Demirli <ehdemirli@proton.me>
++---
++--- /dev/null
+++++ b/Documentation/devicetree/bindings/display/panel/sitronix,st7789p3.yaml
++@@ -0,0 +1,63 @@
+++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+++%YAML 1.2
+++---
+++$id: http://devicetree.org/schemas/display/panel/sitronix,st7789p3.yaml#
+++$schema: http://devicetree.org/meta-schemas/core.yaml#
+++
+++title: Sitronix ST7789P3 Display Panel
+++
+++maintainers:
+++  - Emre Demirli <ehdemirli@proton.me>
+++
+++description:
+++  The Sitronix ST7789P3 is a single-chip controller/driver for 240x320
+++  IPS TFT LCD panels using the MIPI DBI Type C interface.  It is a
+++  variant of the ST7789 family with a distinct power control init
+++  sequence (two-write PWCTRL1 pattern).
+++
+++allOf:
+++  - $ref: panel-common.yaml#
+++  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+++
+++properties:
+++  compatible:
+++    const: sitronix,st7789p3
+++
+++  reg:
+++    maxItems: 1
+++
+++  dc-gpios:
+++    maxItems: 1
+++    description: Display data/command selection (D/CX) of this DBI panel.
+++
+++  reset-gpios:
+++    maxItems: 1
+++    description: Active-low hardware reset.
+++
+++  rotation:
+++    $ref: /schemas/types.yaml#/definitions/uint32
+++    enum: [0, 90, 180, 270]
+++    default: 0
+++
+++  backlight: true
+++
+++  spi-max-frequency: true
+++
+++required:
+++  - compatible
+++  - reg
+++  - dc-gpios
+++
+++unevaluatedProperties: false
+++
+++examples:
+++  - |
+++    #include <dt-bindings/gpio/gpio.h>
+++    spi {
+++        #address-cells = <1>;
+++        #size-cells = <0>;
+++        panel@0 {
+++            compatible = "sitronix,st7789p3";
+++            reg = <0>;
+++            spi-max-frequency = <16000000>;
+++            dc-gpios = <&pio 22 GPIO_ACTIVE_HIGH>;
+++            reset-gpios = <&pio 10 GPIO_ACTIVE_LOW>;
+++            backlight = <&backlight>;
+++            rotation = <0>;
+++        };
+++    };
+++...
++--- a/drivers/gpu/drm/tiny/Kconfig
+++++ b/drivers/gpu/drm/tiny/Kconfig
++@@ -215,3 +215,18 @@
++ 	  * 4.40" Sharp Memory LCD (LS044Q7DH01)
++ 
++ 	  If M is selected the module will be called sharp_memory.
+++
+++config DRM_ST7789P3
+++	tristate "DRM support for Sitronix ST7789P3 display panels"
+++	depends on DRM && SPI
+++	select DRM_CLIENT_SELECTION
+++	select DRM_KMS_HELPER
+++	select DRM_GEM_DMA_HELPER
+++	select DRM_MIPI_DBI
+++	select BACKLIGHT_CLASS_DEVICE
+++	help
+++	  DRM driver for the Sitronix ST7789P3 240x320 IPS TFT LCD
+++	  controller using MIPI DBI Type C Option 3 (SPI + D/C GPIO).
+++	  Used on the GL.iNet GL-BE10000 (Slate 7) front-panel display.
+++
+++	  If M is selected the module will be called st7789p3.
++--- a/drivers/gpu/drm/tiny/Makefile
+++++ b/drivers/gpu/drm/tiny/Makefile
++@@ -15,3 +15,4 @@
++ obj-$(CONFIG_TINYDRM_MI0283QT)		+= mi0283qt.o
++ obj-$(CONFIG_TINYDRM_REPAPER)		+= repaper.o
++ obj-$(CONFIG_TINYDRM_SHARP_MEMORY)	+= sharp-memory.o
+++obj-$(CONFIG_DRM_ST7789P3)		+= st7789p3.o
++--- /dev/null
+++++ b/drivers/gpu/drm/tiny/st7789p3.c
++@@ -0,0 +1,277 @@
+++// SPDX-License-Identifier: GPL-2.0-or-later
+++/*
+++ * DRM driver for Sitronix ST7789P3 display panels
+++ *
+++ * Copyright (C) 2026 Emre Demirli <ehdemirli@proton.me>
+++ *
+++ * Based on ili9341.c:
+++ * Copyright 2018 David Lechner <david@lechnology.com>
+++ *
+++ * The ST7789P3 is a single-chip controller/driver for 240x320 IPS TFT
+++ * panels.  It shares the MIPI DCS command set with the ST7789V but
+++ * requires a different init sequence: distinct gamma curves, a
+++ * two-write PWCTRL1 pattern (0xD0 0xA7; 0xD0 0xA4 0xA1) characteristic
+++ * of the P3 variant, and different LCMCTRL/VCOMS/VRHS values.
+++ */
+++
+++#include <linux/backlight.h>
+++#include <linux/delay.h>
+++#include <linux/gpio/consumer.h>
+++#include <linux/module.h>
+++#include <linux/property.h>
+++#include <linux/spi/spi.h>
+++
+++#include <drm/clients/drm_client_setup.h>
+++#include <drm/drm_atomic_helper.h>
+++#include <drm/drm_drv.h>
+++#include <drm/drm_fbdev_dma.h>
+++#include <drm/drm_gem_atomic_helper.h>
+++#include <drm/drm_gem_dma_helper.h>
+++#include <drm/drm_managed.h>
+++#include <drm/drm_mipi_dbi.h>
+++#include <drm/drm_modeset_helper.h>
+++#include <video/mipi_display.h>
+++
+++#define ST7789P3_RAMCTRL	0xb0
+++#define ST7789P3_PORCTRL	0xb2
+++#define ST7789P3_GCTRL		0xb7
+++#define ST7789P3_VCOMS		0xbb
+++#define ST7789P3_LCMCTRL	0xc0
+++#define ST7789P3_VDVVRHEN	0xc2
+++#define ST7789P3_VRHS		0xc3
+++#define ST7789P3_FRCTRL2	0xc6
+++#define ST7789P3_PWCTRL1	0xd0
+++#define ST7789P3_EQCTRL	0xd6
+++#define ST7789P3_PVGAMCTRL	0xe0
+++#define ST7789P3_NVGAMCTRL	0xe1
+++
+++#define ST7789P3_MADCTL_BGR	BIT(3)
+++#define ST7789P3_MADCTL_MV	BIT(5)
+++#define ST7789P3_MADCTL_MX	BIT(6)
+++#define ST7789P3_MADCTL_MY	BIT(7)
+++
+++static void st7789p3_enable(struct drm_simple_display_pipe *pipe,
+++			    struct drm_crtc_state *crtc_state,
+++			    struct drm_plane_state *plane_state)
+++{
+++	struct mipi_dbi_dev *dbidev = drm_to_mipi_dbi_dev(pipe->crtc.dev);
+++	struct mipi_dbi *dbi = &dbidev->dbi;
+++	u8 addr_mode;
+++	int ret, idx;
+++
+++	if (!drm_dev_enter(pipe->crtc.dev, &idx))
+++		return;
+++
+++	DRM_DEBUG_KMS("\n");
+++
+++	ret = mipi_dbi_poweron_conditional_reset(dbidev);
+++	if (ret < 0)
+++		goto out_exit;
+++	if (ret == 1)
+++		goto out_enable;
+++
+++	mipi_dbi_command(dbi, MIPI_DCS_SET_DISPLAY_OFF);
+++
+++	/* Exit sleep mode */
+++	mipi_dbi_command(dbi, MIPI_DCS_EXIT_SLEEP_MODE);
+++	msleep(120);
+++
+++	/* Pixel format: 16-bit RGB565 */
+++	mipi_dbi_command(dbi, MIPI_DCS_SET_PIXEL_FORMAT,
+++			 MIPI_DCS_PIXEL_FMT_16BIT);
+++
+++	/* RAM control */
+++	mipi_dbi_command(dbi, ST7789P3_RAMCTRL, 0x00, 0xe0);
+++
+++	/* Porch setting */
+++	mipi_dbi_command(dbi, ST7789P3_PORCTRL,
+++			 0x0c, 0x0c, 0x00, 0x33, 0x33);
+++
+++	/* Gate control */
+++	mipi_dbi_command(dbi, ST7789P3_GCTRL, 0x00);
+++
+++	/* VCOM setting */
+++	mipi_dbi_command(dbi, ST7789P3_VCOMS, 0x33);
+++
+++	/* LCM control */
+++	mipi_dbi_command(dbi, ST7789P3_LCMCTRL, 0x2c);
+++
+++	/* VDV and VRH command enable */
+++	mipi_dbi_command(dbi, ST7789P3_VDVVRHEN, 0x01, 0xff);
+++
+++	/* VRH set */
+++	mipi_dbi_command(dbi, ST7789P3_VRHS, 0x23);
+++
+++	/* Frame rate control */
+++	mipi_dbi_command(dbi, ST7789P3_FRCTRL2, 0x0f);
+++
+++	/*
+++	 * Power control 1: characteristic P3 two-write sequence.
+++	 * First write sets the AVDD/AVCL boost converter,
+++	 * second write completes VGH/VGL configuration.
+++	 */
+++	mipi_dbi_command(dbi, ST7789P3_PWCTRL1, 0xa7);
+++	mipi_dbi_command(dbi, ST7789P3_PWCTRL1, 0xa4, 0xa1);
+++
+++	/* Equaliser control */
+++	mipi_dbi_command(dbi, ST7789P3_EQCTRL, 0xa1);
+++
+++	/* Positive voltage gamma control */
+++	mipi_dbi_command(dbi, ST7789P3_PVGAMCTRL,
+++			 0xf0, 0x12, 0x18, 0x10, 0x0e, 0x39, 0x34,
+++			 0x65, 0x42, 0x38, 0x0d, 0x0d, 0x17, 0x20);
+++
+++	/* Negative voltage gamma control */
+++	mipi_dbi_command(dbi, ST7789P3_NVGAMCTRL,
+++			 0xf0, 0x10, 0x16, 0x0a, 0x09, 0x05, 0x34,
+++			 0x54, 0x41, 0x3a, 0x10, 0x0e, 0x15, 0x1d);
+++
+++	/* Display inversion on (required for IPS panels) */
+++	mipi_dbi_command(dbi, MIPI_DCS_ENTER_INVERT_MODE);
+++
+++	/* Enable tearing-effect output from panel (V-blank only) */
+++	mipi_dbi_command(dbi, MIPI_DCS_SET_TEAR_ON, 0x00);
+++
+++	mipi_dbi_command(dbi, MIPI_DCS_SET_DISPLAY_ON);
+++	msleep(20);
+++
+++out_enable:
+++	switch (dbidev->rotation) {
+++	default:
+++		addr_mode = 0;
+++		break;
+++	case 90:
+++		addr_mode = ST7789P3_MADCTL_MV | ST7789P3_MADCTL_MY;
+++		break;
+++	case 180:
+++		addr_mode = ST7789P3_MADCTL_MX | ST7789P3_MADCTL_MY;
+++		break;
+++	case 270:
+++		addr_mode = ST7789P3_MADCTL_MV | ST7789P3_MADCTL_MX;
+++		break;
+++	}
+++	addr_mode |= ST7789P3_MADCTL_BGR;
+++	mipi_dbi_command(dbi, MIPI_DCS_SET_ADDRESS_MODE, addr_mode);
+++	mipi_dbi_enable_flush(dbidev, crtc_state, plane_state);
+++out_exit:
+++	drm_dev_exit(idx);
+++}
+++
+++static const struct drm_simple_display_pipe_funcs st7789p3_pipe_funcs = {
+++	DRM_MIPI_DBI_SIMPLE_DISPLAY_PIPE_FUNCS(st7789p3_enable),
+++};
+++
+++static const struct drm_display_mode st7789p3_mode = {
+++	DRM_SIMPLE_MODE(240, 320, 30, 40),
+++};
+++
+++DEFINE_DRM_GEM_DMA_FOPS(st7789p3_fops);
+++
+++static const struct drm_driver st7789p3_driver = {
+++	.driver_features	= DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
+++	.fops			= &st7789p3_fops,
+++	DRM_GEM_DMA_DRIVER_OPS_VMAP,
+++	DRM_FBDEV_DMA_DRIVER_OPS,
+++	.debugfs_init		= mipi_dbi_debugfs_init,
+++	.name			= "st7789p3",
+++	.desc			= "Sitronix ST7789P3",
+++	.major			= 1,
+++	.minor			= 0,
+++};
+++
+++static const struct of_device_id st7789p3_of_match[] = {
+++	{ .compatible = "sitronix,st7789p3" },
+++	{ }
+++};
+++MODULE_DEVICE_TABLE(of, st7789p3_of_match);
+++
+++static const struct spi_device_id st7789p3_id[] = {
+++	{ "st7789p3", 0 },
+++	{ }
+++};
+++MODULE_DEVICE_TABLE(spi, st7789p3_id);
+++
+++static int st7789p3_probe(struct spi_device *spi)
+++{
+++	struct device *dev = &spi->dev;
+++	struct mipi_dbi_dev *dbidev;
+++	struct drm_device *drm;
+++	struct mipi_dbi *dbi;
+++	struct gpio_desc *dc;
+++	u32 rotation = 0;
+++	int ret;
+++
+++	dbidev = devm_drm_dev_alloc(dev, &st7789p3_driver,
+++				    struct mipi_dbi_dev, drm);
+++	if (IS_ERR(dbidev))
+++		return PTR_ERR(dbidev);
+++
+++	dbi = &dbidev->dbi;
+++	drm = &dbidev->drm;
+++
+++	dbi->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
+++	if (IS_ERR(dbi->reset))
+++		return dev_err_probe(dev, PTR_ERR(dbi->reset),
+++				     "Failed to get GPIO 'reset'\n");
+++
+++	dc = devm_gpiod_get_optional(dev, "dc", GPIOD_OUT_LOW);
+++	if (IS_ERR(dc))
+++		return dev_err_probe(dev, PTR_ERR(dc),
+++				     "Failed to get GPIO 'dc'\n");
+++
+++	dbidev->backlight = devm_of_find_backlight(dev);
+++	if (IS_ERR(dbidev->backlight))
+++		return PTR_ERR(dbidev->backlight);
+++
+++	device_property_read_u32(dev, "rotation", &rotation);
+++
+++	ret = mipi_dbi_spi_init(spi, dbi, dc);
+++	if (ret)
+++		return ret;
+++
+++	ret = mipi_dbi_dev_init(dbidev, &st7789p3_pipe_funcs,
+++				&st7789p3_mode, rotation);
+++	if (ret)
+++		return ret;
+++
+++	drm_mode_config_reset(drm);
+++
+++	ret = drm_dev_register(drm, 0);
+++	if (ret)
+++		return ret;
+++
+++	spi_set_drvdata(spi, drm);
+++
+++	drm_client_setup(drm, NULL);
+++
+++	return 0;
+++}
+++
+++static void st7789p3_remove(struct spi_device *spi)
+++{
+++	struct drm_device *drm = spi_get_drvdata(spi);
+++
+++	drm_dev_unplug(drm);
+++	drm_atomic_helper_shutdown(drm);
+++}
+++
+++static void st7789p3_shutdown(struct spi_device *spi)
+++{
+++	drm_atomic_helper_shutdown(spi_get_drvdata(spi));
+++}
+++
+++static struct spi_driver st7789p3_spi_driver = {
+++	.driver = {
+++		.name = "st7789p3",
+++		.of_match_table = st7789p3_of_match,
+++	},
+++	.id_table = st7789p3_id,
+++	.probe = st7789p3_probe,
+++	.remove = st7789p3_remove,
+++	.shutdown = st7789p3_shutdown,
+++};
+++module_spi_driver(st7789p3_spi_driver);
+++
+++MODULE_DESCRIPTION("DRM driver for the Sitronix ST7789P3 LCD controller");
+++MODULE_AUTHOR("Emre Demirli <ehdemirli@proton.me>");
+++MODULE_LICENSE("GPL");
+-- 
+2.54.0

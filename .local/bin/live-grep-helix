@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-FILE_PATH=$(live-grep | tr '\n' ' ' | sed 's/ *$//')
-
-# BEWARE: window ids are dynamic since we open a new half-window.
-if [[ -n $FILE_PATH ]]; then
-  tmux send-keys -t 0 ":open $FILE_PATH" C-m
-fi

@@ -1,0 +1,37 @@
+# r01 router-specific declarative state (consumed by /etc/init.d/r01-fan
+# and the LuCI page at /cgi-bin/luci/admin/r01/hardware).
+
+config r01 'fan'
+	# auto       -> let the kernel thermal governor manage the PWM
+	# quiet      -> force pwm1=0 (fan off). Safety watchdog reverts to
+	#               'auto' if any temp exceeds 'safety_temp' (millicelsius).
+	# aggressive -> force pwm1=255 (full speed)
+	# manual     -> use 'manual_pwm' value directly (0-255)
+	option mode 'auto'
+	option manual_pwm '128'
+
+	# Kelvin-of-disaster threshold. If any monitored hwmon temp >= this
+	# (in millicelsius) while fan is forced low, the watchdog re-enables
+	# the kernel governor. Set to 0 to disable the watchdog.
+	option safety_temp '85000'
+
+	# Watchdog poll interval in seconds.
+	option safety_interval '5'
+
+# Network watchdog for travelmate / wwan. When the MediaTek MT7996
+# scan engine wedges (returns empty scan results despite APs being in
+# range), travelmate gets stuck without an uplink. This watchdog
+# detects 'wwan down for N consecutive checks while uplinks are
+# enabled' and bounces travelmate to reset the wireless stack.
+config r01 'netwatch'
+	# 0 = disable the watchdog entirely.
+	option enabled '1'
+
+	# Seconds between checks.
+	option check_interval '60'
+
+	# How many consecutive failed checks before we restart travelmate.
+	# Default 5 -> 5 minutes of wwan-down before intervention. This is
+	# longer than travelmate's own internal retry (maxwait * maxretry =
+	# 30 * 5 = 150s), so we don't fight travelmate's own recovery.
+	option stuck_after '5'

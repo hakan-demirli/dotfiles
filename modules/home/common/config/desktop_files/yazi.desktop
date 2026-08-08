@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=yazi
+Comment=Launches the yazi file manager
+Icon=utilities-terminal
+Terminal=false
+Exec=kitty yazi_cd_desktop.sh
+Categories=ConsoleOnly;System;FileTools;FileManager
+MimeType=inode/directory;

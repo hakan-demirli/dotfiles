@@ -1,0 +1,3 @@
+# Build artifacts and device dumps stay local.
+*
+!.gitignore

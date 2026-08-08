@@ -1,0 +1,46 @@
+#!/bin/sh
+set -eu
+
+AUTHKEY_FILE="/etc/tailscale/authkey"
+LOGIN_SERVER_FILE="/etc/tailscale/login-server"
+TAG_FILE="/etc/tailscale/tag"
+
+if [ ! -r "$AUTHKEY_FILE" ]; then
+	echo "kvm-tailscale-bootstrap: $AUTHKEY_FILE missing or unreadable. Skipping"
+	exit 0
+fi
+
+if [ ! -r "$LOGIN_SERVER_FILE" ]; then
+	echo "kvm-tailscale-bootstrap: $LOGIN_SERVER_FILE missing or unreadable. Skipping"
+	exit 0
+fi
+
+if [ ! -r "$TAG_FILE" ]; then
+	echo "kvm-tailscale-bootstrap: $TAG_FILE missing or unreadable. Skipping"
+	exit 0
+fi
+
+STATE="$(tailscale status --json 2>/dev/null | grep -o '"BackendState":"[^"]*"' | head -n1 || true)"
+case "$STATE" in
+*'Running'*)
+	echo "kvm-tailscale-bootstrap: already Running. No-op"
+	exit 0
+	;;
+esac
+
+AUTHKEY="$(cat "$AUTHKEY_FILE")"
+LOGIN_SERVER="$(tr -d ' \t\r\n' <"$LOGIN_SERVER_FILE")"
+TAG="$(tr -d ' \t\r\n' <"$TAG_FILE")"
+
+if [ -z "$AUTHKEY" ] || [ -z "$LOGIN_SERVER" ] || [ -z "$TAG" ]; then
+	echo "kvm-tailscale-bootstrap: one of authkey/login-server/tag is empty. Refusing to register"
+	exit 1
+fi
+
+echo "kvm-tailscale-bootstrap: joining $LOGIN_SERVER as $TAG"
+exec tailscale up \
+	--login-server="https://$LOGIN_SERVER" \
+	--authkey="$AUTHKEY" \
+	--advertise-tags="$TAG" \
+	--hostname=kvm-desk-0 \
+	--reset

@@ -1,0 +1,118 @@
+From 69def656001f64b85a6dc77b60bd845043d03b08 Mon Sep 17 00:00:00 2001
+From: hakan-demirli <ehdemirli@proton.me>
+Date: Thu, 4 Jun 2026 08:41:17 +0200
+Subject: [PATCH] =?UTF-8?q?be10000:=20override=20cpu=5Fthermal=20trips=20f?=
+ =?UTF-8?q?or=20silent=20fan=20below=2065=C2=B0C?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The base mt7987.dtsi has a 40°C active trip point that keeps the fan
+spinning at 50% PWM even when the SoC is barely warm.  Worse, the
+step_wise governor ramps up but never ramps back down.
+
+Override &cpu_thermal with sane trip points and 5°C hysteresis:
+  65°C  low (PWM 80)   - ramps down to off at 60°C
+  70°C  medium (144)   - ramps down at 65°C
+  85°C  high (216)     - ramps down at 80°C
+  100°C full (255)     - ramps down at 95°C
+
+Also override cooling-levels to add a 5th level (0/80/144/216/255)
+for finer granularity.
+
+Result: fan stays off at idle (~45°C), silent at normal load (~60°C).
+---
+ .../dts/mt7987a-glinet-gl-be10000.dts         | 75 +++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+
+diff --git a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+index ea896a24e0..e744cf078d 100644
+--- a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
++++ b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+@@ -97,9 +97,84 @@
+ 	interrupt-parent = <&pio>;
+ 	interrupts = <5 IRQ_TYPE_EDGE_RISING>;
+ 	pwms = <&pwm 1 50000 0>;
++	/*
++	 * Override dtsi cooling-levels: add a proper off state and
++	 * gentler ramp so the fan stays silent below 70 °C.
++	 * Levels: 0=off, 1=low(80), 2=med(144), 3=high(216), 4=full(255)
++	 */
++	cooling-levels = <0 80 144 216 255>;
+ 	status = "okay";
+ };
+ 
++&cpu_thermal {
++	/delete-node/ cooling-maps;
++	/delete-node/ trips;
++
++	trips {
++		cpu_trip_crit: crit {
++			temperature = <125000>;
++			hysteresis = <2000>;
++			type = "critical";
++		};
++
++		cpu_trip_hot: hot {
++			temperature = <120000>;
++			hysteresis = <2000>;
++			type = "hot";
++		};
++
++		cpu_trip_active_high: active-high {
++			temperature = <100000>;
++			hysteresis = <5000>;
++			type = "active";
++		};
++
++		cpu_trip_active_med: active-med {
++			temperature = <85000>;
++			hysteresis = <5000>;
++			type = "active";
++		};
++
++		cpu_trip_active_low: active-low {
++			temperature = <70000>;
++			hysteresis = <5000>;
++			type = "active";
++		};
++
++		cpu_trip_active_silent: active-silent {
++			temperature = <65000>;
++			hysteresis = <5000>;
++			type = "active";
++		};
++	};
++
++	cooling-maps {
++		cpu-active-high {
++			/* 100 °C : full blast */
++			cooling-device = <&fan 4 4>;
++			trip = <&cpu_trip_active_high>;
++		};
++
++		cpu-active-med {
++			/* 85 °C : high */
++			cooling-device = <&fan 3 3>;
++			trip = <&cpu_trip_active_med>;
++		};
++
++		cpu-active-low {
++			/* 70 °C : medium */
++			cooling-device = <&fan 2 2>;
++			trip = <&cpu_trip_active_low>;
++		};
++
++		cpu-active-silent {
++			/* 65 °C : low, ramps down to off at 60 °C via hysteresis */
++			cooling-device = <&fan 1 1>;
++			trip = <&cpu_trip_active_silent>;
++		};
++	};
++};
++
+ &i2c0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&i2c0_pins>;
+-- 
+2.54.0

@@ -1,0 +1,248 @@
+From 8de0a2bb5fdb5da80605f38b3d3332f8afb9b1b3 Mon Sep 17 00:00:00 2001
+From: emre <emre@local>
+Date: Mon, 1 Jun 2026 22:40:59 +0200
+Subject: [PATCH] rules.mk: tar --no-same-owner --no-same-permissions
+
+Building under unshare --user --map-root-user makes the inner process
+EUID 0. Tar then tries to preserve ownership from upstream tarballs;
+when those carry UIDs outside our 1-uid mapping (e.g. linux-atm-2.5.2
+ships files owned by uid 1025) chown(unmapped) returns EINVAL.
+
+Telling tar to ignore the tarball ownership avoids the chown entirely.
+Files end up owned by the build user, which OpenWrt later normalizes
+anyway when assembling the rootfs.
+---
+ rules.mk                                      |   2 +-
+ ...chscreen-hynitron-cstxxx-add-cst3530.patch | 184 +++++++++++++++---
+ 2 files changed, 160 insertions(+), 26 deletions(-)
+
+diff --git a/rules.mk b/rules.mk
+index 0e9c178c1b..4dff624d4d 100644
+--- a/rules.mk
++++ b/rules.mk
+@@ -404,7 +404,7 @@ else
+   DISABLE_IPV6:=--disable-ipv6
+ endif
+ 
+-TAR_OPTIONS:=-xf -
++TAR_OPTIONS:=-xf - --no-same-owner --no-same-permissions
+ 
+ ifeq ($(CONFIG_BUILD_LOG),y)
+   BUILD_LOG:=1
+diff --git a/target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch b/target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch
+index ae3b822ba4..f49cb38f08 100644
+--- a/target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch
++++ b/target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch
+@@ -1,51 +1,185 @@
+ From: emre <emre@local>
+-Subject: [PATCH] input: touchscreen: hynitron_cstxxx: add CST3530 compatible
++Subject: [PATCH] input: touchscreen: hynitron_cstxxx: add CST3530 (cst66xx family)
+ 
+-The CST3530 (Hynitron CST3xxx-family chip, chkcode 0xCACA220E) is
+-electrically and protocol-compatible with the CST340 the upstream
+-driver supports - the firmware-info sanity check via chkcode masks
+-to 0xCACA0000 and matches cst3xx_data.ic_chkcode.
++The CST3530 is a Hynitron CST3xxx-family chip used on the GL.iNet
++GL-BE10000 (Slate 7) front-panel touch panel. Despite the "cst3"
++prefix, Hynitron classifies it as cst66xx-family: it uses a different
++probe handshake and touch-data protocol than the cst340/cst328 the
++upstream driver currently handles.
+ 
+-The CST3530's bootloader entry sequence does NOT match what
+-cst3xx_bootloader_enter expects. Since bootloader_enter is just a
+-sanity probe (the driver doesn't actually flash firmware), skip
+-it for CST3530 and rely on the firmware_info chkcode check to
+-validate the device.
++Differences vs. cst3xx:
++  * 4-byte big-endian register addresses (cst3xx: 2-byte LE).
++  * No usable bootloader_enter / firmware_info commands. The stock
++    GL.iNet cst353x.ko driver performs no probe-time validation.
++  * Touch data read at 0xD0070000 with sum16(seed=0x55) checksum,
++    ACK via 0xD00002AB.
+ 
+----
+- drivers/input/touchscreen/hynitron_cstxxx.c | 21 +++++++++++++++++++++
+- 1 file changed, 21 insertions(+)
++This adds a CST3530 chip-data variant with stubbed bootloader/firmware
++probes and a cst66xx-style touch-report parser mirroring cst66xx_report()
++in hyn_cst66xx.c (gitee.com/thomas0000/hyn_driver).
+ 
+---- a/drivers/input/touchscreen/hynitron_cstxxx.c
+-+++ b/drivers/input/touchscreen/hynitron_cstxxx.c
+-@@ -467,6 +467,26 @@ static const struct hynitron_ts_chip_dat
++---
++--- a/drivers/input/touchscreen/hynitron_cstxxx.c	2026-06-01 23:00:54.283378895 +0200
+++++ b/drivers/input/touchscreen/hynitron_cstxxx.c	2026-06-01 23:01:29.808463147 +0200
++@@ -469,6 +469,157 @@
+  	.report_touch		= &cst3xx_touch_report,
+  };
+  
+++/* --- CST3530 (cst66xx family) ------------------------------------------ */
+++
+++/*
+++ * Write a 1..4-byte BIG-ENDIAN register address, then optionally read
+++ * @rlen bytes. Mirrors Hynitron's hyn_wr_reg() helper.
+++ */
+++static int cst66xx_read_reg(struct i2c_client *client, u32 reg, u8 reg_len,
+++			    u8 *rbuf, u16 rlen)
+++{
+++	struct i2c_msg msgs[2];
+++	u8 wbuf[4];
+++	int i, ret;
+++
+++	if (reg_len < 1 || reg_len > 4)
+++		return -EINVAL;
+++
+++	for (i = 0; i < reg_len; i++)
+++		wbuf[i] = reg >> (8 * (reg_len - 1 - i));
+++
+++	msgs[0].addr = client->addr;
+++	msgs[0].flags = 0;
+++	msgs[0].len = reg_len;
+++	msgs[0].buf = wbuf;
+++
+++	if (rlen == 0) {
+++		ret = i2c_transfer(client->adapter, msgs, 1);
+++		return ret < 0 ? ret : (ret == 1 ? 0 : -EIO);
+++	}
+++
+++	msgs[1].addr = client->addr;
+++	msgs[1].flags = I2C_M_RD;
+++	msgs[1].len = rlen;
+++	msgs[1].buf = rbuf;
+++
+++	ret = i2c_transfer(client->adapter, msgs, 2);
+++	return ret < 0 ? ret : (ret == 2 ? 0 : -EIO);
+++}
+++
+ +/*
+-+ * CST3530 doesn't respond to the 0xaa01a0/0x02a0 bootloader-enter
+-+ * handshake that cst3xx_bootloader_enter expects. Skip it and let
+-+ * firmware_info validate the device via chkcode (0xCACA220E & ~0xffff
+-+ * == 0xCACA0000 which matches cst3xx_data.ic_chkcode).
+++ * CST3530 ignores cst3xx's 0xaa01a0 bootloader handshake.
+++ * Probe-time validation is impossible. Rely on touch reports
+++ * to surface a hardware failure (checksum mismatch).
+ + */
+ +static int cst3530_bootloader_skip(struct i2c_client *client)
+ +{
+ +	return 0;
+ +}
+ +
+++static int cst3530_firmware_info_skip(struct i2c_client *client)
+++{
+++	return 0;
+++}
+++
+++/* Hynitron's sum16 seed used by cst66xx-family CRC verification. */
+++static u16 cst66xx_sum16(u16 seed, const u8 *p, u16 len)
+++{
+++	u16 s = seed;
+++	u16 i;
+++
+++	for (i = 0; i < len; i++)
+++		s += p[i];
+++	return s;
+++}
+++
+++#define CST66XX_TOUCH_DATA_REG		0xD0070000U
+++#define CST66XX_TOUCH_ACK_REG		0xD00002ABU
+++#define CST66XX_REPORT_TYPE_POS		0xFF
+++#define CST66XX_MAX_TOUCH		10
+++
+++/*
+++ * Touch report parser for cst66xx-family chips (CST3530). Mirrors
+++ * cst66xx_report() in hyn_cst66xx.c but reports MT-B input events.
+++ *
+++ * Layout of buf[]:
+++ *   [0..1]   little-endian sum16(seed=0x55) over buf[4..4+N*5]
+++ *   [2]      report type (0xFF position / 0xF0 gesture / 0xE0 prox)
+++ *   [3]      low nibble = finger_num, high nibble = key_num
+++ *   [4..]    per-touch 5-byte records:
+++ *              +0  x[7:0]
+++ *              +1  y[7:0]
+++ *              +2  pressure
+++ *              +3  hi nibble = y[11:8], lo nibble = x[11:8]
+++ *              +4  hi nibble = event (1=down,0=up), lo nibble = id
+++ */
+++static void cst3530_touch_report(struct i2c_client *client)
+++{
+++	struct hynitron_ts_data *ts_data = i2c_get_clientdata(client);
+++	u8 buf[64];
+++	u8 finger_num, key_num, report_typ;
+++	u16 expected_cksum, actual_cksum;
+++	int err, i, total;
+++
+++	err = cst66xx_read_reg(client, CST66XX_TOUCH_DATA_REG, 4, buf, 9);
+++	if (err)
+++		return;
+++
+++	report_typ = buf[2];
+++	finger_num = buf[3] & 0x0F;
+++	key_num    = (buf[3] & 0xF0) >> 4;
+++	total = finger_num + key_num;
+++
+++	if (total > CST66XX_MAX_TOUCH)
+++		goto ack;
+++
+++	if (total > 1) {
+++		err = i2c_master_recv(client, &buf[9], (total - 1) * 5);
+++		if (err < 0)
+++			goto ack;
+++	}
+++
+++	actual_cksum   = cst66xx_sum16(0x55, &buf[4], total * 5);
+++	expected_cksum = buf[0] | ((u16)buf[1] << 8);
+++	if (actual_cksum != expected_cksum)
+++		goto ack;
+++
+++	if (report_typ == CST66XX_REPORT_TYPE_POS) {
+++		for (i = 0; i < finger_num; i++) {
+++			int rec = (key_num + i) * 5;
+++			u16 x   = buf[rec + 4] | ((u16)(buf[rec + 7] & 0x0F) << 8);
+++			u16 y   = buf[rec + 5] | ((u16)(buf[rec + 7] & 0xF0) << 4);
+++			u8 pres = buf[rec + 6];
+++			u8 id   = buf[rec + 8] & 0x0F;
+++			u8 down = (buf[rec + 8] & 0xF0) ? 1 : 0;
+++
+++			input_mt_slot(ts_data->input_dev, id);
+++			input_mt_report_slot_state(ts_data->input_dev,
+++						   MT_TOOL_FINGER, down);
+++			if (down) {
+++				touchscreen_report_pos(ts_data->input_dev,
+++						       &ts_data->prop, x, y, true);
+++				input_report_abs(ts_data->input_dev,
+++						 ABS_MT_PRESSURE, pres);
+++			}
+++		}
+++		input_mt_sync_frame(ts_data->input_dev);
+++		input_sync(ts_data->input_dev);
+++	}
+++
+++ack:
+++	/* Release / ACK so the chip clears the IRQ. */
+++	cst66xx_read_reg(client, CST66XX_TOUCH_ACK_REG, 4, NULL, 0);
+++}
+++
+ +static const struct hynitron_ts_chip_data cst3530_data = {
+-+	.max_touch_num		= 10,	/* CST3530 datasheet: up to 10 touches */
+-+	.ic_chkcode		= 0xcaca0000,
+-+	.firmware_info		= &cst3xx_firmware_info,
+++	.max_touch_num		= CST66XX_MAX_TOUCH,
+++	.firmware_info		= &cst3530_firmware_info_skip,
+ +	.bootloader_enter	= &cst3530_bootloader_skip,
+ +	.init_input		= &cst3xx_input_dev_int,
+-+	.report_touch		= &cst3xx_touch_report,
+++	.report_touch		= &cst3530_touch_report,
+ +};
+ +
+  static const struct i2c_device_id hyn_tpd_id[] = {
+  	{ .name = "hynitron_ts" },
+  	{ /* sentinel */ },
+-@@ -476,6 +496,7 @@ MODULE_DEVICE_TABLE(i2c, hyn_tpd_id);
++@@ -477,6 +628,7 @@
+  
+  static const struct of_device_id hyn_dt_match[] = {
+  	{ .compatible = "hynitron,cst340", .data = &cst3xx_data },
+-- 
+2.54.0
