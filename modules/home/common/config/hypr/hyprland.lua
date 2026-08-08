@@ -224,7 +224,7 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("swayosd-client --output-volume mute-to
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("swayosd-client --input-volume mute-toggle"), { locked = true })
 
 local brightness_command =
-  [[level=$(brightnessctl -m | cut -d, -f4); level=${level%\%}; if [ "$level" -le 5 ]; then step=1; else step=10; fi; swayosd-client --min-brightness 1 --brightness ]]
+  [[level=$(brightnessctl -m | cut -d, -f4); level=${level%\%}; if [ "$level" -le 5 ]; then step=1; else step=10; fi; swayosd-client --min-brightness 0 --brightness ]]
 
 local function change_brightness(direction)
   return hl.dsp.exec_cmd(brightness_command .. direction .. "$step")
