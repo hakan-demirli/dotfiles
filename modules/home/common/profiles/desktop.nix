@@ -18,6 +18,32 @@ let
     '';
   };
 
+  autoRefreshMenu = pkgs.writeTextDir "share/auto-refresh/menu.xml" ''
+    <?xml version="1.0" encoding="UTF-8"?>
+    <interface>
+      <object class="GtkMenu" id="menu">
+        <style>
+          <class name="touch-menu" />
+        </style>
+        <child>
+          <object class="GtkMenuItem" id="rate-120">
+            <property name="label">120 Hz</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkMenuItem" id="rate-48">
+            <property name="label">48 Hz</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkMenuItem" id="auto">
+            <property name="label">Auto</property>
+          </object>
+        </child>
+      </object>
+    </interface>
+  '';
+
   hpPowerMenu = pkgs.writeTextDir "share/hp-power/menu.xml" ''
     <?xml version="1.0" encoding="UTF-8"?>
     <interface>
@@ -123,13 +149,14 @@ let
       adb-sync
       exfatprogs
       android-tools
+      autoRefresh
+      autoRefreshMenu
       hpPowerMenu
       libnotify
       libqalculate-fzf
       pavucontrol
       pulseaudio
       xremap
-      autoRefresh
       (pickNur "youtube_sync")
       (pickNur "riveroftime")
     ];
