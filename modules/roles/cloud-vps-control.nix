@@ -1,4 +1,5 @@
 {
+  config,
   host,
   cluster,
   lib,
@@ -13,6 +14,7 @@ let
   downloadDir = "${primaryHome}/Downloads";
   incompleteDir = "${downloadDir}/.incomplete";
   mediaDir = "${downloadDir}/media";
+  tailnetUrl = "http://100.64.0.1";
 
 in
 {
@@ -58,7 +60,27 @@ in
     homepage.extraServices = [
       {
         name = "Transmission";
-        url = "http://100.64.0.1:9091/transmission/web/";
+        url = "${tailnetUrl}:9091/transmission/web/";
+      }
+      {
+        name = "Grafana";
+        url = "${tailnetUrl}:${toString config.services.cluster-grafana.listenPort}/";
+      }
+      {
+        name = "VictoriaMetrics";
+        url = "${tailnetUrl}:${toString config.services.cluster-victoriametrics.listenPort}/vmui/";
+      }
+      {
+        name = "VictoriaLogs";
+        url = "${tailnetUrl}:${toString config.services.cluster-victorialogs.listenPort}/select/vmui/";
+      }
+      {
+        name = "Alertmanager";
+        url = "${tailnetUrl}:${toString config.services.cluster-alertmanager.listenPort}/";
+      }
+      {
+        name = "Alert rules";
+        url = "${tailnetUrl}:${toString config.services.cluster-vmalert.listenPort}/";
       }
     ];
 
