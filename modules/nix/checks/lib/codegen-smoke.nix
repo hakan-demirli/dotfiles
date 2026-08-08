@@ -1,6 +1,11 @@
-{ pkgs, self }:
+{
+  pkgs,
+  self,
+  inputs,
+}:
 let
   inherit (pkgs) lib;
+  inherit (inputs.infra-lib.lib) headscalePolicy;
   inventory = self.lib.inventory;
   p = self.packages.${pkgs.system};
 
@@ -38,8 +43,9 @@ let
     uid:
     let
       configured = inventory.users.${uid}.headscale_user or null;
+      username = if configured == null then uid else configured;
     in
-    if configured != null then configured else uid;
+    headscalePolicy.userPrincipal username;
 
   stripTag = tag: lib.removePrefix "tag:" tag;
   baseTag =
@@ -150,6 +156,11 @@ pkgs.runCommand "codegen-smoke"
     echo "$body" | jq -e . >/dev/null \
       || fail "headscale-acl: policy not valid JSON"
     pass "headscale-acl: valid JSON"
+
+    echo "$body" | jq -e \
+      '[.groups[]?[] | select(test("^[^@]+@[^@]*$") | not)] | length == 0' >/dev/null \
+      || fail "headscale-acl: group contains an invalid user principal"
+    pass "headscale-acl: group user principals are canonical"
 
     if [ -n "$adminIds" ]; then
       echo "$body" | jq -e '.groups["group:admin"]' >/dev/null \
