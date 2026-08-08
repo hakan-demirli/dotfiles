@@ -1,0 +1,2 @@
+modules/home/common/pkgs/bin/** linguist-detectable=false
+modules/home/common/config/** linguist-detectable=false
