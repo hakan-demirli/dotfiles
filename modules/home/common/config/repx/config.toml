@@ -1,0 +1,36 @@
+theme = "default"
+submission_target = "local"
+default_scheduler = "local"
+[targets]
+[targets.local]
+base_path = "~/.local/share/repx-store"
+default_scheduler = "local"
+default_execution_type = "bwrap"
+[targets.local.local]
+execution_types = ["bwrap", "native", "apptainer"]
+local_concurrency = 15
+
+[targets.local.slurm]
+execution_types = ["bwrap", "native", "apptainer"]
+
+[targets.tailscale-server-dev-1]
+address = "tailscale-server-dev-1"
+base_path = "~/.local/share/repx-store"
+default_scheduler = "slurm"
+default_execution_type = "bwrap"
+[targets.tailscale-server-dev-1.local]
+execution_types = ["bwrap", "apptainer"]
+local_concurrency = 15
+[targets.tailscale-server-dev-1.slurm]
+execution_types = ["bwrap", "apptainer"]
+
+[targets.safari]
+address = "safari"
+base_path = "/mnt/galactica/demirlie/.local/share/repx-store"
+default_scheduler = "slurm"
+default_execution_type = "bwrap"
+[targets.safari.local]
+execution_types = ["bwrap", "apptainer"]
+local_concurrency = 47
+[targets.safari.slurm]
+execution_types = ["bwrap", "apptainer"]

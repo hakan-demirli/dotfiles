@@ -1,0 +1,96 @@
+#!/bin/sh
+# r01 network watchdog. Started by /etc/init.d/r01-net-watchdog via procd.
+#
+# What it does: every <r01.netwatch.check_interval> seconds, read the
+# 'up' state of the wwan netifd interface. If wwan has been down for
+# <r01.netwatch.stuck_after> consecutive checks AND at least one
+# uplink in /etc/config/travelmate is enabled, restart travelmate.
+#
+# Why this exists: with trm_proactive=1 we saw the MT7996 wireless
+# scan engine wedge (iwinfo scan returns empty results despite APs
+# being clearly in range) after a transient disconnect, leaving wwan
+# stuck at NO_DEVICE until a manual travelmate restart. We've turned
+# proactive off as the primary fix. This is the safety net for any
+# residual scan-engine hangs.
+#
+# UCI surface (/etc/config/r01):
+#   r01.netwatch.enabled         0 = disable; 1 = on
+#   r01.netwatch.check_interval  seconds between checks
+#   r01.netwatch.stuck_after     N consecutive failed checks before kick
+
+LOG_TAG="r01-net-watchdog"
+
+# Read /etc/config/r01 [netwatch] each iteration so live tuning via
+# uci/LuCI takes effect without a service restart.
+read_cfg() {
+	enabled=$(uci -q get r01.netwatch.enabled 2>/dev/null)
+	interval=$(uci -q get r01.netwatch.check_interval 2>/dev/null)
+	stuck_after=$(uci -q get r01.netwatch.stuck_after 2>/dev/null)
+	[ -z "$enabled" ]     && enabled=1
+	[ -z "$interval" ]    && interval=60
+	[ -z "$stuck_after" ] && stuck_after=5
+}
+
+# Is wwan up per netifd? jsonfilter returns '' on missing iface, 'true'
+# or 'false' on present iface.
+wwan_up() {
+	state=$(ifstatus wwan 2>/dev/null | jsonfilter -e '@.up' 2>/dev/null)
+	[ "$state" = "true" ]
+}
+
+# Are any travelmate uplinks marked enabled='1'? If not, there's
+# nothing for travelmate to connect to and bouncing it just creates
+# noise.
+have_enabled_uplinks() {
+	uci -q show travelmate 2>/dev/null \
+		| grep -qE "@uplink\[[0-9]+\]\.enabled='1'"
+}
+
+down_count=0
+restart_count=0
+
+while :; do
+	read_cfg
+
+	# Live disable via UCI: sleep one interval and re-check, don't busy-loop.
+	if [ "$enabled" = "0" ]; then
+		sleep "$interval"
+		down_count=0
+		continue
+	fi
+
+	sleep "$interval"
+
+	if wwan_up; then
+		if [ "$down_count" -gt 0 ]; then
+			logger -t "$LOG_TAG" \
+				"wwan recovered after ${down_count} down checks"
+		fi
+		down_count=0
+		continue
+	fi
+
+	# wwan is down. If we have no uplinks configured/enabled, don't kick
+	# travelmate - it would just re-disable everything and we'd loop.
+	if ! have_enabled_uplinks; then
+		[ "$down_count" = "0" ] && \
+			logger -t "$LOG_TAG" \
+				"wwan down but no enabled travelmate uplinks. Idle"
+		continue
+	fi
+
+	down_count=$((down_count + 1))
+	logger -t "$LOG_TAG" \
+		"wwan down ${down_count}/${stuck_after}"
+
+	if [ "$down_count" -ge "$stuck_after" ]; then
+		restart_count=$((restart_count + 1))
+		logger -t "$LOG_TAG" \
+			"wwan stuck (${down_count} checks). Restarting travelmate (kick #${restart_count})"
+		/etc/init.d/travelmate restart >/dev/null 2>&1
+		down_count=0
+		# Give travelmate time to scan, associate, and DHCP before we
+		# start counting failures again.
+		sleep 60
+	fi
+done

@@ -1,0 +1,29 @@
+#!/bin/sh
+# First-boot bootstrap for r01-ui PIN hashes.
+#
+# Generates argon2id hashes for the default PINs (admin=1234, guest=0000)
+# and writes them into /etc/config/r01-ui so the user can log in
+# immediately without ssh-ing the router.
+#
+# This script is idempotent: it only writes a hash if the corresponding
+# UCI option is empty, so a sysupgrade that preserves /etc/config/r01-ui
+# (it does via /etc/sysupgrade.conf) will not overwrite chosen PINs.
+
+set -e
+
+[ -x /usr/bin/r01-ui-set-pin ] || exit 0
+
+admin_hash="$(uci -q get r01-ui.auth.admin_pin_hash)"
+guest_hash="$(uci -q get r01-ui.auth.guest_pin_hash)"
+
+if [ -z "$admin_hash" ]; then
+	/usr/bin/r01-ui-set-pin admin 1234 >/dev/null 2>&1 \
+		&& logger -t r01-ui "bootstrapped default admin PIN (1234). Change it!"
+fi
+
+if [ -z "$guest_hash" ]; then
+	/usr/bin/r01-ui-set-pin guest 0000 >/dev/null 2>&1 \
+		&& logger -t r01-ui "bootstrapped default guest PIN (0000). Change it!"
+fi
+
+exit 0

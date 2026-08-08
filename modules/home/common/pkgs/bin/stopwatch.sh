@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -e
+
+function finish {
+  tput cnorm
+  exit 0
+}
+
+trap finish EXIT
+
+if hash gdate 2> /dev/null; then
+  GNU_DATE="gdate"
+elif date --version | grep 'GNU coreutils' > /dev/null; then
+  GNU_DATE="date"
+fi
+
+function datef {
+  if [[ -z $GNU_DATE ]]; then
+    date "$@"
+  else
+    $GNU_DATE "$@"
+  fi
+}
+
+if datef +%N | grep -q N 2> /dev/null; then
+  DATE_FORMAT="+%H:%M:%S"
+else
+  DATE_FORMAT="+%H:%M:%S.%N"
+  NANOS_SUPPORTED=true
+fi
+
+tput civis
+
+if [[ $1 == "-r" || $1 == "--resume" ]]; then
+  if [[ ! -f $HOME/.config/.sw ]]; then
+    datef +%s > "$HOME"/.config/.sw
+  fi
+  START_TIME=$(cat "$HOME"/.config/.sw)
+else
+  START_TIME=$(datef +%s)
+  echo -n "$START_TIME" > "$HOME"/.config/.sw
+fi
+
+if [[ -z $GNU_DATE ]]; then
+  DATE_INPUT="-v-${START_TIME}S"
+else
+  DATE_INPUT="--date now-${START_TIME}sec"
+fi
+
+while true; do
+  if [[ "$NANOS_SUPPORTED" ]]; then
+    STOPWATCH=$(TZ=UTC datef "$DATE_INPUT" $DATE_FORMAT | sed 's/.\{7\}$//')
+  else
+    STOPWATCH=$(TZ=UTC datef "$DATE_INPUT" $DATE_FORMAT)
+  fi
+
+  printf "\r\e%s" "$STOPWATCH"
+  sleep 0.03
+done

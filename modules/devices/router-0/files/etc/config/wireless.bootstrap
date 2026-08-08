@@ -1,0 +1,47 @@
+# Bootstrap wireless. Ships in the empty overlay (mkConfigOverlay { bootstrap = true; }).
+#
+# Provides ONE 2.4GHz AP on the LAN network so a phone/laptop can reach
+# the router at 192.168.69.1 without ethernet. The 5G and 6G radios stay
+# disabled during bootstrap. There is no need to broadcast three SSIDs before the
+# operator has picked real credentials.
+#
+# SSID / PSK are hard-coded and public. This is known-weak by design.
+# Bootstrap AP gets replaced the moment `mkConfigOverlay { lanWifiPassword = ...; }`
+# runs, because the resulting overlay ships /etc/config/wireless
+# (production) which overwrites this file on the router.
+
+config wifi-device 'radio0'
+	option type 'mac80211'
+	option path 'soc/11280000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'
+	option radio '0'
+	option band '2g'
+	option channel 'auto'
+	option htmode 'HT20'
+	option country 'DE'
+	option disabled '0'
+
+config wifi-iface 'ap_bootstrap'
+	option device 'radio0'
+	option network 'lan'
+	option mode 'ap'
+	option ssid 'bootstrap'
+	option encryption 'psk2'
+	option key 'bootstrap'
+	option ieee80211w '1'
+	option disabled '0'
+
+config wifi-device 'radio1'
+	option type 'mac80211'
+	option path 'soc/11280000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'
+	option radio '1'
+	option band '5g'
+	option country 'DE'
+	option disabled '1'
+
+config wifi-device 'radio2'
+	option type 'mac80211'
+	option path 'soc/11280000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'
+	option radio '2'
+	option band '6g'
+	option country 'DE'
+	option disabled '1'

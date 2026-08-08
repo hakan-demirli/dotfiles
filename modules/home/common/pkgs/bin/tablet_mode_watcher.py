@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+
+import contextlib
+import fcntl
+import glob
+import os
+import re
+import select
+import signal
+import struct
+import subprocess
+import sys
+import time
+
+EV_SYN = 0x00
+EV_SW = 0x05
+SW_TABLET_MODE = 0x01
+
+
+EVENT_FMT = "llHHi"
+EVENT_SIZE = struct.calcsize(EVENT_FMT)
+
+_SW_BUFLEN = 8
+
+STATE_DIR = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+TABLET_LOCK_FILE = os.path.join(STATE_DIR, "tablet_mode_lock")
+
+
+def is_tablet_locked() -> bool:
+    try:
+        with open(TABLET_LOCK_FILE) as f:
+            return f.read().strip() == "1"
+    except OSError:
+        return False
+
+
+def _ioc(direction: int, type_char: str, nr: int, size: int) -> int:
+    return (direction << 30) | (size << 16) | (ord(type_char) << 8) | nr
+
+
+def EVIOCGBIT(ev_type: int, length: int) -> int:
+    return _ioc(2, "E", 0x20 + ev_type, length)
+
+
+def EVIOCGSW(length: int) -> int:
+    return _ioc(2, "E", 0x1B, length)
+
+
+def _has_bit(buf: bytes, bit: int) -> bool:
+    return bool((buf[bit // 8] >> (bit % 8)) & 1)
+
+
+def _event_num(path: str) -> int:
+    m = re.search(r"event(\d+)$", path)
+    return int(m.group(1)) if m else -1
+
+
+def find_tablet_mode_devices() -> list[str]:
+    override = os.environ.get("TABLET_MODE_EVENT")
+    if override:
+        return [override] if os.path.exists(override) else []
+
+    candidates = []
+    for path in sorted(glob.glob("/dev/input/event*"), key=_event_num):
+        try:
+            fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        except OSError:
+            continue
+        try:
+            buf = bytearray(_SW_BUFLEN)
+            fcntl.ioctl(fd, EVIOCGBIT(EV_SW, _SW_BUFLEN), buf, True)
+        except OSError:
+            os.close(fd)
+            continue
+        os.close(fd)
+        if _has_bit(buf, SW_TABLET_MODE):
+            candidates.append(path)
+
+    return candidates
+
+
+def query_initial_state(fd: int) -> bool:
+    buf = bytearray(_SW_BUFLEN)
+    try:
+        fcntl.ioctl(fd, EVIOCGSW(_SW_BUFLEN), buf, True)
+    except OSError as e:
+        log(f"EVIOCGSW failed: {e}. Assuming tablet mode off")
+        return False
+    return _has_bit(buf, SW_TABLET_MODE)
+
+
+def log(msg: str) -> None:
+    sys.stderr.write(f"[tablet_mode_watcher.py] {time.strftime('%H:%M:%S')} {msg}\n")
+    sys.stderr.flush()
+
+
+def apply(state: bool) -> None:
+    arg = "on" if state else "off"
+    try:
+        subprocess.run(
+            ["tablet_mode_apply.sh", arg],
+            check=False,
+            timeout=10,
+        )
+    except Exception as e:
+        log(f"tablet_mode_apply.sh {arg} failed: {e}")
+
+
+_current_state = False
+
+
+def set_state(new: bool, *, force: bool = False) -> None:
+    global _current_state
+    if not force and is_tablet_locked():
+        log(
+            f"tablet lock on: ignoring hinge event (would set {'on' if new else 'off'})"
+        )
+        return
+    if not force and new == _current_state:
+        return
+    _current_state = new
+    log(f"state -> {'on' if new else 'off'}")
+    apply(new)
+
+
+_resync_fds: dict[int, str] = {}
+
+
+def on_sigusr1(_signum, _frame):
+    log("SIGUSR1 received: toggling")
+    set_state(not _current_state, force=True)
+
+
+def on_sigusr2(_signum, _frame):
+    if not _resync_fds:
+        log("SIGUSR2 received but no devices open. Ignoring")
+        return
+    physical = False
+    for fd, dev in _resync_fds.items():
+        state = query_initial_state(fd)
+        log(f"SIGUSR2 resync: {dev} SW_TABLET_MODE={int(state)}")
+        if state:
+            physical = True
+    set_state(physical, force=True)
+
+
+def on_exit(_signum, _frame):
+    log("exit signal: restoring keyboard/touchpad")
+    apply(False)
+    sys.exit(0)
+
+
+def main() -> int:
+    devices = find_tablet_mode_devices()
+    if not devices:
+        log("no input device advertises SW_TABLET_MODE. Nothing to watch")
+        return 1
+
+    fds = {}
+    for dev in devices:
+        try:
+            fd = os.open(dev, os.O_RDONLY | os.O_NONBLOCK)
+            fds[fd] = dev
+            log(f"monitoring {dev}")
+        except OSError as e:
+            log(f"open({dev}) failed: {e}")
+
+    if not fds:
+        log("failed to open any SW_TABLET_MODE device")
+        return 1
+
+    _resync_fds.update(fds)
+
+    signal.signal(signal.SIGUSR1, on_sigusr1)
+    signal.signal(signal.SIGUSR2, on_sigusr2)
+    signal.signal(signal.SIGTERM, on_exit)
+    signal.signal(signal.SIGINT, on_exit)
+    log(f"initial tablet lock = {'on' if is_tablet_locked() else 'off'}")
+
+    initial = False
+    for fd, dev in fds.items():
+        state = query_initial_state(fd)
+        log(f"  {dev}: initial SW_TABLET_MODE={int(state)}")
+        if state:
+            initial = True
+    log(f"initial state -> {'on' if initial else 'off'}")
+    set_state(initial, force=True)
+
+    poll = select.poll()
+    for fd in fds:
+        poll.register(fd, select.POLLIN)
+
+    try:
+        while True:
+            try:
+                events = poll.poll()
+            except InterruptedError:
+                continue
+            for fd, mask in events:
+                if mask & (select.POLLHUP | select.POLLERR | select.POLLNVAL):
+                    log(f"{fds[fd]}: device error/hangup. Removing")
+                    poll.unregister(fd)
+                    os.close(fd)
+                    del fds[fd]
+                    _resync_fds.pop(fd, None)
+                    if not fds:
+                        log("all devices gone")
+                        return 1
+                    continue
+                data = os.read(fd, EVENT_SIZE)
+                if not data or len(data) < EVENT_SIZE:
+                    continue
+                _sec, _usec, etype, ecode, value = struct.unpack(EVENT_FMT, data)
+                if etype == EV_SW and ecode == SW_TABLET_MODE:
+                    log(f"  event from {fds[fd]}: value={value}")
+                    set_state(bool(value))
+    except KeyboardInterrupt:
+        on_exit(None, None)
+    finally:
+        for fd in fds:
+            with contextlib.suppress(OSError):
+                os.close(fd)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

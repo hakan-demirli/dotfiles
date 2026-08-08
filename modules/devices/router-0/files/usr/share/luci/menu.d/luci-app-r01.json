@@ -1,0 +1,24 @@
+{
+  "admin/r01": {
+    "title": "r01",
+    "order": 5,
+    "action": {
+      "type": "firstchild"
+    },
+    "depends": {
+      "acl": ["luci-app-r01"]
+    }
+  },
+
+  "admin/r01/hardware": {
+    "title": "Hardware",
+    "order": 1,
+    "action": {
+      "type": "view",
+      "path": "r01/hardware"
+    },
+    "depends": {
+      "acl": ["luci-app-r01"]
+    }
+  }
+}

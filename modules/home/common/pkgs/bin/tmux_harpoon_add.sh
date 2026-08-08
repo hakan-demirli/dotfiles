@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tmux_cwd=$(tmux display-message -p '#{session_path}')
+tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
+cache_dir="$HOME/.cache/tmux_harpoon"
+data_file="$cache_dir/$tmux_cwd_hash.csv"
+
+status_line=$(tmux capture-pane -pS -3 | tail -n 3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3' || true)
+read -r buffer_path cursor_row cursor_col <<< "$status_line"
+
+IFS='|' read -r tmux_session tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name}|#{window_index}|#{pane_current_command}|#{pane_current_path}')"
+tmux_window=${tmux_window//@/}
+
+if [[ $tmux_command == "yazi" ]]; then
+  if [[ -n $status_line ]]; then
+    temp_full_path="$buffer_path"
+    if [[ $temp_full_path == ~* ]]; then
+      temp_full_path="${temp_full_path/#\~/$HOME}"
+    fi
+    if [[ $temp_full_path != /* ]]; then
+      temp_full_path="$tmux_pane_path/$temp_full_path"
+    fi
+
+    temp_full_path=$(realpath "$temp_full_path" 2> /dev/null || echo "")
+
+    if [[ -f $temp_full_path ]] \
+      && [[ $cursor_row =~ ^[0-9]+$ ]] \
+      && [[ $cursor_col =~ ^[0-9]+$ ]]; then
+      tmux_command="hx"
+    fi
+  fi
+fi
+
+if [[ $buffer_path == ~* ]]; then
+  buffer_path="${buffer_path/#\~/$HOME}"
+fi
+
+if [[ $tmux_command != "hx" ]]; then
+  buffer_path=""
+  cursor_row=""
+  cursor_col=""
+  buffer_dir=""
+  buffer_name=""
+else
+  if [[ $buffer_path != /* ]]; then
+    buffer_path="$tmux_pane_path/$buffer_path"
+  else
+    buffer_path=$(realpath "$buffer_path")
+  fi
+
+  buffer_dir="$(dirname "$buffer_path")"
+  buffer_name="$(basename "$buffer_path")"
+fi
+
+populated=1
+if [[ ! -f $data_file ]]; then
+  populated=0
+  mkdir -p "$cache_dir"
+  touch "$data_file"
+elif [[ ! -s $data_file ]]; then
+  populated=0
+fi
+
+if [[ $buffer_path != *"/default_path"* ]]; then
+  if grep -q "^$buffer_path:" "$data_file"; then
+    tmux_harpoon_update.sh
+  else
+    new_line="$tmux_window,$tmux_command,$buffer_name:$cursor_row:$cursor_col,$buffer_dir,$tmux_pane_path"
+    if [[ ! -s $data_file ]]; then
+      echo "$new_line" >> "$data_file"
+    else
+      sed -i "1i$new_line" "$data_file"
+    fi
+  fi
+else
+  new_line="$tmux_window,$tmux_command,$buffer_name:$cursor_row:$cursor_col,$buffer_dir,$tmux_pane_path"
+  if [[ ! -s $data_file ]]; then
+    echo "$new_line" >> "$data_file"
+  else
+    sed -i "1i$new_line" "$data_file"
+  fi
+fi
+
+if [[ $populated -eq 0 ]]; then
+  {
+    for i in {0..2}; do
+      default_line="$i,bash,::,,$tmux_pane_path"
+      echo "$default_line"
+    done
+    echo
+    echo "# session_name: $tmux_session"
+    echo "# pane_id , command , file_name:r:c , file_path , workspace_dir"
+  } >> "$data_file"
+fi

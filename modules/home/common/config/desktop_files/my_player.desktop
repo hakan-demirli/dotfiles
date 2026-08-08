@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=player_my.sh
+Comment=Launches my music player
+Icon=multimedia-audio-player
+Terminal=false
+Exec=player_my.sh
+Categories=AudioVideo;Audio;Player;
+MimeType=audio/opus;

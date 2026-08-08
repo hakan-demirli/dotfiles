@@ -1,0 +1,184 @@
+From e4dd86b21739018fea172ea9835528acdc91e842 Mon Sep 17 00:00:00 2001
+From: emre <emre@local>
+Date: Mon, 1 Jun 2026 22:29:40 +0200
+Subject: [PATCH] be10000: enable fan, backlight (off), touchscreen (cst3530)
+
+DTS:
+  - fan PWM (ch1) + gpio-controlled 3.3V supply enabled
+  - pwm-backlight on PWM ch2 (default-brightness-level=0 -> OFF at boot)
+  - i2c0 enabled with hynitron,cst3530 cap_touch @0x58
+    (reset gpio8, IRQ gpio11 falling, 240x320)
+
+config-6.18 additions:
+  - CONFIG_BACKLIGHT_CLASS_DEVICE=y, CONFIG_BACKLIGHT_PWM=y
+  - CONFIG_INPUT_EVDEV=y, CONFIG_INPUT_TOUCHSCREEN=y
+  - CONFIG_TOUCHSCREEN_HYNITRON_CSTXXX=y
+
+patches-6.18/999-*: adds cst3530 compatible entry to the upstream
+hynitron_cstxxx driver. The CST3530 chkcode (0xCACA220E & ~0xffff
+== 0xCACA0000) matches cst3xx_data.ic_chkcode, but its bootloader
+entry handshake differs. We skip the bootloader_enter sanity probe
+and rely on firmware_info chkcode to validate the device.
+---
+ .../dts/mt7987a-glinet-gl-be10000.dts         | 52 ++++++++++++++++++
+ target/linux/mediatek/filogic/config-6.18     |  5 ++
+ ...chscreen-hynitron-cstxxx-add-cst3530.patch | 55 +++++++++++++++++++
+ 3 files changed, 112 insertions(+)
+ create mode 100644 target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch
+
+diff --git a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+index 52a3a4a75a..321a81fe08 100644
+--- a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
++++ b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
+@@ -62,6 +62,58 @@
+ 		gpio = <&pio 6 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+ 	};
++
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&pwm 2 50000 0>;	/* PWM ch 2, 20 kHz, normal polarity */
++		default-brightness-level = <0>;	/* OFF at boot */
++	};
++};
++
++&pio {
++	pwm1_pins: pwm1-pins {
++		mux {
++			function = "pwm";
++			groups = "pwm1_0";
++		};
++	};
++
++	pwm2_pins: pwm2-pins {
++		mux {
++			function = "pwm";
++			groups = "pwm2_0";
++		};
++	};
++};
++
++&pwm {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pwm1_pins &pwm2_pins>;
++	status = "okay";
++};
++
++&fan {
++	fan-supply = <&fan_3v>;
++	interrupt-parent = <&pio>;
++	interrupts = <5 IRQ_TYPE_EDGE_RISING>;
++	pwms = <&pwm 1 50000 0>;
++	status = "okay";
++};
++
++&i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c0_pins>;
++	status = "okay";
++
++	cap_touch@58 {
++		compatible = "hynitron,cst3530";
++		reg = <0x58>;
++		reset-gpios = <&pio 8 GPIO_ACTIVE_LOW>;
++		interrupt-parent = <&pio>;
++		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;
++		touchscreen-size-x = <240>;
++		touchscreen-size-y = <320>;
++	};
+ };
+ 
+ &spi2 {
+diff --git a/target/linux/mediatek/filogic/config-6.18 b/target/linux/mediatek/filogic/config-6.18
+index aefb9d9a07..13a33012d2 100644
+--- a/target/linux/mediatek/filogic/config-6.18
++++ b/target/linux/mediatek/filogic/config-6.18
+@@ -54,6 +54,8 @@ CONFIG_ARM_PMUV3=y
+ CONFIG_ARM_PSCI_FW=y
+ CONFIG_ATA=y
+ CONFIG_AUDIT_ARCH_COMPAT_GENERIC=y
++CONFIG_BACKLIGHT_CLASS_DEVICE=y
++CONFIG_BACKLIGHT_PWM=y
+ CONFIG_BLK_DEV_LOOP=y
+ CONFIG_BLK_DEV_SD=y
+ CONFIG_BLK_PM=y
+@@ -238,6 +240,8 @@ CONFIG_I2C_MT65XX=y
+ CONFIG_ICPLUS_PHY=y
+ CONFIG_ILLEGAL_POINTER_VALUE=0xdead000000000000
+ CONFIG_INITRAMFS_SOURCE=""
++CONFIG_INPUT_EVDEV=y
++CONFIG_INPUT_TOUCHSCREEN=y
+ CONFIG_IRQCHIP=y
+ CONFIG_IRQ_DOMAIN=y
+ CONFIG_IRQ_DOMAIN_HIERARCHY=y
+@@ -520,6 +524,7 @@ CONFIG_THREAD_INFO_IN_TASK=y
+ CONFIG_TICK_CPU_ACCOUNTING=y
+ CONFIG_TIMER_OF=y
+ CONFIG_TIMER_PROBE=y
++CONFIG_TOUCHSCREEN_HYNITRON_CSTXXX=y
+ CONFIG_TRACE_IRQFLAGS_NMI_SUPPORT=y
+ CONFIG_TREE_RCU=y
+ CONFIG_TREE_SRCU=y
+diff --git a/target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch b/target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch
+new file mode 100644
+index 0000000000..ae3b822ba4
+--- /dev/null
++++ b/target/linux/mediatek/patches-6.18/999-input-touchscreen-hynitron-cstxxx-add-cst3530.patch
+@@ -0,0 +1,55 @@
++From: emre <emre@local>
++Subject: [PATCH] input: touchscreen: hynitron_cstxxx: add CST3530 compatible
++
++The CST3530 (Hynitron CST3xxx-family chip, chkcode 0xCACA220E) is
++electrically and protocol-compatible with the CST340 the upstream
++driver supports - the firmware-info sanity check via chkcode masks
++to 0xCACA0000 and matches cst3xx_data.ic_chkcode.
++
++The CST3530's bootloader entry sequence does NOT match what
++cst3xx_bootloader_enter expects. Since bootloader_enter is just a
++sanity probe (the driver doesn't actually flash firmware), skip
++it for CST3530 and rely on the firmware_info chkcode check to
++validate the device.
++
++---
++ drivers/input/touchscreen/hynitron_cstxxx.c | 21 +++++++++++++++++++++
++ 1 file changed, 21 insertions(+)
++
++--- a/drivers/input/touchscreen/hynitron_cstxxx.c
+++++ b/drivers/input/touchscreen/hynitron_cstxxx.c
++@@ -467,6 +467,26 @@ static const struct hynitron_ts_chip_dat
++ 	.report_touch		= &cst3xx_touch_report,
++ };
++ 
+++/*
+++ * CST3530 doesn't respond to the 0xaa01a0/0x02a0 bootloader-enter
+++ * handshake that cst3xx_bootloader_enter expects. Skip it and let
+++ * firmware_info validate the device via chkcode (0xCACA220E & ~0xffff
+++ * == 0xCACA0000 which matches cst3xx_data.ic_chkcode).
+++ */
+++static int cst3530_bootloader_skip(struct i2c_client *client)
+++{
+++	return 0;
+++}
+++
+++static const struct hynitron_ts_chip_data cst3530_data = {
+++	.max_touch_num		= 10,	/* CST3530 datasheet: up to 10 touches */
+++	.ic_chkcode		= 0xcaca0000,
+++	.firmware_info		= &cst3xx_firmware_info,
+++	.bootloader_enter	= &cst3530_bootloader_skip,
+++	.init_input		= &cst3xx_input_dev_int,
+++	.report_touch		= &cst3xx_touch_report,
+++};
+++
++ static const struct i2c_device_id hyn_tpd_id[] = {
++ 	{ .name = "hynitron_ts" },
++ 	{ /* sentinel */ },
++@@ -476,6 +496,7 @@ MODULE_DEVICE_TABLE(i2c, hyn_tpd_id);
++ 
++ static const struct of_device_id hyn_dt_match[] = {
++ 	{ .compatible = "hynitron,cst340", .data = &cst3xx_data },
+++	{ .compatible = "hynitron,cst3530", .data = &cst3530_data },
++ 	{ /* sentinel */ },
++ };
++ MODULE_DEVICE_TABLE(of, hyn_dt_match);
+-- 
+2.54.0

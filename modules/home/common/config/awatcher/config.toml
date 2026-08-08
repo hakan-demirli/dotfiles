@@ -1,0 +1,11 @@
+[server]
+
+[awatcher]
+
+[[awatcher.filters]]
+match-title = ".*Tor Browser.*"
+replace-title = "Filtered"
+
+[[awatcher.filters]]
+match-title = ".*Private Browsing.*"
+replace-title = "Filtered"

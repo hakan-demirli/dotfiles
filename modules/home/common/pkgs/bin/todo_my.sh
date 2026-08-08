@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+is_running=$(pgrep -f "my_todo" || true)
+echo "$is_running"
+
+if [ -n "$is_running" ]; then
+  echo "just togglespecialworkspace"
+  hyprctl dispatch 'hl.dsp.workspace.toggle_special("todo")'
+else
+  echo "just todo"
+  cd "${HOME}/.local/share/scratchpads/" && kitty --title "my_todo" txh.sh &
+fi

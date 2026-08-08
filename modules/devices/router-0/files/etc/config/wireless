@@ -1,0 +1,80 @@
+# Declarative wireless configuration for r01 (GL-BE10000).
+#
+# Source of truth for /etc/config/wireless on the router. Consumed by
+# `nix/config-overlay.nix`. The __PLACEHOLDER__ tokens below are
+# substituted at overlay-build time from sops-decrypted secrets.
+#
+# Radios:  radio0=2.4G, radio1=5G (also STA uplink to eth-5 ch36), radio2=6G.
+# All three share one PHY (single-wiphy multi-radio mt76).
+
+config wifi-device 'radio0'
+	option type 'mac80211'
+	option path 'soc/11280000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'
+	option radio '0'
+	option band '2g'
+	option channel 'auto'
+	option htmode 'EHT40'
+	option country 'DE'
+	option disabled '0'
+
+config wifi-iface 'ap_2g'
+	option device 'radio0'
+	option network 'lan'
+	option mode 'ap'
+	option ssid 'r01'
+	option encryption 'sae-mixed'
+	option key '__LAN_WIFI_PASSWORD__'
+	option ieee80211w '1'
+	option disabled '0'
+
+config wifi-device 'radio1'
+	option type 'mac80211'
+	option path 'soc/11280000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'
+	option radio '1'
+	option band '5g'
+	# 'auto' so radio1 can follow whichever 5G STA travelmate brings up.
+	# When STA is down the r01-5G AP picks any allowed 5G channel.
+	option channel 'auto'
+	option htmode 'EHT80'
+	option country 'DE'
+	option disabled '0'
+
+config wifi-iface 'ap_5g'
+	option device 'radio1'
+	option network 'lan'
+	option mode 'ap'
+	option ssid 'r01-5G'
+	option encryption 'sae-mixed'
+	option key '__LAN_WIFI_PASSWORD__'
+	option ieee80211w '1'
+	option disabled '0'
+
+# STA (upstream) wifi-iface entries are generated from the `wifiToml` arg
+# to `mkConfigOverlay` (see modules/devices/router-0/nix/wifi-to-uci.py).
+# travelmate (config at /etc/config/travelmate, also generated in the same
+# pass) scans the configured uplinks, picks the best one in range, handles
+# captive portals, and fails over when the current uplink drops.
+#
+# To add/remove networks, update the encrypted Wi-Fi data passed as `wifiToml`,
+# then rebuild the config overlay.
+
+config wifi-device 'radio2'
+	option type 'mac80211'
+	option path 'soc/11280000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'
+	option radio '2'
+	option band '6g'
+	option channel 'auto'
+	option htmode 'EHT80'
+	option country 'DE'
+	option disabled '0'
+
+config wifi-iface 'ap_6g'
+	option device 'radio2'
+	option network 'lan'
+	option mode 'ap'
+	option ssid 'r01-6G'
+	# 6 GHz mandates WPA3-only.
+	option encryption 'sae'
+	option key '__LAN_WIFI_PASSWORD__'
+	option ieee80211w '2'
+	option disabled '0'

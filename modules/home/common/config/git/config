@@ -1,0 +1,34 @@
+[include]
+    path = ./git_users
+
+[core]
+	fileMode = true
+	autocrlf = false
+	eol = lf
+	editor = hx
+    excludesfile = ~/.config/git/ignore
+[safe]
+	directory = *
+	directory = ///wsl$/Ubuntu-22.04/home/*
+	directory = ///wsl$/Ubuntu-22.04/home/emre/*
+	directory = ///wsl.localhost/Ubuntu-22.04/home/*
+	directory = ///wsl.localhost/docker-desktop/home/*
+	directory = ///wsl.localhost/docker-desktop-data/home/*
+
+[init]
+	defaultBranch = main
+
+[push]
+    autoSetupRemote = true
+
+[credential "https://github.com"]
+	helper = sops-readonly
+
+[url "git@gitlab.ethz.ch:"]
+	insteadOf = https://gitlab.ethz.ch/
+
+[include]
+    path = ./git_sign
+
+[http]
+	postBuffer = 1048576000

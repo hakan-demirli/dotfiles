@@ -1,9 +1,0 @@
-{
-  "autoSwitch": {
-    "order": [
-      "home:~/.cache/claude-multi/etz",
-      "home:~/.cache/claude-multi/ert",
-      "home:~/.cache/claude-multi/ehd"
-    ]
-  }
-}
