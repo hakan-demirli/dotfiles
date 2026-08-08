@@ -74,6 +74,10 @@ in
 
     openssh.settings.PermitRootLogin = lib.mkForce "no";
 
+    pipewire.wireplumber.extraConfig."10-bluetooth-policy"."wireplumber.settings" = {
+      "bluetooth.autoswitch-to-headset-profile" = false;
+    };
+
     tailscale.loginServerHost = "sshr.polarbearvuzi.com";
 
     yubikey.pamOrigin = "pam://emre-sudo";
