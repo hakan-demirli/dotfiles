@@ -467,9 +467,7 @@ def print_waybar(args: argparse.Namespace) -> None:
         else "unknown"
     )
     target = (
-        format_rate(status.target_rate)
-        if status.target_rate is not None
-        else "unknown"
+        format_rate(status.target_rate) if status.target_rate is not None else "unknown"
     )
     tooltip = (
         f"Refresh policy: {policy}\n"
