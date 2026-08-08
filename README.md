@@ -96,7 +96,7 @@ nix build '.#homeConfigurations."user-0@headless".config.home.portablehome'
 | Tailnet bootstrap | `secrets/bootstrap/tailscale.yaml`               | `secrets/bootstrap/tailscale.age.key.enc`    | `/persist/system/var/lib/sops-nix/bootstrap-tailscale.key` |
 | System services   | `secrets/system.yaml`                            | `secrets/system.age.key.enc`                 | `/persist/system/var/lib/sops-nix/key.txt`                 |
 | Home Manager      | `modules/home/users/user-0/secrets/secrets.yaml` | `secrets/identities/home-user-0.age.key.enc` | `~/.config/sops/age/keys.txt`                              |
-| Laptop Wi-Fi      | `secrets/wifi/credentials.yaml`                  | external backup                              | `~/.config/sops/age/wifi.key`                              |
+| Laptop Wi-Fi      | `secrets/wifi/credentials.yaml`                  | `secrets/wifi/age.key.enc`                   | `~/.config/sops/age/wifi.key`                              |
 
 Deploy Home Manager and NixOS secrets separately, as the target user:
 
