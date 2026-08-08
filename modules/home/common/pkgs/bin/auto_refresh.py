@@ -27,6 +27,8 @@ MONITOR_UPDATE_LOCK = RUNTIME_DIR / "hypr-monitor-update.lock"
 
 MODE_RE = re.compile(r"^(\d+)x(\d+)@([\d.]+)Hz$")
 RATE_TOLERANCE = 0.1
+POLICIES = ("auto", "48", "120")
+MANUAL_RATES = {"48": 48.0, "120": 120.0}
 STOP = threading.Event()
 
 
@@ -42,10 +44,28 @@ class Mode:
     value: str
 
 
+@dataclass(frozen=True)
+class RefreshStatus:
+    policy: str
+    monitor: str
+    current_rate: float
+    target_rate: float | None
+    available_rates: tuple[float, ...]
+    external_power: bool | None
+    power_error: str | None
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="auto_refresh",
-        description="Switch the built-in Hyprland display refresh rate with AC power.",
+        description="Manage the built-in Hyprland display refresh-rate policy.",
+    )
+    parser.add_argument(
+        "command",
+        nargs="?",
+        default="daemon",
+        choices=("daemon", *POLICIES, "status", "waybar"),
+        help="Run the daemon, select a policy, or print status (default: daemon).",
     )
     parser.add_argument(
         "--monitor",
@@ -70,7 +90,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--once",
         action="store_true",
-        help="Reconcile once and exit.",
+        help="Reconcile the current policy once and exit instead of running the daemon.",
     )
     parser.add_argument(
         "--dry-run",
@@ -85,6 +105,34 @@ def read_text(path: Path) -> str | None:
         return path.read_text().strip()
     except OSError:
         return None
+
+
+def instance_path(suffix: str) -> Path:
+    signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "default")
+    safe_signature = re.sub(r"[^A-Za-z0-9_.-]", "_", signature)
+    return RUNTIME_DIR / f"auto_refresh-{safe_signature}.{suffix}"
+
+
+def policy_path() -> Path:
+    return instance_path("policy")
+
+
+def read_policy() -> str:
+    policy = read_text(policy_path())
+    return policy if policy in POLICIES else "auto"
+
+
+def write_policy(policy: str) -> None:
+    path = policy_path()
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary.write_text(f"{policy}\n")
+        os.replace(temporary, path)
+    except OSError as e:
+        raise AutoRefreshError(f"cannot write refresh policy to {path}: {e}") from e
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def external_power_online() -> bool:
@@ -207,6 +255,29 @@ def desired_mode(
     return selected
 
 
+def desired_policy_mode(
+    available: list[Mode],
+    policy: str,
+    args: argparse.Namespace,
+    *,
+    external_power: bool | None,
+) -> Mode:
+    if policy in MANUAL_RATES:
+        return desired_mode(available, MANUAL_RATES[policy], highest=True)
+    if external_power is None:
+        raise AutoRefreshError("cannot resolve the auto policy without power status")
+    return desired_mode(
+        available,
+        args.max_rate if external_power else args.min_rate,
+        highest=external_power,
+    )
+
+
+def format_rate(rate: float) -> str:
+    rounded = round(rate)
+    return str(rounded) if abs(rate - rounded) <= RATE_TOLERANCE else f"{rate:g}"
+
+
 def monitor_lua(monitor: dict[str, Any], mode: Mode) -> str:
     name = json.dumps(str(monitor["name"]))
     mode_value = json.dumps(mode.value)
@@ -236,31 +307,46 @@ def verify_rate(name: str, target: float) -> None:
     raise AutoRefreshError(f"monitor {name} did not switch to {target:g}Hz")
 
 
-def reconcile(args: argparse.Namespace, *, announce: bool = False) -> None:
-    online = external_power_online()
-    power = "AC" if online else "battery"
-
+def reconcile(
+    args: argparse.Namespace,
+    *,
+    requested_policy: str | None = None,
+    persist: bool = False,
+    announce: bool = False,
+) -> None:
     with monitor_update_lock():
+        policy = requested_policy or read_policy()
         monitor = select_monitor(args.monitor)
         available = native_modes(monitor)
-        mode = desired_mode(
+        online = external_power_online() if policy == "auto" else None
+        mode = desired_policy_mode(
             available,
-            args.max_rate if online else args.min_rate,
-            highest=online,
+            policy,
+            args,
+            external_power=online,
         )
+
+        if persist:
+            write_policy(policy)
+
         name = str(monitor["name"])
         current_rate = float(monitor.get("refreshRate", 0))
         lua = monitor_lua(monitor, mode)
+        reason = (
+            f"auto ({'AC' if online else 'battery'})"
+            if policy == "auto"
+            else f"fixed {format_rate(mode.rate)}Hz"
+        )
 
         if abs(current_rate - mode.rate) <= RATE_TOLERANCE:
             if announce or args.dry_run:
-                LOG.info("%s power: %s already at %gHz", power, name, current_rate)
+                LOG.info("%s: %s already at %gHz", reason, name, current_rate)
             return
 
         if args.dry_run:
             LOG.info(
-                "%s power: would switch %s from %gHz to %gHz",
-                power,
+                "%s: would switch %s from %gHz to %gHz",
+                reason,
                 name,
                 current_rate,
                 mode.rate,
@@ -272,8 +358,8 @@ def reconcile(args: argparse.Namespace, *, announce: bool = False) -> None:
         if not monitor.get("dpmsStatus", True):
             if announce:
                 LOG.info(
-                    "%s power: queued %gHz for DPMS-off monitor %s",
-                    power,
+                    "%s: queued %gHz for DPMS-off monitor %s",
+                    reason,
                     mode.rate,
                     name,
                 )
@@ -281,18 +367,124 @@ def reconcile(args: argparse.Namespace, *, announce: bool = False) -> None:
 
         verify_rate(name, mode.rate)
         LOG.info(
-            "%s power: switched %s from %gHz to %gHz",
-            power,
+            "%s: switched %s from %gHz to %gHz",
+            reason,
             name,
             current_rate,
             mode.rate,
         )
 
 
+def refresh_status(args: argparse.Namespace) -> RefreshStatus:
+    with monitor_update_lock():
+        policy = read_policy()
+        monitor = select_monitor(args.monitor)
+        available = native_modes(monitor)
+
+        power_error = None
+        try:
+            online = external_power_online()
+        except AutoRefreshError as e:
+            online = None
+            power_error = str(e)
+
+        target = None
+        if policy != "auto" or online is not None:
+            target = desired_policy_mode(
+                available,
+                policy,
+                args,
+                external_power=online,
+            ).rate
+
+        return RefreshStatus(
+            policy=policy,
+            monitor=str(monitor["name"]),
+            current_rate=float(monitor.get("refreshRate", 0)),
+            target_rate=target,
+            available_rates=tuple(sorted({mode.rate for mode in available})),
+            external_power=online,
+            power_error=power_error,
+        )
+
+
+def print_status(args: argparse.Namespace) -> None:
+    status = refresh_status(args)
+    policy = "Auto" if status.policy == "auto" else f"Fixed {status.policy} Hz"
+    power = (
+        "AC"
+        if status.external_power is True
+        else "battery"
+        if status.external_power is False
+        else "unknown"
+    )
+    target = (
+        f"{format_rate(status.target_rate)} Hz"
+        if status.target_rate is not None
+        else "unknown"
+    )
+    rates = ", ".join(format_rate(rate) for rate in status.available_rates)
+
+    print(f"Policy          : {policy}")
+    print(f"Monitor         : {status.monitor}")
+    print(f"Power           : {power}")
+    print(f"Current         : {format_rate(status.current_rate)} Hz")
+    print(f"Target          : {target}")
+    print(f"Native rates    : {rates} Hz")
+    if status.power_error:
+        print(f"Power detection : {status.power_error}")
+
+
+def print_waybar(args: argparse.Namespace) -> None:
+    try:
+        status = refresh_status(args)
+    except AutoRefreshError as e:
+        print(json.dumps({"text": "", "class": "hidden", "tooltip": str(e)}))
+        return
+
+    controls_supported = all(
+        any(abs(rate - requested) <= RATE_TOLERANCE for rate in status.available_rates)
+        for requested in MANUAL_RATES.values()
+    )
+    if not controls_supported:
+        print(json.dumps({"text": "", "class": "hidden"}))
+        return
+
+    current = format_rate(status.current_rate)
+    text = f"󰍹\n{current}Hz"
+    if status.policy == "auto":
+        css_class = "auto" if status.target_rate is not None else "error"
+        policy = "Auto"
+    else:
+        css_class = f"manual-{status.policy}"
+        policy = f"Fixed {status.policy} Hz"
+
+    power = (
+        "AC"
+        if status.external_power is True
+        else "battery"
+        if status.external_power is False
+        else "unknown"
+    )
+    target = (
+        format_rate(status.target_rate)
+        if status.target_rate is not None
+        else "unknown"
+    )
+    tooltip = (
+        f"Refresh policy: {policy}\n"
+        f"Current: {current} Hz\n"
+        f"Target: {target} Hz\n"
+        f"Power: {power}"
+    )
+    if status.power_error:
+        tooltip += f"\n{status.power_error}"
+
+    print(json.dumps({"text": text, "class": css_class, "tooltip": tooltip}))
+
+
 def acquire_daemon_lock() -> Any | None:
-    signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "default")
-    safe_signature = re.sub(r"[^A-Za-z0-9_.-]", "_", signature)
-    path = RUNTIME_DIR / f"auto_refresh-{safe_signature}.lock"
+    path = instance_path("lock")
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     lock = path.open("a+")
     try:
@@ -351,6 +543,31 @@ def main() -> int:
     if args.interval <= 0:
         LOG.error("--interval must be greater than zero")
         return 2
+
+    if args.command == "waybar":
+        print_waybar(args)
+        return 0
+
+    if args.command == "status":
+        try:
+            print_status(args)
+        except AutoRefreshError as e:
+            LOG.error("%s", e)
+            return 1
+        return 0
+
+    if args.command in POLICIES:
+        try:
+            reconcile(
+                args,
+                requested_policy=args.command,
+                persist=not args.dry_run,
+                announce=True,
+            )
+        except AutoRefreshError as e:
+            LOG.error("%s", e)
+            return 1
+        return 0
 
     if args.once or args.dry_run:
         try:

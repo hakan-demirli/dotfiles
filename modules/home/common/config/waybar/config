@@ -21,7 +21,8 @@
     "custom/left-arrow-dark",
     "backlight",
     "custom/left-arrow-dark",
-    "battery",
+    "group/battery-power",
+    "custom/refresh-rate",
     "custom/left-arrow-dark",
     "custom/orientation",
     "custom/osk",
@@ -30,7 +31,6 @@
     "custom/notification",
     "custom/left-arrow-dark",
     "tray",
-    "custom/hp-power",
     "custom/power"
   ],
   "custom/left-arrow-dark": {
@@ -128,7 +128,12 @@
     "tooltip-format": "Brightness {}%",
     "reverse-scrolling": 1
   },
+  "group/battery-power": {
+    "orientation": "horizontal",
+    "modules": ["battery", "custom/hp-power"]
+  },
   "battery": {
+    "align": 0.5,
     "justify": "center",
     "format": "{icon}\n{capacity}%",
     "format-icons": {
@@ -137,8 +142,6 @@
       "plugged": ""
     },
     "format-time": "{H}h{M}m",
-    "format-discharging": "{icon}\n{capacity}%\n{time}",
-    "format-charging": "{icon}\n{capacity}%\n{time}",
     "format-full": "󱟢\n{capacity}%",
     "interval": 5,
     "format-plugged": "\n{capacity}%",
@@ -146,8 +149,16 @@
       "warning": 25,
       "critical": 10
     },
-    "tooltip": false,
-    "on-click": "kitty --hold --title battery-status battery_status.py",
+    "tooltip": true,
+    "tooltip-format": "{timeTo}\nPower: {power} W\nHealth: {health}%\nCycles: {cycles}",
+    "menu": "on-click",
+    "menu-file": "~/.nix-profile/share/hp-power/menu.xml",
+    "menu-actions": {
+      "turbo": "hp-power turbo",
+      "balanced": "hp-power balanced",
+      "silent": "hp-power silent"
+    },
+    "on-click-right": "kitty --hold --title battery-status battery_status.py",
   },
   "custom/notification": {
     "justify": "center",
@@ -207,11 +218,12 @@
     },
   },
   "custom/hp-power": {
+    "justify": "center",
     "exec-if": "command -v hp-power",
     "exec": "hp-power waybar",
     "return-type": "json",
     "interval": 5,
-    "format": "{}",
+    "format": "{}\n ",
     "tooltip": true,
     "menu": "on-click",
     "menu-file": "~/.nix-profile/share/hp-power/menu.xml",
@@ -219,6 +231,21 @@
       "turbo": "hp-power turbo",
       "balanced": "hp-power balanced",
       "silent": "hp-power silent"
+    }
+  },
+  "custom/refresh-rate": {
+    "justify": "center",
+    "exec": "auto_refresh waybar",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "tooltip": true,
+    "menu": "on-click",
+    "menu-file": "~/.nix-profile/share/auto-refresh/menu.xml",
+    "menu-actions": {
+      "rate-120": "auto_refresh 120",
+      "rate-48": "auto_refresh 48",
+      "auto": "auto_refresh auto"
     }
   },
   "custom/osk": {

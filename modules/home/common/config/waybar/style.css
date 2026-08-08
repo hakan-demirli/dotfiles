@@ -28,12 +28,12 @@ tooltip {
 #custom-timer,
 #backlight,
 #batteries,
-#battery,
+#battery-power,
 #pulseaudio,
 #pulseaudio#mic,
 #workspaces,
 #custom-notification,
-#custom-hp-power,
+#custom-refresh-rate,
 #custom-power,
 #custom-osk,
 #custom-orientation,
@@ -112,7 +112,7 @@ tooltip {
 #custom-updates,
 #gamemode,
 #custom-github,
-#custom-hp-power,
+#custom-refresh-rate,
 #custom-power,
 #custom-camera,
 #custom-notifications,
@@ -227,7 +227,7 @@ tooltip {
 /* Shared 32px control unit: rows 1x, menu width 4x, padding 1/2x, radius 1/4x. */
 #custom-notification,
 #custom-power,
-#custom-hp-power,
+#custom-refresh-rate,
 menu.touch-menu menuitem {
   min-height: 32px;
 }
@@ -236,26 +236,53 @@ menu.touch-menu menuitem {
   font-size: 1.1rem;
 }
 
+#custom-refresh-rate.auto {
+  color: @foreground;
+}
+
+#custom-refresh-rate.manual-120,
+#custom-refresh-rate.manual-48 {
+  color: @orange;
+}
+
+#battery,
 #custom-hp-power {
-  font-size: 1.2rem;
+  background: transparent;
+  margin: 0;
+}
+
+#custom-hp-power {
+  padding: 0 2px 0 0;
 }
 
 #custom-hp-power.turbo {
   color: #6272d9;
-  text-shadow: none;
 }
 
 #custom-hp-power.balanced {
-  color: #8be9fd;
+  color: @cyan;
 }
 
 #custom-hp-power.silent {
   color: @foreground;
-  text-shadow: none;
 }
 
 #custom-hp-power.unknown {
   color: @comment;
+}
+
+#custom-refresh-rate.error {
+  color: @red;
+}
+
+#custom-refresh-rate.hidden {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  font-size: 0;
 }
 
 menu {
