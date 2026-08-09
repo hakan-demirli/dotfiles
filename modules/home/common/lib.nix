@@ -27,7 +27,8 @@
           id = name;
           inherit system hasNvidia;
           os = "linux";
-          roles = [ ];
+          deploymentRoles = [ ];
+          topologyRoles = [ ];
           cluster = null;
           mainboard = null;
           location = {

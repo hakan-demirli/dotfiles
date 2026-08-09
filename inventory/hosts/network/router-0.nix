@@ -1,7 +1,8 @@
 {
   id = "router-0";
   hostname = "router-0";
-  roles = [ ];
+  deployment_roles = [ ];
+  topology_roles = [ "external" ];
   state = "provisioned";
 
   location.kind = "workstation";
