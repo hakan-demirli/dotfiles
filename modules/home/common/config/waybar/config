@@ -19,6 +19,8 @@
     "custom/left-arrow-dark",
     "pulseaudio#mic",
     "custom/left-arrow-dark",
+    "custom/screen-record",
+    "custom/left-arrow-dark",
     "backlight",
     "custom/left-arrow-dark",
     "group/battery-power",
@@ -203,6 +205,17 @@
     "on-click": "waybar_timer -t",
     "on-click-right": "waybar_timer -m",
     "interval": 1
+  },
+  "custom/screen-record": {
+    "justify": "center",
+    "exec": "screen-record waybar",
+    "return-type": "json",
+    "interval": 1,
+    "signal": 7,
+    "format": "{}",
+    "tooltip": true,
+    "on-click": "screen-record toggle output",
+    "on-click-right": "screen-record toggle region"
   },
   "custom/power": {
     "format": "⏻",
