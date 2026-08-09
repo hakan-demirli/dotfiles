@@ -28,10 +28,10 @@
   };
 
   disko = {
-    root_disk = "/dev/sda";
+    root_disk = "/dev/oracleoci/oraclevda";
     layout = "btrfs-lvm";
     managed = true;
-    swap_size = "1G";
+    swap_size = "8G";
   };
 
   impermanence = {

@@ -2,7 +2,18 @@
 {
   time.timeZone = "Europe/Zurich";
 
-  services.qemuGuest.enable = true;
+  services = {
+    qemuGuest.enable = true;
+    udev.extraRules = ''
+      KERNEL=="sd*", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", ENV{ID_VENDOR}=="ORACLE", ENV{ID_MODEL}=="BlockVolume", ENV{ID_PATH}=="*:1", SYMLINK+="oracleoci/oraclevda"
+      KERNEL=="sd*", SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_VENDOR}=="ORACLE", ENV{ID_MODEL}=="BlockVolume", ENV{ID_PATH}=="*:1", SYMLINK+="oracleoci/oraclevda%n"
+    '';
+    reverse-ssh-server.allowedTCPPorts = [
+      22
+      80
+      443
+    ];
+  };
 
   boot = {
     initrd.availableKernelModules = [
@@ -22,9 +33,4 @@
 
   networking.useDHCP = lib.mkDefault true;
 
-  services.reverse-ssh-server.allowedTCPPorts = [
-    22
-    80
-    443
-  ];
 }
