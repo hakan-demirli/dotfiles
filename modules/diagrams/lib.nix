@@ -15,7 +15,7 @@ let
     users
     hostToCluster
     hostsByCluster
-    hostNodeRoles
+    hostTopologyRoles
     ;
 
   q = s: replaceStrings [ "\"" ] [ "\\\"" ] (toString s);
@@ -104,7 +104,7 @@ let
           h = hosts.${hid};
           label = lbl [
             hid
-            "roles=${concatStringsSep "," h.roles}"
+            "deployment-roles=${concatStringsSep "," h.deployment_roles}"
           ];
         in
         "  ${i hid} [label=\"${label}\", shape=box, style=filled, fillcolor=\"${hostFill h}\"];";
@@ -258,7 +258,7 @@ let
         let
           label = lbl [
             hid
-            (concatStringsSep "," h.roles)
+            (concatStringsSep "," h.deployment_roles)
           ];
         in
         "  ${i hid} [label=\"${label}\", shape=box, style=filled, fillcolor=\"${hostFill h}\"];";
@@ -299,7 +299,7 @@ let
 
   activeClusters = filterAttrs (_: c: c.state != "retired") clusters;
 
-  tierLabel =
+  unixTierLabel =
     t: if isString t then t else concatStringsSep "," (mapAttrsToList (k: v: "${k}=${v}") t);
 
   clustersBySize =
@@ -326,7 +326,7 @@ let
   hostShapeFor =
     hid:
     let
-      nrs = hostNodeRoles.${hid} or [ "personal" ];
+      nrs = hostTopologyRoles.${hid} or [ "personal" ];
     in
     if elem "controller" nrs then
       "doublecircle"
@@ -410,7 +410,7 @@ let
           col = if cid == null then fleetSoloColor else fleetColorFor cid;
           label = lbl [
             hid
-            (concatStringsSep "," h.roles)
+            (concatStringsSep "," h.deployment_roles)
             h.hardware.arch
           ];
         in
@@ -439,7 +439,7 @@ let
         in
         map (
           g:
-          "  ${i "team:${g.team}"} -> ${i "cluster:${cid}"} [label=\"${q (tierLabel g.tier)}\", color=\"${palette.edgeUplink}\", fontsize=${toString fontSize.edge}];"
+          "  ${i "team:${g.team}"} -> ${i "cluster:${cid}"} [label=\"${q (unixTierLabel g.unix_tier)}\", color=\"${palette.edgeUplink}\", fontsize=${toString fontSize.edge}];"
         ) c.access.teams;
 
       userClusterEdges =
@@ -449,7 +449,7 @@ let
         in
         map (
           g:
-          "  ${i "user:${g.user}"} -> ${i "cluster:${cid}"} [label=\"${q g.tier}\", color=\"${palette.edgeMlag}\", style=dashed, fontsize=${toString fontSize.edge}];"
+          "  ${i "user:${g.user}"} -> ${i "cluster:${cid}"} [label=\"${q g.unix_tier}\", color=\"${palette.edgeMlag}\", style=dashed, fontsize=${toString fontSize.edge}];"
         ) c.access.users;
 
       clusterHostEdges =
@@ -770,7 +770,7 @@ let
         k1: v1: k2: v2:
         "<TR><TD><B>${k1}</B></TD><TD>${v1}</TD><TD><B>${k2}</B></TD><TD COLSPAN=\"2\">${v2}</TD></TR>";
       infoRows = concatStringsSep "\n" [
-        (kvRow "State" (xml h.state) "Roles" (xml (concatStringsSep ", " h.roles)))
+        (kvRow "State" (xml h.state) "Deployment roles" (xml (concatStringsSep ", " h.deployment_roles)))
         (kvRow "Arch" (xml h.hardware.arch) "OS" (xml h.hardware.os))
         (kvRow "CPU" (xml cpu) "RAM" (xml ram))
         (kvRow "GPU" (xml gpu) "FPGAs" (xml fpgaCount))
@@ -841,8 +841,8 @@ let
           gs = grantsAt uid col.hid;
           accts = map (g: g.account) gs;
           srcs = map (g: g.source or "") gs;
-          tiers = filter (t: t != "" && t != null) (unique (map (g: g.tier or "") gs));
-          hasRoot = elem "root" accts || elem "cohort:admin" srcs;
+          unixTiers = filter (t: t != "" && t != null) (unique (map (g: g.unix_tier or "") gs));
+          hasRoot = elem "root" accts;
           hasTrust = elem "ssh_trust" srcs;
           hasReg = any (a: a != "root") accts;
           hasViol = hasViolation uid col.hid;
@@ -856,10 +856,10 @@ let
             + "</FONT>";
 
           tierLine =
-            if tiers == [ ] then
+            if unixTiers == [ ] then
               ""
             else
-              "<BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textMuted}\">${xml (concatStringsSep ", " tiers)}</FONT>";
+              "<BR/><FONT POINT-SIZE=\"${toString fontSize.small}\" COLOR=\"${palette.textMuted}\">${xml (concatStringsSep ", " unixTiers)}</FONT>";
         in
         "<TD ALIGN=\"CENTER\">${markerLine}${tierLine}</TD>";
 
@@ -956,7 +956,7 @@ let
       soloCids = sort lessThan (filter (cid: hostCountOf cid <= 1) activeClusterIds);
       orderedCids = multiCids ++ soloCids;
 
-      hostTags =
+      policyTagsForHost =
         h:
         let
           cid = hostToCluster.${h.id} or null;
@@ -967,7 +967,7 @@ let
             else if (cluster.network.tailscale_tag or null) != null then
               cluster.network.tailscale_tag
             else
-              "tag:${cid}";
+              "tag:cluster-${cid}";
           stripTag = t: removePrefix "tag:" t;
           base = if clusterTag == null then null else stripTag clusterTag;
 
@@ -986,10 +986,11 @@ let
         let
           cid = hostToCluster.${h.id} or "-";
           c = if cid == "-" then fleetSoloColor else fleetColorFor cid;
-          tags = hostTags h;
+          tags = policyTagsForHost h;
           tagStr = if tags == [ ] then "-" else concatStringsSep "<BR/>" (map xml tags);
-          roles = if h.roles == [ ] then "-" else concatStringsSep ", " h.roles;
-          nrs = hostNodeRoles.${h.id} or [ ];
+          deploymentRoles =
+            if h.deployment_roles == [ ] then "-" else concatStringsSep ", " h.deployment_roles;
+          nrs = hostTopologyRoles.${h.id} or [ ];
           nrsStr = if nrs == [ ] then "-" else concatStringsSep ", " nrs;
         in
         "<TR>"
@@ -997,7 +998,7 @@ let
         + "<TD BGCOLOR=\"${c.fill}\" ALIGN=\"LEFT\">${xml cid}</TD>"
         + "<TD ALIGN=\"LEFT\">${xml h.state}</TD>"
         + "<TD ALIGN=\"LEFT\">${xml h.hardware.arch}</TD>"
-        + "<TD ALIGN=\"LEFT\">${xml roles}</TD>"
+        + "<TD ALIGN=\"LEFT\">${xml deploymentRoles}</TD>"
         + "<TD ALIGN=\"LEFT\">${xml nrsStr}</TD>"
         + "<TD ALIGN=\"LEFT\">${tagStr}</TD>"
         + "</TR>";
@@ -1021,9 +1022,9 @@ let
           <TD BGCOLOR="${palette.panelBg}"><B>Cluster</B></TD>
           <TD BGCOLOR="${palette.panelBg}"><B>State</B></TD>
           <TD BGCOLOR="${palette.panelBg}"><B>Arch</B></TD>
-          <TD BGCOLOR="${palette.panelBg}"><B>Roles</B></TD>
-          <TD BGCOLOR="${palette.panelBg}"><B>Node roles</B></TD>
-          <TD BGCOLOR="${palette.panelBg}"><B>Tailscale tag</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Deployment roles</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>Topology roles</B></TD>
+          <TD BGCOLOR="${palette.panelBg}"><B>ACL policy tags</B></TD>
         </TR>
         ${concatStringsSep "\n" (map hostRow allRows)}
         </TABLE>>

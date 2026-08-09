@@ -31,7 +31,7 @@
 
   members = {
     hosts = [ ];
-    roles = [
+    deployment_roles = [
       "personal-laptop"
       "personal-server-dev"
     ];
@@ -42,7 +42,7 @@
     teams = [
       {
         team = "team-user-0";
-        tier = "admin";
+        unix_tier = "admin";
         can_submit_to = [ ];
       }
     ];

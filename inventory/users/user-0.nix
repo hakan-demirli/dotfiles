@@ -1,6 +1,10 @@
 {
   id = "user-0";
-  cohort = "admin";
+  cohort = "staff";
+  admin_scopes = [
+    "fleet"
+    "tailnet"
+  ];
   headscale_user = "user-0";
   allowed_hosts = [ "all" ];
 

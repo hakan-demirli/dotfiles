@@ -1,7 +1,8 @@
 {
   id = "pebble-round-2";
   hostname = "pebble-round-2";
-  roles = [ ];
+  deployment_roles = [ ];
+  topology_roles = [ "external" ];
   state = "planned";
 
   location.kind = "workstation";

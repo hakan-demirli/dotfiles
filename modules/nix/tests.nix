@@ -20,19 +20,19 @@
           pkgs.runCommand "infra-personal-fleet-eval-stamp"
             {
               hostCount = toString (lib.length (lib.attrNames inventory.hosts));
-              roleCount = toString (lib.length (lib.attrNames inventory.roles));
+              deploymentRoleCount = toString (lib.length (lib.attrNames inventory.deploymentRoles));
               clusterCount = toString (lib.length (lib.attrNames inventory.clusters));
               teamCount = toString (lib.length (lib.attrNames inventory.teams));
-              tierCount = toString (lib.length (lib.attrNames inventory.accessTiers));
+              unixTierCount = toString (lib.length (lib.attrNames inventory.unixAccessTiers));
               userCount = toString (lib.length (lib.attrNames inventory.users));
             }
             ''
               {
                 echo "hosts=$hostCount"
-                echo "roles=$roleCount"
+                echo "deployment-roles=$deploymentRoleCount"
                 echo "clusters=$clusterCount"
                 echo "teams=$teamCount"
-                echo "tiers=$tierCount"
+                echo "unix-tiers=$unixTierCount"
                 echo "users=$userCount"
               } > $out
             '';

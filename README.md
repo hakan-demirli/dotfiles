@@ -10,15 +10,15 @@
 
 ## Layout
 
-| Path                               | Purpose                                                      |
-| ---------------------------------- | ------------------------------------------------------------ |
-| `inventory/`                       | Users, access tiers, roles, hosts, clusters, and alert facts |
-| `modules/hosts/`                   | Host-specific NixOS modules                                  |
-| `modules/{roles,services,system}/` | Reusable NixOS behavior                                      |
-| `modules/home/`                    | Rootless, standalone Home Manager tree                       |
-| `modules/devices/`                 | Self-contained non-NixOS device builds                       |
-| `modules/nix/`                     | Flake outputs, checks, installers, and codegen               |
-| `secrets/`                         | SOPS-encrypted data and age identity envelopes               |
+| Path                                          | Purpose                                                     |
+| --------------------------------------------- | ----------------------------------------------------------- |
+| `inventory/`                                  | Users, Unix tiers, deployment/topology, hosts, and clusters |
+| `modules/hosts/`                              | Host-specific NixOS modules                                 |
+| `modules/{deployment-roles,services,system}/` | Reusable NixOS behavior                                     |
+| `modules/home/`                               | Rootless, standalone Home Manager tree                      |
+| `modules/devices/`                            | Self-contained non-NixOS device builds                      |
+| `modules/nix/`                                | Flake outputs, checks, installers, and codegen              |
+| `secrets/`                                    | SOPS-encrypted data and age identity envelopes              |
 
 Inventory entries are Nix modules. `_defaults.nix` is merged into every entity
 in its directory. To add an entity, copy the closest entry, change its `id` and

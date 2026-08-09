@@ -1,7 +1,8 @@
 {
   id = "kvm-desk-0";
   hostname = "kvm-desk-0";
-  roles = [ ];
+  deployment_roles = [ ];
+  topology_roles = [ "external" ];
   state = "provisioned";
 
   location.kind = "workstation";

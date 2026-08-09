@@ -125,7 +125,7 @@ in
       mkdir -p "$HOME/.local/state/bash"
     '';
     factsAvailable = ''
-      echo "infra-home activating for ${facts.id} (cluster=${toString facts.cluster}, roles=[${pkgs.lib.concatStringsSep "," facts.roles}])"
+      echo "infra-home activating for ${facts.id} (cluster=${toString facts.cluster}, deployment-roles=[${pkgs.lib.concatStringsSep "," facts.deploymentRoles}], topology-roles=[${pkgs.lib.concatStringsSep "," facts.topologyRoles}])"
     '';
     nixTailnetCache = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       run ${nixTailnetCacheUpdater}/bin/update-nix-tailnet-cache --refresh

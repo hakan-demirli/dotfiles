@@ -1,8 +1,12 @@
 {
   id = "vps-oracle-0";
-  roles = [
+  deployment_roles = [
     "cloud-vps-control"
     "mgmt-observability"
+  ];
+  topology_roles = [
+    "controller"
+    "mgmt"
   ];
   state = "provisioned";
 

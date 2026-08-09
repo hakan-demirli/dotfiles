@@ -17,12 +17,12 @@ let
   passwordAccountFor =
     hostId:
     let
-      roles = inventory.hosts.${hostId}.roles;
+      deploymentRoles = inventory.hosts.${hostId}.deployment_roles;
     in
-    if lib.elem "personal-laptop" roles then
+    if lib.elem "personal-laptop" deploymentRoles then
       "owner"
     else if
-      lib.any (role: lib.elem role roles) [
+      lib.any (role: lib.elem role deploymentRoles) [
         "personal-server-dev"
         "cloud-vps-control"
       ]
