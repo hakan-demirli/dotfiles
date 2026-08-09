@@ -74,8 +74,28 @@ in
 
     openssh.settings.PermitRootLogin = lib.mkForce "no";
 
-    pipewire.wireplumber.extraConfig."10-bluetooth-policy"."wireplumber.settings" = {
-      "bluetooth.autoswitch-to-headset-profile" = false;
+    pipewire.wireplumber.extraConfig."10-bluetooth-policy" = {
+      "wireplumber.settings" = {
+        "bluetooth.autoswitch-to-headset-profile" = false;
+      };
+
+      "monitor.bluez.properties" = {
+        "bluez5.roles" = [
+          "a2dp_sink"
+          "a2dp_source"
+        ];
+      };
+
+      "monitor.bluez.rules" = [
+        {
+          matches = [
+            { "device.name" = "~bluez_card.*"; }
+          ];
+          actions.update-props = {
+            "bluez5.auto-connect" = [ "a2dp_sink" ];
+          };
+        }
+      ];
     };
 
     tailscale.loginServerHost = "sshr.polarbearvuzi.com";

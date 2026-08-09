@@ -7,222 +7,6 @@
   ...
 }:
 let
-  nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { };
-  pickNur = name: nurPkgs.${name} or null;
-
-  autoRefresh = pkgs.writeShellApplication {
-    name = "auto_refresh";
-    runtimeInputs = [ pkgs.python3 ];
-    text = ''
-      exec python3 ${../pkgs/bin/auto_refresh.py} "$@"
-    '';
-  };
-
-  autoRefreshMenu = pkgs.writeTextDir "share/auto-refresh/menu.xml" ''
-    <?xml version="1.0" encoding="UTF-8"?>
-    <interface>
-      <object class="GtkMenu" id="menu">
-        <style>
-          <class name="touch-menu" />
-        </style>
-        <child>
-          <object class="GtkMenuItem" id="rate-120">
-            <property name="label">120 Hz</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkMenuItem" id="rate-48">
-            <property name="label">48 Hz</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkMenuItem" id="auto">
-            <property name="label">Auto</property>
-          </object>
-        </child>
-      </object>
-    </interface>
-  '';
-
-  hpPowerMenu = pkgs.writeTextDir "share/hp-power/menu.xml" ''
-    <?xml version="1.0" encoding="UTF-8"?>
-    <interface>
-      <object class="GtkMenu" id="menu">
-        <style>
-          <class name="touch-menu" />
-        </style>
-        <child>
-          <object class="GtkMenuItem" id="turbo">
-            <property name="label">Turbo</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkMenuItem" id="balanced">
-            <property name="label">Balanced</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkMenuItem" id="silent">
-            <property name="label">Silent</property>
-          </object>
-        </child>
-      </object>
-    </interface>
-  '';
-
-  immutableConfigEntries = [
-    "aichat"
-    "aider"
-    "anyrun"
-    "awatcher"
-    "bash"
-    "bat"
-    "btop"
-    "cargo"
-    "clangd"
-    "claude"
-    "firefoxcss"
-    "gdb"
-    "gdb-dashboard"
-    "git"
-    "gnome3-keybind-backup"
-    "gnome-extensions"
-    "gtk_indicator"
-    "helix"
-    "hypr"
-    "input-remapper-2"
-    "kitty"
-    "lazygit"
-    "lesskey"
-    "lf"
-    "mimeapps.list"
-    "mpd"
-    "mpv"
-    "nix"
-    "npm"
-    "nwg"
-    "parallel"
-    "piper"
-    "qalculate"
-    "qmk"
-    "QtProject"
-    "quantifyself"
-    "qutebrowser"
-    "repx"
-    "rmpc"
-    "sccache"
-    "sioyek"
-    "starship.toml"
-    "swaync"
-    "tmux"
-    "tmuxp"
-    "tofi"
-    "transmission"
-    "vim"
-    "wavemon"
-    "waybar"
-    "wayscriber"
-    "wgetrc"
-    "wofi"
-    "xdg-desktop-portal-termfilechooser"
-    "xilinx"
-    "xremap"
-    "yazi"
-    "zathura"
-  ];
-
-  mkImmutable =
-    name:
-    let
-      src = ../config + "/${name}";
-    in
-    lib.optionalAttrs (builtins.pathExists src) {
-      ${name} = {
-        source = src;
-        recursive = true;
-      };
-    };
-
-  desktop-cli =
-    with pkgs;
-    lib.filter (x: x != null) [
-      adb-sync
-      exfatprogs
-      android-tools
-      autoRefresh
-      autoRefreshMenu
-      hpPowerMenu
-      libnotify
-      libqalculate-fzf
-      pavucontrol
-      pulseaudio
-      xremap
-      (pickNur "youtube_sync")
-      (pickNur "riveroftime")
-    ];
-
-  gui =
-    with pkgs;
-    lib.filter (x: x != null) [
-      awww
-      brightnessctl
-      dragon-drop
-      drawio
-      feh
-      grim
-      gparted-emre
-      hypridle
-      hyprlock
-      kdePackages.breeze-icons
-      kdePackages.kolourpaint
-      kdePackages.qtimageformats
-      kooha
-      localsend
-      moonlight-qt
-      mpv
-      networkmanagerapplet
-      nwg-displays
-      playerctl
-      qalculate-qt
-      sioyek
-      slurp
-      swaynotificationcenter
-      swayosd
-      tailscale-systray
-      tor-browser
-      transmission_4-qt
-      ttf-wps-fonts
-      udiskie
-      waybar
-      wayscriber
-      wl-clip-persist
-      wl-clipboard
-      wlr-randr
-      wttrbar
-      (pickNur "gtk_applet")
-      (pickNur "waybar_timer")
-      (pickNur "nix-treemap")
-    ];
-
-  gaming =
-    with pkgs;
-    [
-      gamescope
-      mangohud
-      umu-launcher
-      winetricks
-      wineWow64Packages.wayland
-    ]
-    ++ lib.optional (pickNur "umu-fzf" != null) (pickNur "umu-fzf");
-
-  remotedesktopHost = with pkgs; [
-    sunshine
-    libva-utils
-    mesa-demos
-    vulkan-tools
-    wayland-utils
-  ];
-
   mkRawGVariant = rawString: {
     _type = "gvariant";
     type = "s";
@@ -244,20 +28,12 @@ in
   ++ lib.optional ((facts.location.kind or null) == "laptop") ../pkgs/nix/low_battery_notify.nix;
 
   home = {
-    packages = desktop-cli ++ gui ++ gaming ++ remotedesktopHost;
-
     file = {
       ".local/state/bash".source =
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Desktop/infra/state/.local/state/bash";
       ".local/share/scratchpads".source =
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Desktop/infra/state/scratchpads";
       ".ssh/config".source = ../config/ssh/config;
-
-      ".local/bin" = lib.mkIf (builtins.pathExists ../pkgs/bin) {
-        source = ../pkgs/bin;
-        recursive = true;
-        executable = true;
-      };
 
       ".claude/settings.json" = lib.mkIf (builtins.pathExists ../config/claude/settings.json) {
         source = ../config/claude/settings.json;
@@ -353,8 +129,6 @@ in
   };
 
   xdg = {
-    configFile = lib.foldl' (acc: n: acc // (mkImmutable n)) { } immutableConfigEntries;
-
     dataFile.applications = lib.mkIf (builtins.pathExists ../config/desktop_files) {
       source = ../config/desktop_files;
       recursive = true;
