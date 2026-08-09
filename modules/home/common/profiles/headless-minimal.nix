@@ -4,31 +4,14 @@
   ...
 }:
 {
-  imports = [ ./development.nix ];
-
   home.packages = with pkgs; [
-    lazygit
-    tmux
+    btop
+    curl
+    git
+    jq
+    rsync
+    vim
   ];
-
-  programs.neovim = {
-    enable = true;
-    viAlias = true;
-    vimAlias = true;
-    defaultEditor = true;
-    extraConfig = ''
-      set number
-      set relativenumber
-      set expandtab
-      set tabstop=4
-      set shiftwidth=4
-      set termguicolors
-      set ignorecase
-      set smartcase
-      set mouse=a
-      set clipboard^=unnamedplus
-    '';
-  };
 
   programs.tmux = {
     enable = true;

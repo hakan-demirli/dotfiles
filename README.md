@@ -68,12 +68,17 @@ root, then follow the fresh install flow.
 
 ## Home Manager
 
-Profiles are `user-0@desktop`, `user-0@desktop-nvidia`, and `user-0@headless`:
+Configurations are `user-0@desktop`, `user-0@desktop-nvidia`,
+`user-0@headless`, and `user-0@vps-oracle-0`. The VPS configuration uses the
+`headless-minimal` profile; target details come from host inventory.
 
 ```bash
 home-manager switch --flake '.#user-0@desktop'
 nix run path:.#deploy-home-secrets
 ```
+
+`deploy-home-secrets` selects `user-0@vps-oracle-0` on that host. It can also be
+selected explicitly with `--profile user-0@vps-oracle-0`.
 
 Home Manager is rootless and independent from NixOS. `homeStorage` currently
 uses a temporary home by default while persisting the paths declared in
