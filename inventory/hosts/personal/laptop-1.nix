@@ -1,7 +1,7 @@
 {
   id = "laptop-1";
   deployment_roles = [ "personal-laptop" ];
-  topology_roles = [ "personal" ];
+  topology_roles = [ "admin-client" ];
   state = "provisioned";
   location.kind = "laptop";
 

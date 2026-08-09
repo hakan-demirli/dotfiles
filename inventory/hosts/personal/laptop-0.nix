@@ -1,7 +1,7 @@
 {
   id = "laptop-0";
   deployment_roles = [ "personal-laptop" ];
-  topology_roles = [ "personal" ];
+  topology_roles = [ "compute" ];
   state = "provisioned";
   slurm_features = [
     "amd"
