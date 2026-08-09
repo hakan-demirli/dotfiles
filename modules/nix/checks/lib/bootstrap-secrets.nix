@@ -80,6 +80,20 @@ let
       && !(builtins.hasAttr "tailscale-key" config.sops.secrets)
       && lib.elem "tailscale-bootstrap-secret.service" config.systemd.services.tailscaled-autoconnect.requires
     );
+    tailscale-key-stays-file-backed = everyHost (
+      _hostId: config:
+      let
+        service = config.systemd.services.tailscaled-autoconnect;
+        script = config.systemd.services.tailscaled-autoconnect.script;
+      in
+      service.serviceConfig.LoadCredential == [
+        "auth-key:/run/tailscale-bootstrap/preauth-key"
+      ]
+      && lib.hasInfix ''--auth-key "file:$auth_key_file"'' script
+      && !lib.hasInfix "cat /run/tailscale-bootstrap/preauth-key" script
+      && lib.elem "--reset" config.services.tailscale.extraUpFlags
+      && service.serviceConfig.TimeoutStartSec == "60s"
+    );
     munge-is-system-scoped =
       (inventory.clusters.personal.secret_paths or { }) == { }
       && everyHost (
