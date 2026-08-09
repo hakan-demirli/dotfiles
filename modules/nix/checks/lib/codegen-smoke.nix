@@ -7,7 +7,8 @@ let
   inherit (pkgs) lib;
   inherit (inputs.infra-lib.lib) headscalePolicy;
   inventory = self.lib.inventory;
-  p = self.packages.${pkgs.system};
+  p = self.packages.${pkgs.stdenv.hostPlatform.system};
+  isActiveUser = uid: inventory.users ? ${uid} && !(inventory.users.${uid}.archived or false);
 
   activeHostIds = lib.attrNames (
     lib.filterAttrs (
@@ -35,8 +36,10 @@ let
     lib.filterAttrs (_: u: u.system_account != null && !(u.archived or false)) inventory.users
   );
 
-  adminUserIds = map headscaleId (
-    lib.attrNames (lib.filterAttrs (_: u: u.cohort == "admin") inventory.users)
+  tailnetAdminUserIds = map headscaleId (
+    lib.attrNames (
+      lib.filterAttrs (_: u: lib.elem "tailnet" u.admin_scopes && !(u.archived or false)) inventory.users
+    )
   );
 
   headscaleId =
@@ -68,19 +71,27 @@ let
     )
   );
   teamMemberPairs = lib.concatMap (
-    tid: map (member: "${tid}=${headscaleId member.user}") inventory.teams.${tid}.members
+    tid:
+    map (member: "${tid}=${headscaleId member.user}") (
+      lib.filter (member: isActiveUser member.user) inventory.teams.${tid}.members
+    )
   ) grantedTeamIds;
   teamAclPairs = lib.concatMap (
     cid: map (grant: "group:${grant.team}=${loginTag cid}:*") activeClusters.${cid}.access.teams
   ) activeClusterIds;
   userAclPairs = lib.concatMap (
-    cid: map (grant: "${headscaleId grant.user}=${loginTag cid}:*") activeClusters.${cid}.access.users
+    cid:
+    map (grant: "${headscaleId grant.user}=${loginTag cid}:*") (
+      lib.filter (grant: isActiveUser grant.user) activeClusters.${cid}.access.users
+    )
   ) activeClusterIds;
   adminAclDestinations = (map (cid: "${broadTag cid}:*") activeClusterIds) ++ [ "tag:bootstrap:*" ];
 
-  adminAges = lib.unique (
+  fleetAdminAges = lib.unique (
     lib.concatLists (
-      lib.mapAttrsToList (_: u: u.keys.age) (lib.filterAttrs (_: u: u.cohort == "admin") inventory.users)
+      lib.mapAttrsToList (_: u: u.keys.age) (
+        lib.filterAttrs (_: u: lib.elem "fleet" u.admin_scopes && !(u.archived or false)) inventory.users
+      )
     )
   );
 
@@ -105,8 +116,8 @@ pkgs.runCommand "codegen-smoke"
     clusterIds = lib.concatStringsSep " " activeClusterIds;
     secretClusterIds = lib.concatStringsSep " " secretClusterIds;
     userIds = lib.concatStringsSep " " activeUserIds;
-    adminIds = lib.concatStringsSep " " adminUserIds;
-    adminAges = lib.concatStringsSep " " adminAges;
+    tailnetAdminIds = lib.concatStringsSep " " tailnetAdminUserIds;
+    fleetAdminAges = lib.concatStringsSep " " fleetAdminAges;
     hostAgePairs = lib.concatStringsSep " " hostAgePairs;
     clusterTagPairs = lib.concatStringsSep " " clusterTagPairs;
     teamMemberPairs = lib.concatStringsSep " " teamMemberPairs;
@@ -121,11 +132,11 @@ pkgs.runCommand "codegen-smoke"
 
     test -f "$sopsYaml" || fail "sops-yaml output missing"
 
-    for age in $adminAges; do
+    for age in $fleetAdminAges; do
       grep -q "$age" "$sopsYaml" \
-        || fail "sops-yaml: admin age recipient $age missing"
+        || fail "sops-yaml: fleet-admin age recipient $age missing"
     done
-    pass "sops-yaml: all admin recipients present ($(echo $adminAges | wc -w))"
+    pass "sops-yaml: all fleet-admin recipients present ($(echo $fleetAdminAges | wc -w))"
 
     for h in $hostIds; do
       grep -q "secrets/hosts/$h" "$sopsYaml" \
@@ -162,14 +173,14 @@ pkgs.runCommand "codegen-smoke"
       || fail "headscale-acl: group contains an invalid user principal"
     pass "headscale-acl: group user principals are canonical"
 
-    if [ -n "$adminIds" ]; then
+    if [ -n "$tailnetAdminIds" ]; then
       echo "$body" | jq -e '.groups["group:admin"]' >/dev/null \
         || fail "headscale-acl: group:admin missing"
-      for uid in $adminIds; do
+      for uid in $tailnetAdminIds; do
         echo "$body" | jq -e --arg u "$uid" '.groups["group:admin"] | index($u)' >/dev/null \
           || fail "headscale-acl: admin $uid missing from group:admin"
       done
-      pass "headscale-acl: group:admin contains all admins"
+      pass "headscale-acl: group:admin contains all Tailnet admins"
     fi
 
     for pair in $teamMemberPairs; do

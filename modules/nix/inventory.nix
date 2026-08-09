@@ -46,7 +46,7 @@ let
 
   intent = infra-lib.lib.mkIntent { inherit lib inventory; };
 
-  builder = infra-lib.lib.mkRole {
+  builder = infra-lib.lib.mkHost {
     inherit inputs lib inventory;
     inherit (inputs) self;
     libRoot = infra-lib;
