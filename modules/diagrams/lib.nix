@@ -956,30 +956,7 @@ let
       soloCids = sort lessThan (filter (cid: hostCountOf cid <= 1) activeClusterIds);
       orderedCids = multiCids ++ soloCids;
 
-      policyTagsForHost =
-        h:
-        let
-          cid = hostToCluster.${h.id} or null;
-          cluster = if cid == null then null else clusters.${cid} or null;
-          clusterTag =
-            if cluster == null then
-              null
-            else if (cluster.network.tailscale_tag or null) != null then
-              cluster.network.tailscale_tag
-            else
-              "tag:cluster-${cid}";
-          stripTag = t: removePrefix "tag:" t;
-          base = if clusterTag == null then null else stripTag clusterTag;
-
-          isIn = bucket: elem h.id (bucket.${cid} or [ ]);
-          categories =
-            optional (isIn (inventory.loginNodesOfCluster or { })) "login"
-            ++ optional (isIn (inventory.computeNodesOfCluster or { })) "compute"
-            ++ optional (isIn (inventory.storageNodesOfCluster or { })) "storage"
-            ++ optional (isIn (inventory.controllerNodesOfCluster or { })) "controller";
-          roleTags = if base == null then [ ] else map (r: "tag:${base}-${r}") categories;
-        in
-        (if clusterTag == null then [ ] else [ clusterTag ]) ++ roleTags;
+      policyTagsForHost = h: intent.hostPolicyTags.${h.id} or [ ];
 
       hostRow =
         h:
