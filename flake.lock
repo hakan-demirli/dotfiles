@@ -173,11 +173,11 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1786222340,
-        "narHash": "sha256-pqSRioirmOMfebEEjxlBG6E8+CZlRXJwjv3faWT46PQ=",
+        "lastModified": 1786295179,
+        "narHash": "sha256-nDIZMCJyjtcBwJYLSn8CMaGDYscqhob3S0rYo2e+PfY=",
         "owner": "hakan-demirli",
         "repo": "infra-lib",
-        "rev": "97d569c3d569c5cdb889781850d780c35f1c5495",
+        "rev": "601ec2850204113610c36a0bb2809d7dc7e5293d",
         "type": "github"
       },
       "original": {
