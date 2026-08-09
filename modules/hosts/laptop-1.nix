@@ -180,15 +180,6 @@ in
     ];
 
     services = {
-      munged = {
-        unitConfig.ConditionPathExists = "/etc/munge/munge.key";
-        serviceConfig = {
-          ExecStartPre = lib.mkForce "-+${pkgs.coreutils}/bin/chmod 0400 /etc/munge/munge.key";
-          ExecStart = lib.mkForce "-${pkgs.munge}/bin/munged --foreground --key-file /etc/munge/munge.key";
-          Restart = lib.mkForce "no";
-        };
-      };
-
       networkmanager-sops-profiles = {
         description = "Install SOPS-backed NetworkManager profiles";
         wantedBy = [ "multi-user.target" ];
