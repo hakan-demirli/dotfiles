@@ -61,6 +61,7 @@ if [[ -z $profile ]]; then
   case $(hostname -s) in
     laptop-0) profile="user-0@desktop-nvidia" ;;
     laptop-1) profile="user-0@desktop" ;;
+    vps-oracle-0) profile="user-0@vps-oracle-0" ;;
     *) profile="user-0@headless" ;;
   esac
 fi

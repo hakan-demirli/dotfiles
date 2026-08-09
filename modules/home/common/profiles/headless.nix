@@ -4,6 +4,8 @@
   ...
 }:
 {
+  imports = [ ./development.nix ];
+
   home.packages = with pkgs; [
     lazygit
     tmux

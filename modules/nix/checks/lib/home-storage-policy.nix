@@ -8,11 +8,13 @@ let
     desktop = self.homeConfigurations."user-0@desktop";
     desktop-nvidia = self.homeConfigurations."user-0@desktop-nvidia";
     headless = self.homeConfigurations."user-0@headless";
+    vps-oracle-0 = self.homeConfigurations."user-0@vps-oracle-0";
   };
   profiles = [
     homes.desktop
     homes.desktop-nvidia
     homes.headless
+    homes.vps-oracle-0
   ];
   expectedPaths = {
     ".cache" = "persistent";

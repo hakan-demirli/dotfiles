@@ -74,6 +74,14 @@
         };
       };
 
+      configurations = profiles // {
+        vps-oracle-0 = {
+          profile = "headless-minimal";
+          system = inputs.self.lib.inventory.hosts.vps-oracle-0.hardware.arch;
+          hasNvidia = false;
+        };
+      };
+
       discoveredUsers =
         if !builtins.pathExists homeRoot then
           [ ]
@@ -92,7 +100,7 @@
               name = "${uid}.${pname}";
             }
           );
-        }) profiles
+        }) configurations
       ) discoveredUsers
     );
 }
