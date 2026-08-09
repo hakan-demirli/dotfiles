@@ -16,6 +16,13 @@
   intent = import ./intent.nix { inherit pkgs self; };
   inventory-eval = import ./inventory-eval.nix { inherit pkgs self lib; };
   installers = import ./installers.nix { inherit pkgs self; };
-  home-profile-policy = import ./home-profile-policy.nix { inherit pkgs self lib; };
+  home-profile-policy = import ./home-profile-policy.nix {
+    inherit
+      inputs
+      lib
+      pkgs
+      self
+      ;
+  };
   home-storage-policy = import ./home-storage-policy.nix { inherit pkgs self lib; };
 }

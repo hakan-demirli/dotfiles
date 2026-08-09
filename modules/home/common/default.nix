@@ -3,6 +3,8 @@
   pkgs,
   lib,
   facts,
+  inputs,
+  profile,
   ...
 }:
 let
@@ -10,6 +12,78 @@ let
   nixTailnetCacheTag = "tag:nix-binary-cache";
   nixConfigDir = "${config.xdg.configHome}/nix";
   nixTailnetCacheState = "${nixConfigDir}/tailnet-cache.conf";
+  immutableConfigEntries = [
+    "aichat"
+    "aider"
+    "anyrun"
+    "awatcher"
+    "bash"
+    "bat"
+    "btop"
+    "cargo"
+    "clangd"
+    "claude"
+    "firefoxcss"
+    "gdb"
+    "gdb-dashboard"
+    "git"
+    "gnome3-keybind-backup"
+    "gnome-extensions"
+    "gtk_indicator"
+    "helix"
+    "hypr"
+    "input-remapper-2"
+    "kitty"
+    "lazygit"
+    "lesskey"
+    "lf"
+    "mimeapps.list"
+    "mpd"
+    "mpv"
+    "nix"
+    "npm"
+    "nwg"
+    "parallel"
+    "piper"
+    "qalculate"
+    "qmk"
+    "QtProject"
+    "quantifyself"
+    "qutebrowser"
+    "repx"
+    "rmpc"
+    "sccache"
+    "sioyek"
+    "starship.toml"
+    "swaync"
+    "tmux"
+    "tmuxp"
+    "tofi"
+    "transmission"
+    "vim"
+    "wavemon"
+    "waybar"
+    "wayscriber"
+    "wgetrc"
+    "wofi"
+    "xdg-desktop-portal-termfilechooser"
+    "xilinx"
+    "xremap"
+    "yazi"
+    "zathura"
+  ];
+  packageGroups = import ./package-groups.nix { inherit inputs lib pkgs; };
+  mkImmutable =
+    name:
+    let
+      src = ./config + "/${name}";
+    in
+    lib.optionalAttrs (builtins.pathExists src) {
+      ${name} = {
+        source = src;
+        recursive = true;
+      };
+    };
   nixTailnetCacheUpdater = pkgs.writeShellApplication {
     name = "update-nix-tailnet-cache";
     runtimeInputs = [
@@ -116,21 +190,33 @@ in
     };
   };
 
-  home.activation = {
-    backupExistingFiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
-      export HOME_MANAGER_BACKUP_EXT=hm-backup
-      export HOME_MANAGER_BACKUP_OVERWRITE=1
-    '';
-    bashHistoryDir = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      mkdir -p "$HOME/.local/state/bash"
-    '';
-    factsAvailable = ''
-      echo "infra-home activating for ${facts.id} (cluster=${toString facts.cluster}, deployment-roles=[${pkgs.lib.concatStringsSep "," facts.deploymentRoles}], topology-roles=[${pkgs.lib.concatStringsSep "," facts.topologyRoles}])"
-    '';
-    nixTailnetCache = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      run ${nixTailnetCacheUpdater}/bin/update-nix-tailnet-cache --refresh
-    '';
+  home = {
+    file.".local/bin" = lib.mkIf (builtins.pathExists ./pkgs/bin) {
+      source = ./pkgs/bin;
+      recursive = true;
+      executable = true;
+    };
+
+    packages = packageGroups.${profile};
+
+    activation = {
+      backupExistingFiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+        export HOME_MANAGER_BACKUP_EXT=hm-backup
+        export HOME_MANAGER_BACKUP_OVERWRITE=1
+      '';
+      bashHistoryDir = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        mkdir -p "$HOME/.local/state/bash"
+      '';
+      factsAvailable = ''
+        echo "infra-home activating for ${facts.id} (cluster=${toString facts.cluster}, deployment-roles=[${pkgs.lib.concatStringsSep "," facts.deploymentRoles}], topology-roles=[${pkgs.lib.concatStringsSep "," facts.topologyRoles}])"
+      '';
+      nixTailnetCache = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        run ${nixTailnetCacheUpdater}/bin/update-nix-tailnet-cache --refresh
+      '';
+    };
   };
+
+  xdg.configFile = lib.foldl' (acc: name: acc // (mkImmutable name)) { } immutableConfigEntries;
 
   systemd.user.services.nix-tailnet-cache = {
     Unit.Description = "Update Nix cache availability from Tailscale state";

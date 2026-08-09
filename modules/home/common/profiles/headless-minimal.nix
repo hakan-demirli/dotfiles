@@ -1,23 +1,25 @@
+{ config, ... }:
 {
-  pkgs,
-  config,
-  ...
-}:
-{
-  home.packages = with pkgs; [
-    btop
-    curl
-    git
-    jq
-    rsync
-    vim
-  ];
+  programs = {
+    fzf.enable = true;
 
-  programs.tmux = {
-    enable = true;
-    terminal = "tmux-256color";
-    keyMode = "vi";
-    historyLimit = 100000;
+    starship = {
+      enable = true;
+      enableBashIntegration = true;
+    };
+
+    tmux = {
+      enable = true;
+      terminal = "tmux-256color";
+      keyMode = "vi";
+      historyLimit = 100000;
+    };
+
+    yazi = {
+      enable = true;
+      enableBashIntegration = true;
+      shellWrapperName = "f";
+    };
   };
 
   xdg = {
