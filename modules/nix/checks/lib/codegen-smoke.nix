@@ -7,6 +7,7 @@ let
   inherit (pkgs) lib;
   inherit (inputs.infra-lib.lib) headscalePolicy;
   inventory = self.lib.inventory;
+  intent = self.lib.intent;
   p = self.packages.${pkgs.stdenv.hostPlatform.system};
   isActiveUser = uid: inventory.users ? ${uid} && !(inventory.users.${uid}.archived or false);
 
@@ -86,6 +87,10 @@ let
     )
   ) activeClusterIds;
   adminAclDestinations = (map (cid: "${broadTag cid}:*") activeClusterIds) ++ [ "tag:bootstrap:*" ];
+  fleetAdminTag = "tag:fleet-admin-client";
+  controllerTags = map (cid: "tag:${baseTag cid}-controller") (
+    lib.filter (cid: (inventory.controllerNodesOfCluster.${cid} or [ ]) != [ ]) activeClusterIds
+  );
 
   fleetAdminAges = lib.unique (
     lib.concatLists (
@@ -99,6 +104,11 @@ let
     lib.filterAttrs (_: ages: ages != [ ]) (inventory.machineAge or { })
   );
 in
+assert intent.hostPolicyTags."laptop-1" == [ fleetAdminTag ];
+assert intent.canHostReach "laptop-1" "vps-oracle-0" "22";
+assert intent.canHostReach "vps-oracle-0" "laptop-1" "9100";
+assert intent.canHostReach "vps-oracle-0" "laptop-1" "9633";
+assert !(intent.canHostReach "vps-oracle-0" "laptop-1" "22");
 pkgs.runCommand "codegen-smoke"
   {
     nativeBuildInputs = [ pkgs.jq ];
@@ -124,6 +134,8 @@ pkgs.runCommand "codegen-smoke"
     teamAclPairs = lib.concatStringsSep " " teamAclPairs;
     userAclPairs = lib.concatStringsSep " " userAclPairs;
     adminAclDestinations = lib.concatStringsSep " " adminAclDestinations;
+    controllerTags = lib.concatStringsSep " " controllerTags;
+    inherit fleetAdminTag;
   }
   ''
     set -euo pipefail
@@ -203,10 +215,28 @@ pkgs.runCommand "codegen-smoke"
 
     for dst in $adminAclDestinations; do
       echo "$body" | jq -e --arg dst "$dst" \
-        '.acls | any(.action == "accept" and ((.src | index("group:admin")) != null) and ((.dst | index($dst)) != null))' >/dev/null \
-        || fail "headscale-acl: group:admin missing access to $dst"
+        --arg src "$fleetAdminTag" \
+        '.acls | any(.action == "accept" and ((.src | index($src)) != null) and ((.dst | index($dst)) != null))' >/dev/null \
+        || fail "headscale-acl: $fleetAdminTag missing access to $dst"
     done
-    pass "headscale-acl: actual admin reachability present"
+    pass "headscale-acl: fleet admin client reachability present"
+
+    echo "$body" | jq -e --arg tag "$fleetAdminTag" \
+      '.tagOwners[$tag] == ["group:admin"]' >/dev/null \
+      || fail "headscale-acl: fleet admin tag ownership missing"
+
+    echo "$body" | jq -e \
+      '.acls | all((.src | index("group:admin")) == null)' >/dev/null \
+      || fail "headscale-acl: broad group:admin ACL still present"
+
+    for src in $controllerTags; do
+      for port in 9100 9633; do
+        echo "$body" | jq -e --arg src "$src" --arg dst "$fleetAdminTag:$port" \
+          '.acls | any(.action == "accept" and ((.src | index($src)) != null) and ((.dst | index($dst)) != null))' >/dev/null \
+          || fail "headscale-acl: missing monitoring path $src -> $dst"
+      done
+    done
+    pass "headscale-acl: controller monitoring paths present"
 
     for pair in $clusterTagPairs; do
       cid="''${pair%=*}"
@@ -215,6 +245,9 @@ pkgs.runCommand "codegen-smoke"
         || fail "headscale-acl: $tag missing for cluster $cid"
     done
     pass "headscale-acl: tags present for all clusters"
+
+    grep -q "$fleetAdminTag" "$diagramTailnet/tailnet.dot" \
+      || fail "tailnet diagram: fleet admin tag missing"
 
     test -e "$kea" || fail "kea missing"
     test -e "$matchbox" || fail "matchbox missing"

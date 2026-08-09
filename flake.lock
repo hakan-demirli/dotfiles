@@ -89,11 +89,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786031233,
-        "narHash": "sha256-TIDlLTLI1/pB7IqgjzcKQjpODQsZE2oII4XGG9B6KjI=",
+        "lastModified": 1786286733,
+        "narHash": "sha256-7dN93WKkEERgutPtTjK7SY3ZarO2LAU33A1+vKu+7cc=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "7834e82588860aaf780cec1366524456a70898d7",
+        "rev": "367f7ef80856d18438953d54dda235d42a46ba31",
         "type": "github"
       },
       "original": {
@@ -173,11 +173,11 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1786300407,
-        "narHash": "sha256-YOAT5UGnr7eWLZkXNuJV+RJOOHCfzFVHFWQnO0IpPB4=",
+        "lastModified": 1786316121,
+        "narHash": "sha256-l55J2C4+GAcjEBNuXF5b7W1DHVye8t8gWl5+31YfeQ0=",
         "owner": "hakan-demirli",
         "repo": "infra-lib",
-        "rev": "bb01ba4b0602ae831b2559f488722a4f783b7dfc",
+        "rev": "c48305233f4d0e7c72de67e3d3cf1fc38417e5de",
         "type": "github"
       },
       "original": {
@@ -343,11 +343,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1783271174,
-        "narHash": "sha256-IgKy7qUH3zikEPns7JZmMV2BfAOoUNIE5s8ndc/J5Ws=",
+        "lastModified": 1786295861,
+        "narHash": "sha256-AJ1J0rfybtCH3pEYnweRgoCHq/XHuWxx2LMM/ifBGjs=",
         "owner": "hakan-demirli",
         "repo": "NUR",
-        "rev": "2e9c46a8e4c549c52db39409ee357f611bd45a15",
+        "rev": "3d716b322e86f85f3a982708ba457917302b9ae1",
         "type": "github"
       },
       "original": {

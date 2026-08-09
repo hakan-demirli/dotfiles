@@ -10,6 +10,7 @@
     "infra:services/victoriametrics"
     "infra:services/victorialogs"
     "infra:services/grafana"
+    "self:services/grafana-fleet"
     "infra:services/vmalert"
     "infra:services/alertmanager"
   ];

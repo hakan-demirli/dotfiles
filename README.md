@@ -124,12 +124,24 @@ Manager files use `SOPS_AGE_KEY_FILE` with their installed keys and local
 
 ## Tailnet
 
-Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`. For a new
-server, create user `user-0`, create a reusable preauth key tagged
-`tag:bootstrap`, store it in `secrets/bootstrap/tailscale.yaml`, and redeploy.
-Promote a verified node with `sudo headscale nodes tag -i <id> -t <tag>`.
-Approve exit routes with `headscale nodes approve-routes` before assigning
-`tag:exitnode`.
+Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`. Bootstrap
+enrollment uses the dedicated `tagged-devices` Headscale user and a reusable
+preauth key in `secrets/bootstrap/tailscale.yaml`. Every node initially receives
+`tag:bootstrap`, which has no outbound Tailnet access. Permanent tags are
+assigned manually without re-registering the node.
+
+### Node Promotion
+
+1. Deploy inventory and ACL changes, then run `nix build .#diagrams-tailnet`.
+   The `ACL policy tags` column in `result/tailnet.svg` is authoritative.
+2. Identify the node with `sudo headscale nodes list`.
+3. Apply its complete final tag set with
+   `sudo headscale nodes tag -i <id> -t tag:first,tag:second`.
+4. List nodes again, confirm the exact tags and absence of `tag:bootstrap`, then
+   test the intended SSH allow and deny paths.
+
+Tag permissions are cumulative. Never retain `tag:bootstrap` with permanent
+tags. Approve exit routes separately before assigning `tag:exitnode`.
 
 `laptop-1` exposes a write-only rsync inbox on `tailscale0` to approved senders:
 
