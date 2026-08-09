@@ -239,6 +239,7 @@ in
     (import ../pkgs/nix/ntfy-listener.nix { })
     (import ../pkgs/nix/opencode.nix { })
     (import ../pkgs/nix/github_backup.nix { })
+    ../pkgs/nix/screen-record.nix
   ]
   ++ lib.optional ((facts.location.kind or null) == "laptop") ../pkgs/nix/low_battery_notify.nix;
 

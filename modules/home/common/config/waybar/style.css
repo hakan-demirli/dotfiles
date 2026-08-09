@@ -34,6 +34,7 @@ tooltip {
 #workspaces,
 #custom-notification,
 #custom-refresh-rate,
+#custom-screen-record,
 #custom-power,
 #custom-osk,
 #custom-orientation,
@@ -116,7 +117,7 @@ tooltip {
 #custom-power,
 #custom-camera,
 #custom-notifications,
-#custom-recorder,
+#custom-screen-record,
 #custom-batterysaver,
 #bluetooth,
 #disk,
@@ -217,6 +218,26 @@ tooltip {
   background-color: shade(@red, 0.7);
 }
 
+#custom-screen-record.idle {
+  color: @foreground;
+}
+
+#custom-screen-record.selecting,
+#custom-screen-record.starting,
+#custom-screen-record.stopping,
+#custom-screen-record.copying {
+  color: @orange;
+}
+
+#custom-screen-record.recording {
+  color: @red;
+  animation-name: blink;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
 #clock.h-m {
   font-size: 1.8rem;
   font-weight: bold;
@@ -228,6 +249,7 @@ tooltip {
 #custom-notification,
 #custom-power,
 #custom-refresh-rate,
+#custom-screen-record,
 menu.touch-menu menuitem {
   min-height: 32px;
 }
