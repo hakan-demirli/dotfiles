@@ -37,6 +37,7 @@ rec {
         bandwhich
         bash-language-server
         bat
+        cargo
         clang-tools
         claude-code
         clippy
@@ -64,6 +65,7 @@ rec {
         pyright
         ripgrep
         ruff
+        rustc
         rust-analyzer
         rustfmt
         sendToLaptop

@@ -7,9 +7,9 @@ import subprocess
 """
 sdo.py: set default opener
 Usage:
-    sdo.py ./a_file.ext helix.desktop
+    sdo.py ./a_file.ext neovim.desktop
 
-    sdo.py ./a_file.ext helix.sh
+    sdo.py ./a_file.ext nvim
 """
 
 

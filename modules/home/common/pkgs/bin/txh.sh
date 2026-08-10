@@ -13,7 +13,7 @@ if tmux has-session -t "$session_name" 2> /dev/null; then
 fi
 
 if [[ ! -f $data_file ]]; then
-  tmux new-session -s "$session_name" "hx ."
+  tmux new-session -s "$session_name" "nvim ."
   exit 0
 fi
 
@@ -27,4 +27,4 @@ first_hook=$(sed -n "1p" "$data_file")
 first_window_id=$(echo "$first_hook" | awk -F',' '{ print $2 }')
 sed -i "s/,$first_window_id,/,0,/g" "$data_file"
 
-tmux new-session -s "$session_name" "hx ."
+tmux new-session -s "$session_name" "nvim ."

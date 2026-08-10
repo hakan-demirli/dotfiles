@@ -8,4 +8,4 @@ while tmux list-windows -F '#{window_id}' | grep -q "^@$id"; do
   id=$((id + 1))
 done
 
-tmux new-window -n:mywindow -t:$id "hx $file +9999999"
+tmux new-window -n:mywindow -t:$id "nvim +9999999 -- $file"
