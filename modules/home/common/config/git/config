@@ -5,7 +5,7 @@
 	fileMode = true
 	autocrlf = false
 	eol = lf
-	editor = hx
+	editor = nvim
     excludesfile = ~/.config/git/ignore
 [safe]
 	directory = *

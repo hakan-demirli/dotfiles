@@ -54,7 +54,7 @@ c.url.searchengines = {
 }
 c.tabs.title.format_pinned = "{audio}{index}: {current_title}"
 c.window.title_format = "{perc}{current_title}{title_sep}nephestate browser"
-c.editor.command = ["st", "-e", "helix.sh", "{file}", "-c", "normal {line}G{column0}l"]
+c.editor.command = ["st", "-e", "nvim", "+call cursor({line}, {column})", "{file}"]
 
 c.aliases.update(
     {

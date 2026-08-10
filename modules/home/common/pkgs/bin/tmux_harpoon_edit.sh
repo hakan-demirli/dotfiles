@@ -8,6 +8,6 @@ data_file="$cache_dir/$tmux_cwd_hash.csv"
 mkdir -p "$cache_dir"
 touch "$data_file"
 
-tmux display-popup -w 80% -E "hx $data_file"
+tmux display-popup -w 80% -E "nvim $data_file"
 
 sed -i '/^$/d' "$data_file"

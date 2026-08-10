@@ -101,9 +101,9 @@ keymap:
       CTRL-b: reserved
       CTRL-k: Ctrl-Shift-KEY_TAB
       CTRL-j: Ctrl-KEY_TAB
-  - name: helix.sh
+  - name: nvim
     application:
-      only: helix.sh
+      only: nvim
     remap:
       KEY_BACKSPACE: reserved
   - name: Xschem

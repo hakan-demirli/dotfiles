@@ -1,5 +1,0 @@
-{
-  plugins.hop = {
-    enable = true;
-  };
-}

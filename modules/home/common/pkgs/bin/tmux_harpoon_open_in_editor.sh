@@ -43,5 +43,6 @@ else
 fi
 
 absolute_path=$(realpath -m -- "$final_path")
+printf -v editor_launch 'nvim -- %q' "$absolute_path"
 
-tmux send-keys -t "$target_pane" C-c " hx $absolute_path" Enter
+tmux send-keys -t "$target_pane" C-c " $editor_launch" Enter
