@@ -41,6 +41,7 @@ let
     "mpd"
     "mpv"
     "nix"
+    "nvim"
     "npm"
     "nwg"
     "parallel"

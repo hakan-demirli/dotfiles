@@ -4,7 +4,7 @@
 | -------- | ------------------------------------------------------- |
 | Distro   | NixOS                                                   |
 | Desktop  | Hyprland + Waybar                                       |
-| Editor   | Helix + Tmux                                            |
+| Editor   | Neovim + Tmux                                           |
 | Files    | Yazi                                                    |
 | Keyboard | [TBK Mini](https://github.com/Bastardkb/TBK-Mini) + QMK |
 

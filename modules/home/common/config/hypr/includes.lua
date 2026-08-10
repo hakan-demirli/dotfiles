@@ -2,7 +2,7 @@ terminal = "kitty"
 browser = "MOZ_ENABLE_WAYLAND=1 firefox"
 launcher = "pkill tofi || tofi-drun --drun-launch=true"
 filemanager = "lf_cd_hyprland.sh"
-editor = "hx"
+editor = "nvim"
 locker = "hyprlock"
 
 hl.on("hyprland.start", function()
