@@ -17,7 +17,7 @@ Host vm-oracle-aarch64
     IdentityFile ~/.ssh/id_ed25519_proton
 
 Host tailscale-vm-oracle-aarch64
-    HostName 100.64.0.1
+    HostName vps-oracle-0.ts.sshr.polarbearvuzi.com
     User emre
     IdentityFile ~/.ssh/id_ed25519_proton
 
@@ -44,6 +44,11 @@ Host server-dev-1-via-jump
     ProxyJump vm-oracle-aarch64
 
 Host tailscale-server-dev-1
-    HostName 100.64.0.2
+    HostName server-dev-1.ts.sshr.polarbearvuzi.com
     User emre
     IdentityFile ~/.ssh/id_ed25519_proton
+
+Match host "*.ts.sshr.polarbearvuzi.com"
+    User emre
+    IdentityFile ~/.ssh/id_ed25519_proton
+    IdentitiesOnly yes
