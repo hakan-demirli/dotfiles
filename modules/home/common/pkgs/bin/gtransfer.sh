@@ -73,6 +73,21 @@ if [[ -r $HOME/.ssh/config ]]; then
   done < <(awk '$1 == "Host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' "$HOME/.ssh/config")
 fi
 
+if command -v tailscale > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
+  while IFS= read -r peer; do
+    [ -n "$peer" ] || continue
+    MENU_ITEMS+=("$peer")
+  done < <(
+    tailscale status --json 2> /dev/null \
+      | jq -r '(.Peer // {}) | .[] | select(.Online) | .DNSName | rtrimstr(".")' 2> /dev/null \
+      || true
+  )
+fi
+
+if ((${#MENU_ITEMS[@]} > 1)); then
+  mapfile -t MENU_ITEMS < <(printf '%s\n' "${MENU_ITEMS[@]}" | awk '!seen[$0]++')
+fi
+
 if ((${#MENU_ITEMS[@]} == 0)); then
   echo "No transfer targets available." >&2
   exit 1
