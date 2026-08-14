@@ -4,7 +4,6 @@ After=network-online.target tailscaled.service
 Wants=network-online.target tailscaled.service
 ConditionPathExists=/etc/tailscale/authkey
 ConditionPathExists=/etc/tailscale/login-server
-ConditionPathExists=/etc/tailscale/tag
 
 [Service]
 Type=oneshot

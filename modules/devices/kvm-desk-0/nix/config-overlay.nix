@@ -3,7 +3,6 @@
   authorizedKeys ? null,
   tailscaleAuthKey ? null,
   tailscaleLoginServer ? null,
-  tailscaleTag ? null,
   staticIp ? null,
   hostname ? null,
   usbVid ? null,
@@ -125,11 +124,6 @@ pkgs.runCommand "kvm-desk-0-config-overlay"
     ${lib.optionalString (tailscaleLoginServer != null) ''
       install -Dm0644 ${pkgs.writeText "tailscale-login-server" (tailscaleLoginServer + "\n")} \
         $out/root/etc/tailscale/login-server
-    ''}
-
-    ${lib.optionalString (tailscaleTag != null) ''
-      install -Dm0644 ${pkgs.writeText "tailscale-tag" (tailscaleTag + "\n")} \
-        $out/root/etc/tailscale/tag
     ''}
 
     ${lib.optionalString shipsAuthorizedKeys ''

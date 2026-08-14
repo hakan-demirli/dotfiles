@@ -1,0 +1,9 @@
+# Declarative node exporter configuration for r01.
+# Scraped by VictoriaMetrics on vps-oracle-0 over the tailnet. Binds to every
+# interface because tailscale0 carries no netifd address for the init script to
+# resolve; reachability is decided by the firewall zones instead (lan and
+# tailscale accept, wan rejects).
+
+config prometheus-node-exporter-lua 'main'
+	option listen_interface '*'
+	option listen_port '9100'

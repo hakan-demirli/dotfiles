@@ -8,7 +8,6 @@
   authorizedKeys ? null,
   tailscaleAuthKey ? null,
   tailscaleLoginServer ? null,
-  tailscaleTag ? null,
   bootstrap ? false,
 }:
 let
@@ -79,15 +78,12 @@ let
       null;
 
   r01TailscaleUci =
-    if tailscaleLoginServer == null && tailscaleTag == null then
+    if tailscaleLoginServer == null then
       null
     else
       pkgs.writeText "r01-tailscale" ''
         config bootstrap 'main'
-        ${lib.optionalString (
-          tailscaleLoginServer != null
-        ) "\toption login_server '${tailscaleLoginServer}'"}
-        ${lib.optionalString (tailscaleTag != null) "\toption tag '${tailscaleTag}'"}
+        	option login_server '${tailscaleLoginServer}'
       '';
 in
 pkgs.runCommand "router-0-config-overlay"
@@ -99,7 +95,6 @@ pkgs.runCommand "router-0-config-overlay"
         shipsWireless
         tailscaleAuthKey
         tailscaleLoginServer
-        tailscaleTag
         hostname
         ;
       hasWifiToml = wifiTomlFile != null;
@@ -135,6 +130,9 @@ pkgs.runCommand "router-0-config-overlay"
     install -Dm0644 ${systemConfig}                    $out/root/etc/config/system
     install -Dm0644 ${filesRoot}/etc/config/r01        $out/root/etc/config/r01
     install -Dm0644 ${filesRoot}/etc/config/r01-ui     $out/root/etc/config/r01-ui
+
+    install -Dm0644 ${filesRoot}/etc/config/prometheus-node-exporter-lua \
+      $out/root/etc/config/prometheus-node-exporter-lua
 
     install -Dm0755 ${filesRoot}/etc/rc.local          $out/root/etc/rc.local
 

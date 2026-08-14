@@ -28,6 +28,20 @@ let
     CONFIG_PACKAGE_luci=y
     CONFIG_PACKAGE_luci-ssl=y
 
+    # Tailnet membership. kmod-tun must be baked in: snapshot kmods are keyed
+    # by kernel vermagic, and a patched tree's vermagic is never in the feed.
+    CONFIG_PACKAGE_tailscale=y
+    CONFIG_PACKAGE_kmod-tun=y
+    CONFIG_PACKAGE_ca-bundle=y
+
+    # node_exporter-compatible metrics on 9100, scraped over the tailnet.
+    # filesystem is a separate collector, and the disk panels/alerts need it.
+    CONFIG_PACKAGE_prometheus-node-exporter-lua=y
+    CONFIG_PACKAGE_prometheus-node-exporter-lua-filesystem=y
+    CONFIG_PACKAGE_prometheus-node-exporter-lua-openwrt=y
+    CONFIG_PACKAGE_prometheus-node-exporter-lua-thermal=y
+    CONFIG_PACKAGE_prometheus-node-exporter-lua-wifi=y
+
     # Useful tools.
     CONFIG_PACKAGE_diffutils=y
     CONFIG_PACKAGE_tcpdump-mini=y

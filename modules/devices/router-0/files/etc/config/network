@@ -1,10 +1,12 @@
 # Declarative network configuration for r01.
 #
 # Layout:
-#   lan    -> br-lan over eth1, 192.168.69.1/24 (static)
-#   wan    -> eth0, DHCP    (unused unless cable plugged in)
-#   wan6   -> eth0, DHCPv6  (unused unless cable plugged in)
-#   wwan   -> wifi STA to eth-5, DHCP (the primary uplink in the dorm)
+#   lan       -> br-lan over eth1, 192.168.69.1/24 (static)
+#   wan       -> eth0, DHCP    (unused unless cable plugged in)
+#   wan6      -> eth0, DHCPv6  (unused unless cable plugged in)
+#   wwan      -> wifi STA to eth-5, DHCP (the primary uplink in the dorm)
+#   tailscale -> tailscale0, addressed by tailscaled. proto 'none', so it
+#                exists only for the firewall to name it in a zone
 #
 # Routing priority is via the 'metric' option: lower wins.
 #   wan      metric 10
@@ -44,3 +46,7 @@ config interface 'wan6'
 config interface 'wwan'
 	option proto 'dhcp'
 	option metric '20'
+
+config interface 'tailscale'
+	option proto 'none'
+	option device 'tailscale0'

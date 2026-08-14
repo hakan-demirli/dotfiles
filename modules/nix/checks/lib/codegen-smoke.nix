@@ -88,6 +88,8 @@ let
   ) activeClusterIds;
   adminAclDestinations = (map (cid: "${broadTag cid}:*") activeClusterIds) ++ [ "tag:bootstrap:*" ];
   fleetAdminTag = "tag:fleet-admin-client";
+  metricsTag = "tag:metrics";
+  nixCacheTag = "tag:nix-binary-cache";
   controllerTags = map (cid: "tag:${baseTag cid}-controller") (
     lib.filter (cid: (inventory.controllerNodesOfCluster.${cid} or [ ]) != [ ]) activeClusterIds
   );
@@ -104,11 +106,29 @@ let
     lib.filterAttrs (_: ages: ages != [ ]) (inventory.machineAge or { })
   );
 in
-assert intent.hostPolicyTags."laptop-1" == [ fleetAdminTag ];
+assert
+  intent.hostPolicyTags."laptop-1" == [
+    fleetAdminTag
+    metricsTag
+    nixCacheTag
+  ];
+assert
+  intent.hostPolicyTags."router-0" == [
+    "tag:cluster-router-0"
+    metricsTag
+  ];
 assert intent.canHostReach "laptop-1" "vps-oracle-0" "22";
 assert intent.canHostReach "vps-oracle-0" "laptop-1" "9100";
 assert intent.canHostReach "vps-oracle-0" "laptop-1" "9633";
+assert intent.canHostReach "vps-oracle-0" "router-0" "9100";
+assert intent.canHostReach "laptop-0" "vps-oracle-0" "9428";
+assert intent.canHostReach "laptop-0" "vps-oracle-0" "5101";
+assert intent.canHostReach "server-dev-1" "laptop-1" "873";
 assert !(intent.canHostReach "vps-oracle-0" "laptop-1" "22");
+assert !(intent.canHostReach "vps-oracle-0" "router-0" "22");
+assert !(intent.canHostReach "laptop-0" "vps-oracle-0" "22");
+assert !(intent.canHostReach "laptop-0" "laptop-1" "22");
+assert !(intent.canHostReach "router-0" "vps-oracle-0" "9428");
 pkgs.runCommand "codegen-smoke"
   {
     nativeBuildInputs = [ pkgs.jq ];
@@ -135,7 +155,7 @@ pkgs.runCommand "codegen-smoke"
     userAclPairs = lib.concatStringsSep " " userAclPairs;
     adminAclDestinations = lib.concatStringsSep " " adminAclDestinations;
     controllerTags = lib.concatStringsSep " " controllerTags;
-    inherit fleetAdminTag;
+    inherit fleetAdminTag metricsTag nixCacheTag;
   }
   ''
     set -euo pipefail
@@ -225,13 +245,21 @@ pkgs.runCommand "codegen-smoke"
       '.tagOwners[$tag] == ["group:admin"]' >/dev/null \
       || fail "headscale-acl: fleet admin tag ownership missing"
 
+    echo "$body" | jq -e --arg tag "$metricsTag" \
+      '.tagOwners[$tag] == ["group:admin"]' >/dev/null \
+      || fail "headscale-acl: metrics tag ownership missing"
+
+    echo "$body" | jq -e --arg tag "$nixCacheTag" \
+      '.tagOwners[$tag] == ["group:admin"]' >/dev/null \
+      || fail "headscale-acl: nix binary cache tag ownership missing"
+
     echo "$body" | jq -e \
       '.acls | all((.src | index("group:admin")) == null)' >/dev/null \
       || fail "headscale-acl: broad group:admin ACL still present"
 
     for src in $controllerTags; do
       for port in 9100 9633; do
-        echo "$body" | jq -e --arg src "$src" --arg dst "$fleetAdminTag:$port" \
+        echo "$body" | jq -e --arg src "$src" --arg dst "$metricsTag:$port" \
           '.acls | any(.action == "accept" and ((.src | index($src)) != null) and ((.dst | index($dst)) != null))' >/dev/null \
           || fail "headscale-acl: missing monitoring path $src -> $dst"
       done
