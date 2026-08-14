@@ -110,7 +110,6 @@ rec {
       exfatprogs
       feh
       gamescope
-      gparted-emre
       grim
       hypridle
       hyprlock

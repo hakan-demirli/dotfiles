@@ -31,7 +31,7 @@ let
         pkgs.util-linux
       ]
     }
-    ${builtins.readFile ../home/common/pkgs/bin/hp-power.sh}
+    ${builtins.readFile ./hp-power.sh}
   '';
 in
 {

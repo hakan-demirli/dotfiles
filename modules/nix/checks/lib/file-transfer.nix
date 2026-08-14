@@ -75,7 +75,6 @@ pkgs.runCommand "file-transfer-policy"
     mkdir -p "$TMPDIR/home" "$TMPDIR/files"
     touch "$TMPDIR/files/first file" "$TMPDIR/files/second"
     export HOME="$TMPDIR/home"
-    export EMRE_HOME_HOST_ID=server-dev-1
     export MOCK_ARGS="$TMPDIR/args"
     bash ${gtransfer} "$TMPDIR/files/first file" "$TMPDIR/files/second"
 

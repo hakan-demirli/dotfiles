@@ -9,6 +9,7 @@
   bootstrap-authentication = import ./bootstrap-authentication.nix { inherit pkgs self inputs; };
   bootstrap-secrets = import ./bootstrap-secrets.nix { inherit pkgs self lib; };
   codegen-smoke = import ./codegen-smoke.nix { inherit pkgs self inputs; };
+  device-lock-cli = import ./device-lock-cli.nix { inherit pkgs self; };
   generated-headscale-policy = import ./generated-headscale-policy.nix {
     inherit pkgs self inputs;
   };
@@ -25,4 +26,6 @@
       ;
   };
   home-storage-policy = import ./home-storage-policy.nix { inherit pkgs self lib; };
+  remote-desktop-cli = import ./remote-desktop-cli.nix { inherit pkgs self; };
+  ssh-targets = import ./ssh-targets.nix { inherit pkgs self; };
 }

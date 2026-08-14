@@ -2,14 +2,6 @@
 set -u
 set -o pipefail
 
-if [ "${0##*/}" = "hp-power.sh" ]; then
-  if command -v hp-power > /dev/null 2>&1; then
-    exec hp-power "$@"
-  fi
-  echo "hp-power is not installed system-wide" >&2
-  exit 1
-fi
-
 RAPL=/sys/class/powercap/intel-rapl:0
 MMIO=/sys/class/powercap/intel-rapl-mmio:0
 PLATFORM_PROFILE=/sys/firmware/acpi/platform_profile
@@ -363,7 +355,7 @@ cmd_afan() {
   acquire_lock
   if [ -z "${1:-}" ]; then
     echo "EC AFAN (0x2D) = 0x$(read_afan)"
-    echo "valid: $EC_AFAN_VALID  (0x00=max fans, 0x88=most passive, see hp-power.sh help)"
+    echo "valid: $EC_AFAN_VALID  (0x00=max fans, 0x88=most passive, see hp-power help)"
     return 0
   fi
   local hex

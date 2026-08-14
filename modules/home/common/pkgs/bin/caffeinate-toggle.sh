@@ -7,10 +7,10 @@ UNIT_NAME="${UNIT%.service}"
 WHY="SwayNC caffeinate toggle"
 WHAT="idle:sleep:handle-lid-switch"
 
-SYSTEMCTL="/run/current-system/sw/bin/systemctl"
-SYSTEMD_RUN="/run/current-system/sw/bin/systemd-run"
-SYSTEMD_INHIBIT="/run/current-system/sw/bin/systemd-inhibit"
-SLEEP="/run/current-system/sw/bin/sleep"
+SYSTEMCTL="${SYSTEMCTL:-systemctl}"
+SYSTEMD_RUN="${SYSTEMD_RUN:-systemd-run}"
+SYSTEMD_INHIBIT="${SYSTEMD_INHIBIT:-systemd-inhibit}"
+SLEEP="${SLEEP:-sleep}"
 
 notify() {
   command -v notify-send > /dev/null 2>&1 || return 0

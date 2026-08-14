@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-WARP_CLI_BIN="/run/current-system/sw/bin/warp-cli"
+WARP_CLI_BIN="${WARP_CLI_BIN:-$(command -v warp-cli || true)}"
 
-if [[ ! -x $WARP_CLI_BIN ]]; then
-  echo "ERROR: '$WARP_CLI_BIN' is not executable."
-  echo "Please edit this script and set the correct path to the warp-cli binary."
+if [[ -z $WARP_CLI_BIN || ! -x $WARP_CLI_BIN ]]; then
+  echo "ERROR: 'warp-cli' is not executable." >&2
+  echo "Install warp-cli or set WARP_CLI_BIN to its path." >&2
   exit 1
 fi
 

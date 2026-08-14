@@ -124,7 +124,6 @@ in
   #   }
   # );
 
-  gparted-emre = callPkgs ./gparted.nix { };
   libqalculate-fzf = callPkgs ./libqalculate-fzf.nix { };
   ttf-wps-fonts = callPkgs ./ttf-wps-fonts.nix { };
 }

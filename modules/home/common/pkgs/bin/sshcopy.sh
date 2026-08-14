@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOST=$(grep -P "^Host " ~/.ssh/config 2> /dev/null | awk '{print $2}' | grep -F -v "*" | fzf --height=40% --layout=reverse --border --prompt="Select Host > ")
+if ! command -v ssh-targets.sh > /dev/null 2>&1; then
+  echo "ssh-targets.sh is not installed." >&2
+  exit 1
+fi
+
+mapfile -t HOSTS < <(ssh-targets.sh)
+
+if ((${#HOSTS[@]} == 0)); then
+  echo "No hosts available."
+  exit 1
+fi
+
+HOST=$(printf '%s\n' "${HOSTS[@]}" | fzf --height=40% --layout=reverse --border --prompt="Select Host > ") || exit 0
 
 if [ -z "$HOST" ]; then
   echo "No host selected."

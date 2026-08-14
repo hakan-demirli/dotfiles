@@ -55,13 +55,13 @@ alias txs='tmux switch-client -n'
 alias txkw='tmux kill-window -t'
 alias txlw='tmux list-windows'
 
-if [ -d "/sys/devices/platform/asus-nb-wmi" ]; then
-  alias fan-turbo='echo 1 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 1 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
-  alias fan-performance='echo 0 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 0 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
-  alias fan-silent='echo 2 | sudo tee /sys/devices/platform/asus-nb-wmi/fan_boost_mode > /dev/null; echo 2 | sudo tee /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy > /dev/null;'
+if command -v asus-fan-profile > /dev/null 2>&1; then
+  alias fan-turbo='asus-fan-profile turbo'
+  alias fan-performance='asus-fan-profile performance'
+  alias fan-silent='asus-fan-profile silent'
 fi
 
-if [ -d "/sys/devices/platform/hp-wmi" ]; then
+if command -v hp-power > /dev/null 2>&1; then
   alias fan-turbo='hp-power turbo'
   alias fan-performance='hp-power balanced'
   alias fan-silent='hp-power silent'
