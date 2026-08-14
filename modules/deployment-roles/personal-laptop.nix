@@ -156,6 +156,7 @@ in
 
   environment.systemPackages = [
     (pkgs.callPackage ../pkgs/sddm-astronaut.nix { })
+    pkgs.gparted
   ];
 
   fonts.packages = [

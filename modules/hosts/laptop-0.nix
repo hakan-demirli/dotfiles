@@ -4,6 +4,13 @@
   inputs,
   ...
 }:
+let
+  asusFanProfile = pkgs.writeShellApplication {
+    name = "asus-fan-profile";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = builtins.readFile ../hardware/asus-fan-profile.sh;
+  };
+in
 {
   imports = [
     inputs.infra-lib.nixosModules.system-amd-graphics
@@ -15,6 +22,8 @@
   ];
 
   services.slurm-cluster.enable = true;
+
+  environment.systemPackages = [ asusFanProfile ];
 
   boot = {
     initrd.availableKernelModules = [
