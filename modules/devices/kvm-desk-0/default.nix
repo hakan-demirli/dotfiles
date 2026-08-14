@@ -12,7 +12,6 @@ let
       {
         inherit pkgs;
         tailscaleLoginServer = facts.labels.tailscale_login_server;
-        tailscaleTag = facts.labels.tailscale_tag;
         staticIp = facts.labels.lan_ip + "/24";
         inherit (facts) hostname;
       }

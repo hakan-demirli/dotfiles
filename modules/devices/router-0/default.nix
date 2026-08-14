@@ -24,7 +24,6 @@ let
         inherit pkgs r01-ui;
         inherit hostname;
         tailscaleLoginServer = facts.labels.tailscale_login_server;
-        tailscaleTag = facts.labels.tailscale_tag;
       }
       // args
     );

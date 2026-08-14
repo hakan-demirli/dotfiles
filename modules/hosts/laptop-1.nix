@@ -9,9 +9,10 @@ let
   wifiSopsFile = inputs.self + /secrets/wifi/credentials.yaml;
   wifiProfilesDirectory = "/run/NetworkManager/system-connections";
   transferInbox = "/persist/home/emre/paths/Downloads/Inbox";
+  tailnetDomain = "ts.sshr.polarbearvuzi.com";
   transferSources = [
-    "100.64.0.1" # vps-oracle-0
-    "100.64.0.2" # server-dev-1
+    "vps-oracle-0.${tailnetDomain}"
+    "server-dev-1.${tailnetDomain}"
   ];
   wifiProfiles = [
     {
@@ -136,7 +137,7 @@ in
           gid = "users";
           "use chroot" = true;
           "max connections" = 4;
-          "reverse lookup" = false;
+          "reverse lookup" = true;
         };
         sections.inbox = {
           path = transferInbox;

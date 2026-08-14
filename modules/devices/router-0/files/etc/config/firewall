@@ -2,6 +2,10 @@
 #
 # Standard OpenWrt defaults plus 'wwan' (wifi STA uplink) in the wan zone
 # so it's NAT'd and ingress-rejected like the wired wan.
+#
+# The 'tailscale' zone trusts input: peers are authenticated by headscale and
+# gated by the generated ACL, the same way NixOS fleet hosts trust tailscale0.
+# Its forward stays REJECT because this router advertises no subnet routes.
 
 config defaults
 	option syn_flood '1'
@@ -31,6 +35,13 @@ config zone
 	option forward 'DROP'
 	option masq '1'
 	option mtu_fix '1'
+
+config zone
+	option name 'tailscale'
+	list network 'tailscale'
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
 
 config forwarding
 	option src 'lan'
