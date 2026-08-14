@@ -40,8 +40,6 @@ in
       };
     };
 
-    sessionVariables.EMRE_HOME_HOST_ID = facts.id;
-
     pointerCursor = {
       enable = true;
       name = "Dracula-cursors";

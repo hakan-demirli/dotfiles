@@ -10,6 +10,7 @@ let
   cfg = config.services.remotedesktop;
   sunshineLabel = if host == null then "false" else (host.labels.sunshine or "false");
   effectiveMode = if cfg.modeOverride != null then cfg.modeOverride else sunshineLabel;
+  enabled = effectiveMode == "true" || effectiveMode == "headless";
   headless = effectiveMode == "headless";
 
   owner = if host == null then null else (host.ownership.owner or null);
@@ -29,6 +30,7 @@ let
     export PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native
     export PULSE_COOKIE=$HOME/.config/pulse/cookie
     export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
+    export PATH=${config.security.wrapperDir}:${config.system.path}/bin
 
     if [ ! -r ${hyprlandConfPath} ]; then
       echo "remotedesktop-session: missing ${hyprlandConfPath}" >&2
@@ -60,16 +62,41 @@ let
 
     wait $HYPR_PID
   '';
+  rd = pkgs.writeShellApplication {
+    name = "rd.sh";
+    runtimeInputs = with pkgs; [
+      coreutils
+      gawk
+      tailscale
+    ];
+    text = builtins.readFile ./remotedesktop-cli.sh;
+  };
+  mkRdCommand =
+    name: command:
+    pkgs.writeShellScriptBin name ''
+      exec ${rd}/bin/rd.sh ${command} "$@"
+    '';
 in
 {
-  config = lib.mkIf headless {
-    programs.hyprland.enable = true;
+  config = lib.mkMerge [
+    (lib.mkIf enabled {
+      environment.systemPackages = [
+        rd
+        (mkRdCommand "rd-start.sh" "start")
+        (mkRdCommand "rd-stop.sh" "stop")
+        (mkRdCommand "rd-status.sh" "status")
+      ];
+    })
 
-    environment.systemPackages = with pkgs; [
-      kitty
-      foot
-    ];
+    (lib.mkIf headless {
+      programs.hyprland.enable = true;
 
-    services.remotedesktop.sessionExecStart = rdStartScript;
-  };
+      environment.systemPackages = with pkgs; [
+        kitty
+        foot
+      ];
+
+      services.remotedesktop.sessionExecStart = rdStartScript;
+    })
+  ];
 }

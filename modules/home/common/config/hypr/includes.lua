@@ -48,7 +48,6 @@ hl.env(
   "PATH",
   table.concat({
     HOME .. "/.local/bin",
-    "/run/wrappers/bin",
     HOME .. "/.nix-profile/bin",
     "/nix/profile/bin",
     HOME .. "/.local/state/nix/profile/bin",

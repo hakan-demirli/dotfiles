@@ -62,30 +62,16 @@ if [ "$IS_REMOTE" -eq 1 ]; then
   MENU_ITEMS+=("back-home")
 fi
 
-LOCAL_HOST="${EMRE_HOME_HOST_ID:-$(hostname)}"
+LOCAL_HOST=$HOSTNAME
+LOCAL_HOST=${LOCAL_HOST%%.*}
 if [[ $LOCAL_HOST != laptop-1 ]] && command -v send-to-laptop > /dev/null 2>&1; then
   MENU_ITEMS+=("laptop-1-inbox")
 fi
 
-if [[ -r $HOME/.ssh/config ]]; then
+if command -v ssh-targets.sh > /dev/null 2>&1; then
   while IFS= read -r host; do
     MENU_ITEMS+=("$host")
-  done < <(awk '$1 == "Host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' "$HOME/.ssh/config")
-fi
-
-if command -v tailscale > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
-  while IFS= read -r peer; do
-    [ -n "$peer" ] || continue
-    MENU_ITEMS+=("$peer")
-  done < <(
-    tailscale status --json 2> /dev/null \
-      | jq -r '(.Peer // {}) | .[] | select(.Online) | .DNSName | rtrimstr(".")' 2> /dev/null \
-      || true
-  )
-fi
-
-if ((${#MENU_ITEMS[@]} > 1)); then
-  mapfile -t MENU_ITEMS < <(printf '%s\n' "${MENU_ITEMS[@]}" | awk '!seen[$0]++')
+  done < <(ssh-targets.sh)
 fi
 
 if ((${#MENU_ITEMS[@]} == 0)); then

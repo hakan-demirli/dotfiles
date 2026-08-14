@@ -22,7 +22,13 @@ fix_remote() {
 
 kill_tunnel() {
   local host pids
-  host=$(grep -P "^Host " ~/.ssh/config 2> /dev/null | awk '{print $2}' | grep -F -v "*" | fzf --height=40% --layout=reverse --border --prompt="Kill SSH for > ")
+
+  if ! command -v ssh-targets.sh > /dev/null 2>&1; then
+    echo "ssh-targets.sh is not installed." >&2
+    return 1
+  fi
+
+  host=$(ssh-targets.sh | fzf --height=40% --layout=reverse --border --prompt="Kill SSH for > ") || return 0
 
   if [[ -z $host ]]; then
     echo "No host selected."
