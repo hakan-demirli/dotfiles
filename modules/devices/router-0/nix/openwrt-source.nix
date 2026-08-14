@@ -1,12 +1,12 @@
 { pkgs }:
 let
-  upstreamRev = "07a5e432c83aa5c5b8ef21caf84fc1d051dfcadc";
+  upstreamRev = "d329a480a0ceb84768b4b2ed53f2f87633926a4d";
 
   src = pkgs.fetchFromGitHub {
     owner = "openwrt";
     repo = "openwrt";
     rev = upstreamRev;
-    hash = "sha256-OcbWmSi2fpZiCgPeR+E87kc4odbtrG7WcgoVRilRZwg=";
+    hash = "sha256-0aBdMMzCjaLIAUK1dwiCPdicalyiFL8C16kqJrufKV4=";
   };
 in
 pkgs.runCommand "openwrt-source-be10000"

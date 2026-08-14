@@ -27,8 +27,9 @@
   };
 
   monitoring = {
-    enabled = false;
+    enabled = true;
     always_on = false;
+    exporters = [ "node" ];
   };
 
   labels = {

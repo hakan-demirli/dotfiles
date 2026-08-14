@@ -5,10 +5,12 @@
 #
 # Reads:
 #   /etc/tailscale/authkey            (0600, from config-overlay)
-#   /etc/config/r01-tailscale         option login_server, option tag
-# Runs at boot AFTER travelmate has brought up wwan. Skips if:
-#   - `tailscale status` shows we're already registered, OR
-#   - /etc/tailscale/authkey is missing (nothing to bootstrap with).
+#   /etc/config/r01-tailscale         option login_server
+# Runs at boot AFTER tailscaled (START=80) and travelmate. Registers only while
+# tailscaled reports NeedsLogin: any other state means the node is enrolled, and
+# re-running `tailscale up` there would reset a manual tag back to tag:bootstrap.
+# No --advertise-tags, so nodes enrol as tag:bootstrap and are promoted by hand
+# with `headscale nodes tag`. See README "Node Promotion".
 # Idempotent: safe to leave enabled forever. Only acts on first successful boot.
 #
 # Suppressed lints:
@@ -31,10 +33,9 @@ start_service() {
 		set -eu
 
 		LOGIN=$(uci -q get r01-tailscale.main.login_server 2>/dev/null || true)
-		TAG=$(uci -q get r01-tailscale.main.tag 2>/dev/null || true)
 
-		if [ -z "$LOGIN" ] || [ -z "$TAG" ]; then
-			logger -t r01-tailscale "r01-tailscale UCI missing login_server or tag. Skipping"
+		if [ -z "$LOGIN" ]; then
+			logger -t r01-tailscale "r01-tailscale UCI missing login_server. Skipping"
 			exit 0
 		fi
 
@@ -43,26 +44,42 @@ start_service() {
 			exit 0
 		fi
 
-		# If already registered, tailscale status returns a peer list.
-		# Grep for "logged out" (fresh) vs a NodeKey line.
-		if tailscale status --json 2>/dev/null | grep -q "\"BackendState\":\"Running\""; then
-			logger -t r01-tailscale "already Running. Nothing to do"
+		# tailscaled settles asynchronously after its own START=80, so poll for a
+		# conclusive state rather than acting on NoState or an unavailable socket.
+		# Starting is transient and always resolves to Running: keep waiting.
+		i=0
+		STATE=
+		while [ "$i" -lt 60 ]; do
+			STATE=$(tailscale status --json 2>/dev/null \
+				| sed -n "s/.*\"BackendState\":[[:space:]]*\"\([^\"]*\)\".*/\1/p" \
+				| head -n1 || true)
+			case "$STATE" in
+			NeedsLogin | NeedsMachineAuth | Stopped | Running)
+				break
+				;;
+			esac
+			i=$((i + 1))
+			sleep 1
+		done
+
+		# Fails closed: anything other than NeedsLogin leaves the node alone.
+		if [ "$STATE" != "NeedsLogin" ]; then
+			logger -t r01-tailscale "backend state ${STATE:-unavailable} is not NeedsLogin. Nothing to do"
 			exit 0
 		fi
 
 		HOST=$(uci -q get system.@system[0].hostname 2>/dev/null || echo "$(cat /proc/sys/kernel/hostname)")
 		AK=$(cat '"$AUTHKEY"')
 
-		logger -t r01-tailscale "registering with $LOGIN as $HOST (tag=$TAG)"
+		logger -t r01-tailscale "registering with $LOGIN as $HOST"
 
 		if tailscale up \
 			--login-server="https://$LOGIN" \
 			--auth-key="$AK" \
 			--hostname="$HOST" \
-			--advertise-tags="$TAG" \
 			>/tmp/tailscale-bootstrap.log 2>&1
 		then
-			logger -t r01-tailscale "registration OK"
+			logger -t r01-tailscale "registration OK as tag:bootstrap. Promote with headscale nodes tag"
 		else
 			logger -t r01-tailscale "registration FAILED. See /tmp/tailscale-bootstrap.log"
 			exit 1
