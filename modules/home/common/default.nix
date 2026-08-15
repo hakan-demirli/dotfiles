@@ -50,6 +50,7 @@ let
     "qmk"
     "QtProject"
     "quantifyself"
+    "quickshell"
     "qutebrowser"
     "repx"
     "rmpc"

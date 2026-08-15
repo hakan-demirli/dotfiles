@@ -1,0 +1,45 @@
+@import "./colors.css";
+
+* {
+  font-family: "{{font-plain}}", "{{font-icon}}";
+  font-size: {{text-body-medium}}px;
+  font-weight: 600;
+  border-radius: {{radius-extra-small}}px;
+}
+
+#window {
+  margin: 0;
+  border: 2px solid;
+  border-color: @outline;
+  border-radius: {{radius-medium}}px;
+  background-color: alpha(@surface-container-high, 0.4);
+  color: @on-surface;
+}
+
+#input {
+  margin: {{space-large}}px;
+  background-color: alpha(@outline, 0.5);
+  border-radius: {{radius-extra-large}}px;
+  border: 2px solid @outline-variant;
+}
+
+#scroll {
+  margin-bottom: {{space-large}}px;
+}
+
+#entry {
+  margin: 0 {{space-large}}px;
+}
+
+#entry:selected {
+  border: none;
+  outline: none;
+}
+
+#entry > box {
+  margin-left: {{space-large}}px;
+}
+
+#entry image {
+  padding-right: {{space-small}}px;
+}

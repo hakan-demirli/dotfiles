@@ -12,6 +12,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("nm-applet --indicator")
   hl.exec_cmd("blueman-applet")
   hl.exec_cmd("waybar")
+  hl.exec_cmd("qs -n")
   hl.exec_cmd("awww-daemon")
   hl.exec_cmd("gtk_applet_script_menu")
   hl.exec_cmd("sh -c 'mkdir -p ~/.local/state && exec auto_refresh >>~/.local/state/auto_refresh.log 2>&1'")
@@ -80,11 +81,11 @@ hl.config({
 
   general = {
     border_size = 2,
-    gaps_in = 3,
-    gaps_out = 3,
+    gaps_in = 4,
+    gaps_out = 4,
     col = {
-      active_border = "rgba(f9deffff)",
-      inactive_border = "rgba(595959aa)",
+      active_border = "rgba(d7baffff)",
+      inactive_border = "rgba(44475aaa)",
     },
     layout = "dwindle",
     extend_border_grab_area = true,
@@ -92,7 +93,7 @@ hl.config({
   },
 
   decoration = {
-    rounding = 5,
+    rounding = 4,
 
     blur = {
       enabled = true,

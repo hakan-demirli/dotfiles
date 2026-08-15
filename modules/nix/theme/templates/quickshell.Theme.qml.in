@@ -1,0 +1,151 @@
+pragma Singleton
+
+import QtQuick
+
+QtObject {
+    readonly property QtObject palette: QtObject {
+        readonly property color m3error: "{{colour-error}}"
+        readonly property color m3errorContainer: "{{colour-error-container}}"
+        readonly property color m3inverseOnSurface: "{{colour-inverse-on-surface}}"
+        readonly property color m3inverseSurface: "{{colour-inverse-surface}}"
+        readonly property color m3onError: "{{colour-on-error}}"
+        readonly property color m3onErrorContainer: "{{colour-on-error-container}}"
+        readonly property color m3onPrimary: "{{colour-on-primary}}"
+        readonly property color m3onPrimaryContainer: "{{colour-on-primary-container}}"
+        readonly property color m3onSecondary: "{{colour-on-secondary}}"
+        readonly property color m3onSecondaryContainer: "{{colour-on-secondary-container}}"
+        readonly property color m3onSuccess: "{{colour-on-success}}"
+        readonly property color m3onSuccessContainer: "{{colour-on-success-container}}"
+        readonly property color m3onSurface: "{{colour-on-surface}}"
+        readonly property color m3onSurfaceVariant: "{{colour-on-surface-variant}}"
+        readonly property color m3onTertiary: "{{colour-on-tertiary}}"
+        readonly property color m3onTertiaryContainer: "{{colour-on-tertiary-container}}"
+        readonly property color m3onWarning: "{{colour-on-warning}}"
+        readonly property color m3onWarningContainer: "{{colour-on-warning-container}}"
+        readonly property color m3outline: "{{colour-outline}}"
+        readonly property color m3outlineVariant: "{{colour-outline-variant}}"
+        readonly property color m3primary: "{{colour-primary}}"
+        readonly property color m3primaryContainer: "{{colour-primary-container}}"
+        readonly property color m3primaryFixed: "{{colour-primary-fixed}}"
+        readonly property color m3primaryFixedDim: "{{colour-primary-fixed-dim}}"
+        readonly property color m3scrim: "{{colour-scrim}}"
+        readonly property color m3secondary: "{{colour-secondary}}"
+        readonly property color m3secondaryContainer: "{{colour-secondary-container}}"
+        readonly property color m3secondaryFixed: "{{colour-secondary-fixed}}"
+        readonly property color m3secondaryFixedDim: "{{colour-secondary-fixed-dim}}"
+        readonly property color m3shadow: "{{colour-shadow}}"
+        readonly property color m3success: "{{colour-success}}"
+        readonly property color m3successContainer: "{{colour-success-container}}"
+        readonly property color m3surface: "{{colour-surface}}"
+        readonly property color m3surfaceBright: "{{colour-surface-bright}}"
+        readonly property color m3surfaceContainer: "{{colour-surface-container}}"
+        readonly property color m3surfaceContainerHigh: "{{colour-surface-container-high}}"
+        readonly property color m3surfaceContainerHighest: "{{colour-surface-container-highest}}"
+        readonly property color m3surfaceContainerLow: "{{colour-surface-container-low}}"
+        readonly property color m3surfaceContainerLowest: "{{colour-surface-container-lowest}}"
+        readonly property color m3surfaceDim: "{{colour-surface-dim}}"
+        readonly property color m3tertiary: "{{colour-tertiary}}"
+        readonly property color m3tertiaryContainer: "{{colour-tertiary-container}}"
+        readonly property color m3tertiaryFixed: "{{colour-tertiary-fixed}}"
+        readonly property color m3tertiaryFixedDim: "{{colour-tertiary-fixed-dim}}"
+        readonly property color m3warning: "{{colour-warning}}"
+        readonly property color m3warningContainer: "{{colour-warning-container}}"
+    }
+
+    readonly property QtObject shape: QtObject {
+        readonly property int extraLarge: {{radius-extra-large}}
+        readonly property int extraSmall: {{radius-extra-small}}
+        readonly property int full: {{radius-full}}
+        readonly property int large: {{radius-large}}
+        readonly property int medium: {{radius-medium}}
+        readonly property int none: {{radius-none}}
+        readonly property int small: {{radius-small}}
+    }
+
+    readonly property QtObject space: QtObject {
+        readonly property int extraLarge: {{space-extra-large}}
+        readonly property int extraSmall: {{space-extra-small}}
+        readonly property int large: {{space-large}}
+        readonly property int medium: {{space-medium}}
+        readonly property int none: {{space-none}}
+        readonly property int small: {{space-small}}
+    }
+
+    readonly property QtObject font: QtObject {
+        readonly property string brand: "{{font-brand}}"
+        readonly property string icon: "{{font-icon}}"
+        readonly property string mono: "{{font-mono}}"
+        readonly property string plain: "{{font-plain}}"
+        readonly property int bodyLargeSize: {{text-body-large}}
+        readonly property int bodyLargeLine: {{text-line-body-large}}
+        readonly property int bodyLargeWeight: {{text-weight-body-large}}
+        readonly property int bodyMediumSize: {{text-body-medium}}
+        readonly property int bodyMediumLine: {{text-line-body-medium}}
+        readonly property int bodyMediumWeight: {{text-weight-body-medium}}
+        readonly property int bodySmallSize: {{text-body-small}}
+        readonly property int bodySmallLine: {{text-line-body-small}}
+        readonly property int bodySmallWeight: {{text-weight-body-small}}
+        readonly property int displayLargeSize: {{text-display-large}}
+        readonly property int displayLargeLine: {{text-line-display-large}}
+        readonly property int displayLargeWeight: {{text-weight-display-large}}
+        readonly property int displayMediumSize: {{text-display-medium}}
+        readonly property int displayMediumLine: {{text-line-display-medium}}
+        readonly property int displayMediumWeight: {{text-weight-display-medium}}
+        readonly property int displaySmallSize: {{text-display-small}}
+        readonly property int displaySmallLine: {{text-line-display-small}}
+        readonly property int displaySmallWeight: {{text-weight-display-small}}
+        readonly property int headlineLargeSize: {{text-headline-large}}
+        readonly property int headlineLargeLine: {{text-line-headline-large}}
+        readonly property int headlineLargeWeight: {{text-weight-headline-large}}
+        readonly property int headlineMediumSize: {{text-headline-medium}}
+        readonly property int headlineMediumLine: {{text-line-headline-medium}}
+        readonly property int headlineMediumWeight: {{text-weight-headline-medium}}
+        readonly property int headlineSmallSize: {{text-headline-small}}
+        readonly property int headlineSmallLine: {{text-line-headline-small}}
+        readonly property int headlineSmallWeight: {{text-weight-headline-small}}
+        readonly property int labelLargeSize: {{text-label-large}}
+        readonly property int labelLargeLine: {{text-line-label-large}}
+        readonly property int labelLargeWeight: {{text-weight-label-large}}
+        readonly property int labelMediumSize: {{text-label-medium}}
+        readonly property int labelMediumLine: {{text-line-label-medium}}
+        readonly property int labelMediumWeight: {{text-weight-label-medium}}
+        readonly property int labelSmallSize: {{text-label-small}}
+        readonly property int labelSmallLine: {{text-line-label-small}}
+        readonly property int labelSmallWeight: {{text-weight-label-small}}
+        readonly property int titleLargeSize: {{text-title-large}}
+        readonly property int titleLargeLine: {{text-line-title-large}}
+        readonly property int titleLargeWeight: {{text-weight-title-large}}
+        readonly property int titleMediumSize: {{text-title-medium}}
+        readonly property int titleMediumLine: {{text-line-title-medium}}
+        readonly property int titleMediumWeight: {{text-weight-title-medium}}
+        readonly property int titleSmallSize: {{text-title-small}}
+        readonly property int titleSmallLine: {{text-line-title-small}}
+        readonly property int titleSmallWeight: {{text-weight-title-small}}
+    }
+
+    readonly property QtObject duration: QtObject {
+        readonly property int extraLong1: {{duration-extra-long1}}
+        readonly property int extraLong2: {{duration-extra-long2}}
+        readonly property int extraLong3: {{duration-extra-long3}}
+        readonly property int extraLong4: {{duration-extra-long4}}
+        readonly property int long1: {{duration-long1}}
+        readonly property int long2: {{duration-long2}}
+        readonly property int long3: {{duration-long3}}
+        readonly property int long4: {{duration-long4}}
+        readonly property int medium1: {{duration-medium1}}
+        readonly property int medium2: {{duration-medium2}}
+        readonly property int medium3: {{duration-medium3}}
+        readonly property int medium4: {{duration-medium4}}
+        readonly property int short1: {{duration-short1}}
+        readonly property int short2: {{duration-short2}}
+        readonly property int short3: {{duration-short3}}
+        readonly property int short4: {{duration-short4}}
+    }
+
+    readonly property QtObject state: QtObject {
+        readonly property real draggedOpacity: {{state-dragged-opacity}}
+        readonly property real focusOpacity: {{state-focus-opacity}}
+        readonly property real hoverOpacity: {{state-hover-opacity}}
+        readonly property real pressedOpacity: {{state-pressed-opacity}}
+    }
+}
