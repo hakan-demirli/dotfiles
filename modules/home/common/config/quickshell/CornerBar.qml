@@ -60,26 +60,6 @@ Item {
     readonly property int brightnessPercent: brightnessMaximum > 0
         ? Math.round(readInteger(brightnessValueFile) * 100 / brightnessMaximum)
         : -1
-    readonly property int batteryPercent: batteryCapacityFile.loaded
-        ? readInteger(batteryCapacityFile)
-        : -1
-    readonly property string batteryStatus: batteryStatusFile.loaded
-        ? batteryStatusFile.text().trim()
-        : ""
-    readonly property bool batteryCharging: batteryStatus === "Charging"
-        || batteryStatus === "Full"
-    readonly property int batteryEnergyNow: readInteger(batteryEnergyNowFile)
-    readonly property int batteryEnergyFull: readInteger(batteryEnergyFullFile)
-    readonly property int batteryPower: readInteger(batteryPowerFile)
-    readonly property int batteryMinutes: batteryPower > 0
-        && (batteryStatus === "Charging" || batteryStatus === "Discharging")
-        ? Math.round((batteryStatus === "Charging"
-            ? Math.max(0, batteryEnergyFull - batteryEnergyNow)
-            : batteryEnergyNow) * 60 / batteryPower)
-        : -1
-    readonly property string batteryTime: batteryMinutes >= 0
-        ? formatDuration(batteryMinutes)
-        : batteryStatus
 
     readonly property int blockSize: thickness - gap * 2
     // Offset of the corner cell, shared by both arms.
@@ -91,12 +71,6 @@ Item {
     function readInteger(file) {
         const value = Number(file.text().trim());
         return Number.isFinite(value) ? value : 0;
-    }
-
-    function formatDuration(totalMinutes) {
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        return hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
     }
 
     function adjustVolume(steps) {
@@ -145,64 +119,11 @@ Item {
         printErrors: false
     }
 
-    FileView {
-        id: batteryCapacityFile
-
-        path: "/sys/class/power_supply/BAT0/capacity"
-        preload: true
-        printErrors: false
-    }
-
-    FileView {
-        id: batteryStatusFile
-
-        path: "/sys/class/power_supply/BAT0/status"
-        preload: true
-        printErrors: false
-    }
-
-    FileView {
-        id: batteryEnergyNowFile
-
-        path: "/sys/class/power_supply/BAT0/energy_now"
-        preload: true
-        printErrors: false
-    }
-
-    FileView {
-        id: batteryEnergyFullFile
-
-        path: "/sys/class/power_supply/BAT0/energy_full"
-        preload: true
-        printErrors: false
-    }
-
-    FileView {
-        id: batteryPowerFile
-
-        path: "/sys/class/power_supply/BAT0/power_now"
-        preload: true
-        printErrors: false
-    }
-
     Timer {
         interval: 250
         repeat: true
         running: true
         onTriggered: brightnessValueFile.reload()
-    }
-
-    Timer {
-        interval: 5000
-        repeat: true
-        running: true
-        onTriggered: {
-            batteryCapacityFile.reload();
-            batteryStatusFile.reload();
-            batteryEnergyNowFile.reload();
-            batteryEnergyFullFile.reload();
-            batteryPowerFile.reload();
-        }
     }
 
     // ------------------------------------------------------------ surface
@@ -237,11 +158,13 @@ Item {
         y: root.corner - root.thickness * 3 + root.gap
         width: root.blockSize
         height: root.blockSize
-        icon: root.batteryCharging ? "\ue1a3" : "\ue1a4"
-        active: root.batteryPercent >= 0
-        level: root.batteryPercent >= 0 ? root.batteryPercent / 100 : -1
-        tooltip: root.batteryPercent >= 0
-            ? `${root.batteryPercent}%\n${root.batteryTime}`
+        icon: BatteryService.charging ? "\ue1a3" : "\ue1a4"
+        active: BatteryService.percentage >= 0
+        level: BatteryService.percentage >= 0
+            ? BatteryService.percentage / 100
+            : -1
+        tooltip: BatteryService.percentage >= 0
+            ? `${BatteryService.percentage}%\n${BatteryService.detail}`
             : "Battery unavailable"
         onActivated: root.menuRequested("battery")
     }

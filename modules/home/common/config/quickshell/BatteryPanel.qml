@@ -1,16 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Io
 
 Item {
     id: root
-
-    readonly property int percentage: capacityFile.loaded
-        ? Number(capacityFile.text().trim())
-        : 0
-    readonly property string status: statusFile.loaded
-        ? statusFile.text().trim()
-        : "Unavailable"
 
     signal requestClose
 
@@ -20,32 +12,6 @@ Item {
 
     Keys.onEscapePressed: requestClose()
 
-    FileView {
-        id: capacityFile
-
-        path: "/sys/class/power_supply/BAT0/capacity"
-        preload: true
-        printErrors: false
-    }
-
-    FileView {
-        id: statusFile
-
-        path: "/sys/class/power_supply/BAT0/status"
-        preload: true
-        printErrors: false
-    }
-
-    Timer {
-        interval: 5000
-        repeat: true
-        running: true
-        onTriggered: {
-            capacityFile.reload();
-            statusFile.reload();
-        }
-    }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.space.large
@@ -54,7 +20,9 @@ Item {
         MenuHeader {
             Layout.fillWidth: true
             title: "Battery"
-            subtitle: `${root.status} - ${SystemActions.powerProfile}`
+            subtitle: SystemActions.powerProfile === "unknown"
+                ? BatteryService.status
+                : `${BatteryService.status} - ${SystemActions.powerProfile}`
             onClose: root.requestClose()
         }
 
@@ -71,7 +39,8 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                height: parent.height * Math.max(0, Math.min(1, root.percentage / 100))
+                height: parent.height
+                    * Math.max(0, Math.min(1, BatteryService.percentage / 100))
                 color: ShellPalette.indicator
 
                 Behavior on height {
@@ -88,7 +57,7 @@ Item {
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.status === "Charging" ? "\ue1a3" : "\ue1a4"
+                    text: BatteryService.charging ? "\ue1a3" : "\ue1a4"
                     color: ShellPalette.foreground
                     font.family: "Material Symbols Rounded"
                     font.pixelSize: 38
@@ -96,7 +65,7 @@ Item {
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: `${root.percentage}%`
+                    text: `${BatteryService.percentage}%`
                     color: ShellPalette.foreground
                     font.family: Theme.font.mono
                     font.pixelSize: Theme.font.headlineMediumSize
@@ -105,7 +74,7 @@ Item {
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.status
+                    text: BatteryService.detail
                     color: ShellPalette.foregroundMuted
                     font.family: Theme.font.plain
                     font.pixelSize: Theme.font.bodyMediumSize

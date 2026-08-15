@@ -91,11 +91,11 @@ Item {
 
             ControlTile {
                 Layout.fillWidth: true
-                icon: "\ue1a4"
+                icon: BatteryService.charging ? "\ue1a3" : "\ue1a4"
                 title: "Battery"
-                subtitle: SystemActions.fanRpm > 0
-                    ? `${SystemActions.powerProfile} - ${SystemActions.fanRpm} RPM`
-                    : SystemActions.powerProfile
+                subtitle: BatteryService.percentage >= 0
+                    ? `${BatteryService.percentage}% - ${BatteryService.detail}`
+                    : "Unavailable"
                 onActivated: root.requestMenu("battery")
             }
 
