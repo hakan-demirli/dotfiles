@@ -96,7 +96,7 @@ Singleton {
     PollingCommand {
         id: recordingStatus
 
-        command: ["screen-record", "waybar"]
+        command: ["screen-record", "json"]
         interval: 1000
         onOutput: text => {
             const status = root.parseJson(text);
@@ -108,7 +108,7 @@ Singleton {
     PollingCommand {
         id: powerStatus
 
-        command: ["hp-power", "waybar"]
+        command: ["hp-power", "json"]
         interval: 5000
         onOutput: text => {
             const status = root.parseJson(text);
@@ -121,7 +121,7 @@ Singleton {
     PollingCommand {
         id: refreshStatus
 
-        command: ["auto_refresh", "waybar"]
+        command: ["auto_refresh", "json"]
         interval: 2000
         onOutput: text => {
             const status = root.parseJson(text);

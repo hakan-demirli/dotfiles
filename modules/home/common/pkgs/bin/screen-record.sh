@@ -19,14 +19,9 @@ notify() {
     "$1" "${2:-}" 2> /dev/null || true
 }
 
-signal_waybar() {
-  pkill -RTMIN+7 -x waybar 2> /dev/null || true
-}
-
 set_status() {
   mkdir -p "$STATE_DIR"
   printf '%s\n' "$1" > "$STATUS_FILE"
-  signal_waybar
 }
 
 read_status() {
@@ -96,13 +91,11 @@ start_capture() {
     set_status "selecting"
     if ! selection="$(slurp)"; then
       clear_state
-      signal_waybar
       return 0
     fi
 
     if [[ -z $selection ]]; then
       clear_state
-      signal_waybar
       return 0
     fi
   fi
@@ -120,7 +113,6 @@ start_capture() {
   systemctl --user reset-failed "$UNIT" > /dev/null 2>&1 || true
   if ! systemctl --user start --no-block "$UNIT"; then
     clear_state
-    signal_waybar
     notify "Screen recording failed" "Could not start $UNIT"
     return 1
   fi
@@ -136,7 +128,6 @@ stop_capture() {
     systemctl --user stop --no-block "$UNIT"
   else
     clear_state
-    signal_waybar
   fi
 }
 
@@ -253,7 +244,6 @@ finish_capture() {
   fi
 
   clear_state
-  signal_waybar
 }
 
 format_duration() {
@@ -265,7 +255,7 @@ format_duration() {
   fi
 }
 
-waybar_status() {
+json_status() {
   local status started now elapsed duration capture tooltip text class
   status="$(read_status)"
 
@@ -340,12 +330,12 @@ case "${1:-toggle}" in
   finish)
     finish_capture
     ;;
-  waybar | status)
-    waybar_status
+  json | status | waybar)
+    json_status
     ;;
   *)
     printf 'Usage: %s [start|stop|toggle] [output|region]\n' "$0" >&2
-    printf '       %s [waybar|status]\n' "$0" >&2
+    printf '       %s [json|status|waybar]\n' "$0" >&2
     exit 2
     ;;
 esac

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import contextlib
 import fcntl
 import json
 import os
@@ -52,11 +51,6 @@ def write_text(path: str, content: str) -> None:
             f.write(content)
     except OSError as e:
         log(f"write {path}: {e}")
-
-
-def signal_waybar() -> None:
-    with contextlib.suppress(Exception):
-        subprocess.run(["pkill", "-RTMIN+6", "waybar"], check=False, timeout=2)
 
 
 def hyprctl_json(*args: str) -> object | None:
@@ -190,7 +184,6 @@ def apply_transform(transform: int, *, force: bool = False) -> None:
     _current_transform = transform
     _last_apply_t = now
     write_text(ORIENT_STATE_FILE, str(transform))
-    signal_waybar()
     log(f"transform -> {transform} (monitor={mon_name})")
 
 
@@ -209,7 +202,6 @@ def on_sigusr1(_signum, _frame):
     new_locked = not is_locked()
     write_text(LOCK_STATE_FILE, "1" if new_locked else "0")
     log(f"rotation lock -> {'on' if new_locked else 'off'}")
-    signal_waybar()
     if not new_locked and _current_orientation in _ORIENT_TO_TRANSFORM:
         apply_transform(_ORIENT_TO_TRANSFORM[_current_orientation])
 
@@ -241,7 +233,6 @@ def run() -> int:
     if not os.path.exists(LOCK_STATE_FILE):
         write_text(LOCK_STATE_FILE, "0")
     log(f"initial rotation lock = {'on' if is_locked() else 'off'}")
-    signal_waybar()
 
     while True:
         log(f"starting sensor source: {' '.join(cmd)}")

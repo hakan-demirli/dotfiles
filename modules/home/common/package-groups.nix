@@ -146,7 +146,6 @@ rec {
       udiskie
       umu-launcher
       vulkan-tools
-      waybar
       wayland-utils
       wayscriber
       winetricks
@@ -159,7 +158,6 @@ rec {
       (pickNur "youtube_sync")
       (pickNur "riveroftime")
       (pickNur "gtk_applet")
-      (pickNur "waybar_timer")
       (pickNur "nix-treemap")
       (pickNur "umu-fzf")
     ];

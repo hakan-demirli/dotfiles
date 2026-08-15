@@ -18,7 +18,6 @@ do
   end
 end
 
-hl.layer_rule({ name = "blur-waybar", match = { namespace = "waybar" }, blur = true })
 hl.layer_rule({ name = "blur-tofi", match = { namespace = "tofi" }, blur = true })
 hl.layer_rule({ name = "no-anim-hyprpicker", match = { namespace = "hyprpicker" }, no_anim = true })
 hl.layer_rule({ name = "no-anim-selection", match = { namespace = "selection" }, no_anim = true })
@@ -172,7 +171,7 @@ hl.bind("ALT + COMMA", hl.dsp.focus({ workspace = 2 }))
 hl.bind("ALT + PERIOD", hl.dsp.focus({ workspace = 3 }))
 hl.bind("ALT + SLASH", hl.dsp.focus({ workspace = 4 }))
 
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("pkill waybar || waybar"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("qs ipc --any-display call shell toggleBarVisibility"))
 hl.bind(mainMod .. " + Tab", hl.dsp.focus({ last = true }))
 
 for i = 1, 9 do
