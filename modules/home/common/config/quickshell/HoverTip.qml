@@ -10,7 +10,7 @@ Rectangle {
     readonly property bool shown: requested && delay.ready && text.length > 0
 
     width: Math.min(label.implicitWidth + 16, 138)
-    height: 26
+    height: Math.max(26, label.implicitHeight + 12)
     x: placement === "top"
         ? (parent.width - width) / 2
         : -width - 6
@@ -45,7 +45,7 @@ Rectangle {
 
         property bool ready: false
 
-        interval: 2000
+        interval: 1200
         onTriggered: ready = true
     }
 

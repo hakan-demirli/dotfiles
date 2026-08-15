@@ -3,7 +3,7 @@
 |          |                                                         |
 | -------- | ------------------------------------------------------- |
 | Distro   | NixOS                                                   |
-| Desktop  | Hyprland + Waybar                                       |
+| Desktop  | Hyprland + Quickshell                                   |
 | Editor   | Neovim + Tmux                                           |
 | Files    | Yazi                                                    |
 | Keyboard | [TBK Mini](https://github.com/Bastardkb/TBK-Mini) + QMK |

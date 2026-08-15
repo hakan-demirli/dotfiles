@@ -6,6 +6,7 @@ ShellRoot {
     id: shell
 
     property string activeMenu: ""
+    property bool barVisible: true
 
     function toggleMenu(menu) {
         activeMenu = activeMenu === menu ? "" : menu;
@@ -14,12 +15,13 @@ ShellRoot {
     PanelWindow {
         id: panel
 
-        // Arm thickness, matching the current Waybar width.
+        // Arm thickness shared by the vertical and horizontal sections.
         property int thickness: 47
         // Four complete cells per arm is just under one sixth of this screen.
         property int armLength: thickness * 4
 
         screen: Quickshell.screens[0]
+        visible: shell.barVisible
 
         anchors.bottom: true
         anchors.right: true
@@ -112,6 +114,12 @@ ShellRoot {
 
         function close(): void {
             shell.activeMenu = "";
+        }
+
+        function toggleBarVisibility(): void {
+            shell.barVisible = !shell.barVisible;
+            if (!shell.barVisible)
+                shell.activeMenu = "";
         }
     }
 }
