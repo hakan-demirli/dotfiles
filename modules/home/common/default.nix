@@ -64,7 +64,6 @@ let
     "transmission"
     "vim"
     "wavemon"
-    "waybar"
     "wayscriber"
     "wgetrc"
     "wofi"

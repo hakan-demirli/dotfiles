@@ -47,7 +47,6 @@ pkgs.runCommand "device-lock-cli"
     rotation-lock-toggle.sh on
     test "$(cat "$XDG_RUNTIME_DIR/orientation_lock")" = 1
     test "$(rotation-lock-toggle.sh status)" = true
-    grep -qx -- '-RTMIN+6 waybar' "$MOCK_STATE/signals"
     grep -q 'Rotation locked.*Screen will not auto-rotate' "$MOCK_STATE/notifications"
 
     touch "$MOCK_STATE/orientation-watcher"

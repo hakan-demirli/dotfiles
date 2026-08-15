@@ -51,9 +51,6 @@ read_state() {
 write_state() {
   mkdir -p "$STATE_DIR"
   printf '%s' "$1" > "$LOCK_FILE"
-  if [[ $MODE == rotation ]]; then
-    pkill -RTMIN+6 waybar 2> /dev/null || true
-  fi
 }
 
 watcher_running() {

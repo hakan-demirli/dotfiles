@@ -250,7 +250,7 @@ read_fan_rpm() {
   printf '%s' unknown
 }
 
-cmd_waybar() {
+cmd_json() {
   local mode label rpm
   mode=$(read_applied_mode)
   rpm=$(read_fan_rpm)
@@ -508,11 +508,12 @@ cmd_monitor() {
 
 cmd_help() {
   cat << 'EOF'
-usage: hp-power {status|turbo|balanced|silent|afan|hwp|probe|monitor|help}
+usage: hp-power {status|json|turbo|balanced|silent|afan|hwp|probe|monitor|help}
 
 Manual override. No daemons, no auto. What you set stays set until next call or reboot.
 
   status                  current state
+  json                    machine-readable power profile and fan state
   turbo      [sudo]       PL=37/95W perf perf perf  AFAN=0x00 HWP=0x37 (~5.5GHz)
   balanced   [sudo]       PL=28/55W perf perf bal   AFAN=0x44 HWP=0x1a (~2.6GHz)
   silent     [sudo]       PL=15/25W save power cool AFAN=0x88 HWP=0x13 (~1.9GHz)
@@ -544,7 +545,7 @@ EOF
 
 case "${1:-status}" in
   status) cmd_status ;;
-  waybar) cmd_waybar ;;
+  json | waybar) cmd_json ;;
   turbo | t) cmd_turbo ;;
   balanced | b) cmd_balanced ;;
   silent | s | battery | bat) cmd_silent ;;

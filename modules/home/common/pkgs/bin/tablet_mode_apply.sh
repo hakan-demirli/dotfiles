@@ -15,14 +15,8 @@ notify() {
     "$1" "${2:-}" 2> /dev/null || true
 }
 
-signal_waybar() {
-  pkill -RTMIN+5 waybar 2> /dev/null || true
-  pkill -RTMIN+6 waybar 2> /dev/null || true
-}
-
 set_wvkbd_visible() {
   echo "$1" > "$WVKBD_VIS_FILE"
-  signal_waybar
 }
 
 ensure_wvkbd_running() {
@@ -65,7 +59,6 @@ toggle_wvkbd() {
 apply_on() {
   log "entering tablet mode"
   echo on > "$STATE_FILE"
-  signal_waybar
   notify "Tablet mode" "On"
 }
 
@@ -73,7 +66,6 @@ apply_off() {
   log "leaving tablet mode"
   hide_wvkbd
   echo off > "$STATE_FILE"
-  signal_waybar
   notify "Laptop mode" "On"
 }
 

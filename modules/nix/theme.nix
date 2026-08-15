@@ -36,7 +36,6 @@ let
   paletteConsumers = [
     "anyrun"
     "swaync"
-    "waybar"
     "wofi"
   ];
 
@@ -261,10 +260,6 @@ in
                 python3 ${./theme/coverage.py} \
                   ${pkgs.swaynotificationcenter}/etc/xdg/swaync/style.css \
                   "$src/${configRoot}/swaync/style.css"
-
-                python3 ${./theme/waybar-coverage.py} \
-                  "$src/${configRoot}/waybar/config" \
-                  "$src/${configRoot}/waybar/style.css"
 
                 touch "$out"
               ''

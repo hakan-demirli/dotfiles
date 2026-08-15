@@ -64,7 +64,7 @@ def parse_args() -> argparse.Namespace:
         "command",
         nargs="?",
         default="daemon",
-        choices=("daemon", *POLICIES, "status", "waybar"),
+        choices=("daemon", *POLICIES, "status", "json", "waybar"),
         help="Run the daemon, select a policy, or print status (default: daemon).",
     )
     parser.add_argument(
@@ -435,7 +435,7 @@ def print_status(args: argparse.Namespace) -> None:
         print(f"Power detection : {status.power_error}")
 
 
-def print_waybar(args: argparse.Namespace) -> None:
+def print_json(args: argparse.Namespace) -> None:
     try:
         status = refresh_status(args)
     except AutoRefreshError as e:
@@ -542,8 +542,8 @@ def main() -> int:
         LOG.error("--interval must be greater than zero")
         return 2
 
-    if args.command == "waybar":
-        print_waybar(args)
+    if args.command in ("json", "waybar"):
+        print_json(args)
         return 0
 
     if args.command == "status":
