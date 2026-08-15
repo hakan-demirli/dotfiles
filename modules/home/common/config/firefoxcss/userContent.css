@@ -57,7 +57,7 @@
 
 @-moz-document regexp(".+\.pdf$") {
   .pdfViewer .page {
-    background: #38383d !important;
+    background: #373845 !important;
   }
   .loadingIcon + .canvasWrapper {
     visibility: hidden;
@@ -65,7 +65,7 @@
 }
 @-moz-document regexp("^(?!.*\\.pdf\\?n).*") {
   #sidebarContainer > #sidebarContent > #thumbnailView {
-    --sidebaritem-bg-color: #38383d;
+    --sidebaritem-bg-color: #373845;
   }
 
   #viewerContainer > #viewer .page > .canvasWrapper > canvas {

@@ -7,6 +7,8 @@
   ...
 }:
 let
+  theme = import ../theme;
+
   mkRawGVariant = rawString: {
     _type = "gvariant";
     type = "s";
@@ -44,7 +46,7 @@ in
       enable = true;
       name = "Dracula-cursors";
       package = pkgs.dracula-theme;
-      size = 10;
+      size = 24;
     };
   };
 
@@ -56,7 +58,48 @@ in
           x = 6;
           y = 6;
         };
-        font.size = 11.0;
+
+        font = {
+          normal.family = theme.font.family.mono;
+          size = 11.0;
+        };
+
+        colors = {
+          primary = {
+            background = theme.dracula.background;
+            foreground = theme.dracula.foreground;
+          };
+          cursor = {
+            text = theme.dracula.background;
+            cursor = theme.dracula.foreground;
+          };
+          selection = {
+            text = theme.dracula.foreground;
+            background = theme.dracula.selection;
+          };
+          normal = {
+            inherit (theme.ansi)
+              black
+              red
+              green
+              yellow
+              blue
+              magenta
+              cyan
+              white
+              ;
+          };
+          bright = {
+            black = theme.ansi.brightBlack;
+            red = theme.ansi.brightRed;
+            green = theme.ansi.brightGreen;
+            yellow = theme.ansi.brightYellow;
+            blue = theme.ansi.brightBlue;
+            magenta = theme.ansi.brightMagenta;
+            cyan = theme.ansi.brightCyan;
+            white = theme.ansi.brightWhite;
+          };
+        };
       };
     };
 
@@ -78,8 +121,15 @@ in
 
   targets.genericLinux.enable = true;
 
+  fonts.fontconfig.enable = true;
+
   gtk = {
     enable = true;
+    font = {
+      package = pkgs.roboto;
+      name = theme.font.family.plain;
+      size = theme.font.scale.bodyMedium.size;
+    };
     theme = {
       package = pkgs.dracula-theme;
       name = "Dracula";
@@ -91,7 +141,7 @@ in
     cursorTheme = {
       name = "Dracula-cursors";
       package = pkgs.dracula-theme;
-      size = 10;
+      size = 24;
     };
     gtk4 = {
       inherit (config.gtk) theme;
@@ -129,11 +179,6 @@ in
   xdg = {
     dataFile.applications = lib.mkIf (builtins.pathExists ../config/desktop_files) {
       source = ../config/desktop_files;
-      recursive = true;
-    };
-
-    dataFile.fonts = lib.mkIf (builtins.pathExists ../config/fonts) {
-      source = ../config/fonts;
       recursive = true;
     };
 

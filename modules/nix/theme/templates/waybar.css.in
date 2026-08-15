@@ -1,0 +1,336 @@
+@import "./colors.css";
+
+* {
+  background: transparent;
+  font-family: "{{font-plain}}", "{{font-icon}}";
+  font-size: {{text-label-medium}}px;
+  color: @on-surface;
+  margin: 0;
+}
+
+window {
+  background: transparent;
+  border-radius: {{radius-medium}}px;
+}
+
+#tray menu,
+tooltip {
+  background: @surface-container-high;
+  color: @on-surface;
+  border-radius: {{radius-medium}}px;
+}
+
+#scroll,
+#clock,
+#hardware,
+#scripts,
+#custom-weather,
+#custom-timer,
+#backlight,
+#batteries,
+#battery-power,
+#pulseaudio,
+#pulseaudio#mic,
+#workspaces,
+#custom-notification,
+#custom-refresh-rate,
+#custom-screen-record,
+#custom-power,
+#custom-osk,
+#memory,
+#tray {
+  background: alpha(@surface-container-high, 0.8);
+  border-radius: {{radius-small}}px;
+  padding: 1px;
+  margin-right: 1px;
+}
+
+#custom-osk {
+  padding: {{space-small}}px 0;
+  margin-top: 2px;
+  margin-bottom: {{space-extra-small}}px;
+  font-size: {{text-headline-small}}px;
+}
+
+#custom-osk.osk-on {
+  color: @success;
+}
+
+#custom-osk.osk-off {
+  color: @on-surface;
+}
+
+#custom-osk.osk-hidden {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  font-size: 0;
+}
+
+#tray {
+  padding: 0 {{space-extra-small}}px 0 {{space-extra-small}}px;
+}
+
+/* Separator between module groups. It carries no content, so it must not
+   contribute width of its own. */
+#custom-left-arrow-dark {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+#workspaces button {
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  color: shade(@surface-container-high, 0.8);
+}
+
+#workspaces button.urgent {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+#workspaces button.active {
+  background: shade(alpha(@on-surface, 0.2), 0.8);
+  color: shade(@on-surface, 0.9);
+  border-radius: {{radius-small}}px;
+}
+
+#cpu,
+#clock,
+#network,
+#custom-cputemp,
+#custom-colorpicker,
+#hyprland-submap,
+#idle_inhibitor,
+#custom-updates,
+#gamemode,
+#custom-github,
+#custom-refresh-rate,
+#custom-power,
+#custom-camera,
+#custom-notifications,
+#custom-screen-record,
+#custom-batterysaver,
+#bluetooth,
+#disk,
+#memory,
+#pulseaudio,
+#pulseaudio.mic,
+#backlight {
+  padding: 0 {{space-extra-small}}px 0 {{space-extra-small}}px;
+}
+
+#idle_inhibitor,
+#pulseaudio,
+#pulseaudio.mic {
+  color: @tertiary;
+}
+
+#backlight {
+  color: @warning;
+}
+
+#memory {
+  color: shade(@primary, 0.8);
+}
+
+#disk {
+  color: shade(@tertiary, 0.8);
+}
+
+#cpu {
+  color: shade(@success, 0.8);
+}
+
+#custom-batterysaver.powersave {
+  color: @success;
+}
+
+#custom-batterysaver.default {
+  color: @on-surface;
+}
+
+#custom-batterysaver.performance {
+  color: @error;
+}
+
+#network {
+  color: @success;
+}
+
+#network.disabled,
+#network.disconnected {
+  color: @error;
+}
+
+@keyframes blink {
+  to {
+    background-color: alpha(@error, 0.6);
+    color: @on-surface;
+  }
+}
+
+@keyframes blink-blue {
+  to {
+    background-color: alpha(@tertiary, 0.6);
+    color: @on-surface;
+  }
+}
+
+#battery.warning:not(.charging),
+#battery.critical:not(.charging) {
+  animation-name: blink;
+  animation-duration: {{duration-extra-long4}}ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#bluetooth.discoverable,
+#bluetooth.discovering,
+#bluetooth.pairable {
+  animation-name: blink-blue;
+  animation-duration: {{duration-extra-long4}}ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#bluetooth.connected {
+  background: shade(alpha(@on-surface, 0.1), 0.8);
+  border-radius: {{radius-small}}px;
+}
+
+#batteries {
+  margin-right: 0;
+  border-radius: {{radius-small}}px 0px 0px {{radius-small}}px;
+}
+
+#custom-timer.active {
+  background-color: shade(@error, 0.7);
+}
+
+#custom-screen-record.idle {
+  color: @on-surface;
+}
+
+#custom-screen-record.selecting,
+#custom-screen-record.starting,
+#custom-screen-record.stopping,
+#custom-screen-record.copying {
+  color: @warning;
+}
+
+#custom-screen-record.recording {
+  color: @error;
+  animation-name: blink;
+  animation-duration: {{duration-extra-long4}}ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#clock.h-m {
+  font-size: {{text-headline-small}}px;
+  font-weight: bold;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Shared 32px control unit: rows 1x, menu width 4x, padding 1/2x, radius 1/4x. */
+#custom-notification,
+#custom-power,
+#custom-refresh-rate,
+#custom-screen-record,
+menu.touch-menu menuitem {
+  min-height: 32px;
+}
+
+#custom-power {
+  font-size: {{text-label-large}}px;
+}
+
+#custom-refresh-rate.auto {
+  color: @on-surface;
+}
+
+#custom-refresh-rate.manual-120,
+#custom-refresh-rate.manual-48 {
+  color: @warning;
+}
+
+#battery,
+#custom-hp-power {
+  background: transparent;
+  margin: 0;
+}
+
+#custom-hp-power {
+  padding: 0 2px 0 0;
+}
+
+#custom-hp-power.turbo {
+  color: @primary;
+}
+
+#custom-hp-power.balanced {
+  color: @tertiary;
+}
+
+#custom-hp-power.silent {
+  color: @on-surface;
+}
+
+#custom-hp-power.unknown {
+  color: @outline;
+}
+
+#custom-refresh-rate.error {
+  color: @error;
+}
+
+#custom-refresh-rate.hidden {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  font-size: 0;
+}
+
+menu {
+  border-radius: {{radius-small}}px;
+  background: @surface-container-high;
+  color: @on-surface;
+}
+
+menuitem {
+  border-radius: {{radius-large}}px;
+}
+
+menu.touch-menu {
+  padding: {{space-extra-small}}px;
+}
+
+menu.touch-menu menuitem {
+  min-width: 128px;
+  padding: 0 {{space-large}}px;
+  border-radius: {{radius-small}}px;
+}
+
+menu.touch-menu menuitem label {
+  font-size: {{text-title-large}}px;
+  font-weight: 600;
+}
+
+menu.touch-menu menuitem:hover {
+  background: @outline-variant;
+}

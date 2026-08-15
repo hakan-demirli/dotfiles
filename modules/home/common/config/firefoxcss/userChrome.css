@@ -37,8 +37,8 @@
 
 tooltip {
   -moz-appearance: none !important;
-  background: #232323 !important;
-  color: #ededed;
+  background: #1d1f2b !important;
+  color: #f8f8f2;
 }
 
 #urlbar[usertyping] .urlbarView-row:not([type]):first-child,

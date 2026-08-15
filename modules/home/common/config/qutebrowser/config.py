@@ -33,11 +33,11 @@ c.colors.webpage.darkmode.algorithm = "lightness-cielab"
 c.colors.webpage.darkmode.threshold.text = 150
 c.colors.webpage.darkmode.threshold.background = 100
 
-selected_tab_color = "#260f2e"
+selected_tab_color = "#323440"
 c.colors.tabs.even.bg = "black"
 c.colors.tabs.odd.bg = "black"
-c.colors.tabs.pinned.even.bg = "#080d2b"
-c.colors.tabs.pinned.odd.bg = "#080d2b"
+c.colors.tabs.pinned.even.bg = "#1d1f2b"
+c.colors.tabs.pinned.odd.bg = "#1d1f2b"
 c.colors.tabs.selected.odd.bg = selected_tab_color
 c.colors.tabs.selected.even.bg = selected_tab_color
 c.colors.tabs.pinned.selected.odd.bg = selected_tab_color

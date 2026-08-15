@@ -1,0 +1,63 @@
+@import "./colors.css";
+
+* {
+  font-family: "{{font-plain}}", "{{font-icon}}";
+  color: @on-surface;
+}
+
+#window {
+  background-color: transparent;
+}
+
+box#main {
+  background-color: @surface-container-high;
+  border: 1px solid @outline-variant;
+  border-radius: {{radius-extra-large}}px;
+  padding: {{space-small}}px;
+}
+
+#entry {
+  background-color: @surface-container-highest;
+  border: none;
+  border-radius: {{radius-full}}px;
+  padding: {{space-medium}}px {{space-large}}px;
+  margin: {{space-extra-small}}px;
+  font-size: {{text-body-large}}px;
+  caret-color: @primary;
+}
+
+list#main,
+list#plugin {
+  background-color: transparent;
+}
+
+/* Material 3 two-line list item. Height comes from symmetric padding rather
+   than a minimum, so the space above and below the text is always equal. */
+#match {
+  padding: {{space-medium}}px {{space-large}}px;
+  margin: 0 {{space-extra-small}}px;
+  border-radius: {{radius-large}}px;
+}
+
+#match:hover {
+  background-color: alpha(@on-surface, 0.08);
+}
+
+#match:selected {
+  background-color: alpha(@on-surface, 0.12);
+}
+
+label#match-title {
+  font-size: {{text-body-large}}px;
+  color: @on-surface;
+}
+
+label#match-desc {
+  font-size: {{text-body-medium}}px;
+  color: @on-surface-variant;
+}
+
+label#plugin {
+  font-size: {{text-label-large}}px;
+  color: @outline;
+}

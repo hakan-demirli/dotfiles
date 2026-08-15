@@ -125,12 +125,15 @@ rec {
       mesa-demos
       moonlight-qt
       mpv
+      nerd-fonts.symbols-only
       networkmanagerapplet
       nwg-displays
       pavucontrol
       playerctl
       pulseaudio
       qalculate-qt
+      quickshell
+      roboto
       sioyek
       slurp
       sunshine

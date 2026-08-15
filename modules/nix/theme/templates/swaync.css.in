@@ -1,0 +1,585 @@
+@import "./colors.css";
+
+/* Written against the element tree that SwayNotificationCenter 0.12.6
+   documents in its own stylesheet. The tree is
+     .notification-row > .notification-background > .notification
+       > .notification-default-action > .notification-content
+         > .image | .app-icon | .text-box > .summary | .time | .body
+   and alternative actions live in .notification-alt-actions
+   > .notification-action > button. */
+
+/* ---------------------------------------------------------------- shell */
+
+/* notificationwindow and blankwindow are GTK widget type names for the
+   toplevel surfaces, distinct from the .blank-window style class. */
+notificationwindow,
+blankwindow,
+.blank-window,
+.floating-notifications,
+.control-center-list,
+.notification-group-buttons {
+  background: transparent;
+}
+
+.control-center {
+  background: @surface-container;
+  color: @on-surface;
+  border: 1px solid @outline-variant;
+  border-radius: {{radius-extra-large}}px;
+  padding: {{space-extra-small}}px;
+}
+
+/* Placeholder shown when there is nothing to display. */
+.control-center-list-placeholder {
+  color: @on-surface-variant;
+  opacity: 1;
+}
+
+.floating-notifications .notification {
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------- notification */
+
+.notification-row {
+  background: none;
+  outline: none;
+}
+
+.notification-row:focus,
+.notification-row:hover {
+  background: transparent;
+}
+
+/* The wrapper that provides the gap around each card. */
+.notification-background {
+  padding: {{space-extra-small}}px {{space-small}}px;
+}
+
+/* The card itself. */
+.notification-background .notification {
+  background: @surface-container-high;
+  border: 1px solid @outline-variant;
+  border-radius: {{radius-large}}px;
+  padding: 0;
+  transition: background {{duration-short4}}ms {{easing-standard}};
+}
+
+/* Urgency. Material 3 reserves the error role for exactly this. */
+.notification-background .notification.low {
+  border-color: @outline-variant;
+}
+
+.notification-background .notification.normal {
+  border-color: @outline-variant;
+}
+
+.notification-background .notification.critical {
+  background: @error-container;
+  border-color: @error;
+}
+
+.notification-background .notification.critical .summary,
+.notification-background .notification.critical .body,
+.notification-background .notification.critical .time {
+  color: @on-error-container;
+}
+
+.notification-default-action {
+  padding: {{space-small}}px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: @on-surface;
+  border-radius: {{radius-large}}px;
+  transition: background {{duration-short4}}ms {{easing-standard}};
+}
+
+.notification-default-action:hover {
+  background: alpha(@on-surface, 0.08);
+}
+
+/* Square off the bottom when alternative actions are shown below. */
+.notification-default-action:not(:only-child) {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.notification-content {
+  background: transparent;
+  border-radius: {{radius-large}}px;
+  padding: 0;
+}
+
+/* GTK 4 applies a 50% opacity filter to these labels by default. */
+.notification-content .text-box label {
+  filter: none;
+}
+
+.summary {
+  font-size: {{text-title-medium}}px;
+  font-weight: bold;
+  background: transparent;
+  color: @on-surface;
+  text-shadow: none;
+}
+
+.time {
+  font-size: {{text-label-large}}px;
+  font-weight: normal;
+  background: transparent;
+  color: @on-surface-variant;
+  text-shadow: none;
+  margin-right: {{space-large}}px;
+}
+
+.body {
+  font-size: {{text-body-medium}}px;
+  font-weight: normal;
+  background: transparent;
+  color: @on-surface-variant;
+  text-shadow: none;
+}
+
+.notification-content .image {
+  border-radius: {{radius-full}}px;
+  margin: {{space-extra-small}}px;
+}
+
+.notification-content .app-icon {
+  margin: {{space-extra-small}}px;
+}
+
+.notification-content progressbar {
+  margin-top: {{space-extra-small}}px;
+}
+
+.notification-content progressbar trough {
+  background: @surface-container-highest;
+  border-radius: {{radius-full}}px;
+}
+
+.notification-content progressbar progress {
+  background: @primary;
+  border-radius: {{radius-full}}px;
+}
+
+.body-image {
+  margin-top: {{space-extra-small}}px;
+  background-color: transparent;
+  border-radius: {{radius-medium}}px;
+}
+
+/* ------------------------------------------------------- close button */
+
+.close-button {
+  background: @surface-container-highest;
+  color: @on-surface;
+  text-shadow: none;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: {{radius-full}}px;
+  margin-top: {{space-small}}px;
+  margin-right: {{space-small}}px;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.close-button:hover {
+  background: @outline;
+  box-shadow: none;
+  border: none;
+  transition: background {{duration-short3}}ms {{easing-standard}};
+}
+
+/* ------------------------------------------------------------ actions */
+
+.notification-alt-actions {
+  background: none;
+  padding: {{space-extra-small}}px;
+  border-bottom-left-radius: {{radius-large}}px;
+  border-bottom-right-radius: {{radius-large}}px;
+}
+
+/* The container carries only spacing; the button is the painted element. */
+.notification-action {
+  margin: {{space-extra-small}}px;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.notification-action > button,
+.notification-action button {
+  background: @surface-container-highest;
+  color: @on-surface;
+  border: none;
+  box-shadow: none;
+  border-radius: {{radius-full}}px;
+  padding: {{space-small}}px {{space-large}}px;
+  font-size: {{text-label-large}}px;
+}
+
+.notification-action:hover,
+.notification-action > button:hover,
+.notification-action button:hover {
+  background: alpha(@primary, 0.24);
+}
+
+/* ------------------------------------------------------- inline reply */
+
+.inline-reply {
+  margin-top: {{space-extra-small}}px;
+}
+
+.inline-reply-entry {
+  background: @surface-container-highest;
+  color: @on-surface;
+  caret-color: @primary;
+  border: 1px solid @outline-variant;
+  border-radius: {{radius-medium}}px;
+}
+
+.inline-reply-button {
+  margin-left: {{space-extra-small}}px;
+  background: @surface-container-highest;
+  color: @on-surface;
+  border: none;
+  border-radius: {{radius-full}}px;
+  padding: {{space-small}}px {{space-large}}px;
+}
+
+.inline-reply-button:hover {
+  background: alpha(@primary, 0.24);
+}
+
+.inline-reply-button:disabled {
+  background: alpha(@on-surface, 0.1);
+  color: alpha(@on-surface, 0.38);
+  border: none;
+}
+
+/* ------------------------------------------------------------- groups */
+
+.notification-group {
+  transition: opacity {{duration-medium4}}ms {{easing-standard}};
+  border-radius: {{radius-large}}px;
+}
+
+.notification-group:focus {
+  background: alpha(@on-surface, 0.08);
+}
+
+.notification-group.low,
+.notification-group.normal {
+  background: transparent;
+}
+
+.notification-group.critical {
+  background: alpha(@error, 0.12);
+}
+
+.notification-group-headers,
+.notification-group-buttons {
+  margin: 0 {{space-large}}px;
+  color: @on-surface-variant;
+}
+
+.notification-group-header {
+  color: @on-surface-variant;
+  font-size: {{text-label-large}}px;
+}
+
+.notification-group-icon {
+  color: @on-surface-variant;
+}
+
+.notification-group-close-button .close-button {
+  margin: {{space-medium}}px {{space-large}}px;
+}
+
+.notification-group.collapsed .notification-row .notification {
+  background: @surface-container-high;
+}
+
+.notification-group.collapsed.not-expanded {
+  opacity: 0.4;
+}
+
+.notification-group.collapsed .notification-row:not(:last-child) .notification-action,
+.notification-group.collapsed .notification-row:not(:last-child) .notification-default-action {
+  opacity: 0;
+}
+
+.notification-group.collapsed:hover .notification-row:not(:only-child) .notification {
+  background: @surface-container-highest;
+}
+
+/* ------------------------------------------------------------ widgets */
+
+/* Shared frame for every widget, matching the upstream base class. */
+.widget {
+  margin: {{space-small}}px;
+  padding: {{space-small}}px;
+  border-radius: {{radius-large}}px;
+}
+
+.widget-title > label {
+  margin-right: {{space-small}}px;
+  font-size: {{text-title-large}}px;
+  color: @on-surface;
+}
+
+/* The Clear All button. */
+.widget-title > button {
+  margin-left: {{space-small}}px;
+  padding: {{space-small}}px {{space-large}}px;
+  background: @surface-container-highest;
+  color: @on-surface;
+  border: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: {{radius-full}}px;
+  font-size: {{text-label-large}}px;
+}
+
+.widget-title > button:hover {
+  background: alpha(@primary, 0.24);
+}
+
+.widget-dnd,
+.widget-label,
+.widget-volume,
+.widget-backlight,
+.widget-buttons-grid,
+.widget-inhibitors {
+  background: @surface-container-high;
+  border: 1px solid @outline-variant;
+}
+
+.widget-dnd label,
+.widget-inhibitors > label {
+  color: @on-surface;
+  margin-right: {{space-small}}px;
+  font-size: {{text-body-large}}px;
+}
+
+.widget-dnd switch {
+  margin-left: {{space-small}}px;
+  border-radius: {{radius-full}}px;
+  background: @surface-container-highest;
+  border: none;
+  box-shadow: none;
+}
+
+.widget-dnd switch:checked {
+  background: @primary;
+}
+
+.widget-dnd switch slider {
+  border-radius: {{radius-full}}px;
+  background: @on-surface;
+  border: none;
+}
+
+.widget-label > label {
+  font-size: {{text-body-large}}px;
+  color: @on-surface;
+}
+
+/* --------------------------------------------------------- mpris */
+
+.widget-mpris {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.widget-mpris-player {
+  margin: {{space-large}}px;
+  padding: 0;
+  border-radius: {{radius-large}}px;
+  background: @surface-container-high;
+  color: @on-surface;
+}
+
+.mpris-background {
+  filter: blur(10px);
+}
+
+.mpris-overlay {
+  padding: {{space-large}}px;
+  background-color: alpha(@scrim, 0.55);
+  border-radius: {{radius-large}}px;
+}
+
+.widget-mpris-album-art {
+  border-radius: {{radius-medium}}px;
+}
+
+.widget-mpris-title {
+  font-weight: bold;
+  font-size: {{text-title-medium}}px;
+  color: @on-surface;
+}
+
+.widget-mpris-subtitle {
+  font-size: {{text-body-medium}}px;
+  color: @on-surface-variant;
+}
+
+.widget-mpris button,
+.mpris-overlay button {
+  background: transparent;
+  color: @on-surface;
+  border: none;
+  box-shadow: none;
+  border-radius: {{radius-full}}px;
+  padding: {{space-small}}px;
+}
+
+.widget-mpris button:hover,
+.mpris-overlay button:hover {
+  background: alpha(@on-surface, 0.08);
+}
+
+.widget-mpris > box > button:disabled {
+  color: alpha(@on-surface, 0.38);
+  background: transparent;
+}
+
+/* --------------------------------------------------------- sliders */
+
+.widget-slider label {
+  font-size: inherit;
+  color: @on-surface;
+}
+
+.widget-volume > box > label,
+.widget-backlight > box > label {
+  font-size: {{text-title-large}}px;
+  margin-right: {{space-small}}px;
+  color: @on-surface;
+}
+
+.widget-volume scale,
+.widget-backlight scale {
+  min-height: 18px;
+}
+
+.widget-volume scale trough,
+.widget-backlight scale trough {
+  min-height: 12px;
+  background: @surface-container-highest;
+  border-radius: {{radius-full}}px;
+}
+
+.widget-volume scale highlight,
+.widget-backlight scale highlight {
+  background: @primary;
+  border-radius: {{radius-full}}px;
+}
+
+.widget-volume scale slider,
+.widget-backlight scale slider {
+  min-width: 20px;
+  min-height: 20px;
+  background: @primary;
+  border: none;
+  border-radius: {{radius-full}}px;
+  margin: -{{space-small}}px;
+}
+
+/* Per-application volume rows. */
+.per-app-volume {
+  background-color: @surface-container-highest;
+  margin: {{space-small}}px;
+  margin-bottom: 0;
+  padding: {{space-extra-small}}px;
+  border-radius: {{radius-medium}}px;
+}
+
+.widget-volume row image {
+  color: @on-surface-variant;
+}
+
+/* --------------------------------------------------- buttons grid */
+
+.widget-buttons-grid flowbox,
+.widget-buttons-grid flowboxchild {
+  background: transparent;
+  padding: 0;
+}
+
+/* Every cell is given the same width so that each label centres identically.
+   Without this the buttons size to their own text and the right hand gap
+   differs from button to button. */
+.widget-buttons-grid flowboxchild > button {
+  min-width: {{size-swaync-button-cell}}px;
+  min-height: 48px;
+  padding: 0 {{space-small}}px;
+  margin: 0;
+  color: @on-surface;
+  background: @surface-container-highest;
+  border: none;
+  border-radius: {{radius-full}}px;
+  box-shadow: none;
+  text-shadow: none;
+  font-size: {{text-label-large}}px;
+  font-weight: 600;
+}
+
+.widget-buttons-grid flowboxchild > button:hover {
+  background: alpha(@primary, 0.24);
+}
+
+.widget-buttons-grid flowboxchild > button:disabled {
+  background: alpha(@on-surface, 0.1);
+  color: alpha(@on-surface, 0.38);
+}
+
+.widget-buttons-grid flowboxchild > button.toggle:checked,
+.widget-buttons-grid flowboxchild > button:checked,
+.widget-buttons-grid flowboxchild > button.active {
+  color: @on-primary;
+  background: @primary;
+}
+
+/* --------------------------------------------------------- menubar */
+
+.widget-menubar > .menu-button-bar > .start {
+  margin-left: {{space-small}}px;
+}
+
+.widget-menubar > .menu-button-bar > .end {
+  margin-right: {{space-small}}px;
+}
+
+.widget-menubar > .menu-button-bar > .widget-menubar-container button {
+  border-radius: {{radius-full}}px;
+  margin: 0 {{space-extra-small}}px;
+}
+
+.widget-menubar > revealer * {
+  margin-top: {{space-small}}px;
+}
+
+.widget-menubar > revealer * button {
+  border-radius: {{radius-full}}px;
+  margin: {{space-small}}px;
+  margin-top: 0;
+}
+
+.widget-menubar > revealer * button:last-child {
+  margin-bottom: 0;
+}
+
+.widget-inhibitors > button {
+  margin-left: {{space-small}}px;
+  border-radius: {{radius-full}}px;
+  background: @surface-container-highest;
+  color: @on-surface;
+  border: none;
+}

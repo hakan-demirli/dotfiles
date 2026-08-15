@@ -63,7 +63,7 @@
       "format": {
         "months": "<span foreground='#f8f8f2'><b>{}</b></span>",
         "weekdays": "<span foreground='#f8f8f2'>{}</span>",
-        "days": "<span foreground='#c8c9c5'>{}</span>",
+        "days": "<span foreground='#c5c5d5'>{}</span>",
         "today": "<span foreground='#282a36' background='#f1fa8c'><b>{}</b></span>"
       }
     }
@@ -166,13 +166,13 @@
     "tooltip": false,
     "format": "{icon}",
     "format-icons": {
-      "notification": "<span foreground='red'><sup></sup></span>",
+      "notification": "<span foreground='#ff5555'><sup></sup></span>",
       "none": "",
-      "dnd-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-notification": "<span foreground='#ff5555'><sup></sup></span>",
       "dnd-none": "",
-      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "inhibited-notification": "<span foreground='#ff5555'><sup></sup></span>",
       "inhibited-none": "",
-      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-inhibited-notification": "<span foreground='#ff5555'><sup></sup></span>",
       "dnd-inhibited-none": ""
     },
     "return-type": "json",
