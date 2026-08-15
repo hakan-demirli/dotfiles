@@ -1,0 +1,35 @@
+anchor = top
+width = 100%
+horizontal = true
+
+height = 36
+
+padding-top = {{space-extra-small}}
+padding-bottom = 0
+padding-left = {{space-extra-small}}
+padding-right = 0
+
+font-size = {{text-body-small}}
+font = {{font-plain}}
+min-input-width = 120
+result-spacing = {{space-large}}
+
+background-color = {{colour-surface-container-high}}
+
+prompt-text = "Search: "
+prompt-color = {{colour-on-surface}}
+
+input-color = {{colour-success}}
+input-background = {{colour-outline-variant}}
+input-background-padding = {{space-extra-small}}
+input-background-corner-radius = {{radius-small}}
+
+default-result-color = {{colour-outline}}
+
+selection-color = {{colour-tertiary}}
+selection-match-color = {{colour-success}}
+
+border-width = 0
+border-color = {{colour-outline}}
+
+outline-width = 0
