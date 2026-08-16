@@ -9,27 +9,16 @@ Singleton {
 
     readonly property bool available: capacityFile.loaded
     readonly property int percentage: available ? readInteger(capacityFile) : -1
-    readonly property string status: statusFile.loaded
-        ? statusFile.text().trim()
-        : "Unavailable"
+    readonly property string status: statusFile.loaded ? statusFile.text().trim() : "Unavailable"
     readonly property bool charging: status === "Charging" || status === "Full"
 
     readonly property int power: readInteger(powerFile)
     readonly property int energy: readInteger(energyFile)
     readonly property int energyFull: readInteger(energyFullFile)
 
-    readonly property int remainingMinutes: power > 0
-        && (status === "Charging" || status === "Discharging")
-        ? Math.round((status === "Charging"
-            ? Math.max(0, energyFull - energy)
-            : energy) * 60 / power)
-        : -1
-    readonly property string remainingTime: remainingMinutes >= 0
-        ? formatDuration(remainingMinutes)
-        : ""
-    readonly property string detail: remainingTime.length > 0
-        ? remainingTime
-        : status
+    readonly property int remainingMinutes: power > 0 && (status === "Charging" || status === "Discharging") ? Math.round((status === "Charging" ? Math.max(0, energyFull - energy) : energy) * 60 / power) : -1
+    readonly property string remainingTime: remainingMinutes >= 0 ? formatDuration(remainingMinutes) : ""
+    readonly property string detail: remainingTime.length > 0 ? remainingTime : status
 
     function readInteger(file) {
         if (!file.loaded)

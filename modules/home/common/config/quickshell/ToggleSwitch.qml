@@ -34,9 +34,7 @@ Rectangle {
         radius: height / 2
         y: (parent.height - height) / 2
         x: root.checked ? parent.width - width - 4 : 4
-        color: root.checked
-            ? ShellPalette.foreground
-            : ShellPalette.foregroundMuted
+        color: root.checked ? ShellPalette.foreground : ShellPalette.foregroundMuted
 
         Behavior on x {
             NumberAnimation {

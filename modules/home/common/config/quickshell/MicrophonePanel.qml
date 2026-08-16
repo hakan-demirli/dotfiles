@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -73,18 +75,12 @@ Item {
                     implicitWidth: 44
                     implicitHeight: 44
                     radius: Theme.shape.full
-                    color: muteArea.containsMouse
-                        ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                        : ShellPalette.indicator
+                    color: muteArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : ShellPalette.indicator
 
                     Text {
                         anchors.centerIn: parent
-                        text: root.available && root.source.audio.muted
-                            ? "\ue02b"
-                            : "\ue029"
-                        color: root.available && !root.source.audio.muted
-                            ? ShellPalette.foreground
-                            : ShellPalette.foregroundMuted
+                        text: root.available && root.source.audio.muted ? "\ue02b" : "\ue029"
+                        color: root.available && !root.source.audio.muted ? ShellPalette.foreground : ShellPalette.foregroundMuted
                         font.family: "Material Symbols Rounded"
                         font.pixelSize: 25
                     }
@@ -141,16 +137,14 @@ Item {
             model: sourceModel
 
             delegate: Rectangle {
+                id: input
+
                 required property var modelData
 
                 width: inputList.width
                 height: 56
                 radius: Theme.shape.large
-                color: modelData === root.source
-                    ? ShellPalette.indicator
-                    : inputArea.containsMouse
-                        ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                        : "transparent"
+                color: input.modelData === root.source ? ShellPalette.indicator : inputArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
                 RowLayout {
                     anchors.fill: parent
@@ -167,18 +161,16 @@ Item {
 
                     Text {
                         Layout.fillWidth: true
-                        text: modelData.description
+                        text: input.modelData.description
                         color: ShellPalette.foreground
                         elide: Text.ElideRight
                         font.family: Theme.font.plain
                         font.pixelSize: Theme.font.bodyMediumSize
-                        font.weight: modelData === root.source
-                            ? Theme.font.titleMediumWeight
-                            : Theme.font.bodyMediumWeight
+                        font.weight: input.modelData === root.source ? Theme.font.titleMediumWeight : Theme.font.bodyMediumWeight
                     }
 
                     Text {
-                        visible: modelData === root.source
+                        visible: input.modelData === root.source
                         text: "\ue5ca"
                         color: ShellPalette.foreground
                         font.family: "Material Symbols Rounded"
@@ -192,7 +184,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Pipewire.preferredDefaultAudioSource = modelData
+                    onClicked: Pipewire.preferredDefaultAudioSource = input.modelData
                 }
             }
         }

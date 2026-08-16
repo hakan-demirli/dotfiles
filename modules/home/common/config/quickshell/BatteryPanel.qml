@@ -20,9 +20,7 @@ Item {
         MenuHeader {
             Layout.fillWidth: true
             title: "Battery"
-            subtitle: SystemActions.powerProfile === "unknown"
-                ? BatteryService.status
-                : `${BatteryService.status} - ${SystemActions.powerProfile}`
+            subtitle: SystemActions.powerProfile === "unknown" ? BatteryService.status : `${BatteryService.status} - ${SystemActions.powerProfile}`
             onClose: root.requestClose()
         }
 
@@ -39,8 +37,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                height: parent.height
-                    * Math.max(0, Math.min(1, BatteryService.percentage / 100))
+                height: parent.height * Math.max(0, Math.min(1, BatteryService.percentage / 100))
                 color: ShellPalette.indicator
 
                 Behavior on height {
@@ -95,9 +92,7 @@ Item {
             }
 
             Text {
-                text: SystemActions.fanRpm > 0
-                    ? `${SystemActions.fanRpm} RPM`
-                    : "Fan idle"
+                text: SystemActions.fanRpm > 0 ? `${SystemActions.fanRpm} RPM` : "Fan idle"
                 color: ShellPalette.foregroundMuted
                 font.family: Theme.font.mono
                 font.pixelSize: Theme.font.bodySmallSize

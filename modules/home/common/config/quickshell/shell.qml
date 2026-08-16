@@ -15,9 +15,8 @@ ShellRoot {
     PanelWindow {
         id: panel
 
-        // Arm thickness shared by the vertical and horizontal sections.
         property int thickness: 47
-        // Four complete cells per arm is just under one sixth of this screen.
+
         property int armLength: thickness * 4
 
         screen: Quickshell.screens[0]
@@ -31,16 +30,12 @@ ShellRoot {
 
         color: "transparent"
 
-        // Float over everything without reserving space, so no window is
-        // pushed aside.
         aboveWindows: true
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "quickshell-bar"
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-        // Only the two arms accept input; the empty quadrant passes clicks
-        // through to the windows beneath.
         mask: Region {
             Region {
                 x: panel.armLength - panel.thickness
@@ -105,6 +100,35 @@ ShellRoot {
         }
     }
 
+    PanelWindow {
+        id: toastWindow
+
+        screen: panel.screen
+        visible: NotificationService.popups.length > 0
+
+        anchors.top: true
+        anchors.right: true
+        margins.top: 8
+        margins.right: 8
+
+        implicitWidth: toasts.implicitWidth
+        implicitHeight: toasts.implicitHeight
+
+        color: "transparent"
+
+        aboveWindows: true
+        exclusionMode: ExclusionMode.Ignore
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.namespace: "quickshell-notifications"
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+        NotificationToasts {
+            id: toasts
+
+            anchors.fill: parent
+        }
+    }
+
     IpcHandler {
         target: "shell"
 
@@ -120,6 +144,30 @@ ShellRoot {
             shell.barVisible = !shell.barVisible;
             if (!shell.barVisible)
                 shell.activeMenu = "";
+        }
+    }
+
+    IpcHandler {
+        target: "notifications"
+
+        function toggle(): void {
+            shell.toggleMenu("notifications");
+        }
+
+        function clear(): void {
+            NotificationService.clear();
+        }
+
+        function toggleDoNotDisturb(): void {
+            NotificationService.toggleDoNotDisturb();
+        }
+
+        function count(): int {
+            return NotificationService.count;
+        }
+
+        function doNotDisturb(): bool {
+            return NotificationService.doNotDisturb;
         }
     }
 }
