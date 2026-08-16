@@ -220,7 +220,12 @@ hl.bind(
   { locked = true, repeating = true }
 )
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"), { locked = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("swayosd-client --input-volume mute-toggle"), { locked = true })
+
+hl.bind(
+  "XF86AudioMicMute",
+  hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume +0"),
+  { locked = true }
+)
 
 local brightness_command =
   [[level=$(brightnessctl -m | cut -d, -f4); level=${level%\%}; if [ "$level" -le 5 ]; then step=1; else step=10; fi; swayosd-client --min-brightness 0 --brightness ]]
