@@ -9,7 +9,7 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    readonly property QtObject palette: QtObject {
+    component PaletteTokens: QtObject {
         readonly property color m3error: "#ff5555"
         readonly property color m3errorContainer: "#930016"
         readonly property color m3inverseOnSurface: "#2e303c"
@@ -58,7 +58,7 @@ QtObject {
         readonly property color m3warningContainer: "#683c00"
     }
 
-    readonly property QtObject shape: QtObject {
+    component ShapeTokens: QtObject {
         readonly property int extraLarge: 28
         readonly property int extraSmall: 4
         readonly property int full: 9999
@@ -68,7 +68,7 @@ QtObject {
         readonly property int small: 8
     }
 
-    readonly property QtObject space: QtObject {
+    component SpaceTokens: QtObject {
         readonly property int extraLarge: 28
         readonly property int extraSmall: 4
         readonly property int large: 16
@@ -77,7 +77,7 @@ QtObject {
         readonly property int small: 8
     }
 
-    readonly property QtObject font: QtObject {
+    component FontTokens: QtObject {
         readonly property string brand: "Roboto"
         readonly property string icon: "Symbols Nerd Font Mono"
         readonly property string mono: "JetBrainsMono Nerd Font Mono"
@@ -129,7 +129,7 @@ QtObject {
         readonly property int titleSmallWeight: 500
     }
 
-    readonly property QtObject duration: QtObject {
+    component DurationTokens: QtObject {
         readonly property int extraLong1: 700
         readonly property int extraLong2: 800
         readonly property int extraLong3: 900
@@ -148,10 +148,17 @@ QtObject {
         readonly property int short4: 200
     }
 
-    readonly property QtObject state: QtObject {
+    component StateTokens: QtObject {
         readonly property real draggedOpacity: 0.160000
         readonly property real focusOpacity: 0.120000
         readonly property real hoverOpacity: 0.080000
         readonly property real pressedOpacity: 0.120000
     }
+
+    readonly property PaletteTokens palette: PaletteTokens {}
+    readonly property ShapeTokens shape: ShapeTokens {}
+    readonly property SpaceTokens space: SpaceTokens {}
+    readonly property FontTokens font: FontTokens {}
+    readonly property DurationTokens duration: DurationTokens {}
+    readonly property StateTokens state: StateTokens {}
 }

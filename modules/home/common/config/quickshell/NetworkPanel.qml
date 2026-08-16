@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -59,8 +61,7 @@ Item {
         target: NetworkService
 
         function onActiveNetworkChanged() {
-            if (root.pendingNetwork && NetworkService.activeNetwork
-                    && root.pendingNetwork.name === NetworkService.activeNetwork.name)
+            if (root.pendingNetwork && NetworkService.activeNetwork && root.pendingNetwork.name === NetworkService.activeNetwork.name)
                 root.cancelPassword();
         }
 
@@ -77,11 +78,7 @@ Item {
         MenuHeader {
             Layout.fillWidth: true
             title: root.pendingNetwork ? root.pendingNetwork.name : "Wi-Fi"
-            subtitle: root.pendingNetwork
-                ? "Enter the network password"
-                : root.connectedNetwork
-                    ? `Connected to ${root.connectedNetwork.name}`
-                    : NetworkService.wifiEnabled ? "Available networks" : "Wireless is off"
+            subtitle: root.pendingNetwork ? "Enter the network password" : root.connectedNetwork ? `Connected to ${root.connectedNetwork.name}` : NetworkService.wifiEnabled ? "Available networks" : "Wireless is off"
             showBack: root.pendingNetwork !== null
             onBack: root.cancelPassword()
             onClose: root.requestClose()
@@ -109,9 +106,7 @@ Item {
 
                     Text {
                         text: NetworkService.wifiEnabled ? "\ue63e" : "\ue648"
-                        color: NetworkService.wifiEnabled
-                            ? ShellPalette.foreground
-                            : ShellPalette.foregroundMuted
+                        color: NetworkService.wifiEnabled ? ShellPalette.foreground : ShellPalette.foregroundMuted
                         font.family: "Material Symbols Rounded"
                         font.pixelSize: 24
                     }
@@ -164,9 +159,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: !NetworkService.wifiEnabled || networkModel.values.length === 0
-                text: NetworkService.wifiEnabled
-                    ? "Searching for networks..."
-                    : "Turn on Wi-Fi to see nearby networks."
+                text: NetworkService.wifiEnabled ? "Searching for networks..." : "Turn on Wi-Fi to see nearby networks."
                 color: ShellPalette.foregroundMuted
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -219,9 +212,7 @@ Item {
                 radius: Theme.shape.medium
                 color: ShellPalette.surface
                 border.width: passwordInput.activeFocus ? 2 : 1
-                border.color: passwordInput.activeFocus
-                    ? ShellPalette.foreground
-                    : ShellPalette.indicator
+                border.color: passwordInput.activeFocus ? ShellPalette.foreground : ShellPalette.indicator
 
                 TextInput {
                     id: passwordInput
@@ -280,19 +271,12 @@ Item {
                 Layout.fillWidth: true
                 implicitHeight: 48
                 radius: Theme.shape.full
-                color: root.password.length >= 8
-                    ? ShellPalette.foreground
-                    : ShellPalette.indicator
+                color: root.password.length >= 8 ? ShellPalette.foreground : ShellPalette.indicator
 
                 Text {
                     anchors.centerIn: parent
-                    text: root.pendingNetwork
-                            && NetworkService.connectingName === root.pendingNetwork.name
-                        ? "Connecting..."
-                        : "Connect"
-                    color: root.password.length >= 8
-                        ? ShellPalette.background
-                        : ShellPalette.foregroundMuted
+                    text: root.pendingNetwork && NetworkService.connectingName === root.pendingNetwork.name ? "Connecting..." : "Connect"
+                    color: root.password.length >= 8 ? ShellPalette.background : ShellPalette.foregroundMuted
                     font.family: Theme.font.plain
                     font.pixelSize: Theme.font.labelLargeSize
                     font.weight: Theme.font.labelLargeWeight
@@ -300,9 +284,7 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
-                    enabled: root.password.length >= 8
-                        && root.pendingNetwork
-                        && NetworkService.connectingName !== root.pendingNetwork.name
+                    enabled: root.password.length >= 8 && root.pendingNetwork && NetworkService.connectingName !== root.pendingNetwork.name
                     cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onClicked: root.connectPending()
                 }

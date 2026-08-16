@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 
 Rectangle {
@@ -5,11 +7,13 @@ Rectangle {
 
     property string menu: ""
 
+    readonly property Item contentItem: content.item as Item
+
     signal requestClose
     signal requestMenu(string menu)
 
-    implicitWidth: content.item ? content.item.implicitWidth : 380
-    implicitHeight: content.item ? content.item.implicitHeight : 240
+    implicitWidth: root.contentItem ? root.contentItem.implicitWidth : 380
+    implicitHeight: root.contentItem ? root.contentItem.implicitHeight : 240
 
     radius: Theme.shape.extraLarge
     color: ShellPalette.background
@@ -23,18 +27,32 @@ Rectangle {
         anchors.fill: parent
         sourceComponent: {
             switch (root.menu) {
-            case "control": return controlComponent;
-            case "wifi": return wifiComponent;
-            case "bluetooth": return bluetoothComponent;
-            case "audio": return audioComponent;
-            case "microphone": return microphoneComponent;
-            case "brightness": return brightnessComponent;
-            case "battery": return batteryComponent;
-            case "clock": return clockComponent;
-            case "recording": return recordingComponent;
-            case "tablet": return tabletComponent;
-            case "power": return powerComponent;
-            default: return null;
+            case "control":
+                return controlComponent;
+            case "wifi":
+                return wifiComponent;
+            case "bluetooth":
+                return bluetoothComponent;
+            case "audio":
+                return audioComponent;
+            case "microphone":
+                return microphoneComponent;
+            case "brightness":
+                return brightnessComponent;
+            case "battery":
+                return batteryComponent;
+            case "clock":
+                return clockComponent;
+            case "notifications":
+                return notificationsComponent;
+            case "recording":
+                return recordingComponent;
+            case "tablet":
+                return tabletComponent;
+            case "power":
+                return powerComponent;
+            default:
+                return null;
             }
         }
     }
@@ -100,6 +118,14 @@ Rectangle {
         id: clockComponent
 
         ClockPanel {
+            onRequestClose: root.requestClose()
+        }
+    }
+
+    Component {
+        id: notificationsComponent
+
+        NotificationPanel {
             onRequestClose: root.requestClose()
         }
     }

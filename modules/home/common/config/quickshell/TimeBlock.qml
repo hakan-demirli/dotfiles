@@ -20,9 +20,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         radius: parent.radius
-        color: area.containsMouse
-            ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-            : Qt.alpha(ShellPalette.foreground, 0.04)
+        color: area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : Qt.alpha(ShellPalette.foreground, 0.04)
 
         Behavior on color {
             ColorAnimation {

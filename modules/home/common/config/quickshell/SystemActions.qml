@@ -2,7 +2,6 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 
 Singleton {
     id: root
@@ -61,11 +60,11 @@ Singleton {
     }
 
     function toggleAwake() {
-        run([home + "/.local/bin/caffeinate-toggle.sh", "swaync"]);
+        run([home + "/.local/bin/caffeinate-toggle.sh", "toggle"]);
     }
 
     function toggleRotationLock() {
-        run([home + "/.local/bin/rotation-lock-toggle.sh", "swaync"]);
+        run([home + "/.local/bin/rotation-lock-toggle.sh", "toggle"]);
     }
 
     function toggleKeyboard() {
@@ -73,11 +72,7 @@ Singleton {
     }
 
     function toggleTabletLock() {
-        run([home + "/.local/bin/tablet-lock-toggle.sh", "swaync"]);
-    }
-
-    function toggleNotifications() {
-        run(["swaync-client", "-t", "-sw"]);
+        run([home + "/.local/bin/tablet-lock-toggle.sh", "toggle"]);
     }
 
     function power(action) {
@@ -154,5 +149,4 @@ Singleton {
         interval: 3000
         onOutput: text => root.tabletLocked = text.trim() === "true"
     }
-
 }

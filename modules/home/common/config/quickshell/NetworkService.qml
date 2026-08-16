@@ -55,7 +55,7 @@ Singleton {
                 active: fields[0].trim() === "*",
                 name: fields[1],
                 signal: Number(fields[2]) || 0,
-                security: fields.slice(3).join(":"),
+                security: fields.slice(3).join(":")
             };
             const existing = parsed.find(item => item.name === candidate.name);
             if (!existing) {
@@ -83,13 +83,13 @@ Singleton {
 
     function rebuildNetworks() {
         const merged = rawNetworks.map(network => ({
-            active: network.active,
-            known: savedNames.includes(network.name),
-            name: network.name,
-            secured: network.security.length > 0 && network.security !== "--",
-            security: network.security,
-            signal: network.signal,
-        }));
+                    active: network.active,
+                    known: savedNames.includes(network.name),
+                    name: network.name,
+                    secured: network.security.length > 0 && network.security !== "--",
+                    security: network.security,
+                    signal: network.signal
+                }));
         merged.sort((a, b) => {
             if (a.active !== b.active)
                 return a.active ? -1 : 1;
@@ -162,19 +162,7 @@ Singleton {
     Process {
         id: scanProcess
 
-        command: [
-            "nmcli",
-            "--terse",
-            "--escape",
-            "yes",
-            "--fields",
-            "IN-USE,SSID,SIGNAL,SECURITY",
-            "device",
-            "wifi",
-            "list",
-            "--rescan",
-            root.forceRescan ? "yes" : "auto",
-        ]
+        command: ["nmcli", "--terse", "--escape", "yes", "--fields", "IN-USE,SSID,SIGNAL,SECURITY", "device", "wifi", "list", "--rescan", root.forceRescan ? "yes" : "auto",]
         running: true
         stdout: StdioCollector {
             onStreamFinished: root.parseNetworks(text)
@@ -185,16 +173,7 @@ Singleton {
     Process {
         id: savedProcess
 
-        command: [
-            "nmcli",
-            "--terse",
-            "--escape",
-            "yes",
-            "--fields",
-            "NAME,TYPE",
-            "connection",
-            "show",
-        ]
+        command: ["nmcli", "--terse", "--escape", "yes", "--fields", "NAME,TYPE", "connection", "show",]
         running: true
         stdout: StdioCollector {
             onStreamFinished: root.parseSaved(text)
@@ -225,7 +204,7 @@ Singleton {
                 root.pendingPassword = "";
             }
         }
-        onExited: function(exitCode) {
+        onExited: function (exitCode) {
             root.lastError = exitCode === 0 ? "" : actionError.text.trim();
             root.connectingName = "";
             root.actionKind = "";

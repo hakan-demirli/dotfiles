@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -85,18 +87,12 @@ Item {
                     implicitWidth: 44
                     implicitHeight: 44
                     radius: Theme.shape.full
-                    color: muteArea.containsMouse
-                        ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                        : ShellPalette.indicator
+                    color: muteArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : ShellPalette.indicator
 
                     Text {
                         anchors.centerIn: parent
-                        text: root.available && root.sink.audio.muted
-                            ? "\ue04f"
-                            : root.outputIcon(root.sink)
-                        color: root.available && !root.sink.audio.muted
-                            ? ShellPalette.foreground
-                            : ShellPalette.foregroundMuted
+                        text: root.available && root.sink.audio.muted ? "\ue04f" : root.outputIcon(root.sink)
+                        color: root.available && !root.sink.audio.muted ? ShellPalette.foreground : ShellPalette.foregroundMuted
                         font.family: "Material Symbols Rounded"
                         font.pixelSize: 25
                     }
@@ -153,16 +149,14 @@ Item {
             model: sinkModel
 
             delegate: Rectangle {
+                id: output
+
                 required property var modelData
 
                 width: outputList.width
                 height: 56
                 radius: Theme.shape.large
-                color: modelData === root.sink
-                    ? ShellPalette.indicator
-                    : outputArea.containsMouse
-                        ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                        : "transparent"
+                color: output.modelData === root.sink ? ShellPalette.indicator : outputArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
                 RowLayout {
                     anchors.fill: parent
@@ -171,7 +165,7 @@ Item {
                     spacing: Theme.space.medium
 
                     Text {
-                        text: root.outputIcon(modelData)
+                        text: root.outputIcon(output.modelData)
                         color: ShellPalette.foreground
                         font.family: "Material Symbols Rounded"
                         font.pixelSize: 22
@@ -179,18 +173,16 @@ Item {
 
                     Text {
                         Layout.fillWidth: true
-                        text: modelData.description
+                        text: output.modelData.description
                         color: ShellPalette.foreground
                         elide: Text.ElideRight
                         font.family: Theme.font.plain
                         font.pixelSize: Theme.font.bodyMediumSize
-                        font.weight: modelData === root.sink
-                            ? Theme.font.titleMediumWeight
-                            : Theme.font.bodyMediumWeight
+                        font.weight: output.modelData === root.sink ? Theme.font.titleMediumWeight : Theme.font.bodyMediumWeight
                     }
 
                     Text {
-                        visible: modelData === root.sink
+                        visible: output.modelData === root.sink
                         text: "\ue5ca"
                         color: ShellPalette.foreground
                         font.family: "Material Symbols Rounded"
@@ -204,7 +196,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Pipewire.preferredDefaultAudioSink = modelData
+                    onClicked: Pipewire.preferredDefaultAudioSink = output.modelData
                 }
             }
         }

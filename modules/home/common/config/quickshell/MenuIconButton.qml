@@ -11,18 +11,14 @@ Rectangle {
     implicitWidth: 40
     implicitHeight: 40
     radius: Theme.shape.full
-    color: area.containsMouse
-        ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-        : "transparent"
+    color: area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
     Text {
         id: glyph
 
         anchors.centerIn: parent
         text: root.icon
-        color: root.enabled
-            ? ShellPalette.foreground
-            : ShellPalette.foregroundMuted
+        color: root.enabled ? ShellPalette.foreground : ShellPalette.foregroundMuted
         font.family: "Material Symbols Rounded"
         font.pixelSize: 22
 
