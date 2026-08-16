@@ -137,7 +137,6 @@ rec {
       sioyek
       slurp
       sunshine
-      swaynotificationcenter
       swayosd
       tailscale-systray
       tor-browser
@@ -155,6 +154,7 @@ rec {
       wlr-randr
       wttrbar
       xremap
+      xwayland-satellite
       (pickNur "youtube_sync")
       (pickNur "riveroftime")
       (pickNur "gtk_applet")
