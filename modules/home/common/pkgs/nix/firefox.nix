@@ -2,10 +2,120 @@
   username ? "defaultName",
   ...
 }:
+let
+  sideberyId = "{3c078156-979c-498b-8990-85f7987dd929}";
+
+  containers = {
+    work = {
+      id = 1;
+      color = "blue";
+      icon = "fingerprint";
+    };
+    other0 = {
+      id = 2;
+      color = "orange";
+      icon = "briefcase";
+    };
+    other1 = {
+      id = 3;
+      color = "green";
+      icon = "dollar";
+    };
+    personal = {
+      id = 4;
+      color = "pink";
+      icon = "cart";
+    };
+  };
+
+  cookieStoreId = name: "firefox-container-${toString containers.${name}.id}";
+
+  mkTabsPanel =
+    {
+      id,
+      name,
+      color,
+      container ? null,
+    }:
+    {
+      type = 2;
+      inherit id name color;
+      iconSVG = "icon_tabs";
+      iconIMGSrc = "";
+      iconIMG = "";
+      lockedPanel = false;
+      skipOnSwitching = false;
+      noEmpty = false;
+      newTabCtx = if container == null then "none" else cookieStoreId container;
+      dropTabCtx = "none";
+      moveRules = [ ];
+      moveExcludedTo = -1;
+      bookmarksFolderId = -1;
+      newTabBtns = [ ];
+      srcPanelConfig = null;
+    };
+
+  sideberyPanels = [
+    (mkTabsPanel {
+      id = "VvKCwmo8VIlu";
+      name = "Tabs";
+      color = "toolbar";
+    })
+    (mkTabsPanel {
+      id = "fJb9Q47u-Xlu";
+      name = "work";
+      color = "red";
+      container = "other0";
+    })
+    (mkTabsPanel {
+      id = "uP0Nn9bED5nu";
+      name = "other-0";
+      color = "blue";
+      container = "work";
+    })
+    (mkTabsPanel {
+      id = "pmWzPb23d7nu";
+      name = "other-1";
+      color = "green";
+      container = "personal";
+    })
+  ];
+in
 {
   programs.firefox = {
     enable = true;
+
+    # Sidebery reads browser.storage.managed for these keys and gives them
+    # precedence over its own storage.local, so panels, their container
+    # bindings and the non-default settings are owned by this file. Keys not
+    # listed here keep the extension defaults.
+    policies."3rdparty".Extensions.${sideberyId} = {
+      settings = {
+        animations = false;
+        hideEmptyPanels = false;
+        loadBookmarksOnDemand = false;
+        searchBarMode = "none";
+        showNewTabBtns = false;
+        subPanelBookmarks = false;
+        subPanelHistory = false;
+        subPanelRecentlyClosedBar = false;
+        tabsContainerInTooltip = false;
+      };
+      sidebar = {
+        nav = map (panel: panel.id) sideberyPanels;
+        panels = builtins.listToAttrs (
+          map (panel: {
+            name = panel.id;
+            value = panel;
+          }) sideberyPanels
+        );
+      };
+    };
+
     profiles."${username}" = {
+      inherit containers;
+      containersForce = true;
+
       search = {
         default = "ddg";
         force = true;
