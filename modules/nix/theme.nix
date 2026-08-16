@@ -189,23 +189,32 @@ in
   perSystem =
     { pkgs, ... }:
     let
-      rendered = pkgs.runCommand "theme-render" { nativeBuildInputs = [ pkgs.prettier ]; } ''
-        mkdir -p "$out"
-        ${lib.concatStringsSep "\n" (
-          lib.mapAttrsToList (path: text: ''
-            mkdir -p "$out/$(dirname ${lib.escapeShellArg path})"
-            cp ${pkgs.writeText (baseNameOf path) text} "$out/${path}"
-          '') files
-        )}
-        chmod -R u+w "$out"
+      rendered =
+        pkgs.runCommand "theme-render"
+          {
+            nativeBuildInputs = [
+              pkgs.prettier
+              pkgs.qt6.qtdeclarative
+            ];
+          }
+          ''
+            mkdir -p "$out"
+            ${lib.concatStringsSep "\n" (
+              lib.mapAttrsToList (path: text: ''
+                mkdir -p "$out/$(dirname ${lib.escapeShellArg path})"
+                cp ${pkgs.writeText (baseNameOf path) text} "$out/${path}"
+              '') files
+            )}
+            chmod -R u+w "$out"
 
-        if grep -rn '{{' "$out"; then
-          echo "theme-render: unsubstituted template token remains." >&2
-          exit 1
-        fi
+            if grep -rn '{{' "$out"; then
+              echo "theme-render: unsubstituted template token remains." >&2
+              exit 1
+            fi
 
-        find "$out" -name '*.css' -exec prettier --write --parser css {} + > /dev/null
-      '';
+            find "$out" -name '*.css' -exec prettier --write --parser css {} + > /dev/null
+            find "$out" -name '*.qml' -exec qmlformat --inplace --ignore-settings --indent-width 4 {} +
+          '';
     in
     {
       packages.theme-render = rendered;
