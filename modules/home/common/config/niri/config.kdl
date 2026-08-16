@@ -1,0 +1,321 @@
+input {
+    keyboard {
+        xkb {
+            layout "us"
+            options "caps:escape"
+        }
+
+        repeat-delay 200
+        repeat-rate 60
+        numlock
+    }
+
+    touchpad {
+        tap
+        dwt
+        natural-scroll
+    }
+
+    mouse {
+        accel-profile "flat"
+    }
+
+    tablet {
+        map-to-output "eDP-1"
+    }
+
+    touch {
+        map-to-output "eDP-1"
+    }
+
+    focus-follows-mouse
+}
+
+layout {
+    gaps 4
+    center-focused-column "never"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+
+    default-column-width { proportion 0.5; }
+
+    focus-ring {
+        off
+    }
+
+    border {
+        on
+        width 2
+        active-color "#d7baff"
+        inactive-color "#44475a"
+    }
+
+    shadow {
+        off
+    }
+
+    struts {
+    }
+}
+
+workspace "web"
+workspace "term"
+workspace "study"
+workspace "draw"
+workspace "player"
+workspace "btop"
+workspace "calculator"
+workspace "todo"
+workspace "plan"
+
+prefer-no-csd
+
+cursor {
+    xcursor-size 24
+}
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+environment {
+    EDITOR "nvim"
+    TERMINAL "kitty"
+    OPENER "xdg-open"
+    ANDROID_HOME "~/.local/share/android"
+    CARGO_HOME "~/.local/share/cargo"
+    CUDA_CACHE_PATH "~/.cache/nv"
+    GNUPGHOME "~/.local/share/gnupg"
+    PASSWORD_STORE_DIR "~/.local/share/password-store"
+    RUSTUP_HOME "~/.local/share/rustup"
+    NUGET_PACKAGES "~/.cache/NuGetPackages"
+    NPM_CONFIG_USERCONFIG "~/.config/npm/npmrc"
+    DOTNET_CLI_HOME "/tmp/DOTNET_CLI_HOME"
+    WGETRC "~/.config/wgetrc"
+    KIVY_HOME "~/.config/kivy"
+    PYTHONPYCACHEPREFIX "~/.cache/python"
+    PYTHONUSERBASE "~/.local/share/python"
+    GOPATH "~/.cache/go"
+}
+
+spawn-at-startup "xremap" "~/.config/xremap/config.yml"
+spawn-at-startup "tailscale-systray"
+spawn-at-startup "swayosd-server"
+spawn-at-startup "nm-applet" "--indicator"
+spawn-at-startup "blueman-applet"
+spawn-at-startup "qs" "-n"
+spawn-at-startup "awww-daemon"
+spawn-at-startup "gtk_applet_script_menu"
+spawn-at-startup "hypridle"
+spawn-at-startup "battery_status.py" "collect"
+spawn-sh-at-startup "mkdir -p ~/.local/state && exec auto_refresh >>~/.local/state/auto_refresh.log 2>&1"
+spawn-sh-at-startup "mkdir -p ~/.local/state && exec tablet_mode_watcher.py >>~/.local/state/tablet_mode_watcher.py.log 2>&1"
+spawn-sh-at-startup "mkdir -p ~/.local/state && exec orientation_watcher.py >>~/.local/state/orientation_watcher.py.log 2>&1"
+spawn-sh-at-startup "systemctl start --user polkit-gnome-authentication-agent-1"
+spawn-at-startup "firefox"
+spawn-at-startup "kitty" "tmux_home.sh"
+
+window-rule {
+    match app-id=r#"^firefox$"#
+    match app-id=r#"^qutebrowser$"#
+    open-on-workspace "web"
+}
+
+window-rule {
+    match app-id=r#"^kitty$"#
+    open-on-workspace "term"
+}
+
+window-rule {
+    match app-id=r#"^anki$"#
+    match app-id=r#"^gtkwave$"#
+    match app-id=r#"^Vsim$"#
+    match app-id=r#"^WindowObj$"#
+    match app-id=r#"^thunderbird$"#
+    match title=r#"^Surfer"#
+    open-on-workspace "study"
+}
+
+window-rule {
+    match app-id=r#"^draw\.io$"#
+    open-on-workspace "draw"
+}
+
+window-rule {
+    match app-id=r#"^kitty$"# title=r#"^my_player$"#
+    open-on-workspace "player"
+}
+
+window-rule {
+    match app-id=r#"^kitty$"# title=r#"^my_btop$"#
+    open-on-workspace "btop"
+}
+
+window-rule {
+    match app-id=r#"^kitty$"# title=r#"^my_todo$"#
+    open-on-workspace "todo"
+}
+
+window-rule {
+    match app-id=r#"^kitty$"# title=r#"^my_plan$"#
+    open-on-workspace "plan"
+}
+
+window-rule {
+    match app-id=r#"qalculate-qt$"#
+    open-on-workspace "calculator"
+    open-floating true
+}
+
+window-rule {
+    match title=r#"Wine"#
+    match app-id=r#"^zenity$"#
+    match app-id=r#"^Anydesk$"#
+    match title=r#"^Choose symbol$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^firefox$"# title=r#"^Picture-in-Picture$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^com\.gabm\.satty$"#
+    open-fullscreen true
+}
+
+window-rule {
+    match app-id=r#"^Dialog$"# title=r#"^Error in Tcl Script$"#
+    open-on-workspace "study"
+}
+
+window-rule {
+    match app-id=r#"^steam$"# title=r#"^$"#
+    open-focused false
+}
+
+window-rule {
+    match app-id=r#"^showmethekey-gtk$"#
+    open-floating true
+    open-focused false
+    default-floating-position x=0 y=0 relative-to="bottom-left"
+}
+
+window-rule {
+    match app-id=r#"^it\.catboy\.ripdrag$"#
+    match app-id=r#"^xdragon$"#
+    open-floating true
+    open-focused false
+}
+
+window-rule {
+    match app-id=r#"^xwaylandvideobridge$"#
+    open-focused false
+    block-out-from "screencast"
+}
+
+binds {
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    Mod+D { spawn-sh "pkill tofi || tofi-drun --drun-launch=true"; }
+    XF86Launch2 allow-when-locked=true { spawn-sh "pkill tofi || tofi-drun --drun-launch=true"; }
+
+    Mod+Return { spawn "kitty"; }
+    Mod+B { spawn "qs" "ipc" "--any-display" "call" "shell" "toggleBarVisibility"; }
+    Mod+Escape { spawn "hyprlock"; }
+
+    Alt+N { spawn "todo_my.sh"; }
+    Alt+Z { spawn "plan_my.sh"; }
+    Mod+M { spawn "player_my.sh"; }
+
+    Print { spawn-sh "pkill -9 wayscriber || wayscriber -a"; }
+    Mod+Shift+S { spawn-sh "pkill -9 wayscriber || wayscriber -a"; }
+    Mod+Y { spawn-sh "pkill -9 wayscriber || wayscriber -a"; }
+
+    Mod+Shift+T { spawn "pkill" "-USR1" "-f" "tablet_mode_watcher.py"; }
+    Mod+Shift+K { spawn "tablet_mode_apply.sh" "osk-toggle"; }
+
+    Mod+Q { close-window; }
+    Mod+F { fullscreen-window; }
+    Mod+E { toggle-window-floating; }
+    Mod+S { toggle-column-tabbed-display; }
+
+    Mod+Tab { focus-window-previous; }
+    Alt+Tab { focus-window-previous; }
+
+    Mod+H { focus-column-left; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+L { focus-column-right; }
+
+    Mod+Ctrl+H { set-column-width "-20"; }
+    Mod+Ctrl+L { set-column-width "+20"; }
+    Mod+Ctrl+J { set-window-height "+20"; }
+    Mod+Ctrl+K { set-window-height "-20"; }
+
+    Mod+Comma { consume-window-into-column; }
+    Mod+Period { expel-window-from-column; }
+
+    Alt+M { focus-workspace "web"; }
+    Alt+Comma { focus-workspace "term"; }
+    Alt+Period { focus-workspace "study"; }
+    Alt+Slash { focus-workspace "draw"; }
+
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+
+    Mod+Ctrl+1 { move-window-to-workspace 1; }
+    Mod+Ctrl+2 { move-window-to-workspace 2; }
+    Mod+Ctrl+3 { move-window-to-workspace 3; }
+    Mod+Ctrl+4 { move-window-to-workspace 4; }
+    Mod+Ctrl+5 { move-window-to-workspace 5; }
+    Mod+Ctrl+6 { move-window-to-workspace 6; }
+    Mod+Ctrl+7 { move-window-to-workspace 7; }
+    Mod+Ctrl+8 { move-window-to-workspace 8; }
+    Mod+Ctrl+9 { move-window-to-workspace 9; }
+    Mod+Ctrl+0 { move-window-to-workspace 10; }
+
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+    Mod+WheelScrollRight { focus-column-right; }
+    Mod+WheelScrollLeft { focus-column-left; }
+
+    Mod+Grave { toggle-overview; }
+
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "+5"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "-5"; }
+    XF86AudioMute allow-when-locked=true { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
+    XF86AudioMicMute allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume +0"; }
+    XF86Launch8 allow-when-locked=true { spawn "swayosd-client" "--output-volume" "5"; }
+    XF86Launch7 allow-when-locked=true { spawn "swayosd-client" "--output-volume" "-5"; }
+
+    XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
+    XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
+
+    XF86MonBrightnessUp allow-when-locked=true { spawn "brightness_step.sh" "up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightness_step.sh" "down"; }
+    XF86Tools allow-when-locked=true { spawn "brightness_step.sh" "up"; }
+    XF86Launch5 allow-when-locked=true { spawn "brightness_step.sh" "down"; }
+
+    XF86ScreenSaver { power-off-monitors; }
+    XF86Launch6 { power-off-monitors; }
+
+    XF86Calculator allow-when-locked=true { spawn "true"; }
+
+    Mod+Ctrl+F4 { quit; }
+}
+
+include "monitors.kdl"
