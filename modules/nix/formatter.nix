@@ -36,6 +36,7 @@ _: {
           shfmt
           ruff
           stylua
+          qt6.qtdeclarative
           taplo
           yamlfmt
           prettier
@@ -129,6 +130,18 @@ _: {
                 "2"
               ];
               includes = [ "*.lua" ];
+              priority = 1;
+            };
+
+            qmlformat = {
+              command = "qmlformat";
+              options = [
+                "--inplace"
+                "--ignore-settings"
+                "--indent-width"
+                "4"
+              ];
+              includes = [ "*.qml" ];
               priority = 1;
             };
 

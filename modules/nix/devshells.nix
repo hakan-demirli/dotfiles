@@ -10,6 +10,7 @@ _: {
           statix
           deadnix
           taplo
+          qt6.qtdeclarative
           yj
           jq
           remarshal
