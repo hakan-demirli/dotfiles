@@ -8,12 +8,8 @@ Item {
     property int pendingPercent: -1
 
     readonly property int maximum: readInteger(maximumFile)
-    readonly property int actualPercent: maximum > 0
-        ? Math.round(readInteger(valueFile) * 100 / maximum)
-        : 0
-    readonly property int shownPercent: pendingPercent >= 0
-        ? pendingPercent
-        : actualPercent
+    readonly property int actualPercent: maximum > 0 ? Math.round(readInteger(valueFile) * 100 / maximum) : 0
+    readonly property int shownPercent: pendingPercent >= 0 ? pendingPercent : actualPercent
 
     signal requestClose
 
@@ -59,11 +55,7 @@ Item {
         id: applyTimer
 
         interval: 50
-        onTriggered: brightnessProcess.exec([
-            "brightnessctl",
-            "set",
-            `${root.pendingPercent}%`,
-        ])
+        onTriggered: brightnessProcess.exec(["brightnessctl", "set", `${root.pendingPercent}%`,])
     }
 
     Timer {

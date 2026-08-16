@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -75,9 +77,7 @@ Item {
         MenuHeader {
             Layout.fillWidth: true
             title: "Bluetooth"
-            subtitle: root.adapter
-                ? root.adapter.enabled ? "Nearby devices" : "Bluetooth is off"
-                : "No adapter"
+            subtitle: root.adapter ? root.adapter.enabled ? "Nearby devices" : "Bluetooth is off" : "No adapter"
             onClose: root.requestClose()
         }
 
@@ -97,9 +97,7 @@ Item {
 
                 Text {
                     text: "\ue1a7"
-                    color: root.adapter && root.adapter.enabled
-                        ? ShellPalette.foreground
-                        : ShellPalette.foregroundMuted
+                    color: root.adapter && root.adapter.enabled ? ShellPalette.foreground : ShellPalette.foregroundMuted
                     font.family: "Material Symbols Rounded"
                     font.pixelSize: 25
                 }
@@ -146,9 +144,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             visible: !root.adapter || !root.adapter.enabled || deviceModel.values.length === 0
-            text: !root.adapter
-                ? "No Bluetooth adapter was found."
-                : root.adapter.enabled ? "Searching for devices..." : "Turn on Bluetooth to see devices."
+            text: !root.adapter ? "No Bluetooth adapter was found." : root.adapter.enabled ? "Searching for devices..." : "Turn on Bluetooth to see devices."
             color: ShellPalette.foregroundMuted
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -168,16 +164,14 @@ Item {
             model: deviceModel
 
             delegate: Rectangle {
+                id: device
+
                 required property var modelData
 
                 width: deviceList.width
                 height: 60
                 radius: Theme.shape.large
-                color: modelData.connected
-                    ? ShellPalette.indicator
-                    : deviceArea.containsMouse
-                        ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                        : "transparent"
+                color: device.modelData.connected ? ShellPalette.indicator : deviceArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
                 RowLayout {
                     anchors.fill: parent
@@ -186,9 +180,7 @@ Item {
                     spacing: Theme.space.medium
 
                     Text {
-                        text: modelData.icon && /headset|headphones|audio/.test(modelData.icon)
-                            ? "\ue310"
-                            : "\ue1a7"
+                        text: device.modelData.icon && /headset|headphones|audio/.test(device.modelData.icon) ? "\ue310" : "\ue1a7"
                         color: ShellPalette.foreground
                         font.family: "Material Symbols Rounded"
                         font.pixelSize: 23
@@ -200,32 +192,26 @@ Item {
 
                         Text {
                             Layout.fillWidth: true
-                            text: modelData.name || modelData.deviceName || "Unknown device"
+                            text: device.modelData.name || device.modelData.deviceName || "Unknown device"
                             color: ShellPalette.foreground
                             elide: Text.ElideRight
                             font.family: Theme.font.plain
                             font.pixelSize: Theme.font.bodyLargeSize
-                            font.weight: modelData.connected
-                                ? Theme.font.titleMediumWeight
-                                : Theme.font.bodyLargeWeight
+                            font.weight: device.modelData.connected ? Theme.font.titleMediumWeight : Theme.font.bodyLargeWeight
                         }
 
                         Text {
                             Layout.fillWidth: true
                             text: {
-                                if (modelData.pairing)
+                                if (device.modelData.pairing)
                                     return "Pairing...";
-                                if (modelData.state === BluetoothDeviceState.Connecting)
+                                if (device.modelData.state === BluetoothDeviceState.Connecting)
                                     return "Connecting...";
-                                if (modelData.connected)
-                                    return modelData.batteryAvailable
-                                        ? `Connected - ${Math.round((modelData.battery > 1 ? modelData.battery / 100 : modelData.battery) * 100)}%`
-                                        : "Connected";
-                                return modelData.paired ? "Paired" : "Available";
+                                if (device.modelData.connected)
+                                    return device.modelData.batteryAvailable ? `Connected - ${Math.round((device.modelData.battery > 1 ? device.modelData.battery / 100 : device.modelData.battery) * 100)}%` : "Connected";
+                                return device.modelData.paired ? "Paired" : "Available";
                             }
-                            color: modelData.connected
-                                ? ShellPalette.foreground
-                                : ShellPalette.foregroundMuted
+                            color: device.modelData.connected ? ShellPalette.foreground : ShellPalette.foregroundMuted
                             elide: Text.ElideRight
                             font.family: Theme.font.plain
                             font.pixelSize: Theme.font.bodySmallSize
@@ -233,10 +219,8 @@ Item {
                     }
 
                     Text {
-                        text: modelData.connected ? "\ue5ca" : "\ue5cc"
-                        color: modelData.connected
-                            ? ShellPalette.foreground
-                            : ShellPalette.foregroundMuted
+                        text: device.modelData.connected ? "\ue5ca" : "\ue5cc"
+                        color: device.modelData.connected ? ShellPalette.foreground : ShellPalette.foregroundMuted
                         font.family: "Material Symbols Rounded"
                         font.pixelSize: 20
                     }
@@ -246,18 +230,16 @@ Item {
                     id: deviceArea
 
                     anchors.fill: parent
-                    enabled: !modelData.pairing
-                        && modelData.state !== BluetoothDeviceState.Connecting
-                        && modelData.state !== BluetoothDeviceState.Disconnecting
+                    enabled: !device.modelData.pairing && device.modelData.state !== BluetoothDeviceState.Connecting && device.modelData.state !== BluetoothDeviceState.Disconnecting
                     hoverEnabled: true
                     cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onClicked: {
-                        if (modelData.connected)
-                            modelData.disconnect();
-                        else if (modelData.paired)
-                            modelData.connect();
+                        if (device.modelData.connected)
+                            device.modelData.disconnect();
+                        else if (device.modelData.paired)
+                            device.modelData.connect();
                         else
-                            modelData.pair();
+                            device.modelData.pair();
                     }
                 }
             }

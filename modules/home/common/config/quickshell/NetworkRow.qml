@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 
@@ -17,11 +19,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: Theme.shape.large
-        color: root.network.active
-            ? ShellPalette.indicator
-            : area.containsMouse
-                ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                : "transparent"
+        color: root.network.active ? ShellPalette.indicator : area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
         Behavior on color {
             ColorAnimation {
@@ -50,9 +48,7 @@ Item {
                     height: 5 + index * 4
                     y: 20 - height
                     radius: 1
-                    color: index < root.bars
-                        ? ShellPalette.foreground
-                        : Qt.alpha(ShellPalette.foreground, 0.22)
+                    color: index < root.bars ? ShellPalette.foreground : Qt.alpha(ShellPalette.foreground, 0.22)
                 }
             }
         }
@@ -68,9 +64,7 @@ Item {
                 elide: Text.ElideRight
                 font.family: Theme.font.plain
                 font.pixelSize: Theme.font.bodyLargeSize
-                font.weight: root.network.active
-                    ? Theme.font.titleMediumWeight
-                    : Theme.font.bodyLargeWeight
+                font.weight: root.network.active ? Theme.font.titleMediumWeight : Theme.font.bodyLargeWeight
             }
 
             Text {
@@ -86,9 +80,7 @@ Item {
                         return "Open";
                     return "Secured";
                 }
-                color: root.network.active
-                    ? ShellPalette.foreground
-                    : ShellPalette.foregroundMuted
+                color: root.network.active ? ShellPalette.foreground : ShellPalette.foregroundMuted
                 elide: Text.ElideRight
                 font.family: Theme.font.plain
                 font.pixelSize: Theme.font.bodySmallSize
@@ -97,12 +89,8 @@ Item {
 
         Text {
             Layout.alignment: Qt.AlignVCenter
-            text: root.network.active
-                ? "\ue5ca"
-                : root.passwordRequired ? "\ue897" : "\ue5cc"
-            color: root.network.active
-                ? ShellPalette.foreground
-                : ShellPalette.foregroundMuted
+            text: root.network.active ? "\ue5ca" : root.passwordRequired ? "\ue897" : "\ue5cc"
+            color: root.network.active ? ShellPalette.foreground : ShellPalette.foregroundMuted
             font.family: "Material Symbols Rounded"
             font.pixelSize: 20
         }

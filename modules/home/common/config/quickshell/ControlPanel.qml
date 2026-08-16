@@ -41,9 +41,7 @@ Item {
                 Layout.fillWidth: true
                 icon: NetworkService.wifiEnabled ? "\ue63e" : "\ue648"
                 title: "Wi-Fi"
-                subtitle: NetworkService.activeNetwork
-                    ? NetworkService.activeNetwork.name
-                    : NetworkService.wifiEnabled ? "Disconnected" : "Off"
+                subtitle: NetworkService.activeNetwork ? NetworkService.activeNetwork.name : NetworkService.wifiEnabled ? "Disconnected" : "Off"
                 onActivated: root.requestMenu("wifi")
             }
 
@@ -51,9 +49,7 @@ Item {
                 Layout.fillWidth: true
                 icon: "\ue1a7"
                 title: "Bluetooth"
-                subtitle: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled
-                    ? "On"
-                    : "Off"
+                subtitle: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled ? "On" : "Off"
                 onActivated: root.requestMenu("bluetooth")
             }
 
@@ -61,23 +57,15 @@ Item {
                 Layout.fillWidth: true
                 icon: "\ue32d"
                 title: "Sound"
-                subtitle: Pipewire.defaultAudioSink
-                    ? Pipewire.defaultAudioSink.description
-                    : "No output"
+                subtitle: Pipewire.defaultAudioSink ? Pipewire.defaultAudioSink.description : "No output"
                 onActivated: root.requestMenu("audio")
             }
 
             ControlTile {
                 Layout.fillWidth: true
-                icon: Pipewire.defaultAudioSource
-                        && Pipewire.defaultAudioSource.audio
-                        && Pipewire.defaultAudioSource.audio.muted
-                    ? "\ue02b"
-                    : "\ue029"
+                icon: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio && Pipewire.defaultAudioSource.audio.muted ? "\ue02b" : "\ue029"
                 title: "Microphone"
-                subtitle: Pipewire.defaultAudioSource
-                    ? Pipewire.defaultAudioSource.description
-                    : "No input"
+                subtitle: Pipewire.defaultAudioSource ? Pipewire.defaultAudioSource.description : "No input"
                 onActivated: root.requestMenu("microphone")
             }
 
@@ -93,9 +81,7 @@ Item {
                 Layout.fillWidth: true
                 icon: BatteryService.charging ? "\ue1a3" : "\ue1a4"
                 title: "Battery"
-                subtitle: BatteryService.percentage >= 0
-                    ? `${BatteryService.percentage}% - ${BatteryService.detail}`
-                    : "Unavailable"
+                subtitle: BatteryService.percentage >= 0 ? `${BatteryService.percentage}% - ${BatteryService.detail}` : "Unavailable"
                 onActivated: root.requestMenu("battery")
             }
 
@@ -117,13 +103,10 @@ Item {
 
             ControlTile {
                 Layout.fillWidth: true
-                icon: "\ue7f4"
+                icon: NotificationService.doNotDisturb ? "\ue51d" : "\ue7f4"
                 title: "Notifications"
-                subtitle: "Open notification center"
-                onActivated: {
-                    SystemActions.toggleNotifications();
-                    root.requestClose();
-                }
+                subtitle: NotificationService.doNotDisturb ? "Do not disturb" : NotificationService.count > 0 ? `${NotificationService.count} waiting` : "Nothing waiting"
+                onActivated: root.requestMenu("notifications")
             }
 
             ControlTile {

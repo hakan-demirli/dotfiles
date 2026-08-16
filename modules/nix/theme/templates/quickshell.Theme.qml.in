@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    readonly property QtObject palette: QtObject {
+    component PaletteTokens: QtObject {
         readonly property color m3error: "{{colour-error}}"
         readonly property color m3errorContainer: "{{colour-error-container}}"
         readonly property color m3inverseOnSurface: "{{colour-inverse-on-surface}}"
@@ -52,7 +52,7 @@ QtObject {
         readonly property color m3warningContainer: "{{colour-warning-container}}"
     }
 
-    readonly property QtObject shape: QtObject {
+    component ShapeTokens: QtObject {
         readonly property int extraLarge: {{radius-extra-large}}
         readonly property int extraSmall: {{radius-extra-small}}
         readonly property int full: {{radius-full}}
@@ -62,7 +62,7 @@ QtObject {
         readonly property int small: {{radius-small}}
     }
 
-    readonly property QtObject space: QtObject {
+    component SpaceTokens: QtObject {
         readonly property int extraLarge: {{space-extra-large}}
         readonly property int extraSmall: {{space-extra-small}}
         readonly property int large: {{space-large}}
@@ -71,7 +71,7 @@ QtObject {
         readonly property int small: {{space-small}}
     }
 
-    readonly property QtObject font: QtObject {
+    component FontTokens: QtObject {
         readonly property string brand: "{{font-brand}}"
         readonly property string icon: "{{font-icon}}"
         readonly property string mono: "{{font-mono}}"
@@ -123,7 +123,7 @@ QtObject {
         readonly property int titleSmallWeight: {{text-weight-title-small}}
     }
 
-    readonly property QtObject duration: QtObject {
+    component DurationTokens: QtObject {
         readonly property int extraLong1: {{duration-extra-long1}}
         readonly property int extraLong2: {{duration-extra-long2}}
         readonly property int extraLong3: {{duration-extra-long3}}
@@ -142,10 +142,17 @@ QtObject {
         readonly property int short4: {{duration-short4}}
     }
 
-    readonly property QtObject state: QtObject {
+    component StateTokens: QtObject {
         readonly property real draggedOpacity: {{state-dragged-opacity}}
         readonly property real focusOpacity: {{state-focus-opacity}}
         readonly property real hoverOpacity: {{state-hover-opacity}}
         readonly property real pressedOpacity: {{state-pressed-opacity}}
     }
+
+    readonly property PaletteTokens palette: PaletteTokens {}
+    readonly property ShapeTokens shape: ShapeTokens {}
+    readonly property SpaceTokens space: SpaceTokens {}
+    readonly property FontTokens font: FontTokens {}
+    readonly property DurationTokens duration: DurationTokens {}
+    readonly property StateTokens state: StateTokens {}
 }

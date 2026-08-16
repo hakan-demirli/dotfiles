@@ -11,12 +11,8 @@ Rectangle {
 
     width: Math.min(label.implicitWidth + 16, 138)
     height: Math.max(26, label.implicitHeight + 12)
-    x: placement === "top"
-        ? (parent.width - width) / 2
-        : -width - 6
-    y: placement === "top"
-        ? -height - 6
-        : (parent.height - height) / 2
+    x: placement === "top" ? (parent.width - width) / 2 : -width - 6
+    y: placement === "top" ? -height - 6 : (parent.height - height) / 2
     z: 1000
     visible: opacity > 0
     opacity: shown ? 1 : 0

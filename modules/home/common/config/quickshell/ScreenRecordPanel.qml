@@ -5,12 +5,7 @@ Item {
     id: root
 
     readonly property bool recording: SystemActions.recordingState === "recording"
-    readonly property bool transitional: [
-        "selecting",
-        "starting",
-        "stopping",
-        "copying",
-    ].includes(SystemActions.recordingState)
+    readonly property bool transitional: ["selecting", "starting", "stopping", "copying",].includes(SystemActions.recordingState)
 
     signal requestClose
 
@@ -28,8 +23,7 @@ Item {
         MenuHeader {
             Layout.fillWidth: true
             title: "Screen recording"
-            subtitle: SystemActions.recordingState.charAt(0).toUpperCase()
-                + SystemActions.recordingState.slice(1)
+            subtitle: SystemActions.recordingState.charAt(0).toUpperCase() + SystemActions.recordingState.slice(1)
             onClose: root.requestClose()
         }
 
@@ -64,9 +58,7 @@ Item {
                     }
 
                     Text {
-                        text: root.recording
-                            ? "System audio is included"
-                            : "Choose the display or a region"
+                        text: root.recording ? "System audio is included" : "Choose the display or a region"
                         color: ShellPalette.foregroundMuted
                         font.family: Theme.font.plain
                         font.pixelSize: Theme.font.bodySmallSize

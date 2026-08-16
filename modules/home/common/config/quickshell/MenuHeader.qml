@@ -22,9 +22,7 @@ Item {
             implicitWidth: 32
             implicitHeight: 32
             radius: Theme.shape.full
-            color: backArea.containsMouse
-                ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                : "transparent"
+            color: backArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
             Text {
                 anchors.centerIn: parent
@@ -58,9 +56,7 @@ Item {
             implicitWidth: 32
             implicitHeight: 32
             radius: Theme.shape.full
-            color: closeArea.containsMouse
-                ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-                : "transparent"
+            color: closeArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
             Text {
                 anchors.centerIn: parent

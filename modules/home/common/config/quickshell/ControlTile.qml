@@ -12,9 +12,7 @@ Rectangle {
 
     implicitHeight: 64
     radius: Theme.shape.large
-    color: area.containsMouse
-        ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity)
-        : ShellPalette.surface
+    color: area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : ShellPalette.surface
     border.width: 1
     border.color: ShellPalette.indicator
 

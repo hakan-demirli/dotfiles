@@ -44,10 +44,7 @@ Item {
                 spacing: Theme.space.medium
 
                 Repeater {
-                    model: [
-                        Qt.formatTime(clock.date, "HH"),
-                        Qt.formatTime(clock.date, "mm"),
-                    ]
+                    model: [Qt.formatTime(clock.date, "HH"), Qt.formatTime(clock.date, "mm"),]
 
                     Text {
                         required property string modelData
