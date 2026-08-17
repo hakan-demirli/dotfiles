@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+editor_command=${EDITOR:-hx}
+
 if [[ -z ${1:-} ]] || [[ -z ${2:-} ]]; then
   tmux display-message "Error: Script requires CWD and Pane ID."
   exit 1
@@ -43,6 +45,5 @@ else
 fi
 
 absolute_path=$(realpath -m -- "$final_path")
-printf -v editor_launch 'nvim -- %q' "$absolute_path"
 
-tmux send-keys -t "$target_pane" C-c " $editor_launch" Enter
+tmux send-keys -t "$target_pane" C-c " $editor_command $absolute_path" Enter
