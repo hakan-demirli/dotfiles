@@ -99,6 +99,28 @@ jobs:
           echo "hosts-arm=$arm" >> "$GITHUB_OUTPUT"
           echo "x86: $x86"
           echo "arm: $arm"
+  discover-device-packages:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.list.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - id: list
+        run: |
+          devices=$(nix eval --json '.#devices' --apply 'builtins.attrNames')
+          packages=$(nix eval --json '.#packages.x86_64-linux' --apply 'builtins.attrNames')
+          device_packages=$(jq -nc --argjson devices "$devices" --argjson packages "$packages" '
+            [$packages[] as $package
+              | select(any($devices[]; . as $device | $package | startswith($device + "-")))
+              | $package]
+          ')
+          if [[ $(jq length <<< "$device_packages") -eq 0 ]]; then
+            echo "No device packages found"
+            exit 1
+          fi
+          echo "packages=$device_packages" >> "$GITHUB_OUTPUT"
+          echo "discovered: $device_packages"
   build-hosts-x86:
     needs: [discover-hosts]
     runs-on: ubuntu-latest
@@ -134,9 +156,39 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
       - name: Build ${{ matrix.host }}
         run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
+  build-device-packages:
+    needs: [discover-device-packages]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.discover-device-packages.outputs.packages) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - name: Build ${{ matrix.package }}
+        run: nix build .#${{ matrix.package }}
+  build-router-firmware:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        uses: BRAINSia/free-disk-space@7048ffbf50819342ac964ef3998a51c2564a8a75
+        with:
+          tool-cache: false
+          mandb: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - name: Build router-0 firmware
+        run: nix run .#router-0-firmware -- --clean
   flake-check:
     name: flake-check
-    needs: [fast-checks, vm-tests, build-hosts-x86, build-hosts-arm]
+    needs: [fast-checks, vm-tests, build-hosts-x86, build-hosts-arm, build-device-packages, build-router-firmware]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -146,7 +198,9 @@ jobs:
             "fast-checks=${{ needs.fast-checks.result }}" \
             "vm-tests=${{ needs.vm-tests.result }}" \
             "build-hosts-x86=${{ needs.build-hosts-x86.result }}" \
-            "build-hosts-arm=${{ needs.build-hosts-arm.result }}"
+            "build-hosts-arm=${{ needs.build-hosts-arm.result }}" \
+            "build-device-packages=${{ needs.build-device-packages.result }}" \
+            "build-router-firmware=${{ needs.build-router-firmware.result }}"
           do
             name="${r%=*}"; result="${r#*=}"
             echo "$name: $result"
