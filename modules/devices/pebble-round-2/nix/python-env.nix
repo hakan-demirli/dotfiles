@@ -4,6 +4,23 @@
 let
   ps = pkgs.python313Packages;
 
+  pypng = ps.buildPythonPackage rec {
+    pname = "pypng";
+    version = "0.20220715.0";
+    pyproject = true;
+
+    src = ps.fetchPypi {
+      inherit pname version;
+      hash = "sha256-c5xDO6lvB4MV3lTA25da7lN8vD4dCuTtmqsMoeQn4sE=";
+    };
+
+    build-system = [ ps.setuptools ];
+
+    doCheck = false;
+
+    pythonImportsCheck = [ "png" ];
+  };
+
   nanopb = ps.buildPythonPackage rec {
     pname = "nanopb";
     version = "0.4.9.1";
@@ -75,7 +92,7 @@ pkgs.python313.withPackages (p: [
   p.pyusb
   p.pyserial
   p.sh
-  p.pypng
+  pypng
   p.pexpect
   p.cobs
   p.svg-path

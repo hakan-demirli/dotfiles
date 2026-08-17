@@ -156,11 +156,11 @@ Directories containing `modules/devices/<id>/default.nix` are auto-discovered.
 Their `packages` become `<id>-<name>` flake packages. Deployment overlay APIs
 are exposed under `devices.<id>.lib`. Keep devices self-contained.
 
-| Device                  | Build                                                    | Deployment                                                   |
-| ----------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
-| GL.iNet `router-0`      | `nix build --option sandbox relaxed .#router-0-firmware` | Flash the sysupgrade image and push config overlays over SSH |
-| Sipeed `kvm-desk-0`     | `nix build .#kvm-desk-0-config-overlay-empty`            | Flash vendor firmware manually and push overlays over SSH    |
-| Pebble `pebble-round-2` | `nix build .#pebble-round-2-firmware`                    | Sideload `result/firmware.pbz` through the mobile app        |
+| Device                  | Build                                         | Deployment                                                             |
+| ----------------------- | --------------------------------------------- | ---------------------------------------------------------------------- |
+| GL.iNet `router-0`      | `nix run .#router-0-firmware`                 | Flash `result-router-0/firmware.bin` and push config overlays over SSH |
+| Sipeed `kvm-desk-0`     | `nix build .#kvm-desk-0-config-overlay-empty` | Flash vendor firmware manually and push overlays over SSH              |
+| Pebble `pebble-round-2` | `nix build .#pebble-round-2-firmware`         | Sideload `result/firmware.pbz` through the mobile app                  |
 
 Router and KVM overlay arguments are defined in each device's
 `nix/config-overlay.nix`. The router's empty overlay enables the public

@@ -1,6 +1,8 @@
 { pkgs }:
 let
   upstreamRev = "d329a480a0ceb84768b4b2ed53f2f87633926a4d";
+  upstreamVersion = "r35794-d329a48";
+  upstreamDateEpoch = 1786739409;
 
   src = pkgs.fetchFromGitHub {
     owner = "openwrt";
@@ -16,12 +18,12 @@ pkgs.runCommand "openwrt-source-be10000"
       pkgs.gnupatch
     ];
     passthru = {
-      inherit upstreamRev;
+      inherit upstreamRev upstreamVersion upstreamDateEpoch;
       patchSet = ../openwrt/patches;
     };
   }
   ''
-    cp -r --no-preserve=mode,ownership ${src} $out
+    cp -r --no-preserve=ownership ${src} $out
     chmod -R u+w $out
     cd $out
 

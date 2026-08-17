@@ -52,7 +52,7 @@ in
     hardware = facts.hardware.chassis;
     hardware_soc = facts.hardware.cpu_model;
     inherit hostname;
-    needsRelaxedSandbox = true;
+    needsRelaxedSandbox = false;
     lan_ip = facts.labels.lan_ip;
     lan_cidr = facts.labels.lan_cidr;
     tailscale_tag = facts.labels.tailscale_tag;
