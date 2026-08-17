@@ -31,12 +31,12 @@ if [[ $tmux_command_current == "yazi" ]]; then
     if [[ -f $temp_full_path ]] \
       && [[ $cursor_row_current =~ ^[0-9]+$ ]] \
       && [[ $cursor_col_current =~ ^[0-9]+$ ]]; then
-      tmux_command_current="nvim"
+      tmux_command_current="hx"
     fi
   fi
 fi
 
-if [[ $tmux_command_current != "nvim" ]]; then
+if [[ $tmux_command_current != "hx" ]]; then
   exit
 fi
 

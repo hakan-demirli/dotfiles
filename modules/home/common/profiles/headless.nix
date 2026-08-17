@@ -9,7 +9,7 @@
     enable = true;
     viAlias = true;
     vimAlias = true;
-    defaultEditor = true;
+    defaultEditor = false;
     plugins = [ pkgs.vimPlugins.nvim-lspconfig ];
   };
 

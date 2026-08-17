@@ -53,7 +53,8 @@ fzf_opts=(
 export FZF_DEFAULT_OPTS="${fzf_opts[*]}"
 
 export OPENER="xdg-open"
-export EDITOR="nvim"
+export EDITOR="hx"
+export VISUAL="hx"
 export TERMINAL="kitty"
 
 export MANPAGER="less -R --use-color -Dd+r -Du+b"

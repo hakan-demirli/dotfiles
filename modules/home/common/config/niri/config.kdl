@@ -83,7 +83,7 @@ hotkey-overlay {
 }
 
 environment {
-    EDITOR "nvim"
+    EDITOR "hx"
     TERMINAL "kitty"
     OPENER "xdg-open"
     ANDROID_HOME "~/.local/share/android"

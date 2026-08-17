@@ -27,7 +27,7 @@ if [[ $tmux_command == "yazi" ]]; then
     if [[ -f $temp_full_path ]] \
       && [[ $cursor_row =~ ^[0-9]+$ ]] \
       && [[ $cursor_col =~ ^[0-9]+$ ]]; then
-      tmux_command="nvim"
+      tmux_command="hx"
     fi
   fi
 fi
@@ -36,7 +36,7 @@ if [[ $buffer_path == ~* ]]; then
   buffer_path="${buffer_path/#\~/$HOME}"
 fi
 
-if [[ $tmux_command != "nvim" ]]; then
+if [[ $tmux_command != "hx" ]]; then
   buffer_path=""
   cursor_row=""
   cursor_col=""

@@ -2,8 +2,7 @@
 set -euo pipefail
 
 idx=$1
-editor_command=${EDITOR:-nvim}
-editor_name=$(basename "${editor_command%% *}")
+editor_command=${EDITOR:-hx}
 terminal_command="bash"
 
 tmux_cwd=$(tmux display-message -p '#{session_path}')
@@ -35,36 +34,25 @@ IFS=':,' read -r tmux_window_target tmux_command_target buffer_name_target curso
 tmux_session_line=$(tail -n 2 "$data_file" | head -n 1)
 tmux_session_target="${tmux_session_line#*: }"
 
-if [[ $tmux_command_target == "nvim" || $tmux_command_target == "$editor_name" || $tmux_command_target == "hx" ]]; then
-  target_path="$buffer_dir_target/$buffer_name_target"
-  cursor_row_target=${cursor_row_target:-1}
-  cursor_col_target=${cursor_col_target:-1}
-
+if [[ $tmux_command_target == *"$editor_command"* ]]; then
   if tmux has-session -t "$tmux_session_target:$tmux_window_target"; then
     tmux select-window -t "$tmux_session_target:$tmux_window_target" 2> /dev/null
-    active_command=$(tmux display-message -p -t "$tmux_session_target:$tmux_window_target" '#{pane_current_command}')
-
-    if [[ $active_command == "nvim" ]]; then
-      nvim_path=${target_path//\'/\'\'}
-      printf -v editor_open ":execute 'edit ' . fnameescape('%s') | call cursor(%s, %s)" "$nvim_path" "$cursor_row_target" "$cursor_col_target"
-      tmux send-keys -t "$tmux_session_target:$tmux_window_target" Escape "$editor_open" C-m
-    elif [[ $active_command == "hx" ]]; then
-      case "$idx" in
-        1) editor_key=M-u ;;
-        2) editor_key=M-i ;;
-        3) editor_key=M-o ;;
-        4) editor_key=M-p ;;
-      esac
-      tmux send-keys -t "$tmux_session_target:$tmux_window_target" "$editor_key"
-    else
-      printf -v editor_launch 'nvim "+call cursor(%s, %s)" -- %q' "$cursor_row_target" "$cursor_col_target" "$target_path"
-      tmux send-keys -t "$tmux_session_target:$tmux_window_target" "$editor_launch" C-m
+    if [[ $idx == "1" ]]; then
+      tmux send-keys -t "$tmux_session_target:$tmux_window_target" M-u
+    fi
+    if [[ $idx == "2" ]]; then
+      tmux send-keys -t "$tmux_session_target:$tmux_window_target" M-i
+    fi
+    if [[ $idx == "3" ]]; then
+      tmux send-keys -t "$tmux_session_target:$tmux_window_target" M-o
+    fi
+    if [[ $idx == "4" ]]; then
+      tmux send-keys -t "$tmux_session_target:$tmux_window_target" M-p
     fi
   else
-    relative_path=$(realpath --relative-to="$tmux_pane_path_target" "$target_path")
-    printf -v editor_launch 'nvim "+call cursor(%s, %s)" -- %q' "$cursor_row_target" "$cursor_col_target" "$relative_path"
+    relative_path=$(realpath --relative-to="$tmux_pane_path_target" "$buffer_dir_target/$buffer_name_target")
     tmux new-window -t "$tmux_session_target:$tmux_window_target" -c "$tmux_pane_path_target" 2> /dev/null
-    tmux send-keys -t "$tmux_session_target:$tmux_window_target" "$editor_launch" C-m
+    tmux send-keys -t "$tmux_session_target:$tmux_window_target" "hx $relative_path:$cursor_col_target:$cursor_row_target" C-m
   fi
 else
   if tmux has-session -t "$tmux_session_target:$tmux_window_target"; then

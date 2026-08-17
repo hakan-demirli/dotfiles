@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-function nvim_project() {
+editor_command=${EDITOR:-hx}
+
+function editor_project() {
   selected_dir="$(find -L ~/.config /mnt/second/rep \( \
     -name node_modules -o \
     -name conda -o \
@@ -17,8 +19,8 @@ function nvim_project() {
   if [ -n "$selected_dir" ]; then
     cd "$selected_dir" || return 1
     session_name=$(basename "$selected_dir" | tr '.:' '_')
-    tmux new-session -s "$session_name" "nvim $selected_dir"
+    tmux new-session -s "$session_name" "$editor_command $selected_dir"
   fi
 }
 
-nvim_project "$@"
+editor_project "$@"
