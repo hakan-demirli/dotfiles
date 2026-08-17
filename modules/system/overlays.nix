@@ -7,8 +7,6 @@ let
   hwGpu = if host == null then null else (host.hardware.gpu or null);
   hasNvidia = hwGpu != null && (builtins.match ".*nvidia.*" hwGpu) != null;
 
-  hyprlandGlazeOverlay = import ./hyprland-glaze-overlay.nix;
-
   pythonTritonOverlay = _final: prev: {
     python312 =
       if prev.stdenv.isLinux then
@@ -30,5 +28,5 @@ let
   };
 in
 {
-  nixpkgs.overlays = [ hyprlandGlazeOverlay ] ++ lib.optional hasNvidia pythonTritonOverlay;
+  nixpkgs.overlays = lib.optional hasNvidia pythonTritonOverlay;
 }

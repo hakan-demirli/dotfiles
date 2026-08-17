@@ -21,7 +21,6 @@ in
   };
   python312Packages = final.python312.pkgs;
 })
-// (import ../../../../system/hyprland-glaze-overlay.nix final prev)
 // {
   # https://github.com/NixOS/nixpkgs/pull/548380
   dracula-theme =

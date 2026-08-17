@@ -11,6 +11,7 @@ let
   inherit (pkgs) lib;
 
   boardSlug = builtins.replaceStrings [ "@" ] [ "_" ] board;
+  bundlePrefix = if variant == "prf" then "recovery" else variant;
 
   pythonEnv = import ./python-env.nix { inherit pkgs; };
 
@@ -153,9 +154,9 @@ pkgs.stdenv.mkDerivation {
     mkdir -p $out
 
     shopt -s nullglob
-    pbz_files=( build/${variant}_${boardSlug}_*.pbz )
+    pbz_files=( build/${bundlePrefix}_${boardSlug}_*.pbz )
     if [ ''${#pbz_files[@]} -eq 0 ]; then
-      echo "ERROR: no .pbz bundle emitted. Expected build/${variant}_${boardSlug}_*.pbz" >&2
+      echo "ERROR: no .pbz bundle emitted. Expected build/${bundlePrefix}_${boardSlug}_*.pbz" >&2
       echo "Build tree state:" >&2
       ls -la build/ >&2 || true
       exit 1
