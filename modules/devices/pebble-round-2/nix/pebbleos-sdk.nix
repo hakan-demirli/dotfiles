@@ -38,9 +38,9 @@ stdenv.mkDerivation {
     inherit (bundle) sha256;
   };
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
 
-  buildInputs = lib.optionals stdenv.isLinux (
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux (
     with pkgs;
     [
       ncurses6

@@ -69,9 +69,14 @@ QtObject {
     }
 
     component SpaceTokens: QtObject {
+        id: tokens
+
         readonly property int extraLarge: 28
+        readonly property int extraLargeIncreased: tokens.extraLarge + tokens.extraSmall
+        readonly property int extraExtraLarge: tokens.extraLarge + tokens.largeIncreased
         readonly property int extraSmall: 4
         readonly property int large: 16
+        readonly property int largeIncreased: tokens.large + tokens.extraSmall
         readonly property int medium: 12
         readonly property int none: 0
         readonly property int small: 8
@@ -82,6 +87,8 @@ QtObject {
         readonly property string icon: "Symbols Nerd Font Mono"
         readonly property string mono: "JetBrainsMono Nerd Font Mono"
         readonly property string plain: "Roboto"
+        readonly property string symbols: "Material Symbols Rounded"
+        readonly property int boldWeight: 700
         readonly property int bodyLargeSize: 16
         readonly property int bodyLargeLine: 24
         readonly property int bodyLargeWeight: 400
@@ -118,6 +125,8 @@ QtObject {
         readonly property int labelSmallSize: 11
         readonly property int labelSmallLine: 16
         readonly property int labelSmallWeight: 500
+        readonly property int mediumWeight: 500
+        readonly property int regularWeight: 400
         readonly property int titleLargeSize: 22
         readonly property int titleLargeLine: 28
         readonly property int titleLargeWeight: 400
@@ -155,10 +164,86 @@ QtObject {
         readonly property real pressedOpacity: 0.120000
     }
 
+    component IconTokens: QtObject {
+        readonly property int badge: Theme.font.labelSmallSize
+        readonly property int compact: Theme.font.bodyLargeSize
+        readonly property int small: Theme.font.titleSmallLine
+        readonly property int medium: Theme.font.bodyLargeLine
+        readonly property int large: Theme.space.extraLargeIncreased
+        readonly property int extraLarge: Theme.font.headlineLargeLine
+        readonly property int hero: Theme.space.extraExtraLarge
+    }
+
+    component MetricTokens: QtObject {
+        id: metrics
+
+        readonly property int stroke: 1
+        readonly property int focusStroke: metrics.stroke * 2
+        readonly property int listSpacing: metrics.focusStroke
+
+        readonly property int barThickness: Theme.space.extraExtraLarge
+        readonly property int menuColumns: 2
+        readonly property int menuWidth: Theme.space.extraExtraLarge * 8
+        readonly property int menuFallbackHeight: Theme.space.extraExtraLarge * 5
+        readonly property int panelDialogHeight: Theme.space.extraExtraLarge * 6 + Theme.space.medium
+        readonly property int panelListHeight: Theme.space.extraExtraLarge * 8 + Theme.space.large
+        readonly property int panelTallHeight: Theme.space.extraExtraLarge * 10
+        readonly property int panelExtraTallHeight: Theme.space.extraExtraLarge * 11 + Theme.space.extraLargeIncreased
+
+        readonly property int compactIconButtonSize: Theme.font.titleMediumLine
+        readonly property int headerButtonSize: metrics.compactIconButtonSize + Theme.space.small
+        readonly property int iconButtonSize: metrics.compactIconButtonSize + Theme.space.small * 2
+        readonly property int menuHeaderHeight: metrics.headerButtonSize + Theme.space.medium
+        readonly property int buttonHeight: Theme.font.labelLargeLine + Theme.space.medium * 2
+        readonly property int compactButtonHeight: Theme.font.labelLargeLine + Theme.space.small * 2
+        readonly property int primaryButtonHeight: Theme.font.bodyLargeLine + Theme.space.medium * 2
+        readonly property int controlTileHeight: Theme.font.bodyLargeLine + Theme.font.bodySmallLine + Theme.space.medium * 2
+        readonly property int controlRowHeight: metrics.controlTileHeight - Theme.space.extraSmall
+        readonly property int listRowHeight: Theme.font.bodyLargeLine + Theme.space.large * 2
+        readonly property int mediaControlHeight: metrics.buttonHeight + Theme.space.large * 2
+        readonly property int textFieldHeight: metrics.listRowHeight
+        readonly property int batteryGaugeHeight: metrics.controlRowHeight * 3
+
+        readonly property int switchWidth: metrics.switchHeight + Theme.font.bodyMediumLine
+        readonly property int switchHeight: metrics.headerButtonSize
+        readonly property int switchHandleSize: Theme.icon.medium
+        readonly property int sliderHeight: metrics.iconButtonSize
+        readonly property int sliderTrackHeight: Theme.space.small
+        readonly property int sliderHandleSize: Theme.icon.small
+
+        readonly property int notificationImageSize: Theme.space.extraExtraLarge
+        readonly property int notificationAppIconSize: Theme.space.extraLargeIncreased
+        readonly property int notificationBodyLineLimit: 6
+        readonly property int percentageLabelWidth: metrics.buttonHeight - metrics.focusStroke
+
+        readonly property int tooltipMaximumWidth: Theme.space.extraExtraLarge * 3
+        readonly property int tooltipMinimumHeight: Theme.font.labelSmallLine + Theme.space.medium
+        readonly property int overlayZ: 1000
+
+        readonly property int signalBarCount: 4
+        readonly property int signalBarWidth: Theme.space.extraSmall
+        readonly property int signalBarBaseHeight: Theme.space.extraSmall + metrics.stroke
+        readonly property int signalBarStep: Theme.space.extraSmall
+    }
+
+    component OpacityTokens: QtObject {
+        readonly property real subtle: Theme.state.hoverOpacity / 2
+        readonly property real selected: Theme.state.hoverOpacity
+        readonly property real low: Theme.state.focusOpacity
+        readonly property real medium: Theme.state.draggedOpacity
+        readonly property real inactive: Theme.state.focusOpacity * 2
+        readonly property real placeholder: Theme.state.draggedOpacity + Theme.state.focusOpacity
+        readonly property real boundary: Theme.state.draggedOpacity * 2
+        readonly property real muted: Theme.state.draggedOpacity * 3
+    }
+
     readonly property PaletteTokens palette: PaletteTokens {}
     readonly property ShapeTokens shape: ShapeTokens {}
     readonly property SpaceTokens space: SpaceTokens {}
     readonly property FontTokens font: FontTokens {}
     readonly property DurationTokens duration: DurationTokens {}
     readonly property StateTokens state: StateTokens {}
+    readonly property IconTokens icon: IconTokens {}
+    readonly property MetricTokens metrics: MetricTokens {}
+    readonly property OpacityTokens opacity: OpacityTokens {}
 }

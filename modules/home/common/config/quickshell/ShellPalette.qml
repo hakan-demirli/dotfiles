@@ -7,5 +7,5 @@ QtObject {
     readonly property color surface: Theme.palette.m3surfaceContainer
     readonly property color indicator: Theme.palette.m3outlineVariant
     readonly property color foreground: Theme.palette.m3onSurface
-    readonly property color foregroundMuted: Qt.alpha(foreground, 0.48)
+    readonly property color foregroundMuted: Qt.alpha(foreground, Theme.opacity.muted)
 }

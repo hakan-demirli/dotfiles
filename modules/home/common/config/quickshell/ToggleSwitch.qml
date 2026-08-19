@@ -8,8 +8,8 @@ Rectangle {
 
     signal toggled(bool checked)
 
-    implicitWidth: 52
-    implicitHeight: 32
+    implicitWidth: Theme.metrics.switchWidth
+    implicitHeight: Theme.metrics.switchHeight
     Layout.minimumWidth: implicitWidth
     Layout.preferredWidth: implicitWidth
     Layout.maximumWidth: implicitWidth
@@ -17,9 +17,9 @@ Rectangle {
     Layout.preferredHeight: implicitHeight
     Layout.maximumHeight: implicitHeight
     Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-    radius: height / 2
+    radius: Theme.shape.full
     color: checked ? ShellPalette.indicator : ShellPalette.surface
-    border.width: 1
+    border.width: Theme.metrics.stroke
     border.color: ShellPalette.indicator
 
     Behavior on color {
@@ -29,11 +29,11 @@ Rectangle {
     }
 
     Rectangle {
-        width: 24
-        height: 24
-        radius: height / 2
+        width: Theme.metrics.switchHandleSize
+        height: Theme.metrics.switchHandleSize
+        radius: Theme.shape.full
         y: (parent.height - height) / 2
-        x: root.checked ? parent.width - width - 4 : 4
+        x: root.checked ? parent.width - width - Theme.space.extraSmall : Theme.space.extraSmall
         color: root.checked ? ShellPalette.foreground : ShellPalette.foregroundMuted
 
         Behavior on x {

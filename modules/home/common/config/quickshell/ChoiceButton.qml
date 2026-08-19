@@ -8,10 +8,10 @@ Rectangle {
 
     signal activated
 
-    implicitHeight: 44
+    implicitHeight: Theme.metrics.buttonHeight
     radius: Theme.shape.full
     color: checked ? ShellPalette.indicator : area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : ShellPalette.surface
-    border.width: 1
+    border.width: Theme.metrics.stroke
     border.color: ShellPalette.indicator
 
     Text {

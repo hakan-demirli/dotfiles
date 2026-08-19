@@ -10,10 +10,10 @@ Rectangle {
 
     signal activated
 
-    implicitHeight: 64
+    implicitHeight: Theme.metrics.controlTileHeight
     radius: Theme.shape.large
     color: area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : ShellPalette.surface
-    border.width: 1
+    border.width: Theme.metrics.stroke
     border.color: ShellPalette.indicator
 
     RowLayout {
@@ -25,8 +25,8 @@ Rectangle {
         Text {
             text: root.icon
             color: ShellPalette.foreground
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: 25
+            font.family: Theme.font.symbols
+            font.pixelSize: Theme.icon.medium
         }
 
         ColumnLayout {
@@ -57,8 +57,8 @@ Rectangle {
         Text {
             text: "\ue5cc"
             color: ShellPalette.foregroundMuted
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: 20
+            font.family: Theme.font.symbols
+            font.pixelSize: Theme.icon.small
         }
     }
 

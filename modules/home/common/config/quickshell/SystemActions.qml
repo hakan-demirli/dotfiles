@@ -75,8 +75,23 @@ Singleton {
         run([home + "/.local/bin/tablet-lock-toggle.sh", "toggle"]);
     }
 
-    function power(action) {
-        run(["gtk_applet_power_menu", "--action", action]);
+    function executePowerAction(action) {
+        switch (action) {
+        case "suspend":
+            run(["systemctl", "suspend"]);
+            return;
+        case "hibernate":
+            run(["systemctl", "hibernate"]);
+            return;
+        case "logout":
+            run(["hyprctl", "dispatch", "exit"]);
+            return;
+        case "reboot":
+            run(["systemctl", "reboot"]);
+            return;
+        case "shutdown":
+            run(["systemctl", "poweroff"]);
+        }
     }
 
     function refreshAll() {

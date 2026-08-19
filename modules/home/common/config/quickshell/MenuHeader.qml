@@ -11,7 +11,7 @@ Item {
     signal back
     signal close
 
-    implicitHeight: 44
+    implicitHeight: Theme.metrics.menuHeaderHeight
 
     RowLayout {
         anchors.fill: parent
@@ -19,8 +19,8 @@ Item {
 
         Rectangle {
             visible: root.showBack
-            implicitWidth: 32
-            implicitHeight: 32
+            implicitWidth: Theme.metrics.headerButtonSize
+            implicitHeight: Theme.metrics.headerButtonSize
             radius: Theme.shape.full
             color: backArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
@@ -28,8 +28,8 @@ Item {
                 anchors.centerIn: parent
                 text: "\ue5c4"
                 color: ShellPalette.foreground
-                font.family: "Material Symbols Rounded"
-                font.pixelSize: 19
+                font.family: Theme.font.symbols
+                font.pixelSize: Theme.icon.small
             }
 
             MouseArea {
@@ -53,8 +53,8 @@ Item {
         }
 
         Rectangle {
-            implicitWidth: 32
-            implicitHeight: 32
+            implicitWidth: Theme.metrics.headerButtonSize
+            implicitHeight: Theme.metrics.headerButtonSize
             radius: Theme.shape.full
             color: closeArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
@@ -62,8 +62,8 @@ Item {
                 anchors.centerIn: parent
                 text: "\ue5cd"
                 color: ShellPalette.foreground
-                font.family: "Material Symbols Rounded"
-                font.pixelSize: 19
+                font.family: Theme.font.symbols
+                font.pixelSize: Theme.icon.small
             }
 
             MouseArea {

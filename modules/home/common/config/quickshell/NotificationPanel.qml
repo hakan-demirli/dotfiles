@@ -9,8 +9,8 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 560
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: Theme.metrics.panelExtraTallHeight
     focus: true
 
     Keys.onEscapePressed: requestClose()
@@ -41,10 +41,10 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 60
+            implicitHeight: Theme.metrics.controlRowHeight
             radius: Theme.shape.large
             color: ShellPalette.surface
-            border.width: 1
+            border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
 
             RowLayout {
@@ -56,8 +56,8 @@ Item {
                 Text {
                     text: NotificationService.doNotDisturb ? "\ue51d" : "\ue7f4"
                     color: NotificationService.doNotDisturb ? ShellPalette.foreground : ShellPalette.foregroundMuted
-                    font.family: "Material Symbols Rounded"
-                    font.pixelSize: 24
+                    font.family: Theme.font.symbols
+                    font.pixelSize: Theme.icon.medium
                 }
 
                 ColumnLayout {
@@ -144,8 +144,8 @@ Item {
                     }
 
                     MenuIconButton {
-                        implicitWidth: 24
-                        implicitHeight: 24
+                        implicitWidth: Theme.metrics.compactIconButtonSize
+                        implicitHeight: Theme.metrics.compactIconButtonSize
                         icon: "\ue872"
                         onActivated: NotificationService.clearGroup(group.modelData)
                     }

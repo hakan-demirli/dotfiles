@@ -9,18 +9,18 @@ Rectangle {
 
     signal activated
 
-    implicitWidth: 47
-    implicitHeight: 47
+    implicitWidth: Theme.metrics.barThickness
+    implicitHeight: Theme.metrics.barThickness
 
     radius: Theme.shape.medium
     color: ShellPalette.surface
-    border.width: 1
+    border.width: Theme.metrics.stroke
     border.color: ShellPalette.indicator
 
     Rectangle {
         anchors.fill: parent
         radius: parent.radius
-        color: area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : Qt.alpha(ShellPalette.foreground, 0.04)
+        color: area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : Qt.alpha(ShellPalette.foreground, Theme.opacity.subtle)
 
         Behavior on color {
             ColorAnimation {
@@ -42,8 +42,8 @@ Rectangle {
                 text: modelData
                 color: ShellPalette.foreground
                 font.family: Theme.font.mono
-                font.pixelSize: 24
-                font.weight: 700
+                font.pixelSize: Theme.icon.medium
+                font.weight: Theme.font.boldWeight
             }
         }
     }

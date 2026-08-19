@@ -25,28 +25,28 @@ Rectangle {
     signal secondaryActivated
     signal scrolled(int steps)
 
-    implicitWidth: 47
-    implicitHeight: 47
+    implicitWidth: Theme.metrics.barThickness
+    implicitHeight: Theme.metrics.barThickness
 
     radius: Theme.shape.medium
-    color: placeholder ? Qt.alpha(ShellPalette.surface, 0.28) : ShellPalette.surface
-    border.width: 1
+    color: placeholder ? Qt.alpha(ShellPalette.surface, Theme.opacity.placeholder) : ShellPalette.surface
+    border.width: Theme.metrics.stroke
     border.color: ShellPalette.indicator
 
     Rectangle {
         id: levelFill
 
         visible: !root.split && root.level >= 0
-        x: 1
-        width: parent.width - 2
-        height: Math.round((parent.height - 2) * root.boundedLevel)
+        x: Theme.metrics.stroke
+        width: parent.width - Theme.metrics.stroke * 2
+        height: Math.round((parent.height - Theme.metrics.stroke * 2) * root.boundedLevel)
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 1
-        topLeftRadius: height > parent.height - root.radius ? root.radius - 1 : 0
+        anchors.bottomMargin: Theme.metrics.stroke
+        topLeftRadius: height > parent.height - root.radius ? root.radius - Theme.metrics.stroke : 0
         topRightRadius: topLeftRadius
-        bottomLeftRadius: root.radius - 1
-        bottomRightRadius: root.radius - 1
-        color: root.active ? ShellPalette.indicator : Qt.alpha(ShellPalette.foreground, 0.10)
+        bottomLeftRadius: root.radius - Theme.metrics.stroke
+        bottomRightRadius: root.radius - Theme.metrics.stroke
+        color: root.active ? ShellPalette.indicator : Qt.alpha(ShellPalette.foreground, Theme.opacity.low)
 
         Behavior on height {
             NumberAnimation {
@@ -58,11 +58,11 @@ Rectangle {
 
     Rectangle {
         visible: levelFill.visible && root.boundedLevel > 0 && root.boundedLevel < 1
-        x: 2
+        x: Theme.metrics.focusStroke
         y: levelFill.y
-        width: parent.width - 4
-        height: 1
-        color: Qt.alpha(ShellPalette.foreground, root.active ? 0.32 : 0.18)
+        width: parent.width - Theme.space.extraSmall
+        height: Theme.metrics.stroke
+        color: Qt.alpha(ShellPalette.foreground, root.active ? Theme.opacity.boundary : Theme.opacity.medium)
 
         Behavior on y {
             NumberAnimation {
@@ -81,7 +81,7 @@ Rectangle {
         bottomLeftRadius: root.radius
         topRightRadius: root.split ? 0 : root.radius
         bottomRightRadius: root.split ? 0 : root.radius
-        color: primaryArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : root.active && root.level < 0 ? Qt.alpha(ShellPalette.foreground, 0.07) : "transparent"
+        color: primaryArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : root.active && root.level < 0 ? Qt.alpha(ShellPalette.foreground, Theme.opacity.selected) : "transparent"
 
         Behavior on color {
             ColorAnimation {
@@ -98,7 +98,7 @@ Rectangle {
         width: parent.width / 2
         topRightRadius: root.radius
         bottomRightRadius: root.radius
-        color: secondaryArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : root.secondaryActive ? Qt.alpha(ShellPalette.foreground, 0.07) : "transparent"
+        color: secondaryArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : root.secondaryActive ? Qt.alpha(ShellPalette.foreground, Theme.opacity.selected) : "transparent"
 
         Behavior on color {
             ColorAnimation {
@@ -109,7 +109,7 @@ Rectangle {
 
     Rectangle {
         visible: root.split
-        width: 1
+        width: Theme.metrics.stroke
         height: parent.height - Theme.space.small * 2
         anchors.centerIn: parent
         color: ShellPalette.indicator
@@ -125,9 +125,9 @@ Rectangle {
             anchors.centerIn: parent
             text: root.icon
             color: root.active ? ShellPalette.foreground : ShellPalette.foregroundMuted
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: root.split ? 17 : 27
-            font.weight: 500
+            font.family: Theme.font.symbols
+            font.pixelSize: root.split ? Theme.icon.compact : Theme.icon.medium
+            font.weight: Theme.font.mediumWeight
         }
     }
 
@@ -135,13 +135,13 @@ Rectangle {
         visible: !root.split && root.badgeIcon.length > 0
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: 3
-        anchors.rightMargin: 3
+        anchors.topMargin: Theme.space.extraSmall
+        anchors.rightMargin: Theme.space.extraSmall
         text: root.badgeIcon
         color: root.active ? ShellPalette.foreground : ShellPalette.foregroundMuted
-        font.family: "Material Symbols Rounded"
-        font.pixelSize: 10
-        font.weight: 600
+        font.family: Theme.font.symbols
+        font.pixelSize: Theme.icon.badge
+        font.weight: Theme.font.mediumWeight
     }
 
     Item {
@@ -155,9 +155,9 @@ Rectangle {
             anchors.centerIn: parent
             text: root.secondaryIcon
             color: root.secondaryActive ? ShellPalette.foreground : ShellPalette.foregroundMuted
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: 17
-            font.weight: 500
+            font.family: Theme.font.symbols
+            font.pixelSize: Theme.icon.compact
+            font.weight: Theme.font.mediumWeight
         }
     }
 
