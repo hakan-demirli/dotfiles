@@ -17,8 +17,8 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: pendingNetwork ? 300 : 500
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: pendingNetwork ? Theme.metrics.panelDialogHeight : Theme.metrics.panelTallHeight
     focus: true
 
     function beginPassword(network) {
@@ -92,10 +92,10 @@ Item {
 
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: 60
+                implicitHeight: Theme.metrics.controlRowHeight
                 radius: Theme.shape.large
                 color: ShellPalette.surface
-                border.width: 1
+                border.width: Theme.metrics.stroke
                 border.color: ShellPalette.indicator
 
                 RowLayout {
@@ -107,8 +107,8 @@ Item {
                     Text {
                         text: NetworkService.wifiEnabled ? "\ue63e" : "\ue648"
                         color: NetworkService.wifiEnabled ? ShellPalette.foreground : ShellPalette.foregroundMuted
-                        font.family: "Material Symbols Rounded"
-                        font.pixelSize: 24
+                        font.family: Theme.font.symbols
+                        font.pixelSize: Theme.icon.medium
                     }
 
                     ColumnLayout {
@@ -174,7 +174,7 @@ Item {
                 Layout.fillHeight: true
                 visible: NetworkService.wifiEnabled && count > 0
                 clip: true
-                spacing: 2
+                spacing: Theme.metrics.listSpacing
                 boundsBehavior: Flickable.StopAtBounds
                 model: networkModel
 
@@ -202,16 +202,16 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 text: "\ue63e"
                 color: ShellPalette.foreground
-                font.family: "Material Symbols Rounded"
-                font.pixelSize: 40
+                font.family: Theme.font.symbols
+                font.pixelSize: Theme.icon.extraLarge
             }
 
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: 54
+                implicitHeight: Theme.metrics.textFieldHeight
                 radius: Theme.shape.medium
                 color: ShellPalette.surface
-                border.width: passwordInput.activeFocus ? 2 : 1
+                border.width: passwordInput.activeFocus ? Theme.metrics.focusStroke : Theme.metrics.stroke
                 border.color: passwordInput.activeFocus ? ShellPalette.foreground : ShellPalette.indicator
 
                 TextInput {
@@ -244,12 +244,12 @@ Item {
                     anchors.rightMargin: Theme.space.medium
                     text: root.passwordVisible ? "\ue8f5" : "\ue8f4"
                     color: ShellPalette.foregroundMuted
-                    font.family: "Material Symbols Rounded"
-                    font.pixelSize: 21
+                    font.family: Theme.font.symbols
+                    font.pixelSize: Theme.icon.small
 
                     MouseArea {
                         anchors.fill: parent
-                        anchors.margins: -10
+                        anchors.margins: -Theme.space.medium
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.passwordVisible = !root.passwordVisible
                     }
@@ -269,7 +269,7 @@ Item {
 
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: 48
+                implicitHeight: Theme.metrics.primaryButtonHeight
                 radius: Theme.shape.full
                 color: root.password.length >= 8 ? ShellPalette.foreground : ShellPalette.indicator
 

@@ -12,12 +12,12 @@ Rectangle {
     signal requestClose
     signal requestMenu(string menu)
 
-    implicitWidth: root.contentItem ? root.contentItem.implicitWidth : 380
-    implicitHeight: root.contentItem ? root.contentItem.implicitHeight : 240
+    implicitWidth: root.contentItem ? root.contentItem.implicitWidth : Theme.metrics.menuWidth
+    implicitHeight: root.contentItem ? root.contentItem.implicitHeight : Theme.metrics.menuFallbackHeight
 
     radius: Theme.shape.extraLarge
     color: ShellPalette.background
-    border.width: 1
+    border.width: Theme.metrics.stroke
     border.color: ShellPalette.indicator
     clip: true
 

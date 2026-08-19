@@ -9,13 +9,15 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 310
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: content.implicitHeight + Theme.space.large * 2
     focus: true
 
     Keys.onEscapePressed: requestClose()
 
     ColumnLayout {
+        id: content
+
         anchors.fill: parent
         anchors.margins: Theme.space.large
         spacing: Theme.space.medium
@@ -29,21 +31,23 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 110
+            implicitHeight: heroContent.implicitHeight + Theme.space.extraLargeIncreased * 2
             radius: Theme.shape.large
             color: root.recording ? ShellPalette.indicator : ShellPalette.surface
-            border.width: 1
+            border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
 
             RowLayout {
+                id: heroContent
+
                 anchors.centerIn: parent
                 spacing: Theme.space.medium
 
                 Text {
                     text: root.recording ? "\ue061" : "\ue04b"
                     color: ShellPalette.foreground
-                    font.family: "Material Symbols Rounded"
-                    font.pixelSize: 38
+                    font.family: Theme.font.symbols
+                    font.pixelSize: Theme.icon.extraLarge
                 }
 
                 ColumnLayout {

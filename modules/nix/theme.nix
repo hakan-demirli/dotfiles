@@ -50,6 +50,7 @@ let
     "font-plain" = theme.font.family.plain;
     "font-mono" = theme.font.family.mono;
     "font-icon" = theme.font.family.icon;
+    "font-symbols" = theme.font.family.symbols;
   }
   // prefixed "colour" lib.id (theme.dracula // theme.palette)
   // prefixed "ansi" lib.id theme.ansi
@@ -58,6 +59,7 @@ let
   // prefixed "text" (role: toString role.size) theme.font.scale
   // prefixed "text-line" (role: toString role.lineHeight) theme.font.scale
   // prefixed "text-weight" (role: toString role.weight) theme.font.scale
+  // prefixed "weight" toString theme.weight
   // prefixed "duration" toString theme.motion.duration
   // prefixed "state" toString theme.state
   // prefixed "easing" lib.id theme.motion.css
@@ -259,7 +261,7 @@ in
         # Comparing against it catches both elements we never style and rules we
         # kept after the application renamed or removed the class.
         theme-coverage =
-          if pkgs.stdenv.isLinux then
+          if pkgs.stdenv.hostPlatform.isLinux then
             pkgs.runCommand "check-theme-coverage"
               {
                 src = inputs.self;
@@ -291,6 +293,7 @@ in
                 name = "theme-fonts";
                 paths = [
                   pkgs.roboto
+                  pkgs.material-symbols
                   pkgs.nerd-fonts.jetbrains-mono
                   pkgs.nerd-fonts.symbols-only
                 ];

@@ -13,8 +13,8 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 330
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: content.implicitHeight + Theme.space.large * 2
     focus: true
 
     function readInteger(file) {
@@ -76,6 +76,8 @@ Item {
     }
 
     ColumnLayout {
+        id: content
+
         anchors.fill: parent
         anchors.margins: Theme.space.large
         spacing: Theme.space.medium
@@ -89,10 +91,10 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 78
+            implicitHeight: Theme.metrics.mediaControlHeight
             radius: Theme.shape.large
             color: ShellPalette.surface
-            border.width: 1
+            border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
 
             RowLayout {
@@ -104,8 +106,8 @@ Item {
                 Text {
                     text: "\ue3ac"
                     color: ShellPalette.foreground
-                    font.family: "Material Symbols Rounded"
-                    font.pixelSize: 28
+                    font.family: Theme.font.symbols
+                    font.pixelSize: Theme.icon.large
                 }
 
                 LevelSlider {
@@ -115,7 +117,7 @@ Item {
                 }
 
                 Text {
-                    Layout.preferredWidth: 42
+                    Layout.preferredWidth: Theme.metrics.percentageLabelWidth
                     text: `${root.shownPercent}%`
                     color: ShellPalette.foreground
                     horizontalAlignment: Text.AlignRight

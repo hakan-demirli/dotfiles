@@ -6,13 +6,15 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 410
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: content.implicitHeight + Theme.space.large * 2
     focus: true
 
     Keys.onEscapePressed: requestClose()
 
     ColumnLayout {
+        id: content
+
         anchors.fill: parent
         anchors.margins: Theme.space.large
         spacing: Theme.space.medium
@@ -26,10 +28,10 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 180
+            implicitHeight: Theme.metrics.batteryGaugeHeight
             radius: Theme.shape.large
             color: ShellPalette.surface
-            border.width: 1
+            border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
             clip: true
 
@@ -56,8 +58,8 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: BatteryService.charging ? "\ue1a3" : "\ue1a4"
                     color: ShellPalette.foreground
-                    font.family: "Material Symbols Rounded"
-                    font.pixelSize: 38
+                    font.family: Theme.font.symbols
+                    font.pixelSize: Theme.icon.extraLarge
                 }
 
                 Text {

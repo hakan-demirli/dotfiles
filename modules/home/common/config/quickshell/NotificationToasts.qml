@@ -6,7 +6,7 @@ import Quickshell
 Item {
     id: root
 
-    implicitWidth: 380
+    implicitWidth: Theme.metrics.menuWidth
     implicitHeight: stack.contentHeight
 
     SystemClock {

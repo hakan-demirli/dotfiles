@@ -27,8 +27,8 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 480
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: Theme.metrics.panelTallHeight
     focus: true
 
     Keys.onEscapePressed: requestClose()
@@ -83,10 +83,10 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 60
+            implicitHeight: Theme.metrics.controlRowHeight
             radius: Theme.shape.large
             color: ShellPalette.surface
-            border.width: 1
+            border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
 
             RowLayout {
@@ -98,8 +98,8 @@ Item {
                 Text {
                     text: "\ue1a7"
                     color: root.adapter && root.adapter.enabled ? ShellPalette.foreground : ShellPalette.foregroundMuted
-                    font.family: "Material Symbols Rounded"
-                    font.pixelSize: 25
+                    font.family: Theme.font.symbols
+                    font.pixelSize: Theme.icon.medium
                 }
 
                 ColumnLayout {
@@ -159,7 +159,7 @@ Item {
             Layout.fillHeight: true
             visible: root.adapter && root.adapter.enabled && count > 0
             clip: true
-            spacing: 2
+            spacing: Theme.metrics.listSpacing
             boundsBehavior: Flickable.StopAtBounds
             model: deviceModel
 
@@ -169,7 +169,7 @@ Item {
                 required property var modelData
 
                 width: deviceList.width
-                height: 60
+                height: Theme.metrics.controlRowHeight
                 radius: Theme.shape.large
                 color: device.modelData.connected ? ShellPalette.indicator : deviceArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
@@ -182,8 +182,8 @@ Item {
                     Text {
                         text: device.modelData.icon && /headset|headphones|audio/.test(device.modelData.icon) ? "\ue310" : "\ue1a7"
                         color: ShellPalette.foreground
-                        font.family: "Material Symbols Rounded"
-                        font.pixelSize: 23
+                        font.family: Theme.font.symbols
+                        font.pixelSize: Theme.icon.medium
                     }
 
                     ColumnLayout {
@@ -221,8 +221,8 @@ Item {
                     Text {
                         text: device.modelData.connected ? "\ue5ca" : "\ue5cc"
                         color: device.modelData.connected ? ShellPalette.foreground : ShellPalette.foregroundMuted
-                        font.family: "Material Symbols Rounded"
-                        font.pixelSize: 20
+                        font.family: Theme.font.symbols
+                        font.pixelSize: Theme.icon.small
                     }
                 }
 

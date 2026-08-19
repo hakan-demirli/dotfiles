@@ -9,7 +9,7 @@ Item {
 
     readonly property real boundedValue: Math.max(0, Math.min(1, value))
 
-    implicitHeight: 40
+    implicitHeight: Theme.metrics.sliderHeight
 
     Rectangle {
         id: track
@@ -17,10 +17,10 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        height: 8
-        radius: height / 2
+        height: Theme.metrics.sliderTrackHeight
+        radius: Theme.shape.full
         color: ShellPalette.surface
-        border.width: 1
+        border.width: Theme.metrics.stroke
         border.color: ShellPalette.indicator
 
         Rectangle {
@@ -32,13 +32,13 @@ Item {
     }
 
     Rectangle {
-        width: 20
-        height: 20
-        radius: height / 2
+        width: Theme.metrics.sliderHandleSize
+        height: Theme.metrics.sliderHandleSize
+        radius: Theme.shape.full
         x: Math.max(0, Math.min(parent.width - width, parent.width * root.boundedValue - width / 2))
         anchors.verticalCenter: parent.verticalCenter
         color: ShellPalette.foreground
-        border.width: 2
+        border.width: Theme.metrics.focusStroke
         border.color: ShellPalette.indicator
     }
 

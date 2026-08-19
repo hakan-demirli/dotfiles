@@ -9,12 +9,12 @@ Item {
     required property var network
 
     readonly property real signalLevel: Math.max(0, Math.min(1, network.signal / 100))
-    readonly property int bars: Math.max(1, Math.ceil(signalLevel * 4))
+    readonly property int bars: Math.max(1, Math.ceil(signalLevel * Theme.metrics.signalBarCount))
     readonly property bool passwordRequired: !network.known && network.secured
 
     signal passwordRequested(var network)
 
-    implicitHeight: 60
+    implicitHeight: Theme.metrics.controlRowHeight
 
     Rectangle {
         anchors.fill: parent
@@ -36,19 +36,19 @@ Item {
 
         Row {
             Layout.alignment: Qt.AlignVCenter
-            spacing: 2
+            spacing: Theme.metrics.listSpacing
 
             Repeater {
-                model: 4
+                model: Theme.metrics.signalBarCount
 
                 Rectangle {
                     required property int index
 
-                    width: 4
-                    height: 5 + index * 4
-                    y: 20 - height
-                    radius: 1
-                    color: index < root.bars ? ShellPalette.foreground : Qt.alpha(ShellPalette.foreground, 0.22)
+                    width: Theme.metrics.signalBarWidth
+                    height: Theme.metrics.signalBarBaseHeight + index * Theme.metrics.signalBarStep
+                    y: Theme.icon.small - height
+                    radius: Theme.metrics.stroke
+                    color: index < root.bars ? ShellPalette.foreground : Qt.alpha(ShellPalette.foreground, Theme.opacity.inactive)
                 }
             }
         }
@@ -91,8 +91,8 @@ Item {
             Layout.alignment: Qt.AlignVCenter
             text: root.network.active ? "\ue5ca" : root.passwordRequired ? "\ue897" : "\ue5cc"
             color: root.network.active ? ShellPalette.foreground : ShellPalette.foregroundMuted
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: 20
+            font.family: Theme.font.symbols
+            font.pixelSize: Theme.icon.small
         }
     }
 

@@ -9,17 +9,17 @@ Rectangle {
 
     readonly property bool shown: requested && delay.ready && text.length > 0
 
-    width: Math.min(label.implicitWidth + 16, 138)
-    height: Math.max(26, label.implicitHeight + 12)
-    x: placement === "top" ? (parent.width - width) / 2 : -width - 6
-    y: placement === "top" ? -height - 6 : (parent.height - height) / 2
-    z: 1000
+    width: Math.min(label.implicitWidth + Theme.space.large, Theme.metrics.tooltipMaximumWidth)
+    height: Math.max(Theme.metrics.tooltipMinimumHeight, label.implicitHeight + Theme.space.medium)
+    x: placement === "top" ? (parent.width - width) / 2 : -width - Theme.space.small
+    y: placement === "top" ? -height - Theme.space.small : (parent.height - height) / 2
+    z: Theme.metrics.overlayZ
     visible: opacity > 0
     opacity: shown ? 1 : 0
 
     radius: Theme.shape.small
     color: ShellPalette.surface
-    border.width: 1
+    border.width: Theme.metrics.stroke
     border.color: ShellPalette.indicator
 
     onRequestedChanged: {
@@ -41,7 +41,7 @@ Rectangle {
 
         property bool ready: false
 
-        interval: 1200
+        interval: Theme.duration.extraLong4 + Theme.duration.short4
         onTriggered: ready = true
     }
 
@@ -49,8 +49,8 @@ Rectangle {
         id: label
 
         anchors.fill: parent
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
+        anchors.leftMargin: Theme.space.small
+        anchors.rightMargin: Theme.space.small
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideRight
