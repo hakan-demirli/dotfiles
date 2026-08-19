@@ -1,11 +1,18 @@
+--- @since 26.8.15
+
 local WINDOWS = ya.target_family() == "windows"
 
+-- The code of supported git status,
+-- also used to determine which status to show for directories when they contain different statuses
+-- see `bubble_up`
+---@enum CODES
 local CODES = {
-  unknown = 100,
-  excluded = 99,
-  ignored = 6,
-  untracked = 5,
-  modified = 4,
+  unknown = 100, -- status cannot/not yet determined
+  excluded = 99, -- ignored directory
+  ignored = 7, -- ignored file
+  untracked = 6,
+  unstaged = 5,
+  staged = 4,
   added = 3,
   deleted = 2,
   updated = 1,
@@ -15,13 +22,41 @@ local CODES = {
 local PATTERNS = {
   { "!$", CODES.ignored },
   { "?$", CODES.untracked },
-  { "[MT]", CODES.modified },
+  { ".[MT]", CODES.unstaged },
+  { "[MT] ", CODES.staged },
   { "[AC]", CODES.added },
   { "D", CODES.deleted },
   { "U", CODES.updated },
   { "[AD][AD]", CODES.updated },
 }
 
+local function theme()
+  local t = th.git or {}
+  return {
+    [CODES.unknown] = t.unknown or ui.Style(),
+    [CODES.ignored] = t.ignored or ui.Style():fg("darkgray"),
+    [CODES.untracked] = t.untracked or ui.Style():fg("magenta"),
+    [CODES.unstaged] = t.unstaged or ui.Style():fg("yellow"),
+    [CODES.staged] = t.staged or ui.Style():fg("green"),
+    [CODES.added] = t.added or ui.Style():fg("green"),
+    [CODES.deleted] = t.deleted or ui.Style():fg("red"),
+    [CODES.updated] = t.updated or ui.Style():fg("yellow"),
+    [CODES.clean] = t.clean or ui.Style(),
+  }, {
+    [CODES.unknown] = t.unknown_sign or "",
+    [CODES.ignored] = t.ignored_sign or " ",
+    [CODES.untracked] = t.untracked_sign or "? ",
+    [CODES.unstaged] = t.unstaged_sign or " ",
+    [CODES.staged] = t.staged_sign or " ",
+    [CODES.added] = t.added_sign or " ",
+    [CODES.deleted] = t.deleted_sign or " ",
+    [CODES.updated] = t.updated_sign or " ",
+    [CODES.clean] = t.clean_sign or "",
+  }
+end
+
+---@param line string
+---@return CODES, string
 local function match(line)
   local signs = line:sub(1, 2)
   for _, p in ipairs(PATTERNS) do
@@ -32,13 +67,17 @@ local function match(line)
     end
     if not path then
     elseif path:find("[/\\]$") then
+      -- Mark the ignored directory as `excluded`, so we can process it further within `propagate_down`
       return code == CODES.ignored and CODES.excluded or code, path:sub(1, -2)
     else
       return code, path
     end
+    ---@diagnostic disable-next-line: missing-return
   end
 end
 
+---@param cwd Url
+---@return string?
 local function root(cwd)
   local is_worktree = function(url)
     local file, head = io.open(tostring(url)), nil
@@ -59,6 +98,17 @@ local function root(cwd)
   until not cwd
 end
 
+---@type UnstableFetcher
+local function retry(job)
+  return ya.co(function()
+    for _, file in ipairs(job.files) do
+      coroutine.yield(file, { retry = true })
+    end
+  end)
+end
+
+---@param changed Changes
+---@return Changes
 local function bubble_up(changed)
   local new, empty = {}, Url("")
   for path, code in pairs(changed) do
@@ -74,26 +124,39 @@ local function bubble_up(changed)
   return new
 end
 
+---@param excluded string[]
+---@param cwd Url
+---@param repo Url
+---@return Changes
 local function propagate_down(excluded, cwd, repo)
   local new, rel = {}, cwd:strip_prefix(repo)
   for _, path in ipairs(excluded) do
     if rel:starts_with(path) then
+      -- If `cwd` is a subdirectory of an excluded directory, also mark it as `excluded`
       new[tostring(cwd)] = CODES.excluded
     elseif cwd == repo:join(path).parent then
+      -- If `path` is a direct subdirectory of `cwd`, mark it as `ignored`
       new[path] = CODES.ignored
     else
+      -- Skipping, we only care about `cwd` itself and its direct subdirectories for maximum performance
     end
   end
   return new
 end
 
+---@param cwd string
+---@param repo string
+---@param changed Changes
 local add = ya.sync(function(st, cwd, repo, changed)
+  ---@cast st State
+
   st.dirs[cwd] = repo
   st.repos[repo] = st.repos[repo] or {}
   for path, code in pairs(changed) do
     if code == CODES.clean then
       st.repos[repo][path] = nil
     elseif code == CODES.excluded then
+      -- Mark the directory with a special value `excluded` so that it can be distinguished during UI rendering
       st.dirs[path] = CODES.excluded
     else
       st.repos[repo][path] = code
@@ -102,7 +165,10 @@ local add = ya.sync(function(st, cwd, repo, changed)
   ui.render()
 end)
 
+---@param cwd string
 local remove = ya.sync(function(st, cwd)
+  ---@cast st State
+
   local repo = st.dirs[cwd]
   if not repo then
     return
@@ -122,6 +188,8 @@ local remove = ya.sync(function(st, cwd)
   st.repos[repo] = nil
 end)
 
+---@param st State
+---@param opts Options
 local function setup(st, opts)
   st.dirs = {}
   st.repos = {}
@@ -129,27 +197,10 @@ local function setup(st, opts)
   opts = opts or {}
   opts.order = opts.order or 1500
 
-  local t = th.git or {}
-  local styles = {
-    [CODES.unknown] = t.unknown or ui.Style(),
-    [CODES.ignored] = t.ignored or ui.Style():fg("darkgray"),
-    [CODES.untracked] = t.untracked or ui.Style():fg("magenta"),
-    [CODES.modified] = t.modified or ui.Style():fg("yellow"),
-    [CODES.added] = t.added or ui.Style():fg("green"),
-    [CODES.deleted] = t.deleted or ui.Style():fg("red"),
-    [CODES.updated] = t.updated or ui.Style():fg("yellow"),
-    [CODES.clean] = t.clean or ui.Style(),
-  }
-  local signs = {
-    [CODES.unknown] = t.unknown_sign or "",
-    [CODES.ignored] = t.ignored_sign or " ",
-    [CODES.untracked] = t.untracked_sign or "? ",
-    [CODES.modified] = t.modified_sign or " ",
-    [CODES.added] = t.added_sign or " ",
-    [CODES.deleted] = t.deleted_sign or " ",
-    [CODES.updated] = t.updated_sign or " ",
-    [CODES.clean] = t.clean_sign or "",
-  }
+  local styles, signs = theme()
+  ps.sub("theme", function()
+    styles, signs = theme()
+  end)
 
   Linemode:children_add(function(self)
     if not self._file.in_current then
@@ -173,12 +224,13 @@ local function setup(st, opts)
   end, opts.order)
 end
 
+---@type UnstableFetcher
 local function fetch(_, job)
   local cwd = job.files[1].url.base or job.files[1].url.parent
   local repo = root(cwd)
   if not repo then
     remove(tostring(cwd))
-    return true
+    return require("noop"):fetch(job)
   end
 
   local paths = {}
@@ -186,23 +238,15 @@ local function fetch(_, job)
     paths[#paths + 1] = tostring(file.url)
   end
 
-  local output, err = Command("git")
-    :cwd(tostring(cwd))
-    :arg({
-      "--no-optional-locks",
-      "-c",
-      "core.quotePath=",
-      "status",
-      "--porcelain",
-      "-unormal",
-      "--no-renames",
-      "--ignored=matching",
-    })
-    :arg(paths)
-    :stdout(Command.PIPED)
-    :output()
+	-- stylua: ignore
+	local output, err = Command("git")
+		:cwd(tostring(cwd))
+		:arg({ "--no-optional-locks", "-c", "core.quotePath=", "status", "--porcelain", "-unormal", "--no-renames", "--ignored=matching" })
+		:arg(paths)
+		:output()
   if not output then
-    return true, Err("Cannot spawn `git` command, error: %s", err)
+    ya.err("Cannot spawn `git` command, error: " .. err)
+    return require("noop"):fetch(job)
   end
 
   local changed, excluded = {}, {}
@@ -220,6 +264,8 @@ local function fetch(_, job)
   end
   ya.dict_merge(changed, propagate_down(excluded, cwd, Url(repo)))
 
+  -- Reset the status of any files that don't appear in the output of `git status` to `clean`,
+  -- so that cleaning up outdated statuses from `st.repos`
   for _, path in ipairs(paths) do
     local s = path:sub(#repo + 2)
     changed[s] = changed[s] or CODES.clean
@@ -227,7 +273,7 @@ local function fetch(_, job)
 
   add(tostring(cwd), repo, changed)
 
-  return false
+  return retry(job)
 end
 
 return { setup = setup, fetch = fetch }
