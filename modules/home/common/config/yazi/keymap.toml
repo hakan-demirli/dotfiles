@@ -35,7 +35,7 @@ keymap = [
   { on = [
     "x",
   ], run = [
-    "toggle --state=none",
+    "toggle",
     "arrow 1",
   ], desc = "Toggle the current selection state" },
   { on = [
@@ -74,21 +74,21 @@ keymap = [
     "y",
     "r",
   ], run = [
-    ''' shell --block --confirm 'gtransfer.sh "$@"' ''',
+    "shell --block -- gtransfer.sh %s",
     "escape",
   ], desc = "Transfer Menu (Remote/Upload)" },
   { on = [
     "<Space>",
     "c",
   ], run = [
-    ''' shell --block --confirm 'yazi_zip.sh "$@"' ''',
+    "shell --block -- yazi_zip.sh %s",
     "escape",
   ], desc = "Zip selected" },
   { on = [
     "<Space>",
     "d",
   ], run = [
-    '''shell 'xdragon "$@" --all -x 2>/dev/null &' --confirm''',
+    "shell --orphan -- xdragon %s --all -x 2>/dev/null",
     "escape",
   ], desc = "Show files in drag and drop menu" },
   { on = [
@@ -150,7 +150,7 @@ keymap = [
   { on = [
     "g",
     "l",
-  ], run = '''shell --orphan -- ya emit reveal "$(readlink -f "$0")" ''', desc = "Follow hovered symlink" },
+  ], run = "follow", desc = "Follow hovered symlink" },
 
   { on = [
     "/",
@@ -242,7 +242,7 @@ keymap = [
   ], run = "visual_mode --unset", desc = "Enter visual mode (unset mode)" },
   { on = [
     "%",
-  ], run = "toggle_all --state=true", desc = "Select all files" },
+  ], run = "toggle_all --state=on", desc = "Select all files" },
 
 
   { on = [
@@ -289,13 +289,13 @@ keymap = [
   ], run = "hidden toggle", desc = "Toggle the visibility of hidden files" },
   { on = [
     "s",
-  ], run = "search fd", desc = "Search files by name using fd" },
+  ], run = "search --via=fd", desc = "Search files by name using fd" },
   { on = [
     "S",
-  ], run = "search rg", desc = "Search files by content using ripgrep" },
+  ], run = "search --via=rg", desc = "Search files by content using ripgrep" },
   { on = [
     "<C-s>",
-  ], run = "search none", desc = "Cancel the ongoing search" },
+  ], run = "escape --search", desc = "Cancel the ongoing search" },
 
   { on = [
     "m",
@@ -322,19 +322,19 @@ keymap = [
   { on = [
     ",",
     "m",
-  ], run = "sort modified --dir-first", desc = "Sort by modified time" },
+  ], run = "sort mtime --dir-first", desc = "Sort by modified time" },
   { on = [
     ",",
     "M",
-  ], run = "sort modified --reverse --dir-first", desc = "Sort by modified time (reverse)" },
+  ], run = "sort mtime --reverse --dir-first", desc = "Sort by modified time (reverse)" },
   { on = [
     ",",
     "c",
-  ], run = "sort created --dir-first", desc = "Sort by created time" },
+  ], run = "sort btime --dir-first", desc = "Sort by created time" },
   { on = [
     ",",
     "C",
-  ], run = "sort created --reverse --dir-first", desc = "Sort by created time (reverse)" },
+  ], run = "sort btime --reverse --dir-first", desc = "Sort by created time (reverse)" },
   { on = [
     ",",
     "e",
@@ -416,7 +416,7 @@ keymap = [
 
   { on = [
     "w",
-  ], run = "tasks_show", desc = "Show the tasks manager" },
+  ], run = "tasks:show", desc = "Show the tasks manager" },
 
 
   { on = [
@@ -466,7 +466,7 @@ keymap = [
   ], run = "help", desc = "Open help" },
 ]
 
-[select]
+[pick]
 
 keymap = [
   { on = [
@@ -686,7 +686,7 @@ keymap = [
   ], run = "help", desc = "Open help" },
 ]
 
-[completion]
+[cmp]
 
 keymap = [
   { on = [
@@ -699,7 +699,7 @@ keymap = [
     "<Enter>",
   ], run = [
     "close --submit",
-    "close_input --submit",
+    "input:close --submit",
   ], desc = "Submit the completion and input" },
 
   { on = [

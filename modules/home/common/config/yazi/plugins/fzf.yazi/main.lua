@@ -18,7 +18,7 @@ local function fail(s, ...)
 end
 
 local function entry(_, args)
-  local _permit = ya.hide()
+  local permit = ui.hide()
   local cwd = state()
   local shell_value = os.getenv("SHELL"):match(".*/(.*)")
   local cmd_args = ""
@@ -68,10 +68,12 @@ local function entry(_, args)
     :spawn()
 
   if not child then
+    permit:drop()
     return fail("Spawn `rfzf` failed with error code %s. Do you have it installed?", err)
   end
 
   local output, err = child:wait_with_output()
+  permit:drop()
   if not output then
     return fail("Cannot read `fzf` output, error code %s", err)
   elseif not output.status.success and output.status.code ~= 130 then
