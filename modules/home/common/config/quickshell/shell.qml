@@ -15,7 +15,7 @@ ShellRoot {
     PanelWindow {
         id: panel
 
-        property int thickness: 47
+        property int thickness: Theme.metrics.barThickness
 
         property int armLength: thickness * 4
 
@@ -67,8 +67,8 @@ ShellRoot {
         visible: shell.activeMenu.length > 0
         anchors.bottom: true
         anchors.right: true
-        margins.bottom: panel.thickness + 8
-        margins.right: panel.thickness + 8
+        margins.bottom: panel.thickness + Theme.space.small
+        margins.right: panel.thickness + Theme.space.small
         implicitWidth: menuSurface.implicitWidth
         implicitHeight: menuSurface.implicitHeight
         color: "transparent"
@@ -108,8 +108,8 @@ ShellRoot {
 
         anchors.top: true
         anchors.right: true
-        margins.top: 8
-        margins.right: 8
+        margins.top: Theme.space.small
+        margins.right: Theme.space.small
 
         implicitWidth: toasts.implicitWidth
         implicitHeight: toasts.implicitHeight

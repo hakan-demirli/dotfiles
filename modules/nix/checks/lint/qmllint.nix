@@ -9,7 +9,7 @@ in
     { pkgs, ... }:
     {
       checks.qmllint =
-        if pkgs.stdenv.isLinux then
+        if pkgs.stdenv.hostPlatform.isLinux then
           pkgs.runCommand "check-qmllint"
             {
               nativeBuildInputs = [ pkgs.qt6.qtdeclarative ];

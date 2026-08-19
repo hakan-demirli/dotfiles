@@ -88,7 +88,7 @@ rec {
         (pickNur "flake-updater")
         (pickNur "raider")
       ]
-      ++ lib.optionals pkgs.stdenv.isLinux [ verible ]
+      ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ verible ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [ cpufrequtils ]
     );
 
@@ -122,6 +122,7 @@ rec {
       libva-utils
       localsend
       mangohud
+      material-symbols
       mesa-demos
       moonlight-qt
       mpv

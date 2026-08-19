@@ -5,7 +5,7 @@ final: prev:
 let
   callPkgs = path: extra: final.callPackage path ({ pkgs = final; } // extra);
 in
-(prev.lib.optionalAttrs (hasNvidia && prev.stdenv.isLinux) {
+(prev.lib.optionalAttrs (hasNvidia && prev.stdenv.hostPlatform.isLinux) {
   python312 = prev.python312.override {
     packageOverrides = _: prevPy: {
       triton-bin = prevPy.triton-bin.overridePythonAttrs (_: {

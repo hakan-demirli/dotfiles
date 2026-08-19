@@ -29,8 +29,8 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 400
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: Theme.metrics.panelListHeight
     focus: true
 
     function outputIcon(node) {
@@ -71,10 +71,10 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 76
+            implicitHeight: Theme.metrics.mediaControlHeight
             radius: Theme.shape.large
             color: ShellPalette.surface
-            border.width: 1
+            border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
 
             RowLayout {
@@ -84,8 +84,8 @@ Item {
                 spacing: Theme.space.medium
 
                 Rectangle {
-                    implicitWidth: 44
-                    implicitHeight: 44
+                    implicitWidth: Theme.metrics.buttonHeight
+                    implicitHeight: Theme.metrics.buttonHeight
                     radius: Theme.shape.full
                     color: muteArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : ShellPalette.indicator
 
@@ -93,8 +93,8 @@ Item {
                         anchors.centerIn: parent
                         text: root.available && root.sink.audio.muted ? "\ue04f" : root.outputIcon(root.sink)
                         color: root.available && !root.sink.audio.muted ? ShellPalette.foreground : ShellPalette.foregroundMuted
-                        font.family: "Material Symbols Rounded"
-                        font.pixelSize: 25
+                        font.family: Theme.font.symbols
+                        font.pixelSize: Theme.icon.medium
                     }
 
                     MouseArea {
@@ -118,7 +118,7 @@ Item {
                 }
 
                 Text {
-                    Layout.preferredWidth: 42
+                    Layout.preferredWidth: Theme.metrics.percentageLabelWidth
                     text: `${Math.round(root.volume * 100)}%`
                     color: ShellPalette.foreground
                     horizontalAlignment: Text.AlignRight
@@ -144,7 +144,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            spacing: 2
+            spacing: Theme.metrics.listSpacing
             boundsBehavior: Flickable.StopAtBounds
             model: sinkModel
 
@@ -154,7 +154,7 @@ Item {
                 required property var modelData
 
                 width: outputList.width
-                height: 56
+                height: Theme.metrics.listRowHeight
                 radius: Theme.shape.large
                 color: output.modelData === root.sink ? ShellPalette.indicator : outputArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
@@ -167,8 +167,8 @@ Item {
                     Text {
                         text: root.outputIcon(output.modelData)
                         color: ShellPalette.foreground
-                        font.family: "Material Symbols Rounded"
-                        font.pixelSize: 22
+                        font.family: Theme.font.symbols
+                        font.pixelSize: Theme.icon.medium
                     }
 
                     Text {
@@ -185,8 +185,8 @@ Item {
                         visible: output.modelData === root.sink
                         text: "\ue5ca"
                         color: ShellPalette.foreground
-                        font.family: "Material Symbols Rounded"
-                        font.pixelSize: 20
+                        font.family: Theme.font.symbols
+                        font.pixelSize: Theme.icon.small
                     }
                 }
 

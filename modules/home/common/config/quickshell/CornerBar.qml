@@ -8,7 +8,7 @@ Item {
 
     signal menuRequested(string menu)
 
-    property int thickness: 47
+    property int thickness: Theme.metrics.barThickness
     property int armLength: thickness * 4
     property int gap: Theme.space.extraSmall
 

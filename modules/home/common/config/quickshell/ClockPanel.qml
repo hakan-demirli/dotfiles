@@ -7,8 +7,8 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 250
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: content.implicitHeight + Theme.space.large * 2
     focus: true
 
     Keys.onEscapePressed: requestClose()
@@ -20,6 +20,8 @@ Item {
     }
 
     ColumnLayout {
+        id: content
+
         anchors.fill: parent
         anchors.margins: Theme.space.large
         spacing: Theme.space.medium
@@ -34,12 +36,15 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            implicitHeight: clockDigits.implicitHeight + Theme.space.extraLarge * 2
             radius: Theme.shape.large
             color: ShellPalette.surface
-            border.width: 1
+            border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
 
             Row {
+                id: clockDigits
+
                 anchors.centerIn: parent
                 spacing: Theme.space.medium
 
@@ -52,8 +57,8 @@ Item {
                         text: modelData
                         color: ShellPalette.foreground
                         font.family: Theme.font.mono
-                        font.pixelSize: 52
-                        font.weight: 700
+                        font.pixelSize: Theme.font.displayMediumLine
+                        font.weight: Theme.font.boldWeight
                     }
                 }
             }

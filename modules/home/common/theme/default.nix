@@ -40,11 +40,12 @@ let
     brand = "Roboto";
     mono = "JetBrainsMono Nerd Font Mono";
     icon = "Symbols Nerd Font Mono";
+    symbols = "Material Symbols Rounded";
   };
 in
 {
   inherit (dracula) ansi syntax;
-  inherit (m3) state elevation;
+  inherit (m3) state elevation weight;
 
   dracula = dracula.standard;
 

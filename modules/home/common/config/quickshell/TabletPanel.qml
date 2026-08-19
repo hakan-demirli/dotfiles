@@ -6,13 +6,15 @@ Item {
 
     signal requestClose
 
-    implicitWidth: 380
-    implicitHeight: 280
+    implicitWidth: Theme.metrics.menuWidth
+    implicitHeight: content.implicitHeight + Theme.space.large * 2
     focus: true
 
     Keys.onEscapePressed: requestClose()
 
     ColumnLayout {
+        id: content
+
         anchors.fill: parent
         anchors.margins: Theme.space.large
         spacing: Theme.space.medium
@@ -26,7 +28,7 @@ Item {
 
         GridLayout {
             Layout.fillWidth: true
-            columns: 2
+            columns: Theme.metrics.menuColumns
             rowSpacing: Theme.space.small
             columnSpacing: Theme.space.small
 

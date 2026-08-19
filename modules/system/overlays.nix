@@ -9,7 +9,7 @@ let
 
   pythonTritonOverlay = _final: prev: {
     python312 =
-      if prev.stdenv.isLinux then
+      if prev.stdenv.hostPlatform.isLinux then
         prev.python312.override {
           packageOverrides = _: prevPy: {
             triton-bin = prevPy.triton-bin.overridePythonAttrs (_: {

@@ -8,8 +8,8 @@ Rectangle {
 
     signal activated
 
-    implicitWidth: 40
-    implicitHeight: 40
+    implicitWidth: Theme.metrics.iconButtonSize
+    implicitHeight: Theme.metrics.iconButtonSize
     radius: Theme.shape.full
     color: area.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : "transparent"
 
@@ -19,13 +19,13 @@ Rectangle {
         anchors.centerIn: parent
         text: root.icon
         color: root.enabled ? ShellPalette.foreground : ShellPalette.foregroundMuted
-        font.family: "Material Symbols Rounded"
-        font.pixelSize: 22
+        font.family: Theme.font.symbols
+        font.pixelSize: Theme.icon.medium
 
         RotationAnimator on rotation {
             from: 0
             to: 360
-            duration: 900
+            duration: Theme.duration.extraLong3
             loops: Animation.Infinite
             running: root.busy
         }
