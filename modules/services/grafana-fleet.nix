@@ -1,4 +1,5 @@
 {
+  cluster,
   config,
   lib,
   pkgs,
@@ -10,6 +11,66 @@ let
     uid = "\${datasource}";
   };
   metricsDirectory = "/var/lib/prometheus-node-exporter-textfiles";
+  provisionedHosts = lib.sort (a: b: a.id < b.id) (
+    lib.filter (host: host.state == "provisioned") (lib.attrValues (cluster.hosts or { }))
+  );
+  boolString = value: if value then "true" else "false";
+  prometheusLabel = value: lib.replaceStrings [ "\\" "\"" "\n" ] [ "\\\\" "\\\"" "\\n" ] value;
+  monitoringPolicyLines = map (
+    host:
+    let
+      enabled = host.monitoring.enabled or true;
+      alwaysOn = host.monitoring.always_on or true;
+      exporters = host.monitoring.exporters or [ ];
+      mode =
+        if !enabled then
+          "disabled"
+        else if alwaysOn then
+          "always_on"
+        else
+          "optional";
+      hasExporter = exporter: enabled && lib.elem exporter exporters;
+    in
+    ''fleet_monitoring_policy_info{host="${prometheusLabel host.id}",mode="${mode}",node="${boolString (hasExporter "node")}",smartctl="${boolString (hasExporter "smartctl")}"} 1''
+  ) provisionedHosts;
+  monitoringPolicyMetrics = pkgs.writeText "fleet-monitoring-policy.prom" ''
+    # HELP fleet_monitoring_policy_info Inventory monitoring policy for provisioned fleet hosts.
+    # TYPE fleet_monitoring_policy_info gauge
+    ${lib.concatStringsSep "\n" monitoringPolicyLines}
+  '';
+  tailnetMetricsCollector = pkgs.writeShellApplication {
+    name = "collect-fleet-tailnet-metrics";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.headscale
+      pkgs.jq
+    ];
+    text = ''
+      mkdir -p ${metricsDirectory}
+      output="$(mktemp ${metricsDirectory}/fleet-tailnet.prom.XXXXXX)"
+      trap 'rm -f "$output"' EXIT
+
+      {
+        printf '%s\n' '# HELP fleet_tailnet_node_status Headscale node state: 1=offline, 2=online.'
+        printf '%s\n' '# TYPE fleet_tailnet_node_status gauge'
+        headscale nodes list --output json | jq -r '
+          def prom_escape:
+            gsub("\\\\"; "\\\\\\\\")
+            | gsub("\""; "\\\"")
+            | gsub("\n"; "\\n");
+          .[]
+          | (.given_name // .name) as $host
+          | ([.ip_addresses[]? | select(test("^[0-9]+[.]"))][0] // "") as $ipv4
+          | ([.tags[]?] | sort | join(",")) as $tags
+          | "fleet_tailnet_node_status{host=\"\($host | prom_escape)\",ipv4=\"\($ipv4 | prom_escape)\",tags=\"\($tags | prom_escape)\"} \(if .online then 2 else 1 end)"
+        '
+      } > "$output"
+
+      chmod 0644 "$output"
+      mv "$output" ${metricsDirectory}/fleet-tailnet.prom
+      trap - EXIT
+    '';
+  };
   mainRevisionCollector = pkgs.writeShellApplication {
     name = "collect-dotfiles-main-revision";
     runtimeInputs = [
@@ -137,12 +198,22 @@ let
         "0" = {
           color = "red";
           index = 0;
-          text = "UNREACHABLE";
+          text = "DOWN";
         };
         "1" = {
-          color = "green";
+          color = "orange";
           index = 1;
+          text = "DOWN";
+        };
+        "2" = {
+          color = "green";
+          index = 2;
           text = "UP";
+        };
+        "3" = {
+          color = "gray";
+          index = 3;
+          text = "N/A";
         };
       };
     }
@@ -152,8 +223,52 @@ let
         match = "null";
         result = {
           color = "gray";
-          index = 2;
+          index = 4;
           text = "N/A";
+        };
+      };
+    }
+  ];
+  monitoringModeMappings = [
+    {
+      type = "value";
+      options = {
+        "0" = {
+          color = "gray";
+          index = 0;
+          text = "DISABLED";
+        };
+        "1" = {
+          color = "blue";
+          index = 1;
+          text = "OPTIONAL";
+        };
+        "2" = {
+          color = "green";
+          index = 2;
+          text = "ALWAYS ON";
+        };
+      };
+    }
+  ];
+  tailnetMappings = [
+    {
+      type = "value";
+      options = {
+        "0" = {
+          color = "gray";
+          index = 0;
+          text = "NOT ENROLLED";
+        };
+        "1" = {
+          color = "orange";
+          index = 1;
+          text = "OFFLINE";
+        };
+        "2" = {
+          color = "green";
+          index = 2;
+          text = "ONLINE";
         };
       };
     }
@@ -168,9 +283,19 @@ let
           text = "DEGRADED";
         };
         "1" = {
-          color = "green";
+          color = "gray";
           index = 1;
+          text = "N/A";
+        };
+        "2" = {
+          color = "green";
+          index = 2;
           text = "HEALTHY";
+        };
+        "3" = {
+          color = "gray";
+          index = 3;
+          text = "N/A";
         };
       };
     }
@@ -252,6 +377,51 @@ let
   '';
 
   withHost = expression: ''label_replace(${expression}, "host", "$1", "instance", "([^.:]+).*")'';
+  monitoringPolicyStatusExpression = ''
+    label_replace(
+      (
+        (fleet_monitoring_policy_info{mode="disabled"} * 0)
+        or (fleet_monitoring_policy_info{mode="optional"} * 0 + 1)
+        or (fleet_monitoring_policy_info{mode="always_on"} * 0 + 2)
+      ),
+      "signal", "Policy", "host", ".*"
+    )
+  '';
+  tailnetStatusExpression = ''
+    label_replace(
+      (
+        (fleet_tailnet_node_status and on(host) fleet_monitoring_policy_info)
+        or on(host) (fleet_monitoring_policy_info * 0)
+      ),
+      "signal", "Tailnet", "host", ".*"
+    )
+  '';
+  nodeStatusExpression = ''
+    label_replace(
+      (
+        (${withHost ''up{job="fleet-node",always_on="true"}''} * 2)
+        or (${withHost ''up{job="fleet-node",always_on="false"}''} + 1)
+        or on(host) (fleet_monitoring_policy_info{node="false"} * 0 + 3)
+      ),
+      "signal", "Node exporter", "host", ".*"
+    )
+  '';
+  smartStatusExpression = ''
+    label_replace(
+      (
+        (${withHost ''up{job="fleet-smartctl",always_on="true"}''} * 2)
+        or (${withHost ''up{job="fleet-smartctl",always_on="false"}''} + 1)
+        or on(host) (fleet_monitoring_policy_info{smartctl="false"} * 0 + 3)
+      ),
+      "signal", "SMART exporter", "host", ".*"
+    )
+  '';
+  monitoringStatusExpression = ''
+    (${monitoringPolicyStatusExpression})
+    or (${tailnetStatusExpression})
+    or (${nodeStatusExpression})
+    or (${smartStatusExpression})
+  '';
   diskHealthExpression = ''
     label_join(
       label_replace(
@@ -594,14 +764,14 @@ let
         (mkStat {
           id = 2;
           title = "Fleet status";
-          expression = ''min(up{job=~"fleet-(node|smartctl)"})'';
+          expression = ''min(up{job=~"fleet-(node|smartctl)",always_on="true"})'';
           x = 0;
           y = 1;
           min = 0;
           max = 1;
           thresholds = healthyThresholds;
           mappings = healthMappings;
-          description = "All configured node and SMART exporters are reachable.";
+          description = "All always-on node and SMART exporters are reachable. Disabled and optional targets do not degrade this status.";
         })
         (mkStat {
           id = 3;
@@ -664,8 +834,8 @@ let
 
         {
           id = 28;
-          title = "Configured Monitoring Targets";
-          description = "Every exporter VictoriaMetrics is configured to scrape. Best-effort targets may legitimately be offline; always-on targets should remain reachable.";
+          title = "Fleet Connectivity And Monitoring";
+          description = "Tailnet reports Headscale node state; exporter columns report metric reachability. Disabled exporters are N/A, and optional failures do not degrade fleet health.";
           type = "table";
           inherit datasource;
           gridPos = {
@@ -676,7 +846,47 @@ let
           };
           fieldConfig = {
             defaults = { };
-            overrides =
+            overrides = [
+              {
+                matcher = {
+                  id = "byName";
+                  options = "Policy";
+                };
+                properties = [
+                  {
+                    id = "mappings";
+                    value = monitoringModeMappings;
+                  }
+                  {
+                    id = "custom.cellOptions";
+                    value = {
+                      mode = "basic";
+                      type = "color-background";
+                    };
+                  }
+                ];
+              }
+              {
+                matcher = {
+                  id = "byName";
+                  options = "Tailnet";
+                };
+                properties = [
+                  {
+                    id = "mappings";
+                    value = tailnetMappings;
+                  }
+                  {
+                    id = "custom.cellOptions";
+                    value = {
+                      mode = "basic";
+                      type = "color-background";
+                    };
+                  }
+                ];
+              }
+            ]
+            ++
               map
                 (name: {
                   matcher = {
@@ -698,34 +908,34 @@ let
                   ];
                 })
                 [
-                  "Node"
-                  "SMART"
+                  "Node exporter"
+                  "SMART exporter"
                 ]
-              ++ [
-                {
-                  matcher = {
-                    id = "byName";
-                    options = "Overall";
-                  };
-                  properties = [
-                    {
-                      id = "mappings";
-                      value = overallMappings;
-                    }
-                    {
-                      id = "custom.cellOptions";
-                      value = {
-                        mode = "basic";
-                        type = "color-background";
-                      };
-                    }
-                    {
-                      id = "custom.width";
-                      value = 170;
-                    }
-                  ];
-                }
-              ];
+            ++ [
+              {
+                matcher = {
+                  id = "byName";
+                  options = "Overall";
+                };
+                properties = [
+                  {
+                    id = "mappings";
+                    value = overallMappings;
+                  }
+                  {
+                    id = "custom.cellOptions";
+                    value = {
+                      mode = "basic";
+                      type = "color-background";
+                    };
+                  }
+                  {
+                    id = "custom.width";
+                    value = 170;
+                  }
+                ];
+              }
+            ];
           };
           options = {
             cellHeight = "sm";
@@ -734,7 +944,7 @@ let
           };
           targets = [
             (mkTarget {
-              expression = withHost ''up{job=~"fleet-(node|smartctl)"}'';
+              expression = monitoringStatusExpression;
               legend = "__auto";
               refId = "A";
               instant = true;
@@ -749,7 +959,7 @@ let
             {
               id = "groupingToMatrix";
               options = {
-                columnField = "exporter";
+                columnField = "signal";
                 rowField = "host";
                 valueField = "Value";
                 emptyValue = "null";
@@ -762,8 +972,8 @@ let
                 mode = "reduceRow";
                 reduce = {
                   include = [
-                    "node"
-                    "smartctl"
+                    "Node exporter"
+                    "SMART exporter"
                   ];
                   reducer = "min";
                   nullValueMode = "ignore";
@@ -776,15 +986,15 @@ let
               id = "organize";
               options = {
                 indexByName = {
-                  "host\\exporter" = 0;
-                  node = 1;
-                  smartctl = 2;
-                  Overall = 3;
+                  "host\\signal" = 0;
+                  Policy = 1;
+                  Tailnet = 2;
+                  "Node exporter" = 3;
+                  "SMART exporter" = 4;
+                  Overall = 5;
                 };
                 renameByName = {
-                  "host\\exporter" = "Host";
-                  node = "Node";
-                  smartctl = "SMART";
+                  "host\\signal" = "Host";
                 };
               };
             }
@@ -1264,7 +1474,7 @@ let
       timezone = "browser";
       title = "Fleet Overview";
       uid = "fleet-revisions";
-      version = 6;
+      version = 7;
       weekStart = "";
     }
   );
@@ -2141,22 +2351,57 @@ in
   };
 
   systemd = {
-    services.dotfiles-main-revision-metrics = {
-      description = "Export the current dotfiles main revision";
-      wants = [ "network-online.target" ];
-      after = [ "network-online.target" ];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = lib.getExe mainRevisionCollector;
+    tmpfiles.rules = [
+      "L+ ${metricsDirectory}/fleet-monitoring-policy.prom - - - - ${monitoringPolicyMetrics}"
+    ];
+
+    services = {
+      dotfiles-main-revision-metrics = {
+        description = "Export the current dotfiles main revision";
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = lib.getExe mainRevisionCollector;
+        };
+      };
+
+      fleet-tailnet-metrics = {
+        description = "Export Headscale node state for fleet monitoring";
+        requires = [ "headscale.service" ];
+        after = [ "headscale.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = lib.getExe tailnetMetricsCollector;
+          User = "root";
+          Group = "root";
+          NoNewPrivileges = true;
+          PrivateTmp = true;
+          ProtectHome = true;
+          ProtectSystem = "strict";
+          ReadWritePaths = [ metricsDirectory ];
+          UMask = "0022";
+        };
       };
     };
 
-    timers.dotfiles-main-revision-metrics = {
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnBootSec = "2m";
-        OnUnitActiveSec = "15m";
-        Unit = "dotfiles-main-revision-metrics.service";
+    timers = {
+      dotfiles-main-revision-metrics = {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2m";
+          OnUnitActiveSec = "15m";
+          Unit = "dotfiles-main-revision-metrics.service";
+        };
+      };
+
+      fleet-tailnet-metrics = {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "30s";
+          OnUnitActiveSec = "30s";
+          Unit = "fleet-tailnet-metrics.service";
+        };
       };
     };
   };
