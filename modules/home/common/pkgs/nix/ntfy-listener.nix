@@ -1,6 +1,9 @@
 {
   baseUrl ? "http://vps-oracle-0:8111",
-  topics ? [ "emre-laptop" ],
+  topics ? [
+    "emre-laptop"
+    "alerts"
+  ],
   soundPath ? null,
 }:
 { config, pkgs, ... }:

@@ -9,9 +9,12 @@
     "infra:system/ephemeral-root"
     "infra:services/victoriametrics"
     "infra:services/victorialogs"
+    "self:services/flow-collector"
+    "self:services/flow-exporter"
     "infra:services/grafana"
     "self:services/grafana-fleet"
     "infra:services/vmalert"
     "infra:services/alertmanager"
+    "self:deployment-roles/mgmt-observability"
   ];
 }
