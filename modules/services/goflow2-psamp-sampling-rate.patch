@@ -1,0 +1,67 @@
+diff --git a/producer/proto/producer_nf.go b/producer/proto/producer_nf.go
+index 07f0df0..6fefb32 100644
+--- a/producer/proto/producer_nf.go
++++ b/producer/proto/producer_nf.go
+@@ -688,8 +688,29 @@ func SearchNetFlowDataSets(version uint16, baseTime uint32, uptime uint32, dataF
+ func SearchNetFlowOptionDataSets(dataFlowSet []netflow.OptionsDataFlowSet) (samplingRate uint32, found bool, err error) {
+ 	for _, dataFlowSetItem := range dataFlowSet {
+ 		for _, record := range dataFlowSetItem.Records {
+-			if found, err := NetFlowPopulate(record.OptionsValues, 305, &samplingRate); err != nil || found {
+-				return samplingRate, found, err
++			var samplingPacketInterval uint32
++			intervalFound, err := NetFlowPopulate(record.OptionsValues, 305, &samplingPacketInterval)
++			if err != nil {
++				return 0, false, err
++			}
++			if intervalFound {
++				var samplingPacketSpace uint32
++				spaceFound, err := NetFlowPopulate(record.OptionsValues, 306, &samplingPacketSpace)
++				if err != nil {
++					return 0, false, err
++				}
++				if !spaceFound {
++					return samplingPacketInterval, true, nil
++				}
++				if samplingPacketInterval == 0 {
++					return 0, false, fmt.Errorf("sampling packet interval cannot be zero")
++				}
++				totalPackets := uint64(samplingPacketInterval) + uint64(samplingPacketSpace)
++				samplingRate64 := totalPackets / uint64(samplingPacketInterval)
++				if samplingRate64 > uint64(^uint32(0)) {
++					return 0, false, fmt.Errorf("sampling rate %d exceeds uint32", samplingRate64)
++				}
++				return uint32(samplingRate64), true, nil
+ 			}
+ 			if found, err := NetFlowPopulate(record.OptionsValues, 50, &samplingRate); err != nil || found {
+ 				return samplingRate, found, err
+diff --git a/producer/proto/producer_test.go b/producer/proto/producer_test.go
+index 926efa6..539cffe 100644
+--- a/producer/proto/producer_test.go
++++ b/producer/proto/producer_test.go
+@@ -73,6 +73,26 @@ func TestProcessMessageNetFlow(t *testing.T) {
+ 	assert.Nil(t, err)
+ }
+ 
++func TestSearchNetFlowOptionDataSetsSamplingPacketSpace(t *testing.T) {
++	dataSets := []netflow.OptionsDataFlowSet{
++		{
++			Records: []netflow.OptionsDataRecord{
++				{
++					OptionsValues: []netflow.DataField{
++						{Type: 305, Value: []byte{0, 0, 0, 1}},
++						{Type: 306, Value: []byte{0, 0, 0, 255}},
++					},
++				},
++			},
++		},
++	}
++
++	samplingRate, found, err := SearchNetFlowOptionDataSets(dataSets)
++	assert.NoError(t, err)
++	assert.True(t, found)
++	assert.Equal(t, uint32(256), samplingRate)
++}
++
+ func TestProcessMessageSFlow(t *testing.T) {
+ 	sh := sflow.SampledHeader{
+ 		FrameLength: 10,
