@@ -1461,10 +1461,204 @@ let
     type = "victoriametrics-logs-datasource";
     uid = "victorialogs";
   };
+  sshAccepted = ''{unit="sshd.service"} _msg:~"^Accepted (publickey|password|keyboard-interactive) for "'';
+  sshAcceptedParsed = ''${sshAccepted} | extract_regexp "^Accepted (?P<method>[^ ]+) for (?P<user>[^ ]+) from (?P<source_ip>[^ ]+) port (?P<source_port>[0-9]+) ssh2(?:: (?P<key_type>[^ ]+) (?P<fingerprint>[^ ]+))?$"'';
+  sshConnections = ''{unit="sshd.service"} _msg:~"^Connection from " | extract_regexp "^Connection from (?P<source_ip>[^ ]+) port (?P<source_port>[0-9]+) on (?P<destination_ip>[^ ]+) port (?P<destination_port>[0-9]+)"'';
+  sshCredentialFailures = ''{unit="sshd.service"} _msg:~"^(Failed |Invalid user |maximum authentication attempts exceeded)"'';
+  sshTargetedAccounts = ''{unit="sshd.service"} _msg:~"(Invalid user|authenticating user)" | extract_regexp "(?:Invalid user|authenticating user) (?P<user>[^ ]+) (?:from )?(?P<source_ip>[^ ]+) port"'';
+  nonInternetSourcePattern = "^(100[.](6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])[.]|10[.]|127[.]|169[.]254[.]|172[.](1[6-9]|2[0-9]|3[01])[.]|192[.]168[.]|::1$|[fF][cCdD][0-9a-fA-F]{2}:|[fF][eE][89aAbB][0-9a-fA-F]:)";
+  sshInternetConnections = ''${sshConnections} | source_ip:!~"${nonInternetSourcePattern}"'';
+  sshInternetAccepted = ''${sshAcceptedParsed} | source_ip:!~"${nonInternetSourcePattern}"'';
+
+  mkLogsTarget =
+    {
+      expression,
+      refId ? "A",
+      queryType ? "stats",
+      legend ? null,
+      maxLines ? null,
+      direction ? null,
+    }:
+    {
+      datasource = logsDatasource;
+      editorMode = "code";
+      expr = expression;
+      inherit refId queryType;
+    }
+    // lib.optionalAttrs (legend != null) { legendFormat = legend; }
+    // lib.optionalAttrs (maxLines != null) { inherit maxLines; }
+    // lib.optionalAttrs (direction != null) { inherit direction; };
+  mkLogsStat =
+    {
+      id,
+      title,
+      description,
+      expression,
+      x,
+      y,
+      thresholds ? {
+        mode = "absolute";
+        steps = [
+          {
+            color = "blue";
+            value = null;
+          }
+        ];
+      },
+    }:
+    {
+      inherit
+        id
+        title
+        description
+        ;
+      type = "stat";
+      datasource = logsDatasource;
+      gridPos = {
+        h = 4;
+        w = 6;
+        inherit x y;
+      };
+      fieldConfig = {
+        defaults = {
+          decimals = 0;
+          unit = "short";
+          inherit thresholds;
+        };
+        overrides = [ ];
+      };
+      options = {
+        colorMode = "value";
+        graphMode = "none";
+        justifyMode = "auto";
+        orientation = "auto";
+        reduceOptions = {
+          calcs = [ "lastNotNull" ];
+          fields = "";
+          values = false;
+        };
+        textMode = "auto";
+        wideLayout = true;
+      };
+      targets = [ (mkLogsTarget { inherit expression; }) ];
+    };
+  mkLogsBarGauge =
+    {
+      id,
+      title,
+      description,
+      expression,
+      legend,
+      x,
+      y,
+      w,
+      h,
+      unit ? "short",
+    }:
+    {
+      inherit
+        id
+        title
+        description
+        ;
+      type = "bargauge";
+      datasource = logsDatasource;
+      gridPos = {
+        inherit
+          h
+          w
+          x
+          y
+          ;
+      };
+      fieldConfig = {
+        defaults = {
+          inherit unit;
+          min = 0;
+          thresholds = {
+            mode = "absolute";
+            steps = [
+              {
+                color = "blue";
+                value = null;
+              }
+            ];
+          };
+        };
+        overrides = [ ];
+      };
+      options = {
+        displayMode = "gradient";
+        maxVizHeight = 300;
+        minVizHeight = 18;
+        minVizWidth = 8;
+        namePlacement = "left";
+        orientation = "horizontal";
+        reduceOptions = {
+          calcs = [ "lastNotNull" ];
+          fields = "";
+          values = false;
+        };
+        showUnfilled = true;
+        sizing = "auto";
+        valueMode = "color";
+      };
+      targets = [
+        (mkLogsTarget {
+          inherit expression legend;
+        })
+      ];
+    };
+  mkLogsPanel =
+    {
+      id,
+      title,
+      description,
+      expression,
+      x,
+      y,
+      w,
+      h,
+      maxLines ? 500,
+    }:
+    {
+      inherit
+        id
+        title
+        description
+        ;
+      type = "logs";
+      datasource = logsDatasource;
+      gridPos = {
+        inherit
+          h
+          w
+          x
+          y
+          ;
+      };
+      options = {
+        dedupStrategy = "none";
+        enableLogDetails = true;
+        prettifyLogMessage = false;
+        showCommonLabels = true;
+        showLabels = true;
+        showTime = true;
+        sortOrder = "Descending";
+        wrapLogMessage = true;
+      };
+      targets = [
+        (mkLogsTarget {
+          inherit expression maxLines;
+          queryType = "instant";
+          direction = "desc";
+        })
+      ];
+    };
   sshAccessDashboard = pkgs.writeText "ssh-access.json" (
     builtins.toJSON {
       annotations.list = [ ];
-      description = "Successful and failed SSH authentication events from the fleet journal.";
+      description = "SSH participants and outcomes across the fleet. Counts are log events in the selected time range, not unique people or interactive sessions.";
       editable = false;
       fiscalYearStartMonth = 0;
       graphTooltip = 1;
@@ -1472,148 +1666,207 @@ let
       links = [ ];
       liveNow = false;
       panels = [
-        {
+        (mkRow {
           id = 1;
-          title = "Successful authentications";
-          description = "OpenSSH accepted-authentication messages in the selected time range.";
-          type = "stat";
-          datasource = logsDatasource;
-          gridPos = {
-            h = 5;
-            w = 12;
-            x = 0;
-            y = 0;
-          };
-          fieldConfig = {
-            defaults = {
-              color.mode = "thresholds";
-              thresholds = {
-                mode = "absolute";
-                steps = [
-                  {
-                    color = "green";
-                    value = null;
-                  }
-                ];
-              };
-            };
-            overrides = [ ];
-          };
-          options = {
-            colorMode = "value";
-            graphMode = "none";
-            justifyMode = "auto";
-            orientation = "auto";
-            reduceOptions = {
-              calcs = [ "lastNotNull" ];
-              fields = "";
-              values = false;
-            };
-            textMode = "auto";
-            wideLayout = true;
-          };
-          targets = [
-            {
-              datasource = logsDatasource;
-              editorMode = "code";
-              expr = ''{unit="sshd.service"} _msg:~"Accepted (publickey|password|keyboard-interactive)" | stats count() as logins'';
-              queryType = "stats";
-              refId = "A";
-            }
-          ];
-        }
-        {
+          title = "Security Posture";
+          y = 0;
+        })
+        (mkLogsStat {
           id = 2;
-          title = "Failed authentications";
-          description = "OpenSSH failed-authentication messages in the selected time range.";
-          type = "stat";
-          datasource = logsDatasource;
-          gridPos = {
-            h = 5;
-            w = 12;
-            x = 12;
-            y = 0;
-          };
-          fieldConfig = {
-            defaults = {
-              color.mode = "thresholds";
-              thresholds = {
-                mode = "absolute";
-                steps = [
-                  {
-                    color = "green";
-                    value = null;
-                  }
-                  {
-                    color = "red";
-                    value = 1;
-                  }
-                ];
-              };
-            };
-            overrides = [ ];
-          };
-          options = {
-            colorMode = "value";
-            graphMode = "none";
-            justifyMode = "auto";
-            orientation = "auto";
-            reduceOptions = {
-              calcs = [ "lastNotNull" ];
-              fields = "";
-              values = false;
-            };
-            textMode = "auto";
-            wideLayout = true;
-          };
-          targets = [
-            {
-              datasource = logsDatasource;
-              editorMode = "code";
-              expr = ''{unit="sshd.service"} _msg:~"(?i)(failed|invalid user|authentication failure)" | stats count() as failures'';
-              queryType = "stats";
-              refId = "A";
-            }
-          ];
-        }
-        {
+          title = "Accepted authentications";
+          description = "Successful OpenSSH authentication events. See Accepted Identities for source, account, method, and key.";
+          expression = "${sshAccepted} | stats count() as logins";
+          x = 0;
+          y = 1;
+        })
+        (mkLogsStat {
           id = 3;
-          title = "SSH Journal";
-          description = "Raw OpenSSH journal events from all reporting hosts.";
-          type = "logs";
+          title = "Accepted via internet";
+          description = "Successful authentications from outside private, loopback, link-local, and Tailscale CGNAT ranges. Any value warrants identity review.";
+          expression = "${sshInternetAccepted} | stats count() as logins";
+          x = 6;
+          y = 1;
+          thresholds = warningThresholds;
+        })
+        (mkLogsStat {
+          id = 4;
+          title = "Internet connections";
+          description = "TCP connections to fleet SSH endpoints from public source addresses; this is exposure volume, not successful authentication.";
+          expression = "${sshInternetConnections} | stats count() as connections";
+          x = 12;
+          y = 1;
+        })
+        (mkLogsStat {
+          id = 5;
+          title = "Credential rejections";
+          description = "Failed credentials, invalid users, and maximum-attempt events. A connection can produce more than one rejection event.";
+          expression = "${sshCredentialFailures} | stats count() as rejections";
+          x = 18;
+          y = 1;
+          thresholds = {
+            mode = "absolute";
+            steps = [
+              {
+                color = "green";
+                value = null;
+              }
+              {
+                color = "orange";
+                value = 1;
+              }
+            ];
+          };
+        })
+
+        (mkRow {
+          id = 6;
+          title = "Activity Over Time";
+          y = 5;
+        })
+        {
+          id = 7;
+          title = "SSH activity by destination host";
+          description = "Public connection volume, successful authentications, and credential-rejection events over the selected range.";
+          type = "timeseries";
           datasource = logsDatasource;
           gridPos = {
-            h = 17;
+            h = 8;
             w = 24;
             x = 0;
-            y = 5;
+            y = 6;
+          };
+          fieldConfig = {
+            defaults = {
+              min = 0;
+              unit = "short";
+              color.mode = "palette-classic";
+              custom = {
+                axisCenteredZero = false;
+                axisColorMode = "text";
+                axisLabel = "Events";
+                axisPlacement = "auto";
+                drawStyle = "line";
+                fillOpacity = 16;
+                gradientMode = "none";
+                lineInterpolation = "smooth";
+                lineWidth = 2;
+                pointSize = 4;
+                scaleDistribution.type = "linear";
+                showPoints = "never";
+                spanNulls = false;
+                stacking = {
+                  group = "A";
+                  mode = "none";
+                };
+                thresholdsStyle.mode = "off";
+              };
+              thresholds = {
+                mode = "absolute";
+                steps = [
+                  {
+                    color = "green";
+                    value = null;
+                  }
+                ];
+              };
+            };
+            overrides = [ ];
           };
           options = {
-            dedupStrategy = "none";
-            enableLogDetails = true;
-            prettifyLogMessage = false;
-            showCommonLabels = false;
-            showLabels = false;
-            showTime = true;
-            sortOrder = "Descending";
-            wrapLogMessage = true;
+            legend = {
+              calcs = [ "lastNotNull" ];
+              displayMode = "table";
+              placement = "bottom";
+              showLegend = true;
+            };
+            tooltip = {
+              hideZeros = false;
+              mode = "multi";
+              sort = "desc";
+            };
           };
           targets = [
-            {
-              datasource = logsDatasource;
-              direction = "desc";
-              editorMode = "code";
-              expr = ''{unit="sshd.service"}'';
-              maxLines = 500;
-              queryType = "instant";
+            (mkLogsTarget {
+              expression = "${sshInternetConnections} | stats by (host) count() as connections";
               refId = "A";
-            }
+              queryType = "statsRange";
+              legend = "Internet connections: {{host}}";
+            })
+            (mkLogsTarget {
+              expression = "${sshAccepted} | stats by (host) count() as logins";
+              refId = "B";
+              queryType = "statsRange";
+              legend = "Accepted: {{host}}";
+            })
+            (mkLogsTarget {
+              expression = "${sshCredentialFailures} | stats by (host) count() as rejections";
+              refId = "C";
+              queryType = "statsRange";
+              legend = "Rejected: {{host}}";
+            })
           ];
         }
+
+        (mkRow {
+          id = 8;
+          title = "Event Detail";
+          y = 14;
+        })
+        (mkLogsPanel {
+          id = 9;
+          title = "Accepted authentication events";
+          description = "Successful source -> destination identity events. Expand a line for the original journal fields.";
+          expression = ''${sshAcceptedParsed} | format "info" as level | format "<source_ip> -> <host> user=<user> method=<method> key=<key_type> <fingerprint>"'';
+          x = 0;
+          y = 15;
+          w = 12;
+          h = 14;
+          maxLines = 500;
+        })
+        (mkLogsPanel {
+          id = 10;
+          title = "SSH connection attempts";
+          description = "Every source socket -> destination inventory host and local SSH endpoint, whether or not authentication was attempted.";
+          expression = ''${sshConnections} | format "info" as level | format "<source_ip>:<source_port> -> <host> (<destination_ip>:<destination_port>)"'';
+          x = 12;
+          y = 15;
+          w = 12;
+          h = 14;
+          maxLines = 500;
+        })
+
+        (mkRow {
+          id = 11;
+          title = "Investigation Breakdowns";
+          y = 29;
+        })
+        (mkLogsBarGauge {
+          id = 12;
+          title = "Top internet sources";
+          description = "Public source addresses ranked by TCP connections, with the destination inventory host and local endpoint in each label.";
+          expression = "${sshInternetConnections} | stats by (source_ip,host,destination_ip,destination_port) count() as connections | sort by (connections desc) limit 12";
+          legend = "{{source_ip}} -> {{host}} ({{destination_ip}}:{{destination_port}})";
+          x = 0;
+          y = 30;
+          w = 12;
+          h = 10;
+        })
+        (mkLogsBarGauge {
+          id = 13;
+          title = "Targeted accounts";
+          description = "Usernames observed in invalid-user and pre-authentication messages, ranked by event count.";
+          expression = "${sshTargetedAccounts} | stats by (user,source_ip,host) count() as events | sort by (events desc) limit 12";
+          legend = "{{user}} <= {{source_ip}} -> {{host}}";
+          x = 12;
+          y = 30;
+          w = 12;
+          h = 10;
+        })
       ];
       refresh = "30s";
       schemaVersion = 42;
       tags = [
+        "fleet"
         "security"
         "ssh"
       ];
@@ -1626,7 +1879,7 @@ let
       timezone = "browser";
       title = "SSH Access";
       uid = "ssh-access";
-      version = 1;
+      version = 3;
       weekStart = "";
     }
   );
@@ -1742,94 +1995,30 @@ let
             }
           ];
         }
-        {
+        (mkLogsBarGauge {
           id = 3;
           title = "Top source addresses";
           description = "Sources ranked by sampling-adjusted bytes in observed flow records.";
-          type = "table";
-          datasource = logsDatasource;
-          gridPos = {
-            h = 10;
-            w = 12;
-            x = 0;
-            y = 5;
-          };
-          fieldConfig = {
-            defaults = { };
-            overrides = [
-              {
-                matcher = {
-                  id = "byName";
-                  options = "bytes";
-                };
-                properties = [
-                  {
-                    id = "unit";
-                    value = "bytes";
-                  }
-                ];
-              }
-            ];
-          };
-          options = {
-            cellHeight = "sm";
-            showHeader = true;
-            footer.show = false;
-          };
-          targets = [
-            {
-              datasource = logsDatasource;
-              editorMode = "code";
-              expr = "event_kind:network_flow flow.src_addr:* | stats by (flow.src_addr) sum(flow.estimated_bytes) as bytes | sort by (bytes desc) limit 20";
-              queryType = "stats";
-              refId = "A";
-            }
-          ];
-        }
-        {
+          expression = "event_kind:network_flow flow.src_addr:* | stats by (flow.src_addr) sum(flow.estimated_bytes) as bytes | sort by (bytes desc) limit 12";
+          legend = "{{flow.src_addr}}";
+          x = 0;
+          y = 5;
+          w = 12;
+          h = 10;
+          unit = "bytes";
+        })
+        (mkLogsBarGauge {
           id = 4;
           title = "Top destination addresses";
           description = "Destinations ranked by sampling-adjusted bytes in observed flow records.";
-          type = "table";
-          datasource = logsDatasource;
-          gridPos = {
-            h = 10;
-            w = 12;
-            x = 12;
-            y = 5;
-          };
-          fieldConfig = {
-            defaults = { };
-            overrides = [
-              {
-                matcher = {
-                  id = "byName";
-                  options = "bytes";
-                };
-                properties = [
-                  {
-                    id = "unit";
-                    value = "bytes";
-                  }
-                ];
-              }
-            ];
-          };
-          options = {
-            cellHeight = "sm";
-            showHeader = true;
-            footer.show = false;
-          };
-          targets = [
-            {
-              datasource = logsDatasource;
-              editorMode = "code";
-              expr = "event_kind:network_flow flow.dst_addr:* | stats by (flow.dst_addr) sum(flow.estimated_bytes) as bytes | sort by (bytes desc) limit 20";
-              queryType = "stats";
-              refId = "A";
-            }
-          ];
-        }
+          expression = "event_kind:network_flow flow.dst_addr:* | stats by (flow.dst_addr) sum(flow.estimated_bytes) as bytes | sort by (bytes desc) limit 12";
+          legend = "{{flow.dst_addr}}";
+          x = 12;
+          y = 5;
+          w = 12;
+          h = 10;
+          unit = "bytes";
+        })
         {
           id = 5;
           title = "Raw flow records";
@@ -1881,7 +2070,7 @@ let
       timezone = "browser";
       title = "Network Flows";
       uid = "network-flows";
-      version = 1;
+      version = 2;
       weekStart = "";
     }
   );
