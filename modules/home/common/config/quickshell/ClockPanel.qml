@@ -5,6 +5,8 @@ import Quickshell
 Item {
     id: root
 
+    readonly property string dateLabel: Qt.formatDate(clock.date, "dddd, d MMMM yyyy")
+
     signal requestClose
 
     implicitWidth: Theme.metrics.menuWidth
@@ -29,37 +31,51 @@ Item {
         MenuHeader {
             Layout.fillWidth: true
             title: "Time"
-            subtitle: Qt.formatDate(clock.date, "dddd, d MMMM yyyy")
+            subtitle: root.dateLabel
             onClose: root.requestClose()
         }
 
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            implicitHeight: clockDigits.implicitHeight + Theme.space.extraLarge * 2
+            implicitHeight: clockStack.implicitHeight + Theme.space.extraLarge * 2
             radius: Theme.shape.large
             color: ShellPalette.surface
             border.width: Theme.metrics.stroke
             border.color: ShellPalette.indicator
 
-            Row {
-                id: clockDigits
+            Column {
+                id: clockStack
 
                 anchors.centerIn: parent
-                spacing: Theme.space.medium
+                spacing: Theme.space.small
 
-                Repeater {
-                    model: [Qt.formatTime(clock.date, "HH"), Qt.formatTime(clock.date, "mm"),]
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: Theme.space.medium
 
-                    Text {
-                        required property string modelData
+                    Repeater {
+                        model: [Qt.formatTime(clock.date, "HH"), Qt.formatTime(clock.date, "mm"),]
 
-                        text: modelData
-                        color: ShellPalette.foreground
-                        font.family: Theme.font.mono
-                        font.pixelSize: Theme.font.displayMediumLine
-                        font.weight: Theme.font.boldWeight
+                        Text {
+                            required property string modelData
+
+                            text: modelData
+                            color: ShellPalette.foreground
+                            font.family: Theme.font.mono
+                            font.pixelSize: Theme.font.displayMediumLine
+                            font.weight: Theme.font.boldWeight
+                        }
                     }
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: root.dateLabel
+                    color: ShellPalette.foregroundMuted
+                    font.family: Theme.font.plain
+                    font.pixelSize: Theme.font.bodyMediumSize
+                    font.weight: Theme.font.bodyMediumWeight
                 }
             }
         }
