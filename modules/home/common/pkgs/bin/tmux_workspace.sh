@@ -32,32 +32,19 @@ END {
   }
 }'
 
-if [[ -z $TMUX ]]; then
-  while true; do
-    raw_input=$(
-      {
-        echo "$HOME"
-        find -L "$HOME/Desktop" "$HOME/Desktop/infra" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
-      } \
-        | sed "s|^${HOME}|~|" \
-        | awk "$COLORIZER_AWK" \
-        | fzf --ansi --delimiter='|' --with-nth 2 --prompt="Select project: " \
-        | cut -d'|' -f 1
-    )
-    [[ -n $raw_input ]] && break
-  done
-else
+while true; do
   raw_input=$(
     {
       echo "$HOME"
-      find -L "$HOME/Desktop" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
+      find -L "$HOME/Desktop/infra" "$HOME/Downloads" -mindepth 1 -maxdepth 1 -type d ! -name ".*"
     } \
       | sed "s|^${HOME}|~|" \
       | awk "$COLORIZER_AWK" \
       | fzf --ansi --delimiter='|' --with-nth 2 --prompt="Select project: " \
       | cut -d'|' -f 1
   )
-fi
+  [[ -n $raw_input ]] && break
+done
 
 if [[ -z $raw_input ]]; then
   echo "No directory selected."
@@ -131,7 +118,7 @@ else
     fi
   fi
 
-  if [[ -n $TMUX ]]; then
+  if [[ -v TMUX ]]; then
     echo "Already inside tmux. Switching client to session '$session_name'..."
     tmux switch-client -t "$session_name"
   else
