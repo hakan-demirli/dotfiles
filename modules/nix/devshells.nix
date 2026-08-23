@@ -24,6 +24,12 @@ _: {
           ipmitool
           gitMinimal
         ];
+
+        shellHook = ''
+          if [ -d /run/wrappers/bin ]; then
+            export PATH="/run/wrappers/bin:$PATH"
+          fi
+        '';
       };
     };
 }
