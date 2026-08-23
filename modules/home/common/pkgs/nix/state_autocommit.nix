@@ -44,12 +44,14 @@ in
     services.state-autopush = {
       Unit = {
         Description = "Auto-push ${logBranch} branch of ${resolvedRepoPath}";
-        Wants = [ "network-online.target" ];
-        After = [ "network-online.target" ];
+        StartLimitIntervalSec = 900;
+        StartLimitBurst = 6;
       };
       Service = {
         Type = "oneshot";
         ExecStart = "${autopush}/bin/state-autopush.sh --repo-path ${resolvedRepoPath} --branch ${logBranch}";
+        Restart = "on-failure";
+        RestartSec = 30;
       };
     };
 
