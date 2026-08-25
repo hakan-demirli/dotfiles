@@ -91,6 +91,11 @@ in
     (lib.mkIf headless {
       programs.hyprland.enable = true;
 
+      systemd.tmpfiles.rules = [
+        "x /tmp/.X11-unix"
+        "x /tmp/.X11-unix/*"
+      ];
+
       environment.systemPackages = with pkgs; [
         kitty
         foot
