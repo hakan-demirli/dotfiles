@@ -39,14 +39,7 @@
         ];
         text = builtins.readFile ./pkgs/bin/deploy-system-secrets.sh;
       };
-      themeTones =
-        pkgs.runCommand "theme-tones"
-          {
-            nativeBuildInputs = [ (pkgs.python3.withPackages (ps: [ ps.materialyoucolor ])) ];
-          }
-          ''
-            python3 ${../home/common/theme/tones.py} > "$out"
-          '';
+
       intentReport =
         pkgs.runCommand "intent-report"
           {
@@ -312,8 +305,6 @@
         matchbox = codegen.matchbox { inherit pkgs; };
         kea = codegen.kea { inherit pkgs; };
         headscale-acl = codegen.headscaleAcl { inherit pkgs; };
-        theme-tones = themeTones;
-
         intent-report = intentReport;
         bootstrap-deploy = bootstrapDeploy;
         deploy-home-secrets = deployHomeSecrets;

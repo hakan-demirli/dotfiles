@@ -7,7 +7,7 @@
   ...
 }:
 let
-  theme = import ../theme;
+  theme = import ../theme.nix;
 
   mkRawGVariant = rawString: {
     _type = "gvariant";

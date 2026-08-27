@@ -487,16 +487,16 @@ let
         rankdir=LR; splines=true; concentrate=true; overlap=false;
         graph [fontname="${fontFamily}"]; node [fontname="${fontFamily}"]; edge [fontname="${fontFamily}"];
 
-        subgraph "cluster_users"    { label="users";    style="rounded,filled"; fillcolor="#fff7fb";
+        subgraph "cluster_users"    { label="users";    style="rounded,filled"; fillcolor="${palette.laneUser}";
       ${userBlock}
         }
-        subgraph "cluster_teams"    { label="teams";    style="rounded,filled"; fillcolor="#faf5ff";
+        subgraph "cluster_teams"    { label="teams";    style="rounded,filled"; fillcolor="${palette.laneTeam}";
       ${teamBlock}
         }
-        subgraph "cluster_clusters" { label="clusters"; style="rounded,filled"; fillcolor="#f1f5f9";
+        subgraph "cluster_clusters" { label="clusters"; style="rounded,filled"; fillcolor="${palette.laneCluster}";
       ${clusterBlock}
         }
-        subgraph "cluster_hosts"    { label="hosts";    style="rounded,filled"; fillcolor="#f0fdf4";
+        subgraph "cluster_hosts"    { label="hosts";    style="rounded,filled"; fillcolor="${palette.laneHost}";
       ${hostBlock}
         }
 

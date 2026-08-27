@@ -39,19 +39,6 @@ label {
 
 label {
     monitor =
-    text = Hey <span text_transform="capitalize" size="larger">$USER</span>
-    font_size = {{text-title-large}}
-    font_family = {{font-plain}}
-    position = 0, -80
-    halign = center
-    valign = center
-
-    shadow_passes = 3
-    shadow_size = {{space-extra-small}}
-}
-
-label {
-    monitor =
     text = Type to unlock!
     font_size = {{text-body-large}}
     font_family = {{font-plain}}

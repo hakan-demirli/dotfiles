@@ -1,0 +1,234 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
+  "md": {
+    "ref": {
+      "typeface": {
+        "brand": {
+          "$value": "{desktop.typeface.brand}"
+        },
+        "plain": {
+          "$value": "{desktop.typeface.plain}"
+        }
+      }
+    },
+    "sys": {
+      "color": {
+        "$type": "color",
+        "surface": {
+          "$value": "{tones.neutral.6}"
+        },
+        "surfaceDim": {
+          "$value": "{tones.neutral.6}"
+        },
+        "surfaceBright": {
+          "$value": "{tones.neutral.24}"
+        },
+        "surfaceContainerLowest": {
+          "$value": "{tones.neutral.4}"
+        },
+        "surfaceContainerLow": {
+          "$value": "{tones.neutral.10}"
+        },
+        "surfaceContainer": {
+          "$value": "{tones.neutral.12}"
+        },
+        "surfaceContainerHigh": {
+          "$value": "{dracula.color.background}"
+        },
+        "surfaceContainerHighest": {
+          "$value": "{tones.neutral.22}"
+        },
+        "onSurface": {
+          "$value": "{dracula.color.foreground}"
+        },
+        "onSurfaceVariant": {
+          "$value": "{tones.neutral.80}"
+        },
+        "outline": {
+          "$value": "{dracula.color.comment}"
+        },
+        "outlineVariant": {
+          "$value": "{dracula.color.selection}"
+        },
+        "inverseSurface": {
+          "$value": "{tones.neutral.90}"
+        },
+        "inverseOnSurface": {
+          "$value": "{tones.neutral.20}"
+        },
+        "shadow": {
+          "$value": "{tones.neutral.0}"
+        },
+        "scrim": {
+          "$value": "{tones.neutral.0}"
+        },
+        "primary": {
+          "$value": "{dracula.color.purple}"
+        },
+        "onPrimary": {
+          "$value": "{tones.onAccent.purple}"
+        },
+        "primaryContainer": {
+          "$value": "{tones.accentContainer.purple}"
+        },
+        "onPrimaryContainer": {
+          "$value": "{tones.onAccentContainer.purple}"
+        },
+        "primaryFixed": {
+          "$value": "{tones.accentFixed.purple}"
+        },
+        "primaryFixedDim": {
+          "$value": "{tones.accentFixedDim.purple}"
+        },
+        "secondary": {
+          "$value": "{dracula.color.pink}"
+        },
+        "onSecondary": {
+          "$value": "{tones.onAccent.pink}"
+        },
+        "secondaryContainer": {
+          "$value": "{tones.accentContainer.pink}"
+        },
+        "onSecondaryContainer": {
+          "$value": "{tones.onAccentContainer.pink}"
+        },
+        "secondaryFixed": {
+          "$value": "{tones.accentFixed.pink}"
+        },
+        "secondaryFixedDim": {
+          "$value": "{tones.accentFixedDim.pink}"
+        },
+        "tertiary": {
+          "$value": "{dracula.color.cyan}"
+        },
+        "onTertiary": {
+          "$value": "{tones.onAccent.cyan}"
+        },
+        "tertiaryContainer": {
+          "$value": "{tones.accentContainer.cyan}"
+        },
+        "onTertiaryContainer": {
+          "$value": "{tones.onAccentContainer.cyan}"
+        },
+        "tertiaryFixed": {
+          "$value": "{tones.accentFixed.cyan}"
+        },
+        "tertiaryFixedDim": {
+          "$value": "{tones.accentFixedDim.cyan}"
+        },
+        "error": {
+          "$value": "{dracula.color.red}"
+        },
+        "onError": {
+          "$value": "{tones.onAccent.red}"
+        },
+        "errorContainer": {
+          "$value": "{tones.accentContainer.red}"
+        },
+        "onErrorContainer": {
+          "$value": "{tones.onAccentContainer.red}"
+        }
+      }
+    }
+  },
+  "desktop": {
+    "typeface": {
+      "$type": "fontFamily",
+      "brand": {
+        "$value": "Roboto"
+      },
+      "plain": {
+        "$value": "Roboto"
+      },
+      "mono": {
+        "$value": "JetBrainsMono Nerd Font Mono"
+      },
+      "icon": {
+        "$value": "Symbols Nerd Font Mono"
+      },
+      "symbols": {
+        "$value": "Material Symbols Rounded"
+      }
+    },
+    "color": {
+      "$type": "color",
+      "success": {
+        "$value": "{dracula.color.green}"
+      },
+      "onSuccess": {
+        "$value": "{tones.onAccent.green}"
+      },
+      "successContainer": {
+        "$value": "{tones.accentContainer.green}"
+      },
+      "onSuccessContainer": {
+        "$value": "{tones.onAccentContainer.green}"
+      },
+      "warning": {
+        "$value": "{dracula.color.orange}"
+      },
+      "onWarning": {
+        "$value": "{tones.onAccent.orange}"
+      },
+      "warningContainer": {
+        "$value": "{tones.accentContainer.orange}"
+      },
+      "onWarningContainer": {
+        "$value": "{tones.onAccentContainer.orange}"
+      }
+    },
+    "space": {
+      "none": {
+        "$value": "{md.sys.shape.corner.none}"
+      },
+      "extraSmall": {
+        "$value": "{md.sys.shape.corner.extraSmall}"
+      },
+      "small": {
+        "$value": "{md.sys.shape.corner.small}"
+      },
+      "medium": {
+        "$value": "{md.sys.shape.corner.medium}"
+      },
+      "large": {
+        "$value": "{md.sys.shape.corner.large}"
+      },
+      "extraLarge": {
+        "$value": "{md.sys.shape.corner.extraLarge}"
+      }
+    },
+    "component": {
+      "$type": "dimension",
+      "swayncWidth": {
+        "$value": {
+          "value": 500,
+          "unit": "px"
+        }
+      },
+      "swayncIcon": {
+        "$value": {
+          "value": 24,
+          "unit": "px"
+        }
+      },
+      "swayncAlbumArt": {
+        "$value": {
+          "value": 96,
+          "unit": "px"
+        }
+      },
+      "notificationImage": {
+        "$value": {
+          "value": 48,
+          "unit": "px"
+        }
+      }
+    },
+    "grid": {
+      "$type": "number",
+      "swayncButtonColumns": {
+        "$value": 4
+      }
+    }
+  }
+}
