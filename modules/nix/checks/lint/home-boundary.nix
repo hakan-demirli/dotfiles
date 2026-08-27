@@ -30,6 +30,20 @@
               failed=1
             fi
 
+            while IFS= read -r file; do
+              dir=$(dirname "$file")
+              while IFS= read -r ref; do
+                [ -n "$ref" ] || continue
+                case "$(realpath -m "$dir/$ref")" in
+                  "$home"/*) ;;
+                  *)
+                    echo "Home code must not reference $ref outside modules/home: ''${file#"$src/"}" >&2
+                    failed=1
+                    ;;
+                esac
+              done < <(rg -oNP '(?<![\w./])(\.\./)+[\w./-]*' "$file" || true)
+            done < <(find "$home" -name '*.nix')
+
             if [ "$failed" -ne 0 ]; then
               exit 1
             fi

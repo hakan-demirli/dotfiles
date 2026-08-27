@@ -16,7 +16,6 @@ def load_config(path: str) -> dict:
     with open(path) as handle:
         text = handle.read()
 
-    # Waybar accepts comments and trailing commas; strict JSON does not.
     text = re.sub(r"//.*$", "", text, flags=re.M)
     text = re.sub(r",(\s*[}\]])", r"\1", text)
     return json.loads(text)
@@ -75,7 +74,7 @@ def covered(target: str, styled: set[str]) -> bool:
 
 def main(argv: list[str]) -> int:
     if len(argv) != 3:
-        print(__doc__, file=sys.stderr)
+        print("usage: waybar-coverage.py WAYBAR_CONFIG WAYBAR_CSS", file=sys.stderr)
         return 2
 
     config = load_config(argv[1])
