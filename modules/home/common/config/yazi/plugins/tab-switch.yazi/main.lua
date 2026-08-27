@@ -1,3 +1,5 @@
+--- @sync entry
+
 local function entry(_, job)
   local target = tonumber(job.args[1]) or 0
   local num_tabs = #cx.tabs
