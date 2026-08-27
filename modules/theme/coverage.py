@@ -16,8 +16,6 @@ def rules(path: str) -> dict[str, str]:
         source = handle.read()
 
     text = re.sub(r"/\*.*?\*/", "", source, flags=re.S)
-    # Statement at-rules such as @import end in a semicolon and would otherwise
-    # be captured as part of the following selector.
     text = re.sub(r"@[a-zA-Z-]+[^;{}]*;", "", text)
 
     found: dict[str, str] = {}
@@ -39,7 +37,7 @@ def leaf(selector: str) -> str:
 
 def main(argv: list[str]) -> int:
     if len(argv) != 3:
-        print(__doc__, file=sys.stderr)
+        print("usage: coverage.py UPSTREAM_CSS THEME_CSS", file=sys.stderr)
         return 2
 
     upstream, theme = rules(argv[1]), rules(argv[2])

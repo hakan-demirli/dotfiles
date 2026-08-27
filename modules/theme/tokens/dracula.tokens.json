@@ -1,0 +1,600 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
+  "dracula": {
+    "$description": "https://spec.draculatheme.com",
+    "color": {
+      "$type": "color",
+      "background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1568627450980392, 0.16470588235294117, 0.21176470588235294
+          ],
+          "hex": "#282a36"
+        }
+      },
+      "comment": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3843137254901961, 0.4470588235294118, 0.6431372549019608
+          ],
+          "hex": "#6272a4"
+        }
+      },
+      "cyan": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5450980392156862, 0.9137254901960784, 0.9921568627450981
+          ],
+          "hex": "#8be9fd"
+        }
+      },
+      "foreground": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9725490196078431, 0.9725490196078431, 0.9490196078431372
+          ],
+          "hex": "#f8f8f2"
+        }
+      },
+      "green": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3137254901960784, 0.9803921568627451, 0.4823529411764706
+          ],
+          "hex": "#50fa7b"
+        }
+      },
+      "orange": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 0.7215686274509804, 0.4235294117647059],
+          "hex": "#ffb86c"
+        }
+      },
+      "pink": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 0.4745098039215686, 0.7764705882352941],
+          "hex": "#ff79c6"
+        }
+      },
+      "purple": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7411764705882353, 0.5764705882352941, 0.9764705882352941
+          ],
+          "hex": "#bd93f9"
+        }
+      },
+      "red": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 0.3333333333333333, 0.3333333333333333],
+          "hex": "#ff5555"
+        }
+      },
+      "selection": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.26666666666666666, 0.2784313725490196, 0.35294117647058826
+          ],
+          "hex": "#44475a"
+        }
+      },
+      "yellow": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9450980392156862, 0.9803921568627451, 0.5490196078431373
+          ],
+          "hex": "#f1fa8c"
+        }
+      }
+    },
+    "ansi": {
+      "$type": "color",
+      "black": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.12941176470588237, 0.13333333333333333, 0.17254901960784313
+          ],
+          "hex": "#21222c"
+        }
+      },
+      "blue": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7411764705882353, 0.5764705882352941, 0.9764705882352941
+          ],
+          "hex": "#bd93f9"
+        }
+      },
+      "brightBlack": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3843137254901961, 0.4470588235294118, 0.6431372549019608
+          ],
+          "hex": "#6272a4"
+        }
+      },
+      "brightBlue": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.8392156862745098, 0.6745098039215687, 1.0],
+          "hex": "#d6acff"
+        }
+      },
+      "brightCyan": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.6431372549019608, 1.0, 1.0],
+          "hex": "#a4ffff"
+        }
+      },
+      "brightGreen": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.4117647058823529, 1.0, 0.5803921568627451],
+          "hex": "#69ff94"
+        }
+      },
+      "brightMagenta": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 0.5725490196078431, 0.8745098039215686],
+          "hex": "#ff92df"
+        }
+      },
+      "brightRed": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 0.43137254901960786, 0.43137254901960786],
+          "hex": "#ff6e6e"
+        }
+      },
+      "brightWhite": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 1.0, 1.0],
+          "hex": "#ffffff"
+        }
+      },
+      "brightYellow": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 1.0, 0.6470588235294118],
+          "hex": "#ffffa5"
+        }
+      },
+      "cyan": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5450980392156862, 0.9137254901960784, 0.9921568627450981
+          ],
+          "hex": "#8be9fd"
+        }
+      },
+      "green": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3137254901960784, 0.9803921568627451, 0.4823529411764706
+          ],
+          "hex": "#50fa7b"
+        }
+      },
+      "magenta": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 0.4745098039215686, 0.7764705882352941],
+          "hex": "#ff79c6"
+        }
+      },
+      "red": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1.0, 0.3333333333333333, 0.3333333333333333],
+          "hex": "#ff5555"
+        }
+      },
+      "white": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9725490196078431, 0.9725490196078431, 0.9490196078431372
+          ],
+          "hex": "#f8f8f2"
+        }
+      },
+      "yellow": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9450980392156862, 0.9803921568627451, 0.5490196078431373
+          ],
+          "hex": "#f1fa8c"
+        }
+      }
+    },
+    "syntax": {
+      "$type": "color",
+      "bracketsParensBraces": {
+        "foreground": {
+          "$value": "{dracula.color.foreground}"
+        }
+      },
+      "builtInFunctions": {
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "builtInMagicMethodsOrConstants": {
+        "foreground": {
+          "$value": "{dracula.color.purple}"
+        }
+      },
+      "className": {
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "comment": {
+        "foreground": {
+          "$value": "{dracula.color.comment}"
+        }
+      },
+      "constant": {
+        "foreground": {
+          "$value": "{dracula.color.purple}"
+        }
+      },
+      "constantEscapeSequences": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "cssParentSelectors": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "dateTime": {
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "decorators": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.green}"
+        }
+      },
+      "deprecated": {
+        "foreground": {
+          "$value": "{dracula.color.foreground}"
+        },
+        "background": {
+          "$value": "{dracula.color.purple}"
+        }
+      },
+      "destructuringAliasLhs": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "destructuringAliasRhs": {
+        "foreground": {
+          "$value": "{dracula.color.foreground}"
+        }
+      },
+      "diffChanged": {
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "diffDeleted": {
+        "foreground": {
+          "$value": "{dracula.color.red}"
+        }
+      },
+      "diffHeader": {
+        "foreground": {
+          "$value": "{dracula.color.comment}"
+        }
+      },
+      "diffInserted": {
+        "foreground": {
+          "$value": "{dracula.color.green}"
+        }
+      },
+      "diffText": {
+        "foreground": {
+          "$value": "{dracula.color.comment}"
+        }
+      },
+      "docCommentKeywords": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "docCommentParameters": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "docCommentTypes": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "error": {
+        "foreground": {
+          "$value": "{dracula.color.red}"
+        }
+      },
+      "functionNames": {
+        "foreground": {
+          "$value": "{dracula.color.green}"
+        }
+      },
+      "functionParameters": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "genericTemplatesAndMappedDeclarations": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "htmlCssAttributeNames": {
+        "foreground": {
+          "$value": "{dracula.color.green}"
+        }
+      },
+      "htmlTags": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "inheritedClassName": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "instanceReservedWords": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.purple}"
+        }
+      },
+      "invalid": {
+        "foreground": {
+          "$value": "{dracula.color.foreground}"
+        },
+        "background": {
+          "$value": "{dracula.color.red}"
+        }
+      },
+      "keys": {
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "keyword": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "keywordGenericCssSelector": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "keywordNew": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["bold"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "markupBlockquote": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.yellow}"
+        }
+      },
+      "markupBold": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["bold"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "markupCodeBlockWithoutSyntax": {
+        "foreground": {
+          "$value": "{dracula.color.orange}"
+        }
+      },
+      "markupHeading": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["bold"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.purple}"
+        }
+      },
+      "markupHorizontalRule": {
+        "foreground": {
+          "$value": "{dracula.color.comment}"
+        }
+      },
+      "markupInlineCode": {
+        "foreground": {
+          "$value": "{dracula.color.green}"
+        }
+      },
+      "markupItalic": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.yellow}"
+        }
+      },
+      "markupLinkText": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "markupLinkUrl": {
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "markupListBulletOrNumber": {
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "markupRstConstants": {
+        "foreground": {
+          "$value": "{dracula.color.purple}"
+        }
+      },
+      "modifiers": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "objectKeys": {
+        "foreground": {
+          "$value": "{dracula.color.foreground}"
+        }
+      },
+      "separatorsReferencesOrAccessors": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "storage": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "string": {
+        "foreground": {
+          "$value": "{dracula.color.yellow}"
+        }
+      },
+      "stringInterpolationOperators": {
+        "foreground": {
+          "$value": "{dracula.color.pink}"
+        }
+      },
+      "stringRegExp": {
+        "foreground": {
+          "$value": "{dracula.color.red}"
+        }
+      },
+      "support": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "types": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.cyan}"
+        }
+      },
+      "variable": {
+        "foreground": {
+          "$value": "{dracula.color.foreground}"
+        }
+      },
+      "yamlAliases": {
+        "$extensions": {
+          "com.github.hakan-demirli.dotfiles": {
+            "decoration": ["italic", "underline"]
+          }
+        },
+        "foreground": {
+          "$value": "{dracula.color.green}"
+        }
+      }
+    }
+  }
+}
