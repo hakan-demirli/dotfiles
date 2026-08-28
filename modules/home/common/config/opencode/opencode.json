@@ -9,7 +9,7 @@
       "/bin/**": "allow",
       "/boot/**": "allow",
       "~/Desktop/**": "allow",
-      "~/.storage/persistent/Desktop": "allow"
+      "~/.storage/persistent/Desktop/**": "allow"
     }
   },
   "autoupdate": false,
