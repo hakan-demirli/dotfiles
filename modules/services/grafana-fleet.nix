@@ -138,6 +138,36 @@ let
       }
     ];
   };
+  availabilityThresholds = {
+    mode = "absolute";
+    steps = [
+      {
+        color = "red";
+        value = null;
+      }
+      {
+        color = "orange";
+        value = 95;
+      }
+      {
+        color = "green";
+        value = 99;
+      }
+    ];
+  };
+  uptimeThresholds = {
+    mode = "absolute";
+    steps = [
+      {
+        color = "orange";
+        value = null;
+      }
+      {
+        color = "green";
+        value = 3600;
+      }
+    ];
+  };
   warningThresholds = {
     mode = "absolute";
     steps = [
@@ -620,10 +650,12 @@ let
       y,
       w,
       unit ? "short",
+      decimals ? null,
       min ? null,
       max ? null,
       thresholds ? percentThresholds,
       mappings ? [ ],
+      displayMode ? "gradient",
       description ? "",
     }:
     {
@@ -642,6 +674,7 @@ let
         defaults = {
           inherit
             unit
+            decimals
             min
             max
             thresholds
@@ -651,7 +684,7 @@ let
         overrides = [ ];
       };
       options = {
-        displayMode = "gradient";
+        inherit displayMode;
         maxVizHeight = 300;
         minVizHeight = 16;
         minVizWidth = 8;
@@ -1334,23 +1367,55 @@ let
           y = 40;
         })
         (mkBarGauge {
-          id = 22;
-          title = "Uptime";
-          expression = withHost ''time() - node_boot_time_seconds{job="fleet-node"}'';
+          id = 29;
+          title = "Availability";
+          description = "Share of the selected time range in which the node exporter scrape succeeded. Restricted to always-on hosts because optional hosts are expected to be offline. A host absent from service discovery for part of the range is not counted as down.";
+          expression = withHost ''avg_over_time(up{job="fleet-node",always_on="true"}[$__range]) * 100'';
           legend = "{{host}}";
           x = 0;
           y = 41;
           w = 8;
+          unit = "percent";
+          decimals = 2;
+          min = 0;
+          max = 100;
+          thresholds = availabilityThresholds;
+          displayMode = "basic";
+        })
+        (mkBarGauge {
+          id = 22;
+          title = "Uptime";
+          description = "Time since last boot. This is a duration, not an availability ratio; bar length compares hosts against the longest-running host. Use Availability for the reachability percentage.";
+          expression = withHost ''time() - node_boot_time_seconds{job="fleet-node"}'';
+          legend = "{{host}}";
+          x = 8;
+          y = 41;
+          w = 8;
           unit = "s";
           min = 0;
-          thresholds = healthyThresholds;
+          thresholds = uptimeThresholds;
+          displayMode = "basic";
+        })
+        (mkBarGauge {
+          id = 24;
+          title = "Failed Systemd Units";
+          description = "Units in the failed state per host.";
+          expression = withHost ''sum by(instance) (node_systemd_unit_state{job="fleet-node",state="failed"})'';
+          legend = "{{host}}";
+          x = 16;
+          y = 41;
+          w = 8;
+          min = 0;
+          thresholds = warningThresholds;
+          mappings = clearMappings;
+          displayMode = "basic";
         })
         (mkTimeSeries {
           id = 23;
           title = "System Load";
-          x = 8;
-          y = 41;
-          w = 8;
+          x = 0;
+          y = 49;
+          w = 24;
           unit = "short";
           min = 0;
           targets = [
@@ -1366,23 +1431,11 @@ let
             })
           ];
         })
-        (mkBarGauge {
-          id = 24;
-          title = "Failed Systemd Units";
-          expression = withHost ''sum by(instance) (node_systemd_unit_state{job="fleet-node",state="failed"})'';
-          legend = "{{host}}";
-          x = 16;
-          y = 41;
-          w = 8;
-          min = 0;
-          thresholds = warningThresholds;
-          mappings = clearMappings;
-        })
 
         (mkRow {
           id = 25;
           title = "Configuration Source";
-          y = 49;
+          y = 57;
         })
         (mkTable {
           id = 26;
@@ -1390,7 +1443,7 @@ let
           description = "Compares each active NixOS source with the current dotfiles main branch. Path and dirty-tree builds are intentionally reported as local.";
           expression = configurationFreshnessExpression;
           x = 0;
-          y = 50;
+          y = 58;
           w = 24;
           fields = {
             host = 0;
@@ -1474,7 +1527,7 @@ let
       timezone = "browser";
       title = "Fleet Overview";
       uid = "fleet-revisions";
-      version = 7;
+      version = 8;
       weekStart = "";
     }
   );
@@ -1680,6 +1733,12 @@ let
   sshInternetConnections = ''${sshConnections} | source_ip:!~"${nonInternetSourcePattern}"'';
   sshInternetAccepted = ''${sshAcceptedParsed} | source_ip:!~"${nonInternetSourcePattern}"'';
 
+  sshAccessUid = "ssh-access";
+  sshAcceptedPanel = 9;
+  sshConnectionsPanel = 10;
+  sshInternetAcceptedPanel = 14;
+  sshRejectionsPanel = 15;
+
   mkLogsTarget =
     {
       expression,
@@ -1704,6 +1763,7 @@ let
       title,
       description,
       expression,
+      detailPanel,
       x,
       y,
       thresholds ? {
@@ -1734,6 +1794,13 @@ let
           decimals = 0;
           unit = "short";
           inherit thresholds;
+          links = [
+            {
+              title = "Show the matching events";
+              url = "/d/${sshAccessUid}?viewPanel=${toString detailPanel}&\${__url_time_range}";
+              targetBlank = false;
+            }
+          ];
         };
         overrides = [ ];
       };
@@ -1884,16 +1951,18 @@ let
         (mkLogsStat {
           id = 2;
           title = "Accepted authentications";
-          description = "Successful OpenSSH authentication events. See Accepted Identities for source, account, method, and key.";
+          description = "Successful OpenSSH authentication events. Click the value for the source, account, method, and key of each one.";
           expression = "${sshAccepted} | stats count() as logins";
+          detailPanel = sshAcceptedPanel;
           x = 0;
           y = 1;
         })
         (mkLogsStat {
           id = 3;
           title = "Accepted via internet";
-          description = "Successful authentications from outside private, loopback, link-local, and Tailscale CGNAT ranges. Any value warrants identity review.";
+          description = "Successful authentications from outside private, loopback, link-local, and Tailscale CGNAT ranges. Any value warrants identity review; click the value for the events behind it.";
           expression = "${sshInternetAccepted} | stats count() as logins";
+          detailPanel = sshInternetAcceptedPanel;
           x = 6;
           y = 1;
           thresholds = warningThresholds;
@@ -1901,16 +1970,18 @@ let
         (mkLogsStat {
           id = 4;
           title = "Internet connections";
-          description = "TCP connections to fleet SSH endpoints from public source addresses; this is exposure volume, not successful authentication.";
+          description = "TCP connections to fleet SSH endpoints from public source addresses; this is exposure volume, not successful authentication. Click the value for the individual attempts.";
           expression = "${sshInternetConnections} | stats count() as connections";
+          detailPanel = sshConnectionsPanel;
           x = 12;
           y = 1;
         })
         (mkLogsStat {
           id = 5;
           title = "Credential rejections";
-          description = "Failed credentials, invalid users, and maximum-attempt events. A connection can produce more than one rejection event.";
+          description = "Failed credentials, invalid users, and maximum-attempt events. A connection can produce more than one rejection event. Click the value for the raw messages.";
           expression = "${sshCredentialFailures} | stats count() as rejections";
+          detailPanel = sshRejectionsPanel;
           x = 18;
           y = 1;
           thresholds = {
@@ -2023,7 +2094,7 @@ let
           y = 14;
         })
         (mkLogsPanel {
-          id = 9;
+          id = sshAcceptedPanel;
           title = "Accepted authentication events";
           description = "Successful source -> destination identity events. Expand a line for the original journal fields.";
           expression = ''${sshAcceptedParsed} | format "info" as level | format "<source_ip> -> <host> user=<user> method=<method> key=<key_type> <fingerprint>"'';
@@ -2034,12 +2105,34 @@ let
           maxLines = 500;
         })
         (mkLogsPanel {
-          id = 10;
+          id = sshInternetAcceptedPanel;
+          title = "Accepted via internet events";
+          description = "The subset of accepted authentications whose source address is outside private, loopback, link-local, and Tailscale CGNAT ranges. Every line here is a successful login from the public internet.";
+          expression = ''${sshInternetAccepted} | format "error" as level | format "<source_ip> -> <host> user=<user> method=<method> key=<key_type> <fingerprint>"'';
+          x = 12;
+          y = 15;
+          w = 12;
+          h = 14;
+          maxLines = 500;
+        })
+        (mkLogsPanel {
+          id = sshConnectionsPanel;
           title = "SSH connection attempts";
           description = "Every source socket -> destination inventory host and local SSH endpoint, whether or not authentication was attempted.";
           expression = ''${sshConnections} | format "info" as level | format "<source_ip>:<source_port> -> <host> (<destination_ip>:<destination_port>)"'';
+          x = 0;
+          y = 29;
+          w = 12;
+          h = 14;
+          maxLines = 500;
+        })
+        (mkLogsPanel {
+          id = sshRejectionsPanel;
+          title = "Credential rejection events";
+          description = "Raw sshd messages behind the rejection count. The message shapes differ between failed credentials, invalid users, and maximum-attempt events, so the original text is shown instead of a parsed summary.";
+          expression = ''${sshCredentialFailures} | format "warn" as level'';
           x = 12;
-          y = 15;
+          y = 29;
           w = 12;
           h = 14;
           maxLines = 500;
@@ -2048,7 +2141,7 @@ let
         (mkRow {
           id = 11;
           title = "Investigation Breakdowns";
-          y = 29;
+          y = 43;
         })
         (mkLogsBarGauge {
           id = 12;
@@ -2057,18 +2150,18 @@ let
           expression = "${sshInternetConnections} | stats by (source_ip,host,destination_ip,destination_port) count() as connections | sort by (connections desc) limit 12";
           legend = "{{source_ip}} -> {{host}} ({{destination_ip}}:{{destination_port}})";
           x = 0;
-          y = 30;
+          y = 44;
           w = 12;
           h = 10;
         })
         (mkLogsBarGauge {
           id = 13;
           title = "Targeted accounts";
-          description = "Usernames observed in invalid-user and pre-authentication messages, ranked by event count.";
+          description = "Usernames observed in invalid-user and pre-authentication messages, ranked by event count. This is a narrower filter than Credential rejections and will not reconcile with it.";
           expression = "${sshTargetedAccounts} | stats by (user,source_ip,host) count() as events | sort by (events desc) limit 12";
           legend = "{{user}} <= {{source_ip}} -> {{host}}";
           x = 12;
-          y = 30;
+          y = 44;
           w = 12;
           h = 10;
         })
@@ -2088,8 +2181,8 @@ let
       timepicker = { };
       timezone = "browser";
       title = "SSH Access";
-      uid = "ssh-access";
-      version = 3;
+      uid = sshAccessUid;
+      version = 4;
       weekStart = "";
     }
   );
