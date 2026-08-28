@@ -23,7 +23,6 @@ in
     (import ../pkgs/nix/firefox.nix { username = "emre"; })
     (import ../pkgs/nix/state_autocommit.nix { })
     (import ../pkgs/nix/ntfy-listener.nix { })
-    (import ../pkgs/nix/opencode.nix { })
     (import ../pkgs/nix/github_backup.nix { })
     ../pkgs/nix/screen-record.nix
   ]

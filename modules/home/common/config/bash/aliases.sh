@@ -17,6 +17,8 @@ alias da='direnv allow'
 alias np='np.sh'
 alias txf='txf.sh'
 
+alias oc='opencode'
+
 alias git='git_cached.py'
 alias ga.='git add .'
 alias gau.='git add -u .'

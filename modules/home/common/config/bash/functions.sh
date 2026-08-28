@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+opencode() {
+  if [ "$#" -eq 0 ]; then
+    command opencode attach "$OPENCODE_URL"
+  else
+    command opencode "$@"
+  fi
+}
+
 lf_cd() {
   if command -v lf &> /dev/null; then
     cd "$(command lf -print-last-dir "$@")" || exit
