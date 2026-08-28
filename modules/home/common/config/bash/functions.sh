@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 opencode() {
-  if [ "$#" -eq 0 ]; then
-    command opencode attach "$OPENCODE_URL"
+  if [ "$#" -eq 0 ] && [ -n "${OPENCODE_URL:-}" ]; then
+    command opencode attach "$OPENCODE_URL" --dir "$PWD"
   else
     command opencode "$@"
   fi

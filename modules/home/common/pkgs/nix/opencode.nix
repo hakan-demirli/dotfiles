@@ -1,5 +1,4 @@
 {
-  role,
   address,
   port,
 }:
@@ -15,12 +14,6 @@ let
   opencodePlugins = nurPkgs.opencode-plugins or null;
   hasPlugins = opencodePlugins != null;
 
-  hostsTheServer =
-    {
-      server = true;
-      client = false;
-    }
-    .${role} or (throw "opencode role must be \"server\" or \"client\", not ${toString role}");
   serverUrl = "http://${address}:${toString port}";
 
   serviceEnvFile = "${config.home.homeDirectory}/.config/secrets/environment";
@@ -65,27 +58,25 @@ in
     recursive = true;
   };
 
-  systemd.user.services = lib.optionalAttrs hostsTheServer {
-    opencode-serve = {
-      Unit = {
-        Description = "OpenCode shared HTTP server on ${serverUrl}";
-        Wants = [ "sops-nix.service" ];
-        After = [ "sops-nix.service" ];
-        X-Restart-Triggers = [ "${opencodeConfig}" ];
-      };
-      Service = {
-        Type = "simple";
-        EnvironmentFile = serviceEnvFile;
-        Environment = commonServiceEnv;
-        ExecStartPre = "${requireServerPassword}/bin/opencode-require-server-password";
-        ExecStart = "${pkgs.opencode}/bin/opencode serve --hostname ${address} --port ${toString port}";
-        Restart = "always";
-        RestartSec = 10;
-        RestartSteps = 5;
-        RestartMaxDelaySec = 300;
-        MemoryMax = "8G";
-      };
-      Install.WantedBy = [ "default.target" ];
+  systemd.user.services.opencode-serve = {
+    Unit = {
+      Description = "OpenCode node server on ${serverUrl}";
+      Wants = [ "sops-nix.service" ];
+      After = [ "sops-nix.service" ];
+      X-Restart-Triggers = [ "${opencodeConfig}" ];
     };
+    Service = {
+      Type = "simple";
+      EnvironmentFile = serviceEnvFile;
+      Environment = commonServiceEnv;
+      ExecStartPre = "${requireServerPassword}/bin/opencode-require-server-password";
+      ExecStart = "${pkgs.opencode}/bin/opencode serve --hostname ${address} --port ${toString port}";
+      Restart = "always";
+      RestartSec = 10;
+      RestartSteps = 5;
+      RestartMaxDelaySec = 300;
+      MemoryMax = "8G";
+    };
+    Install.WantedBy = [ "default.target" ];
   };
 }
