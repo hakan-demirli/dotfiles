@@ -12,7 +12,6 @@ Item {
     property bool passwordVisible: false
     property string errorMessage: ""
 
-    readonly property var connectedNetwork: NetworkService.activeNetwork
     readonly property var sortedNetworks: NetworkService.networks
 
     signal requestClose
@@ -77,8 +76,8 @@ Item {
 
         MenuHeader {
             Layout.fillWidth: true
-            title: root.pendingNetwork ? root.pendingNetwork.name : "Wi-Fi"
-            subtitle: root.pendingNetwork ? "Enter the network password" : root.connectedNetwork ? `Connected to ${root.connectedNetwork.name}` : NetworkService.wifiEnabled ? "Available networks" : "Wireless is off"
+            title: root.pendingNetwork ? root.pendingNetwork.name : "Network"
+            subtitle: root.pendingNetwork ? "Enter the network password" : NetworkService.status
             showBack: root.pendingNetwork !== null
             onBack: root.cancelPassword()
             onClose: root.requestClose()
@@ -92,6 +91,55 @@ Item {
 
             Rectangle {
                 Layout.fillWidth: true
+                visible: NetworkService.wiredDevice !== null
+                implicitHeight: Theme.metrics.controlRowHeight
+                radius: Theme.shape.large
+                color: ShellPalette.surface
+                border.width: Theme.metrics.stroke
+                border.color: ShellPalette.indicator
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.space.medium
+                    anchors.rightMargin: Theme.space.medium
+                    spacing: Theme.space.medium
+
+                    Text {
+                        text: "\ueb2f"
+                        color: NetworkService.wiredConnected ? ShellPalette.foreground : ShellPalette.foregroundMuted
+                        font.family: Theme.font.symbols
+                        font.pixelSize: Theme.icon.medium
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 0
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: NetworkService.wiredConnected ? NetworkService.connectionName : "Ethernet"
+                            color: ShellPalette.foreground
+                            elide: Text.ElideRight
+                            font.family: Theme.font.plain
+                            font.pixelSize: Theme.font.bodyLargeSize
+                            font.weight: Theme.font.titleMediumWeight
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: NetworkService.wiredConnected ? NetworkService.status : NetworkService.wiredDevice.available ? "Not connected" : "Cable unplugged"
+                            color: ShellPalette.foregroundMuted
+                            elide: Text.ElideRight
+                            font.family: Theme.font.plain
+                            font.pixelSize: Theme.font.bodySmallSize
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                visible: NetworkService.wirelessDevice !== null
                 implicitHeight: Theme.metrics.controlRowHeight
                 radius: Theme.shape.large
                 color: ShellPalette.surface
@@ -134,7 +182,7 @@ Item {
                     MenuIconButton {
                         icon: "\ue5d5"
                         busy: NetworkService.scanning
-                        enabled: NetworkService.wifiEnabled
+                        enabled: NetworkService.wifiAvailable
                         onActivated: NetworkService.refresh(true)
                     }
 
@@ -158,8 +206,8 @@ Item {
             Text {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: !NetworkService.wifiEnabled || networkModel.values.length === 0
-                text: NetworkService.wifiEnabled ? "Searching for networks..." : "Turn on Wi-Fi to see nearby networks."
+                visible: !NetworkService.wifiAvailable || networkModel.values.length === 0
+                text: NetworkService.wifiAvailable ? "Searching for networks..." : "Turn on Wi-Fi to see nearby networks."
                 color: ShellPalette.foregroundMuted
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -172,7 +220,7 @@ Item {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: NetworkService.wifiEnabled && count > 0
+                visible: NetworkService.wifiAvailable && count > 0
                 clip: true
                 spacing: Theme.metrics.listSpacing
                 boundsBehavior: Flickable.StopAtBounds

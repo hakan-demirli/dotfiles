@@ -29,8 +29,8 @@ Rectangle {
             switch (root.menu) {
             case "control":
                 return controlComponent;
-            case "wifi":
-                return wifiComponent;
+            case "network":
+                return networkComponent;
             case "bluetooth":
                 return bluetoothComponent;
             case "audio":
@@ -67,7 +67,7 @@ Rectangle {
     }
 
     Component {
-        id: wifiComponent
+        id: networkComponent
 
         NetworkPanel {
             onRequestClose: root.requestClose()
