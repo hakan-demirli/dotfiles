@@ -89,20 +89,10 @@
         };
       };
 
-      opencodeServer = {
-        configuration = "vps-oracle-0";
-        address = "100.64.0.1";
+      opencodeEndpoint = {
+        address = "127.0.0.1";
         port = 4096;
       };
-
-      opencodeEndpoint =
-        configuration:
-        lib.throwIfNot (configurations ? ${opencodeServer.configuration})
-          "opencode server configuration ${opencodeServer.configuration} has no home configuration"
-          {
-            inherit (opencodeServer) address port;
-            role = if configuration == opencodeServer.configuration then "server" else "client";
-          };
 
       discoveredUsers =
         if !builtins.pathExists homeRoot then
@@ -120,7 +110,7 @@
             // {
               user = uid;
               name = "${uid}.${pname}";
-              opencode = opencodeEndpoint pname;
+              opencode = opencodeEndpoint;
             }
           );
         }) configurations

@@ -21,6 +21,7 @@ rec {
   minimal = with pkgs; [
     btop
     curl
+    delta
     git
     jq
     python3
@@ -42,7 +43,6 @@ rec {
         claude-code
         clippy
         cmake-language-server
-        delta
         diagnostic-languageserver
         fd
         ffmpeg-full
