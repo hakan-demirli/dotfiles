@@ -7,6 +7,20 @@ import Quickshell.Io
 Singleton {
     id: root
 
+    enum Link {
+        Down,
+        Wired,
+        Wireless
+    }
+
+    enum Reach {
+        Unknown,
+        Offline,
+        Portal,
+        Limited,
+        Online
+    }
+
     property bool wifiEnabled: false
     property bool forceRescan: false
     property bool busy: actionProcess.running
@@ -16,10 +30,75 @@ Singleton {
     property var networks: []
     property var activeNetwork: null
 
+    property var devices: []
     property var rawNetworks: []
     property var savedNames: []
+    property int reach: NetworkService.Reach.Unknown
     property string actionKind: ""
     property string pendingPassword: ""
+
+    readonly property var wiredDevice: pickDevice("ethernet")
+    readonly property var wirelessDevice: pickDevice("wifi")
+    readonly property bool wiredConnected: wiredDevice !== null && wiredDevice.connected
+    readonly property bool wifiAvailable: wifiEnabled && wirelessDevice !== null && wirelessDevice.available
+    readonly property bool activating: devices.some(device => device.connecting)
+    readonly property int link: wiredConnected ? NetworkService.Link.Wired : wirelessDevice && wirelessDevice.connected ? NetworkService.Link.Wireless : NetworkService.Link.Down
+    readonly property bool degraded: link !== NetworkService.Link.Down && (reach === NetworkService.Reach.Limited || reach === NetworkService.Reach.Portal || reach === NetworkService.Reach.Offline)
+    readonly property real signalLevel: link === NetworkService.Link.Wireless && activeNetwork ? Math.max(0, Math.min(1, activeNetwork.signal / 100)) : -1
+
+    readonly property var wirelessIcons: ["\uf0b0", "\uebe4", "\uebd6", "\uebe1", "\ue1ba"]
+
+    readonly property string connectionName: {
+        switch (link) {
+        case NetworkService.Link.Wired:
+            return wiredDevice.connection || "Ethernet";
+        case NetworkService.Link.Wireless:
+            return wirelessDevice.connection || "Wi-Fi";
+        default:
+            return "Network";
+        }
+    }
+
+    readonly property string icon: {
+        switch (link) {
+        case NetworkService.Link.Wired:
+            return "\ueb2f";
+        case NetworkService.Link.Wireless:
+            return wirelessIcon(signalLevel);
+        default:
+            return wifiAvailable ? "\uf0ef" : "\uf1ca";
+        }
+    }
+
+    readonly property string badge: degraded ? "\ue645" : ""
+
+    readonly property string status: {
+        if (activating)
+            return "Connecting...";
+        if (link === NetworkService.Link.Down)
+            return wifiAvailable ? "Not connected" : wirelessDevice ? "Wi-Fi off" : "No network";
+        switch (reach) {
+        case NetworkService.Reach.Portal:
+            return "Sign-in required";
+        case NetworkService.Reach.Limited:
+        case NetworkService.Reach.Offline:
+            return "No internet access";
+        default:
+            return link === NetworkService.Link.Wired ? "Connected" : `Connected - ${Math.round(signalLevel * 100)}%`;
+        }
+    }
+
+    function wirelessIcon(level) {
+        const steps = wirelessIcons.length - 1;
+        if (level < 0)
+            return wirelessIcons[steps];
+        return wirelessIcons[Math.max(0, Math.min(steps, Math.ceil(level * steps)))];
+    }
+
+    function pickDevice(kind) {
+        const matches = devices.filter(device => device.kind === kind);
+        return matches.find(device => device.connected) || matches.find(device => device.connecting) || matches[0] || null;
+    }
 
     function splitEscaped(line) {
         const fields = [];
@@ -68,6 +147,46 @@ Singleton {
         rebuildNetworks();
     }
 
+    function parseDevices(text) {
+        const parsed = [];
+        for (const line of text.trim().split("\n")) {
+            if (!line)
+                continue;
+            const fields = splitEscaped(line);
+            if (fields.length < 4 || fields[1] === "loopback")
+                continue;
+            const state = fields[2];
+            parsed.push({
+                available: state !== "unmanaged" && state !== "unavailable",
+                connected: state.startsWith("connected"),
+                connecting: state.startsWith("connecting"),
+                connection: fields[3],
+                kind: fields[1],
+                name: fields[0]
+            });
+        }
+        devices = parsed;
+    }
+
+    function parseReach(text) {
+        switch (text.trim()) {
+        case "full":
+            reach = NetworkService.Reach.Online;
+            return;
+        case "limited":
+            reach = NetworkService.Reach.Limited;
+            return;
+        case "portal":
+            reach = NetworkService.Reach.Portal;
+            return;
+        case "none":
+            reach = NetworkService.Reach.Offline;
+            return;
+        default:
+            reach = NetworkService.Reach.Unknown;
+        }
+    }
+
     function parseSaved(text) {
         const parsed = [];
         for (const line of text.trim().split("\n")) {
@@ -108,12 +227,25 @@ Singleton {
     function refresh(rescan) {
         if (rescan)
             forceRescan = true;
-        if (!scanProcess.running)
-            scanProcess.running = true;
-        if (!savedProcess.running)
-            savedProcess.running = true;
+        if (!deviceProcess.running)
+            deviceProcess.running = true;
+        if (!reachProcess.running)
+            reachProcess.running = true;
         if (!radioProcess.running)
             radioProcess.running = true;
+        if (!savedProcess.running)
+            savedProcess.running = true;
+        if (wifiAvailable && !scanProcess.running)
+            scanProcess.running = true;
+    }
+
+    onWifiAvailableChanged: {
+        if (wifiAvailable) {
+            refresh(true);
+            return;
+        }
+        rawNetworks = [];
+        rebuildNetworks();
     }
 
     function setWifi(enabled) {
@@ -160,10 +292,30 @@ Singleton {
     }
 
     Process {
+        id: deviceProcess
+
+        command: ["nmcli", "--terse", "--escape", "yes", "--fields", "DEVICE,TYPE,STATE,CONNECTION", "device", "status",]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: root.parseDevices(text)
+        }
+    }
+
+    Process {
+        id: reachProcess
+
+        command: ["nmcli", "--terse", "--fields", "CONNECTIVITY", "general", "status",]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: root.parseReach(text)
+        }
+    }
+
+    Process {
         id: scanProcess
 
         command: ["nmcli", "--terse", "--escape", "yes", "--fields", "IN-USE,SSID,SIGNAL,SECURITY", "device", "wifi", "list", "--rescan", root.forceRescan ? "yes" : "auto",]
-        running: true
+        running: false
         stdout: StdioCollector {
             onStreamFinished: root.parseNetworks(text)
         }
