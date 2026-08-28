@@ -21,7 +21,7 @@ let
 
   hyprlandConfPath = "/home/${user}/.config/hypr/headless.conf";
 
-  rdStartScript = pkgs.writeShellScript "remotedesktop-personal-session" ''
+  rdStartScript = pkgs.writeShellScript "remotedesktop-session" ''
     set -u
     export XDG_RUNTIME_DIR="/run/user/${uid}"
     export WLR_BACKENDS=drm

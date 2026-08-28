@@ -6,6 +6,7 @@
   state = "planned";
 
   location.kind = "workstation";
+  tailnet_member = false;
 
   ownership = {
     class = "personal";

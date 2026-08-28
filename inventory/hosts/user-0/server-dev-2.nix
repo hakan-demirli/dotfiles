@@ -1,6 +1,6 @@
 {
   id = "server-dev-2";
-  deployment_roles = [ "personal-server-dev" ];
+  deployment_roles = [ "server-dev" ];
   topology_roles = [ "compute" ];
   state = "provisioned";
   slurm_features = [

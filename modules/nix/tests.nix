@@ -17,7 +17,7 @@
     {
       checks = {
         fleet-eval =
-          pkgs.runCommand "infra-personal-fleet-eval-stamp"
+          pkgs.runCommand "infra-fleet-eval-stamp"
             {
               hostCount = toString (lib.length (lib.attrNames inventory.hosts));
               deploymentRoleCount = toString (lib.length (lib.attrNames inventory.deploymentRoles));

@@ -35,7 +35,7 @@ in
       type = lib.types.bool;
       default = hasTailscaleAuthorityFromInventory;
       description = ''
-        Host has full authority on the personal tailnet -- i.e. it can
+        Host has full authority on the fleet tailnet -- i.e. it can
         reach the tailnet binary cache at 100.64.0.1:5101. Defaults to
         true when host.labels.tailscale_authority == "true".
       '';

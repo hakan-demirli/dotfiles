@@ -52,7 +52,7 @@ nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
 ### Fresh Install
 
 1. Boot a NixOS ISO, clone this repository, and verify the target disk with
-   `lsblk` against `inventory/hosts/<zone>/<host>.nix`.
+   `lsblk` against `inventory/hosts/<owner>/<host>.nix`.
 2. Partition it: `nix run github:nix-community/disko -- --mode disko --flake .#<host>`.
 3. Install the mandatory password identity, optionally including Tailscale:
    `nix run .#bootstrap-deploy -- /mnt [--with-tailscale]`.
