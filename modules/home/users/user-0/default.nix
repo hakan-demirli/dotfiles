@@ -1,9 +1,15 @@
-{ lib, profile, ... }:
+{
+  lib,
+  opencode,
+  profile,
+  ...
+}:
 {
   imports = [
     ../../common/default.nix
     (../../common/profiles + "/${profile}.nix")
     ../../common/modules/sops.nix
+    (import ../../common/pkgs/nix/opencode.nix opencode)
   ]
   ++ lib.optional (profile == "desktop") ./wallpaper.nix;
 
