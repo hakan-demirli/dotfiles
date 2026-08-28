@@ -41,10 +41,10 @@ Item {
 
             ControlTile {
                 Layout.fillWidth: true
-                icon: NetworkService.wifiEnabled ? "\ue63e" : "\ue648"
-                title: "Wi-Fi"
-                subtitle: NetworkService.activeNetwork ? NetworkService.activeNetwork.name : NetworkService.wifiEnabled ? "Disconnected" : "Off"
-                onActivated: root.requestMenu("wifi")
+                icon: NetworkService.icon
+                title: NetworkService.link === NetworkService.Link.Down ? "Network" : NetworkService.connectionName
+                subtitle: NetworkService.status
+                onActivated: root.requestMenu("network")
             }
 
             ControlTile {

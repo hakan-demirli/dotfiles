@@ -22,10 +22,8 @@ Item {
     readonly property bool audioHeadphones: audioBluetooth || /headphones?|headsets?/i.test(audioIdentity)
     readonly property bool audioDisplay: /hdmi|displayport/i.test(audioIdentity)
     readonly property string audioIcon: audioHeadphones ? "\ue310" : audioDisplay ? "\ue333" : audioMuted ? "\ue04f" : audioVolume < 0.5 ? "\ue04d" : "\ue050"
-    readonly property var wifiNetwork: NetworkService.activeNetwork
-    readonly property real wifiLevel: wifiNetwork ? Math.max(0, Math.min(1, wifiNetwork.signal / 100)) : -1
     readonly property string audioTooltip: audioAvailable ? `${audioSink.description} - ${Math.round(audioVolume * 100)}%${audioMuted ? " muted" : ""}` : "No audio output"
-    readonly property string wifiTooltip: !NetworkService.wifiEnabled ? "Wi-Fi off" : wifiNetwork ? `${wifiNetwork.name} - ${Math.round(wifiLevel * 100)}%` : "Wi-Fi disconnected"
+    readonly property string networkTooltip: NetworkService.link === NetworkService.Link.Down ? NetworkService.status : `${NetworkService.connectionName}\n${NetworkService.status}`
     readonly property int brightnessMaximum: readInteger(brightnessMaximumFile)
     readonly property int brightnessPercent: brightnessMaximum > 0 ? Math.round(readInteger(brightnessValueFile) * 100 / brightnessMaximum) : -1
 
@@ -180,11 +178,12 @@ Item {
         y: root.corner - root.thickness + root.gap
         width: root.blockSize
         height: root.blockSize
-        icon: NetworkService.wifiEnabled ? "\ue63e" : "\ue648"
-        active: root.wifiNetwork !== null
-        level: root.wifiLevel
-        tooltip: root.wifiTooltip
-        onActivated: root.menuRequested("wifi")
+        icon: NetworkService.icon
+        badgeIcon: NetworkService.badge
+        active: NetworkService.link !== NetworkService.Link.Down
+        level: NetworkService.signalLevel
+        tooltip: root.networkTooltip
+        onActivated: root.menuRequested("network")
     }
 
     BarBlock {
