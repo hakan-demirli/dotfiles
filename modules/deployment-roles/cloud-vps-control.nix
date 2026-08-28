@@ -92,6 +92,8 @@ in
     cluster-victoriametrics.targetDomain = "ts.sshr.polarbearvuzi.com";
   };
 
+  users.users.${primaryUser}.linger = true;
+
   security.sudo = {
     wheelNeedsPassword = true;
     extraConfig = ''
