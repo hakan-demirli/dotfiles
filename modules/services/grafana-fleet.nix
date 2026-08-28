@@ -781,7 +781,7 @@ let
   dashboard = pkgs.writeText "fleet-overview.json" (
     builtins.toJSON {
       annotations.list = [ ];
-      description = "Operational health, capacity, storage, disk health, and deployment state for the personal fleet.";
+      description = "Operational health, capacity, storage, disk health, and deployment state for the managed fleet.";
       editable = false;
       fiscalYearStartMonth = 0;
       graphTooltip = 1;

@@ -5,7 +5,7 @@
   topology_roles = [ "external" ];
   state = "provisioned";
 
-  location.kind = "workstation";
+  location.kind = "network-equipment";
 
   ownership = {
     class = "personal";

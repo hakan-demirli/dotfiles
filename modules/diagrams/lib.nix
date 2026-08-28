@@ -326,7 +326,7 @@ let
   hostShapeFor =
     hid:
     let
-      nrs = hostTopologyRoles.${hid} or [ "personal" ];
+      nrs = hostTopologyRoles.${hid} or [ ];
     in
     if elem "controller" nrs then
       "doublecircle"

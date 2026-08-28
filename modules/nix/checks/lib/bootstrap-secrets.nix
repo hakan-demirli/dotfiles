@@ -19,11 +19,11 @@ let
     let
       deploymentRoles = inventory.hosts.${hostId}.deployment_roles;
     in
-    if lib.elem "personal-laptop" deploymentRoles then
+    if lib.elem "laptop" deploymentRoles then
       "owner"
     else if
       lib.any (role: lib.elem role deploymentRoles) [
-        "personal-server-dev"
+        "server-dev"
         "cloud-vps-control"
       ]
     then
@@ -95,7 +95,7 @@ let
       && service.serviceConfig.TimeoutStartSec == "60s"
     );
     munge-is-system-scoped =
-      (inventory.clusters.personal.secret_paths or { }) == { }
+      (inventory.clusters.user-0-fleet.secret_paths or { }) == { }
       && everyHost (
         _hostId: config:
         let
