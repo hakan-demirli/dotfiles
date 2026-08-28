@@ -1,6 +1,6 @@
 {
-  id = "personal-server-dev";
-  description = "Personal AMD workstation acting as a slurm compute node and submit host";
+  id = "server-dev";
+  description = "Individually-used workstation acting as a slurm compute node and submit host";
   kind = "nixos";
   modules = [
     "infra:system/base"
@@ -13,6 +13,6 @@
     "infra:services/apptainer"
     "infra:services/slurm"
     "self:services/sops"
-    "self:deployment-roles/personal-server-dev"
+    "self:deployment-roles/server-dev"
   ];
 }

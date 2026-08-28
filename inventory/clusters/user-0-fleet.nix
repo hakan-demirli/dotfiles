@@ -1,7 +1,7 @@
 {
-  id = "personal";
-  description = "Personal slurm cluster. Single-user fleet";
-  kind = "personal";
+  id = "user-0-fleet";
+  description = "Slurm cluster spanning the machines owned and operated by user-0";
+  kind = "single-user";
   state = "active";
 
   lifecycle.created_at = "2025-01-01";
@@ -30,11 +30,14 @@
   };
 
   members = {
-    hosts = [ ];
-    deployment_roles = [
-      "personal-laptop"
-      "personal-server-dev"
+    hosts = [
+      "laptop-0"
+      "laptop-1"
+      "server-dev-1"
+      "server-dev-2"
+      "vps-oracle-0"
     ];
+    deployment_roles = [ ];
   };
 
   access = {
@@ -50,7 +53,6 @@
 
   network = {
     intra_cluster = "mesh";
-    tailscale_tag = "tag:cluster-personal";
     egress = {
       clusters = [ ];
       internet = true;
@@ -65,6 +67,4 @@
     ssh = [ ];
     age = [ ];
   };
-
-  labels.scope = "personal";
 }

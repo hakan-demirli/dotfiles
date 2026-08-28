@@ -1,6 +1,6 @@
 {
-  id = "personal-laptop";
-  description = "Personal laptop (mobile, hibernates, tailnet-attached)";
+  id = "laptop";
+  description = "Laptop (mobile, hibernates, tailnet-attached)";
   kind = "nixos";
   modules = [
     "infra:system/base"
@@ -26,6 +26,6 @@
     "self:services/sops"
     "infra:services/apptainer"
     "infra:services/earlyoom"
-    "self:deployment-roles/personal-laptop"
+    "self:deployment-roles/laptop"
   ];
 }
