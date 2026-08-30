@@ -1,3 +1,7 @@
+# Language
+
+- Use ASD-STE100 Simplified Technical English
+
 # Authentication and Authorization
 
 - Do NOT open remote MRs, PRs or issues unless EXPLICITLY asked for.
