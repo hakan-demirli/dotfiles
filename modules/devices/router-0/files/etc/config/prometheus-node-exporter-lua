@@ -1,4 +1,4 @@
-# Declarative node exporter configuration for r01.
+# Declarative node exporter configuration for router-0.
 # Scraped by VictoriaMetrics on vps-oracle-0 over the tailnet. Binds to every
 # interface because tailscale0 carries no netifd address for the init script to
 # resolve; reachability is decided by the firewall zones instead (lan and

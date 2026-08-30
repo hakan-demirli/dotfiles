@@ -1,4 +1,4 @@
-# Declarative firewall configuration for r01.
+# Declarative firewall configuration for router-0.
 #
 # Standard OpenWrt defaults plus 'wwan' (wifi STA uplink) in the wan zone
 # so it's NAT'd and ingress-rejected like the wired wan.

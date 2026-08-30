@@ -3,7 +3,7 @@
 
 R01_PWM_DIR=/sys/class/hwmon/hwmon2
 
-r01_fan_apply_mode() {
+router_fan_apply_mode() {
   local mode="$1" manual_pwm="$2" n
 
   [ -d "$R01_PWM_DIR" ] || return 0
