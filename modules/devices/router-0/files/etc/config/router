@@ -1,7 +1,7 @@
-# r01 router-specific declarative state (consumed by /etc/init.d/r01-fan
-# and the LuCI page at /cgi-bin/luci/admin/r01/hardware).
+# Router-specific declarative state (consumed by /etc/init.d/router-fan
+# and the LuCI page at /cgi-bin/luci/admin/router/hardware).
 
-config r01 'fan'
+config router 'fan'
 	# auto       -> let the kernel thermal governor manage the PWM
 	# quiet      -> force pwm1=0 (fan off). Safety watchdog reverts to
 	#               'auto' if any temp exceeds 'safety_temp' (millicelsius).
@@ -23,7 +23,7 @@ config r01 'fan'
 # range), travelmate gets stuck without an uplink. This watchdog
 # detects 'wwan down for N consecutive checks while uplinks are
 # enabled' and bounces travelmate to reset the wireless stack.
-config r01 'netwatch'
+config router 'netwatch'
 	# 0 = disable the watchdog entirely.
 	option enabled '1'
 

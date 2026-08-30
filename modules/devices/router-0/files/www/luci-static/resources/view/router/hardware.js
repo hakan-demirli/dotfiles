@@ -39,7 +39,7 @@ const SENSORS = [
 const FAN_RPM_PATH = "/sys/class/hwmon/hwmon2/fan1_input";
 const FAN_PWM_PATH = "/sys/class/hwmon/hwmon2/pwm1";
 const FAN_ENABLE_PATH = "/sys/class/hwmon/hwmon2/pwm1_enable";
-const FAN_OVERRIDE = "/var/run/r01-fan.override";
+const FAN_OVERRIDE = "/var/run/router-fan.override";
 
 const MODES = [
   { id: "auto", label: "Auto", hint: "Kernel thermal governor decides." },
@@ -65,10 +65,10 @@ function readInt(path) {
 
 function tempClass(milliC) {
   const c = milliC / 1000;
-  if (c >= 85) return "r01-crit";
-  if (c >= 75) return "r01-hot";
-  if (c >= 60) return "r01-warm";
-  return "r01-ok";
+  if (c >= 85) return "router-crit";
+  if (c >= 75) return "router-hot";
+  if (c >= 60) return "router-warm";
+  return "router-ok";
 }
 
 function fmtTemp(milliC) {
@@ -84,7 +84,7 @@ return view.extend({
   handleReset: null,
 
   load() {
-    return Promise.all([uci.load("r01"), this.readAll()]);
+    return Promise.all([uci.load("router"), this.readAll()]);
   },
 
   readAll() {
@@ -113,18 +113,22 @@ return view.extend({
       const throttle = values[off + 1];
       const crit = values[off + 2];
 
-      const cls = "r01-pill " + tempClass(milli);
+      const cls = "router-pill " + tempClass(milli);
 
       const inner = [
-        E("div", { class: "r01-pill-label" }, [s.label]),
-        E("div", { class: "r01-pill-temp" }, [fmtTemp(milli)]),
+        E("div", { class: "router-pill-label" }, [s.label]),
+        E("div", { class: "router-pill-temp" }, [fmtTemp(milli)]),
       ];
       if (crit > 0)
         inner.push(
-          E("div", { class: "r01-pill-sub" }, ["critical: " + fmtTemp(crit)]),
+          E("div", { class: "router-pill-sub" }, [
+            "critical: " + fmtTemp(crit),
+          ]),
         );
       if (throttle > 0)
-        inner.push(E("div", { class: "r01-pill-throttle" }, ["⚠ throttled"]));
+        inner.push(
+          E("div", { class: "router-pill-throttle" }, ["⚠ throttled"]),
+        );
 
       pills.push(E("div", { class: cls }, inner));
     }
@@ -143,7 +147,8 @@ return view.extend({
       return E(
         "button",
         {
-          class: "btn r01-mode-btn " + (isActive ? "r01-mode-active" : ""),
+          class:
+            "btn router-mode-btn " + (isActive ? "router-mode-active" : ""),
           title: m.hint,
           click: ui.createHandlerFn(this, "pickMode", m.id),
         },
@@ -154,28 +159,28 @@ return view.extend({
     const sliderRow = E(
       "div",
       {
-        class: "r01-slider-row",
+        class: "router-slider-row",
         style: selectedMode === "manual" ? "" : "display:none",
       },
       [
-        E("label", { for: "r01-pwm-slider" }, ["Manual PWM"]),
+        E("label", { for: "router-pwm-slider" }, ["Manual PWM"]),
         E("input", {
           type: "range",
           min: "0",
           max: "255",
           step: "1",
           value: String(manualPwm),
-          id: "r01-pwm-slider",
+          id: "router-pwm-slider",
           change: ui.createHandlerFn(self, "changeManualPwm"),
           input: function (ev) {
-            document.getElementById("r01-pwm-value").textContent =
+            document.getElementById("router-pwm-value").textContent =
               ev.target.value +
               " (" +
               Math.round((ev.target.value * 100) / 255) +
               "%)";
           },
         }),
-        E("span", { id: "r01-pwm-value" }, [
+        E("span", { id: "router-pwm-value" }, [
           manualPwm + " (" + Math.round((manualPwm * 100) / 255) + "%)",
         ]),
       ],
@@ -183,39 +188,39 @@ return view.extend({
 
     const stateBits = [];
     stateBits.push(
-      E("span", { class: "r01-state" }, [
+      E("span", { class: "router-state" }, [
         "mode_raw: " + { 0: "off", 1: "manual", 2: "auto" }[pwmEnable] ||
           String(pwmEnable),
       ]),
     );
     stateBits.push(
-      E("span", { class: "r01-state" }, [
+      E("span", { class: "router-state" }, [
         "pwm: " + pwm + " (" + fmtPercent(pwm) + ")",
       ]),
     );
-    stateBits.push(E("span", { class: "r01-state" }, ["rpm: " + rpm]));
+    stateBits.push(E("span", { class: "router-state" }, ["rpm: " + rpm]));
     if (overridden)
       stateBits.push(
-        E("span", { class: "r01-state r01-override" }, [
+        E("span", { class: "router-state router-override" }, [
           "⚠ safety watchdog active",
         ]),
       );
 
-    return E("div", { class: "r01-card" }, [
+    return E("div", { class: "router-card" }, [
       E("h3", {}, ["Fan"]),
-      E("div", { class: "r01-mode-row" }, buttons),
-      E("div", { class: "r01-hint" }, [
+      E("div", { class: "router-mode-row" }, buttons),
+      E("div", { class: "router-hint" }, [
         MODES.find(function (m) {
           return m.id === selectedMode;
         }).hint,
       ]),
       sliderRow,
-      E("div", { class: "r01-state-row" }, stateBits),
+      E("div", { class: "router-state-row" }, stateBits),
     ]);
   },
 
   pickMode(mode) {
-    uci.set("r01", "fan", "mode", mode);
+    uci.set("router", "fan", "mode", mode);
     return uci
       .save()
       .then(function () {
@@ -243,8 +248,8 @@ return view.extend({
   changeManualPwm(ev) {
     const v = parseInt(ev.target.value, 10);
     if (!Number.isFinite(v) || v < 0 || v > 255) return;
-    uci.set("r01", "fan", "manual_pwm", String(v));
-    uci.set("r01", "fan", "mode", "manual");
+    uci.set("router", "fan", "manual_pwm", String(v));
+    uci.set("router", "fan", "mode", "manual");
     return uci
       .save()
       .then(function () {
@@ -267,14 +272,14 @@ return view.extend({
   refresh() {
     return this.readAll().then(
       L.bind(function (values) {
-        const sensorsEl = document.getElementById("r01-sensors");
+        const sensorsEl = document.getElementById("router-sensors");
         if (sensorsEl) dom.content(sensorsEl, this.renderSensors(values));
 
-        const fanEl = document.getElementById("r01-fan");
+        const fanEl = document.getElementById("router-fan");
         if (fanEl) {
-          const mode = uci.get("r01", "fan", "mode") || "auto";
+          const mode = uci.get("router", "fan", "mode") || "auto";
           const manualPwm = parseInt(
-            uci.get("r01", "fan", "manual_pwm") || "128",
+            uci.get("router", "fan", "manual_pwm") || "128",
             10,
           );
           dom.content(fanEl, this.renderFan(values, mode, manualPwm));
@@ -284,57 +289,57 @@ return view.extend({
   },
 
   render([_unused, values]) {
-    const mode = uci.get("r01", "fan", "mode") || "auto";
+    const mode = uci.get("router", "fan", "mode") || "auto";
     const manualPwm = parseInt(
-      uci.get("r01", "fan", "manual_pwm") || "128",
+      uci.get("router", "fan", "manual_pwm") || "128",
       10,
     );
 
     poll.add(L.bind(this.refresh, this), 3);
 
     const style = E("style", {}, [
-      ".r01-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem;margin:.6rem 0}" +
-        ".r01-pill{border-radius:8px;padding:.7rem .8rem;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.15)}" +
-        ".r01-pill-label{font-size:.85rem;opacity:.85}" +
-        ".r01-pill-temp{font-size:1.4rem;font-weight:600;margin-top:.2rem}" +
-        ".r01-pill-sub{font-size:.7rem;opacity:.7;margin-top:.15rem}" +
-        ".r01-pill-throttle{font-size:.75rem;background:rgba(0,0,0,.25);display:inline-block;padding:.1rem .3rem;border-radius:4px;margin-top:.3rem}" +
-        ".r01-ok{background:#3a8a3a}" +
-        ".r01-warm{background:#c08b1e}" +
-        ".r01-hot{background:#d46b1c}" +
-        ".r01-crit{background:#b03030}" +
-        ".r01-card{border:1px solid #ccc;border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;background:rgba(0,0,0,.02)}" +
-        ".r01-card h3{margin-top:0}" +
-        ".r01-mode-row{display:flex;flex-wrap:wrap;gap:.4rem;margin:.4rem 0}" +
-        ".r01-mode-btn{min-width:7rem}" +
-        ".r01-mode-active{background:#3070d0;color:#fff;border-color:#3070d0}" +
-        ".r01-slider-row{margin-top:.6rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}" +
-        ".r01-slider-row input[type=range]{flex:1;min-width:200px}" +
-        ".r01-state-row{margin-top:.6rem;display:flex;flex-wrap:wrap;gap:.8rem;font-family:monospace;font-size:.85rem;opacity:.85}" +
-        ".r01-state{padding:.15rem .4rem;border-radius:4px;background:rgba(0,0,0,.05)}" +
-        ".r01-override{background:#b03030;color:#fff}" +
-        ".r01-hint{font-size:.8rem;opacity:.7;margin:.2rem 0 .4rem 0}",
+      ".router-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem;margin:.6rem 0}" +
+        ".router-pill{border-radius:8px;padding:.7rem .8rem;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.15)}" +
+        ".router-pill-label{font-size:.85rem;opacity:.85}" +
+        ".router-pill-temp{font-size:1.4rem;font-weight:600;margin-top:.2rem}" +
+        ".router-pill-sub{font-size:.7rem;opacity:.7;margin-top:.15rem}" +
+        ".router-pill-throttle{font-size:.75rem;background:rgba(0,0,0,.25);display:inline-block;padding:.1rem .3rem;border-radius:4px;margin-top:.3rem}" +
+        ".router-ok{background:#3a8a3a}" +
+        ".router-warm{background:#c08b1e}" +
+        ".router-hot{background:#d46b1c}" +
+        ".router-crit{background:#b03030}" +
+        ".router-card{border:1px solid #ccc;border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;background:rgba(0,0,0,.02)}" +
+        ".router-card h3{margin-top:0}" +
+        ".router-mode-row{display:flex;flex-wrap:wrap;gap:.4rem;margin:.4rem 0}" +
+        ".router-mode-btn{min-width:7rem}" +
+        ".router-mode-active{background:#3070d0;color:#fff;border-color:#3070d0}" +
+        ".router-slider-row{margin-top:.6rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}" +
+        ".router-slider-row input[type=range]{flex:1;min-width:200px}" +
+        ".router-state-row{margin-top:.6rem;display:flex;flex-wrap:wrap;gap:.8rem;font-family:monospace;font-size:.85rem;opacity:.85}" +
+        ".router-state{padding:.15rem .4rem;border-radius:4px;background:rgba(0,0,0,.05)}" +
+        ".router-override{background:#b03030;color:#fff}" +
+        ".router-hint{font-size:.8rem;opacity:.7;margin:.2rem 0 .4rem 0}",
     ]);
 
     return E(
       [],
       [
         style,
-        E("h2", {}, ["r01 Hardware"]),
+        E("h2", {}, ["router Hardware"]),
         E("p", { class: "cbi-map-descr" }, [
-          "Live sensor readings and fan control for the GL-BE10000. Fan mode persists in /etc/config/r01 and re-applies on boot.",
+          "Live sensor readings and fan control for the GL-BE10000. Fan mode persists in /etc/config/router and re-applies on boot.",
         ]),
 
-        E("div", { class: "r01-card" }, [
+        E("div", { class: "router-card" }, [
           E("h3", {}, ["Temperatures"]),
           E(
             "div",
-            { id: "r01-sensors", class: "r01-grid" },
+            { id: "router-sensors", class: "router-grid" },
             this.renderSensors(values),
           ),
         ]),
 
-        E("div", { id: "r01-fan" }, this.renderFan(values, mode, manualPwm)),
+        E("div", { id: "router-fan" }, this.renderFan(values, mode, manualPwm)),
       ],
     );
   },

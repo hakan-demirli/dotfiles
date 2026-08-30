@@ -1,15 +1,15 @@
-## /etc/config/r01-ui touchscreen UI configuration.
+## /etc/config/router-ui touchscreen UI configuration.
 ##
-## PIN hashes are filled in by /etc/uci-defaults/99-r01-ui-pins on first boot
+## PIN hashes are filled in by /etc/uci-defaults/99-router-ui-pins on first boot
 ## from the well-known defaults (admin=1234, guest=0000). Change them with:
-##     r01-ui-set-pin admin
-##     r01-ui-set-pin guest
+##     router-ui-set-pin admin
+##     router-ui-set-pin guest
 
-config r01-ui 'auth'
+config router-ui 'auth'
 	# argon2id PHC string. Empty until first-boot uci-defaults populates it.
 	option admin_pin_hash ''
 	option guest_pin_hash ''
 
-config r01-ui 'session'
+config router-ui 'session'
 	# Auto-blank inactivity timeout in seconds.
 	option idle_seconds '10'

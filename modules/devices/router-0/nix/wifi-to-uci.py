@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import json
 import pathlib
 import re
 import sys
 
-import tomllib
-
 NETIFD_IFACE = "wwan"
-ALLOWED_RADIOS = {"radio0", "radio1"}
-MARKER = "# === GENERATED STA wifi-iface BLOCKS (from secrets/wifi.toml) ==="
+RADIO_EXPANSION = {
+    "radio0": ["radio0"],
+    "radio1": ["radio1"],
+    "any": ["radio0", "radio1"],
+}
+MARKER = "# === GENERATED STA wifi-iface BLOCKS (from secrets/wifi/networks.yaml) ==="
 
 
 def slug(s: str) -> str:
@@ -19,78 +22,94 @@ def slug(s: str) -> str:
     return s or "net"
 
 
-def quote(s) -> str:
-    s = str(s)
-    return "'" + s.replace("'", "'\\''") + "'"
+def quote(s: object) -> str:
+    return "'" + str(s).replace("'", "'\\''") + "'"
 
 
-def emit_wireless(net: dict, radio: str, section: str) -> list[str] | None:
-    auth = net.get("auth", "psk").lower()
-    ssid = net["ssid"]
-    out: list[str] = []
-    out.append(f"config wifi-iface {quote(section)}")
-    out.append(f"\toption device {quote(radio)}")
-    out.append("\toption mode 'sta'")
-    out.append(f"\toption network {quote(NETIFD_IFACE)}")
-    out.append(f"\toption ssid {quote(ssid)}")
-    if net.get("hidden"):
-        out.append("\toption scan_ssid '1'")
-    if "ieee80211w" in net:
-        out.append(f"\toption ieee80211w {quote(net['ieee80211w'])}")
+def resolve(networks: dict) -> list[dict]:
+    """Select networks marked as uplinks, failing loudly on a malformed record."""
+    resolved: list[dict] = []
+    for network_id, network in networks.items():
+        radio = network.get("uplink_radio")
+        if radio is None:
+            continue
+
+        if radio not in RADIO_EXPANSION:
+            raise SystemExit(
+                f"wifi-to-uci: uplink {network_id} has invalid radio {radio!r}"
+            )
+
+        auth = network.get("auth")
+        if auth in ("psk", "sae"):
+            if not network.get("psk"):
+                raise SystemExit(f"wifi-to-uci: uplink {network_id} is missing its psk")
+        elif auth in ("eap-ttls", "eap-peap"):
+            if not network.get("identity") or not network.get("password"):
+                raise SystemExit(
+                    f"wifi-to-uci: uplink {network_id} is missing its identity or password"
+                )
+        elif auth != "open":
+            raise SystemExit(
+                f"wifi-to-uci: uplink {network_id} has unsupported auth {auth!r}"
+            )
+
+        if not network.get("ssid"):
+            raise SystemExit(f"wifi-to-uci: uplink {network_id} is missing its ssid")
+
+        resolved.append(
+            {
+                "id": network_id,
+                "ssid": network["ssid"],
+                "auth": auth,
+                "network": network,
+                "radios": RADIO_EXPANSION[radio],
+                "priority": int(network.get("uplink_priority", 50)),
+            }
+        )
+
+    resolved.sort(key=lambda entry: (-entry["priority"], entry["ssid"]))
+    return resolved
+
+
+def emit_wireless(entry: dict, radio: str, section: str) -> list[str]:
+    network = entry["network"]
+    auth = entry["auth"]
+    out = [
+        f"config wifi-iface {quote(section)}",
+        f"\toption device {quote(radio)}",
+        "\toption mode 'sta'",
+        f"\toption network {quote(NETIFD_IFACE)}",
+        f"\toption ssid {quote(entry['ssid'])}",
+    ]
 
     if auth == "psk":
-        psk = net.get("psk") or ""
-        if not psk:
-            print(
-                f"wifi-to-uci: psk network '{ssid}' has empty psk. Skipping",
-                file=sys.stderr,
-            )
-            return None
         out.append("\toption encryption 'psk2'")
-        out.append(f"\toption key {quote(psk)}")
-    elif auth in ("eap-ttls", "eap-peap", "wpa-eap", "eap"):
-        eap_type = (
-            "ttls"
-            if auth == "eap-ttls"
-            else ("peap" if auth == "eap-peap" else net.get("eap_type", "ttls"))
-        )
-        identity = net.get("identity") or ""
-        password = net.get("password") or ""
-        if not identity or not password:
-            print(
-                f"wifi-to-uci: eap network '{ssid}' missing identity/password. Skipping",
-                file=sys.stderr,
-            )
-            return None
+        out.append(f"\toption key {quote(network['psk'])}")
+    elif auth == "sae":
+        out.append("\toption encryption 'sae'")
+        out.append(f"\toption key {quote(network['psk'])}")
+        out.append("\toption ieee80211w '2'")
+    elif auth in ("eap-ttls", "eap-peap"):
         out.append("\toption encryption 'wpa2'")
-        out.append(f"\toption eap_type {quote(eap_type)}")
-        out.append(f"\toption auth {quote(net.get('inner_auth', 'MSCHAPV2'))}")
-        out.append(f"\toption identity {quote(identity)}")
-        out.append(f"\toption password {quote(password)}")
-        if net.get("anonymous_identity"):
-            out.append(
-                f"\toption anonymous_identity {quote(net['anonymous_identity'])}"
-            )
-        out.append(f"\toption ca_cert {quote(net.get('ca_cert', ''))}")
+        out.append(f"\toption eap_type {quote(auth.removeprefix('eap-'))}")
+        out.append(
+            f"\toption auth {quote(network.get('inner_auth', 'MSCHAPV2').upper())}"
+        )
+        out.append(f"\toption identity {quote(network['identity'])}")
+        out.append(f"\toption password {quote(network['password'])}")
+        out.append("\toption ca_cert ''")
     elif auth == "open":
         out.append("\toption encryption 'none'")
-    else:
-        print(
-            f"wifi-to-uci: unknown auth '{auth}' for '{ssid}'. Skipping",
-            file=sys.stderr,
-        )
-        return None
 
     out.append("\toption disabled '1'")
     return out
 
 
-def emit_uplink(net: dict, radio: str) -> list[str]:
-    ssid = net["ssid"]
+def emit_uplink(entry: dict, radio: str) -> list[str]:
     return [
         "config uplink",
         f"\toption device {quote(radio)}",
-        f"\toption ssid {quote(ssid)}",
+        f"\toption ssid {quote(entry['ssid'])}",
         "\toption bssid ''",
         "\toption enabled '1'",
     ]
@@ -113,39 +132,20 @@ TRAVELMATE_GLOBAL = [
 ]
 
 
-def render(wifi_toml_path: pathlib.Path) -> tuple[str, str]:
-    with wifi_toml_path.open("rb") as f:
-        cfg = tomllib.load(f)
-
-    networks = cfg.get("networks", [])
-    if not networks:
-        raise SystemExit("wifi-to-uci: no [[networks]] entries in wifi.toml")
+def render(networks: dict) -> tuple[str, str]:
+    entries = resolve(networks)
+    if not entries:
+        raise SystemExit("wifi-to-uci: no network declares an uplink_radio")
 
     wireless_lines: list[str] = []
     trm_uplinks: list[str] = []
 
-    sorted_nets = sorted(
-        [n for n in networks if "ssid" in n],
-        key=lambda n: -int(n.get("priority", 50)),
-    )
-
-    for net in sorted_nets:
-        requested = net.get("radio", "radio0")
-        radios = [requested] if requested != "any" else ["radio0", "radio1"]
-        for r in radios:
-            if r not in ALLOWED_RADIOS:
-                print(
-                    f"wifi-to-uci: invalid radio '{r}' for '{net['ssid']}'. Skipping",
-                    file=sys.stderr,
-                )
-                continue
-            section = f"sta_{slug(net['ssid'])}_{r[-1]}"
-            w = emit_wireless(net, r, section)
-            if not w:
-                continue
-            wireless_lines.extend(w)
+    for entry in entries:
+        for radio in entry["radios"]:
+            section = f"sta_{slug(entry['ssid'])}_{radio[-1]}"
+            wireless_lines.extend(emit_wireless(entry, radio, section))
             wireless_lines.append("")
-            trm_uplinks.extend(emit_uplink(net, r))
+            trm_uplinks.extend(emit_uplink(entry, radio))
             trm_uplinks.append("")
 
     wireless = MARKER + "\n" + "\n".join(wireless_lines).rstrip() + "\n"
@@ -157,14 +157,17 @@ def render(wifi_toml_path: pathlib.Path) -> tuple[str, str]:
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("wifi_toml", type=pathlib.Path)
+    p.add_argument("--networks", type=pathlib.Path, required=True)
     p.add_argument("--wireless-out", type=pathlib.Path, required=True)
     p.add_argument("--travelmate-out", type=pathlib.Path, required=True)
     args = p.parse_args()
 
-    wireless, travelmate = render(args.wifi_toml)
+    networks = json.loads(args.networks.read_text()).get("networks", {})
+
+    wireless, travelmate = render(networks)
     args.wireless_out.write_text(wireless)
     args.travelmate_out.write_text(travelmate)
+    print(f"wifi-to-uci: rendered {len(resolve(networks))} uplinks", file=sys.stderr)
     return 0
 
 

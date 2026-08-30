@@ -12,7 +12,7 @@ Adds ST7789P3 240x320 SPI panel support via the DRM-tiny driver
   - bindings: sitronix,st7789p3.yaml devicetree schema doc
 
 Enables the on-device 240x320 touchscreen (touch controller wired by
-patch 0002) as /dev/fb0 for the r01-ui touchscreen application.
+patch 0002) as /dev/fb0 for the router-ui touchscreen application.
 
 Signed-off-by: hakan-demirli <ehdemirli@proton.me>
 ---
@@ -59,7 +59,7 @@ diff --git a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts b/target/li
 index 321a81fe08..ea896a24e0 100644
 --- a/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
 +++ b/target/linux/mediatek/dts/mt7987a-glinet-gl-be10000.dts
-@@ -289,3 +289,40 @@
+@@ -289,3 +289,43 @@
  	pinctrl-0 = <&uart0_pins>;
  	status = "okay";
  };
@@ -69,7 +69,10 @@ index 321a81fe08..ea896a24e0 100644
 + * Stock pinmap (be10000-stock.dts):
 + *   SPI bus  : spi@11008800   (mainline &spi1, mediatek,ipm-spi-single)
 + *   Pinmux   : spi1_1 group   (UART1_RTS / PCM_CLK_I2S_BCLK / SPI2_CS pads)
-+ *   RESET    : pio 10, active-low
++ *   RESET    : pio 10, RESX is active-low in hardware but declared
++ *              GPIO_ACTIVE_HIGH: mipi_dbi_hw_reset() leaves the line at
++ *              logical 1 to mean "released", matching every mainline
++ *              drm/tiny MIPI-DBI binding
 + *   DC       : pio 22, active-high
 + *   TE       : pio 9,  active-high (tearing-effect line for VSYNC sync)
 + *   Backlight: pwm-backlight (PWM ch2, declared above)
@@ -96,7 +99,7 @@ index 321a81fe08..ea896a24e0 100644
 +		spi-max-frequency = <16000000>;
 +		rotation = <0>;
 +		backlight = <&backlight>;
-+		reset-gpios = <&pio 10 GPIO_ACTIVE_LOW>;
++		reset-gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 +		dc-gpios = <&pio 22 GPIO_ACTIVE_HIGH>;
 +	};
 +};
@@ -217,7 +220,7 @@ index 0000000000..d060384828
 ++            reg = <0>;
 ++            spi-max-frequency = <16000000>;
 ++            dc-gpios = <&pio 22 GPIO_ACTIVE_HIGH>;
-++            reset-gpios = <&pio 10 GPIO_ACTIVE_LOW>;
+++            reset-gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 ++            backlight = <&backlight>;
 ++            rotation = <0>;
 ++        };

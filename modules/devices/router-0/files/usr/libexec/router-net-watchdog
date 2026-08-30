@@ -1,9 +1,9 @@
 #!/bin/sh
-# r01 network watchdog. Started by /etc/init.d/r01-net-watchdog via procd.
+# router network watchdog. Started by /etc/init.d/router-net-watchdog via procd.
 #
-# What it does: every <r01.netwatch.check_interval> seconds, read the
+# What it does: every <router.netwatch.check_interval> seconds, read the
 # 'up' state of the wwan netifd interface. If wwan has been down for
-# <r01.netwatch.stuck_after> consecutive checks AND at least one
+# <router.netwatch.stuck_after> consecutive checks AND at least one
 # uplink in /etc/config/travelmate is enabled, restart travelmate.
 #
 # Why this exists: with trm_proactive=1 we saw the MT7996 wireless
@@ -13,19 +13,19 @@
 # proactive off as the primary fix. This is the safety net for any
 # residual scan-engine hangs.
 #
-# UCI surface (/etc/config/r01):
-#   r01.netwatch.enabled         0 = disable; 1 = on
-#   r01.netwatch.check_interval  seconds between checks
-#   r01.netwatch.stuck_after     N consecutive failed checks before kick
+# UCI surface (/etc/config/router):
+#   router.netwatch.enabled         0 = disable; 1 = on
+#   router.netwatch.check_interval  seconds between checks
+#   router.netwatch.stuck_after     N consecutive failed checks before kick
 
-LOG_TAG="r01-net-watchdog"
+LOG_TAG="router-net-watchdog"
 
-# Read /etc/config/r01 [netwatch] each iteration so live tuning via
+# Read /etc/config/router [netwatch] each iteration so live tuning via
 # uci/LuCI takes effect without a service restart.
 read_cfg() {
-	enabled=$(uci -q get r01.netwatch.enabled 2>/dev/null)
-	interval=$(uci -q get r01.netwatch.check_interval 2>/dev/null)
-	stuck_after=$(uci -q get r01.netwatch.stuck_after 2>/dev/null)
+	enabled=$(uci -q get router.netwatch.enabled 2>/dev/null)
+	interval=$(uci -q get router.netwatch.check_interval 2>/dev/null)
+	stuck_after=$(uci -q get router.netwatch.stuck_after 2>/dev/null)
 	[ -z "$enabled" ]     && enabled=1
 	[ -z "$interval" ]    && interval=60
 	[ -z "$stuck_after" ] && stuck_after=5

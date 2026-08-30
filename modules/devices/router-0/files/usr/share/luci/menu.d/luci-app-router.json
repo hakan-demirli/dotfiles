@@ -1,24 +1,24 @@
 {
-  "admin/r01": {
-    "title": "r01",
+  "admin/router": {
+    "title": "Router",
     "order": 5,
     "action": {
       "type": "firstchild"
     },
     "depends": {
-      "acl": ["luci-app-r01"]
+      "acl": ["luci-app-router"]
     }
   },
 
-  "admin/r01/hardware": {
+  "admin/router/hardware": {
     "title": "Hardware",
     "order": 1,
     "action": {
       "type": "view",
-      "path": "r01/hardware"
+      "path": "router/hardware"
     },
     "depends": {
-      "acl": ["luci-app-r01"]
+      "acl": ["luci-app-router"]
     }
   }
 }

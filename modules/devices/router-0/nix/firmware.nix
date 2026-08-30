@@ -1,7 +1,7 @@
 {
   pkgs,
   openwrtSource,
-  r01-ui,
+  router-ui,
 }:
 
 let
@@ -56,6 +56,11 @@ let
     CONFIG_PACKAGE_ethtool=y
     CONFIG_PACKAGE_iw-full=y
     CONFIG_PACKAGE_ip-full=y
+
+    CONFIG_PACKAGE_kmod-spi-dev=y
+    CONFIG_PACKAGE_spi-tools=y
+    CONFIG_PACKAGE_gpiod-tools=y
+    CONFIG_KERNEL_DYNAMIC_DEBUG=y
 
     # Recovery initramfs (PR define references it).
     CONFIG_TARGET_ROOTFS_INITRAMFS=y
@@ -231,7 +236,7 @@ let
       echo ">>> resetting feeds for pinned revisions"
       rm -rf feeds package/feeds
     fi
-    cp ${feedsConfig} feeds.conf
+    install -m0644 ${feedsConfig} feeds.conf
 
     echo ">>> updating feeds"
     ./scripts/feeds update -a
@@ -239,9 +244,9 @@ let
     ./scripts/feeds install -a
 
     echo ">>> configuring firmware"
-    cp ${seedConfig} .config
+    install -m0644 ${seedConfig} .config
     make defconfig
-    install -Dm0755 ${r01-ui}/bin/r01-ui files/usr/bin/r01-ui
+    install -Dm0755 ${router-ui}/bin/router-ui files/usr/bin/router-ui
 
     echo ">>> downloading sources"
     make -j"$jobs" download

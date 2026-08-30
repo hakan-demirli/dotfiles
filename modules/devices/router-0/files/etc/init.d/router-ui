@@ -1,0 +1,38 @@
+#!/bin/sh /etc/rc.common
+# shellcheck shell=sh
+# shellcheck disable=SC2034,SC3043
+
+USE_PROCD=1
+START=97
+STOP=10
+
+PROG=/usr/bin/router-ui
+
+start_service() {
+	local i=0
+	while [ ! -c /dev/fb0 ] || [ ! -c /dev/input/event0 ]; do
+		i=$((i + 1))
+		[ "$i" -gt 60 ] && {
+			logger -t router-ui "fb0 or event0 missing after 60s, giving up"
+			return 1
+		}
+		sleep 1
+	done
+
+	procd_open_instance
+	procd_set_param command "$PROG"
+	procd_set_param env RUST_LOG=info
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	procd_set_param term_timeout 3
+	procd_set_param respawn 60 5 10
+	procd_close_instance
+}
+
+reload_service() {
+	procd_send_signal router-ui '*' HUP
+}
+
+service_triggers() {
+	procd_add_reload_trigger 'router-ui'
+}

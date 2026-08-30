@@ -1,0 +1,31 @@
+#!/bin/sh
+# Cold-start fallback for router-ui PIN hashes.
+#
+# The authoritative PINs live in secrets/router-0/deploy.yaml and are applied
+# by `nix run .#router-0-config`. This script only covers the window before
+# the first config push, so the touchscreen is usable on a freshly flashed
+# device without ssh.
+#
+# It only writes a hash when the corresponding UCI option is empty, so it
+# never clobbers a PIN that router-0-config has already set. Note that
+# /etc/config is preserved across sysupgrade by /lib/upgrade/keep.d/base-files,
+# which lists the whole directory; /etc/sysupgrade.conf is not involved.
+
+set -e
+
+[ -x /usr/bin/router-ui-set-pin ] || exit 0
+
+admin_hash="$(uci -q get router-ui.auth.admin_pin_hash)"
+guest_hash="$(uci -q get router-ui.auth.guest_pin_hash)"
+
+if [ -z "$admin_hash" ]; then
+	/usr/bin/router-ui-set-pin admin 1234 >/dev/null 2>&1 \
+		&& logger -t router-ui "bootstrapped default admin PIN (1234). Change it!"
+fi
+
+if [ -z "$guest_hash" ]; then
+	/usr/bin/router-ui-set-pin guest 0000 >/dev/null 2>&1 \
+		&& logger -t router-ui "bootstrapped default guest PIN (0000). Change it!"
+fi
+
+exit 0

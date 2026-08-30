@@ -1,12 +1,12 @@
 #!/bin/sh
-# r01-ui-set-pin USER [PIN]
+# router-ui-set-pin USER [PIN]
 #
-# Compute an argon2id hash of PIN and store it in /etc/config/r01-ui under
+# Compute an argon2id hash of PIN and store it in /etc/config/router-ui under
 # the right user slot. If PIN is omitted, read it from /dev/tty without
 # echo so it doesn't end up in shell history.
 #
-# r01-ui itself contains an argon2 implementation. We call it through a
-# tiny subcommand `r01-ui hash <pin>` that prints the PHC string and exits.
+# router-ui itself contains an argon2 implementation. We call it through a
+# tiny subcommand `router-ui hash <pin>` that prints the PHC string and exits.
 # (The subcommand is implemented in the same Rust binary so we avoid
 # shipping a second tool.)
 
@@ -14,7 +14,7 @@ set -e
 
 usage() {
 	cat <<EOF >&2
-usage: r01-ui-set-pin USER [PIN]
+usage: router-ui-set-pin USER [PIN]
 
 USER  must be 'admin' or 'guest'.
 PIN   is read interactively from /dev/tty if omitted (no echo).
@@ -39,20 +39,20 @@ if [ -z "$pin" ]; then
 fi
 
 if [ -z "$pin" ]; then
-	echo "r01-ui-set-pin: empty PIN" >&2
+	echo "router-ui-set-pin: empty PIN" >&2
 	exit 65
 fi
 
-hash="$(/usr/bin/r01-ui hash "$pin" 2>/dev/null || true)"
+hash="$(/usr/bin/router-ui hash "$pin" 2>/dev/null || true)"
 if [ -z "$hash" ]; then
-	echo "r01-ui-set-pin: failed to compute hash (is /usr/bin/r01-ui installed?)" >&2
+	echo "router-ui-set-pin: failed to compute hash (is /usr/bin/router-ui installed?)" >&2
 	exit 70
 fi
 
-uci set "r01-ui.auth.${user}_pin_hash=$hash"
-uci commit r01-ui
+uci set "router-ui.auth.${user}_pin_hash=$hash"
+uci commit router-ui
 
-# Tell a running r01-ui to reload its UCI cache.
-[ -x /etc/init.d/r01-ui ] && /etc/init.d/r01-ui reload >/dev/null 2>&1 || true
+# Tell a running router-ui to reload its UCI cache.
+[ -x /etc/init.d/router-ui ] && /etc/init.d/router-ui reload >/dev/null 2>&1 || true
 
 echo "set ${user} PIN hash" >&2

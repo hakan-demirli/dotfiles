@@ -1,8 +1,10 @@
-# Declarative wireless configuration for r01 (GL-BE10000).
+# Declarative wireless configuration for router-0 (GL-BE10000).
 #
-# Source of truth for /etc/config/wireless on the router. Consumed by
-# `nix/config-overlay.nix`. The __PLACEHOLDER__ tokens below are
-# substituted at overlay-build time from sops-decrypted secrets.
+# Source of truth for /etc/config/wireless on the router. __PLACEHOLDER__ tokens
+# are substituted by router-0-config at push time, never in the Nix store.
+#
+# SSIDs are user-visible identity, so they keep the r01 names: renaming them
+# forces every client to re-pair and must change secrets/wifi/networks.yaml too.
 #
 # Radios:  radio0=2.4G, radio1=5G (also STA uplink to eth-5 ch36), radio2=6G.
 # All three share one PHY (single-wiphy multi-radio mt76).
@@ -32,9 +34,10 @@ config wifi-device 'radio1'
 	option path 'soc/11280000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'
 	option radio '1'
 	option band '5g'
-	# 'auto' so radio1 can follow whichever 5G STA travelmate brings up.
-	# When STA is down the r01-5G AP picks any allowed 5G channel.
-	option channel 'auto'
+	# Pinned to UNII-1. 'auto' let ACS pick DFS channels (it chose 52), which
+	# clients cannot associate to without passive-scan/CAC, silently locking
+	# every 5G client out after a restart.
+	option channel '36'
 	option htmode 'EHT80'
 	option country 'DE'
 	option disabled '0'
@@ -49,14 +52,10 @@ config wifi-iface 'ap_5g'
 	option ieee80211w '1'
 	option disabled '0'
 
-# STA (upstream) wifi-iface entries are generated from the `wifiToml` arg
-# to `mkConfigOverlay` (see modules/devices/router-0/nix/wifi-to-uci.py).
-# travelmate (config at /etc/config/travelmate, also generated in the same
-# pass) scans the configured uplinks, picks the best one in range, handles
-# captive portals, and fails over when the current uplink drops.
-#
-# To add/remove networks, update the encrypted Wi-Fi data passed as `wifiToml`,
-# then rebuild the config overlay.
+# STA (upstream) wifi-iface entries are appended by nix/wifi-to-uci.py at push
+# time from secrets/wifi/networks.yaml: any network with an uplink_radio is
+# used. travelmate, generated in the same pass, scans those uplinks, picks the
+# best in range, handles captive portals, and fails over.
 
 config wifi-device 'radio2'
 	option type 'mac80211'
