@@ -28,44 +28,36 @@ let
     CONFIG_TARGET_mediatek_filogic=y
     CONFIG_TARGET_mediatek_filogic_DEVICE_glinet_gl-be10000=y
 
-    # wpa_supplicant with full EAP (TTLS+MSCHAPv2 for ETH eth network).
-    # CONFIG_PACKAGE_wpad-basic-mbedtls is not set
     CONFIG_PACKAGE_wpad-openssl=y
 
-    # Web UI.
     CONFIG_PACKAGE_luci=y
     CONFIG_PACKAGE_luci-ssl=y
 
-    # Tailnet membership. kmod-tun must be baked in: snapshot kmods are keyed
-    # by kernel vermagic, and a patched tree's vermagic is never in the feed.
     CONFIG_PACKAGE_tailscale=y
     CONFIG_PACKAGE_kmod-tun=y
     CONFIG_PACKAGE_ca-bundle=y
 
-    # node_exporter-compatible metrics on 9100, scraped over the tailnet.
-    # filesystem is a separate collector, and the disk panels/alerts need it.
     CONFIG_PACKAGE_prometheus-node-exporter-lua=y
     CONFIG_PACKAGE_prometheus-node-exporter-lua-filesystem=y
     CONFIG_PACKAGE_prometheus-node-exporter-lua-openwrt=y
     CONFIG_PACKAGE_prometheus-node-exporter-lua-thermal=y
     CONFIG_PACKAGE_prometheus-node-exporter-lua-wifi=y
 
-    # Useful tools.
     CONFIG_PACKAGE_diffutils=y
     CONFIG_PACKAGE_tcpdump-mini=y
     CONFIG_PACKAGE_ethtool=y
     CONFIG_PACKAGE_iw-full=y
     CONFIG_PACKAGE_ip-full=y
 
+    CONFIG_PACKAGE_coreutils-base64=y
+
     CONFIG_PACKAGE_kmod-spi-dev=y
     CONFIG_PACKAGE_spi-tools=y
     CONFIG_PACKAGE_gpiod-tools=y
     CONFIG_KERNEL_DYNAMIC_DEBUG=y
 
-    # Recovery initramfs (PR define references it).
     CONFIG_TARGET_ROOTFS_INITRAMFS=y
 
-    # LCD: DRM tiny st7789p3 driver + pwm-backlight.
     CONFIG_DISPLAY_SUPPORT=y
     CONFIG_PACKAGE_kmod-backlight=y
     CONFIG_PACKAGE_kmod-backlight-pwm=y
@@ -73,12 +65,8 @@ let
     CONFIG_PACKAGE_kmod-drm-st7789p3=y
     CONFIG_PACKAGE_kmod-fb=y
 
-    # Touch input (DTS + in-tree kernel patch supply the driver).
     CONFIG_PACKAGE_kmod-input-evdev=y
 
-    # Roaming STA: travelmate scans configured uplinks and connects
-    # to the best one in range, handles captive portals, fails over
-    # on signal loss.
     CONFIG_PACKAGE_travelmate=y
     CONFIG_PACKAGE_iwinfo=y
     CONFIG_PACKAGE_uclient-fetch=y
