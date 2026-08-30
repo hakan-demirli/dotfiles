@@ -20,12 +20,6 @@
 | `modules/nix/`                                | Flake outputs, checks, installers, and codegen              |
 | `secrets/`                                    | SOPS-encrypted data and age identity envelopes              |
 
-Inventory entries are Nix modules. `_defaults.nix` is merged into every entity
-in its directory. To add an entity, copy the closest entry, change its `id` and
-facts, reference it from the relevant cluster/host, then run `nix flake check`.
-Role module references resolve through this repo first and then `infra-lib`.
-missing references fail evaluation.
-
 ## Develop And Inspect
 
 ```bash
@@ -36,11 +30,6 @@ nix run .#inventory-dump
 nix build .#intent-report
 nix build .#diagrams
 ```
-
-Generated outputs include `sops-yaml`, `headscale-acl`, `matchbox`, `kea`, and
-`kexec`. Build one with `nix build .#<name>`. Generated SOPS policy is applied
-with `cp -f result secrets/.sops.yaml`, followed by `sops updatekeys` for each
-affected encrypted file.
 
 ## NixOS
 
@@ -57,35 +46,27 @@ nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
 3. Install the mandatory password identity, optionally including Tailscale:
    `nix run .#bootstrap-deploy -- /mnt [--with-tailscale]`.
 4. Install: `nixos-install --root /mnt --flake .#<host> --no-root-passwd`.
-5. Reboot only after bootstrap deployment and installation both succeed.
+5. Reboot.
 
-Managed Disko hosts also expose `nix run .#install-<host>`, which validates the
-inventory disk and requires typing `WIPE <host>` before destructive work.
+#### ARM Bootstrap
 
-For takeover from a foreign ARM Linux host, build
-`nix build .#kexec --system aarch64-linux`, copy `result` to the host, run it as
-root, then follow the fresh install flow.
+`nix build .#kexec --system aarch64-linux`, copy `result` to the host, run it as root, then follow the fresh install flow.
+
+#### Auto Deploy
+
+`nix run .#install-<host>` and type `WIPE <host>`
 
 ## Home Manager
 
-Configurations are `user-0@desktop`, `user-0@desktop-nvidia`,
-`user-0@headless`, and `user-0@vps-oracle-0`. The VPS configuration uses the
-`headless-minimal` profile; target details come from host inventory.
-
 ```bash
 home-manager switch --flake '.#user-0@desktop'
+home-manager switch --flake '.#user-0@desktop-nvidia'
+home-manager switch --flake '.#user-0@headless'
+home-manager switch --flake '.#user-0@vps-oracle-0'
 nix run path:.#deploy-home-secrets
 ```
 
-`deploy-home-secrets` selects `user-0@vps-oracle-0` on that host. It can also be
-selected explicitly with `--profile user-0@vps-oracle-0`.
-
-Home Manager is rootless and independent from NixOS. `homeStorage` currently
-uses a temporary home by default while persisting the paths declared in
-`modules/home/users/user-0/default.nix`. On first NixOS enablement, switch NixOS,
-switch Home Manager, verify `~/.storage/control/current`, then reboot.
-
-For a Linux target without Nix:
+### Without Nix
 
 ```bash
 nix build '.#homeConfigurations."user-0@headless".config.home.portablehome'
@@ -110,52 +91,16 @@ nix run path:.#deploy-home-secrets
 nix run path:.#deploy-system-secrets
 ```
 
-Edit an envelope-backed file without writing its identity to disk:
-
-```bash
-export SOPS_AGE_KEY="$(age --decrypt secrets/system.age.key.enc)" || exit 1
-sops --config secrets/.sops.yaml secrets/system.yaml
-unset SOPS_AGE_KEY
-```
-
-Use the matching bootstrap envelope/config for bootstrap files. Wi-Fi and Home
-Manager files use `SOPS_AGE_KEY_FILE` with their installed keys and local
-`.sops.yaml`.
-
 ## Tailnet
 
-Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`. Bootstrap
-enrollment uses the dedicated `tagged-devices` Headscale user and a reusable
-preauth key in `secrets/bootstrap/tailscale.yaml`. Every node initially receives
-`tag:bootstrap`, which has no outbound Tailnet access. Permanent tags are
-assigned manually without re-registering the node.
+Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`.
+Every node initially receives `tag:bootstrap` using preauth key in `secrets/bootstrap/tailscale.yaml`.
+Permanent tags are assigned manually without re-registering the node.
 
-### Node Promotion
-
-1. Deploy inventory and ACL changes, then run `nix build .#diagrams-tailnet`.
-   The `ACL policy tags` column in `result/tailnet.svg` is authoritative.
-2. Identify the node with `sudo headscale nodes list`.
-3. Apply its complete final tag set with
-   `sudo headscale nodes tag -i <id> -t tag:first,tag:second`.
-4. List nodes again, confirm the exact tags and absence of `tag:bootstrap`, then
-   test the intended SSH allow and deny paths.
-
-Tag permissions are cumulative. Never retain `tag:bootstrap` with permanent
-tags. Approve exit routes separately before assigning `tag:exitnode`.
-
-`laptop-1` exposes a write-only rsync inbox on `tailscale0` to approved senders:
-
-```bash
-nix profile install path:.#send-to-laptop
-send-to-laptop FILE...
-```
+- `nix build .#diagrams-tailnet`
+- `sudo headscale nodes tag -i <id> -t tag:first,tag:second`.
 
 ## Non-NixOS Devices
-
-Directories containing `modules/devices/<id>/default.nix` are auto-discovered.
-Their `packages` become `<id>-<name>` flake packages and their `apps` become
-`<id>-<name>` flake apps. Deployment overlay APIs are exposed under
-`devices.<id>.lib`.
 
 | Device                  | Build                                         | Deployment                                                           |
 | ----------------------- | --------------------------------------------- | -------------------------------------------------------------------- |
