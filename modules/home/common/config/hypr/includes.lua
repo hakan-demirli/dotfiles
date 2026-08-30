@@ -40,23 +40,19 @@ local XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME") or (HOME .. "/.config")
 local XDG_STATE_HOME = os.getenv("XDG_STATE_HOME") or (HOME .. "/.local/state")
 local XDG_CACHE_HOME = os.getenv("XDG_CACHE_HOME") or (HOME .. "/.cache")
 
+local LOCAL_BIN = HOME .. "/.local/bin"
+local PATH = os.getenv("PATH")
+if not PATH or PATH == "" then
+  PATH = LOCAL_BIN
+elseif not (":" .. PATH .. ":"):find(":" .. LOCAL_BIN .. ":", 1, true) then
+  PATH = LOCAL_BIN .. ":" .. PATH
+end
+
 hl.env("XDG_DATA_HOME", XDG_DATA_HOME)
 hl.env("XDG_CONFIG_HOME", XDG_CONFIG_HOME)
 hl.env("XDG_STATE_HOME", XDG_STATE_HOME)
 hl.env("XDG_CACHE_HOME", XDG_CACHE_HOME)
-hl.env(
-  "PATH",
-  table.concat({
-    HOME .. "/.local/bin",
-    HOME .. "/.nix-profile/bin",
-    "/nix/profile/bin",
-    HOME .. "/.local/state/nix/profile/bin",
-    "/etc/profiles/per-user/" .. (os.getenv("USER") or "") .. "/bin",
-    "/nix/var/nix/profiles/default/bin",
-    "/run/current-system/sw/bin",
-    "/usr/local/bin",
-  }, ":")
-)
+hl.env("PATH", PATH)
 
 hl.env("ANDROID_HOME", XDG_DATA_HOME .. "/android")
 hl.env("CARGO_HOME", XDG_DATA_HOME .. "/cargo")
