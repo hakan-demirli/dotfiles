@@ -28,7 +28,7 @@
 
   monitoring = {
     enabled = true;
-    always_on = false;
+    always_on = true;
     exporters = [ "node" ];
   };
 

@@ -17,11 +17,7 @@
 
         {
           alert = "HostStale";
-          expr = ''
-            (time() - max by (instance) (
-              timestamp(up{job=~"fleet-node.*", always_on="false"})
-            )) > 7 * 24 * 3600
-          '';
+          expr = ''max_over_time(up{job=~"fleet-node.*", always_on="false"}[7d]) == 0'';
           for = "30m";
           labels.severity = "warning";
           annotations = {
