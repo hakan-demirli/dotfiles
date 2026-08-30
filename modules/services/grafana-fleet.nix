@@ -1,6 +1,7 @@
 {
   cluster,
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -38,6 +39,17 @@ let
     # TYPE fleet_monitoring_policy_info gauge
     ${lib.concatStringsSep "\n" monitoringPolicyLines}
   '';
+  expectedTagLines = lib.concatMap (
+    host:
+    map (
+      tag: ''fleet_expected_tag_info{host="${prometheusLabel host.id}",tag="${prometheusLabel tag}"} 1''
+    ) (inputs.self.lib.intent.hostPolicyTags.${host.id} or [ ])
+  ) provisionedHosts;
+  expectedTagMetrics = pkgs.writeText "fleet-expected-tags.prom" ''
+    # HELP fleet_expected_tag_info Expected headscale ACL policy tag per provisioned host.
+    # TYPE fleet_expected_tag_info gauge
+    ${lib.concatStringsSep "\n" expectedTagLines}
+  '';
   tailnetMetricsCollector = pkgs.writeShellApplication {
     name = "collect-fleet-tailnet-metrics";
     runtimeInputs = [
@@ -50,10 +62,12 @@ let
       output="$(mktemp ${metricsDirectory}/fleet-tailnet.prom.XXXXXX)"
       trap 'rm -f "$output"' EXIT
 
+      nodes="$(headscale nodes list --output json)"
+
       {
         printf '%s\n' '# HELP fleet_tailnet_node_status Headscale node state: 1=offline, 2=online.'
         printf '%s\n' '# TYPE fleet_tailnet_node_status gauge'
-        headscale nodes list --output json | jq -r '
+        printf '%s' "$nodes" | jq -r '
           def prom_escape:
             gsub("\\\\"; "\\\\\\\\")
             | gsub("\""; "\\\"")
@@ -63,6 +77,18 @@ let
           | ([.ip_addresses[]? | select(test("^[0-9]+[.]"))][0] // "") as $ipv4
           | ([.tags[]?] | sort | join(",")) as $tags
           | "fleet_tailnet_node_status{host=\"\($host | prom_escape)\",ipv4=\"\($ipv4 | prom_escape)\",tags=\"\($tags | prom_escape)\"} \(if .online then 2 else 1 end)"
+        '
+        printf '%s\n' '# HELP fleet_tailnet_node_tag_info Headscale ACL policy tag currently on a tailnet node.'
+        printf '%s\n' '# TYPE fleet_tailnet_node_tag_info gauge'
+        printf '%s' "$nodes" | jq -r '
+          def prom_escape:
+            gsub("\\\\"; "\\\\\\\\")
+            | gsub("\""; "\\\"")
+            | gsub("\n"; "\\n");
+          .[]
+          | (.given_name // .name) as $host
+          | .tags[]?
+          | "fleet_tailnet_node_tag_info{host=\"\($host | prom_escape)\",tag=\"\(. | prom_escape)\"} 1"
         '
       } > "$output"
 
@@ -1495,6 +1521,48 @@ let
             }
           ];
         })
+        (mkRow {
+          id = 30;
+          title = "Tailnet Drift";
+          y = 65;
+        })
+        (mkTable {
+          id = 31;
+          title = "Missing Tags";
+          description = "ACL policy tags the inventory expects that headscale does not have. Promote with 'headscale nodes tag'.";
+          expression = ''
+            (fleet_expected_tag_info unless on(host, tag) fleet_tailnet_node_tag_info)
+            and on() (count(fleet_tailnet_node_tag_info) > 0)
+          '';
+          x = 0;
+          y = 66;
+          w = 12;
+          fields = {
+            host = 0;
+            tag = 1;
+          };
+          renamedFields = {
+            host = "Host";
+            tag = "Missing tag";
+          };
+        })
+        (mkTable {
+          id = 32;
+          title = "Unexpected Tags";
+          description = "Tags headscale carries that the inventory does not list. Nodes left on tag:bootstrap appear here.";
+          expression = "fleet_tailnet_node_tag_info unless on(host, tag) fleet_expected_tag_info";
+          x = 12;
+          y = 66;
+          w = 12;
+          fields = {
+            host = 0;
+            tag = 1;
+          };
+          renamedFields = {
+            host = "Host";
+            tag = "Unexpected tag";
+          };
+        })
       ];
       refresh = "30s";
       schemaVersion = 42;
@@ -2446,6 +2514,7 @@ in
   systemd = {
     tmpfiles.rules = [
       "L+ ${metricsDirectory}/fleet-monitoring-policy.prom - - - - ${monitoringPolicyMetrics}"
+      "L+ ${metricsDirectory}/fleet-expected-tags.prom - - - - ${expectedTagMetrics}"
     ];
 
     services = {
