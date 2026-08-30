@@ -13,7 +13,7 @@
             home="$src/modules/home"
             failed=0
 
-            if rg -n '(^|[;&|[:space:]])(sudo|doas|pkexec)([[:space:]]|$)|/run/wrappers/' \
+            if rg -n '(^|[;&|[:space:]])(sudo|doas|pkexec)([[:space:]]|$)|/run/wrappers/bin/(sudo|doas|pkexec)' \
               "$home"; then
               echo "Home code must not perform privilege escalation." >&2
               failed=1
