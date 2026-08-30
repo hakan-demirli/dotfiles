@@ -1,6 +1,6 @@
 {
-  "luci-app-r01": {
-    "description": "Grant access to r01 router-health page (read sensors, control fan)",
+  "luci-app-router": {
+    "description": "Grant access to the router hardware page (read sensors, control fan)",
     "read": {
       "file": {
         "/sys/class/thermal/thermal_zone0/temp": ["read"],
@@ -29,12 +29,12 @@
         "/sys/class/hwmon/hwmon5/temp1_max": ["read"],
         "/sys/class/hwmon/hwmon5/temp1_crit": ["read"],
         "/sys/class/hwmon/hwmon5/throttle1": ["read"],
-        "/var/run/r01-fan.override": ["read"]
+        "/var/run/router-fan.override": ["read"]
       },
       "ubus": {
         "file": ["read", "stat"]
       },
-      "uci": ["r01"]
+      "uci": ["router"]
     },
     "write": {
       "file": {
@@ -54,7 +54,7 @@
           "reload_config"
         ]
       },
-      "uci": ["r01"]
+      "uci": ["router"]
     }
   }
 }

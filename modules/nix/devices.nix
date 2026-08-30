@@ -36,9 +36,16 @@ in
           devices.${id}.packages or { }
         ))
       ) { } (lib.attrNames devices);
+
+      flatApps = lib.foldl' (
+        acc: id:
+        acc
+        // (lib.mapAttrs' (name: app: lib.nameValuePair "${id}-${name}" app) (devices.${id}.apps or { }))
+      ) { } (lib.attrNames devices);
     in
     {
       packages = flatPackages;
+      apps = flatApps;
     };
 
   flake.devices = lib.mapAttrs (

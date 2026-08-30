@@ -1,4 +1,4 @@
-# Declarative network configuration for r01.
+# Declarative network configuration for router-0.
 #
 # Layout:
 #   lan       -> br-lan over eth1, 192.168.69.1/24 (static)

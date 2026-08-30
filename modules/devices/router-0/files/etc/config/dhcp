@@ -1,4 +1,4 @@
-# Declarative DHCP/DNS configuration for r01.
+# Declarative DHCP/DNS configuration for router-0.
 # dnsmasq serves DHCP + DNS for the LAN subnet 192.168.69.0/24.
 
 config dnsmasq
