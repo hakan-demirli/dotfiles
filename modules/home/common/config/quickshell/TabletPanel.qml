@@ -50,9 +50,9 @@ Item {
 
             ChoiceButton {
                 Layout.fillWidth: true
-                text: "Keyboard"
-                enabled: !SystemActions.actionBusy
-                onActivated: SystemActions.toggleKeyboard()
+                text: KeyboardService.active ? "Keyboard: On" : "Keyboard: Off"
+                checked: KeyboardService.active
+                onActivated: KeyboardService.toggle()
             }
 
             ChoiceButton {
