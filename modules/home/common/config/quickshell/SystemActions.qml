@@ -67,10 +67,6 @@ Singleton {
         run([home + "/.local/bin/rotation-lock-toggle.sh", "toggle"]);
     }
 
-    function toggleKeyboard() {
-        run([home + "/.local/bin/tablet_mode_apply.sh", "osk-toggle"]);
-    }
-
     function toggleTabletLock() {
         run([home + "/.local/bin/tablet-lock-toggle.sh", "toggle"]);
     }

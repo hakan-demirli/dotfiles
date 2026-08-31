@@ -129,6 +129,7 @@ rec {
       nerd-fonts.symbols-only
       networkmanagerapplet
       nwg-displays
+      oskd
       pavucontrol
       playerctl
       pulseaudio

@@ -124,5 +124,6 @@ in
   # );
 
   libqalculate-fzf = callPkgs ./libqalculate-fzf.nix { };
+  oskd = callPkgs ./oskd.nix { };
   ttf-wps-fonts = callPkgs ./ttf-wps-fonts.nix { };
 }

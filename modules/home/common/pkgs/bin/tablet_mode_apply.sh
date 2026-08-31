@@ -4,7 +4,6 @@ set -u
 
 STATE_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
 STATE_FILE="$STATE_DIR/tablet_mode"
-WVKBD_VIS_FILE="$STATE_DIR/wvkbd_visible"
 
 log() { printf '[tablet_mode_apply.sh] %s\n' "$*" >&2; }
 
@@ -15,45 +14,9 @@ notify() {
     "$1" "${2:-}" 2> /dev/null || true
 }
 
-set_wvkbd_visible() {
-  echo "$1" > "$WVKBD_VIS_FILE"
-}
-
-ensure_wvkbd_running() {
-  if pgrep -x wvkbd-mobintl > /dev/null 2>&1; then
-    return 0
-  fi
-  setsid -f wvkbd-mobintl --hidden -L 280 -l full,special,emoji > /dev/null 2>&1 \
-    || log "failed to spawn wvkbd-mobintl (is it installed?)"
-  sleep 0.05
-  pgrep -x wvkbd-mobintl > /dev/null 2>&1
-}
-
-show_wvkbd() {
-  ensure_wvkbd_running || {
-    log "wvkbd not running, cannot show"
-    return 1
-  }
-  pkill -USR2 -x wvkbd-mobintl 2> /dev/null || log "wvkbd show signal failed"
-  set_wvkbd_visible 1
-}
-
-hide_wvkbd() {
-  pkill -USR1 -x wvkbd-mobintl 2> /dev/null || true
-  set_wvkbd_visible 0
-}
-
-toggle_wvkbd() {
-  ensure_wvkbd_running || {
-    log "wvkbd not running, cannot toggle"
-    return 1
-  }
-  if [[ "$(cat "$WVKBD_VIS_FILE" 2> /dev/null)" == "1" ]]; then
-    hide_wvkbd
-  else
-    pkill -USR2 -x wvkbd-mobintl 2> /dev/null || log "wvkbd show signal failed"
-    set_wvkbd_visible 1
-  fi
+hide_keyboard() {
+  command -v qs > /dev/null 2>&1 || return 0
+  qs ipc --any-display call osk close > /dev/null 2>&1 || true
 }
 
 apply_on() {
@@ -64,7 +27,7 @@ apply_on() {
 
 apply_off() {
   log "leaving tablet mode"
-  hide_wvkbd
+  hide_keyboard
   echo off > "$STATE_FILE"
   notify "Laptop mode" "On"
 }
@@ -79,14 +42,11 @@ case "${1:-}" in
       apply_on
     fi
     ;;
-  osk-toggle) toggle_wvkbd ;;
-  osk-show) show_wvkbd ;;
-  osk-hide) hide_wvkbd ;;
   status)
     cat "$STATE_FILE" 2> /dev/null || echo "off"
     ;;
   *)
-    echo "usage: $0 {on|off|toggle|osk-toggle|osk-show|osk-hide|status}" >&2
+    echo "usage: $0 {on|off|toggle|status}" >&2
     exit 2
     ;;
 esac

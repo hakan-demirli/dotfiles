@@ -26,7 +26,6 @@
     "group/battery-power",
     "custom/refresh-rate",
     "custom/left-arrow-dark",
-    "custom/osk",
     "custom/weather",
     "custom/left-arrow-dark",
     "custom/notification",
@@ -259,13 +258,5 @@
       "rate-48": "auto_refresh 48",
       "auto": "auto_refresh auto"
     }
-  },
-  "custom/osk": {
-    "justify": "center",
-    "exec": "waybar_osk",
-    "return-type": "json",
-    "signal": 5,
-    "format": "{}",
-    "on-click": "tablet_mode_apply.sh osk-toggle"
   },
 }
