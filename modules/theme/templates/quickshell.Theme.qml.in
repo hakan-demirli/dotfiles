@@ -187,6 +187,7 @@ QtObject {
         readonly property int compactIconButtonSize: Theme.font.titleMediumLine
         readonly property int headerButtonSize: metrics.compactIconButtonSize + Theme.space.small
         readonly property int iconButtonSize: metrics.compactIconButtonSize + Theme.space.small * 2
+        readonly property int touchTarget: Theme.space.extraExtraLarge
         readonly property int menuHeaderHeight: metrics.headerButtonSize + Theme.space.medium
         readonly property int buttonHeight: Theme.font.labelLargeLine + Theme.space.medium * 2
         readonly property int compactButtonHeight: Theme.font.labelLargeLine + Theme.space.small * 2
@@ -197,6 +198,10 @@ QtObject {
         readonly property int mediaControlHeight: metrics.buttonHeight + Theme.space.large * 2
         readonly property int textFieldHeight: metrics.listRowHeight
         readonly property int batteryGaugeHeight: metrics.controlRowHeight * 3
+
+        readonly property int keyboardKeyHeight: metrics.touchTarget
+        readonly property int keyboardGap: Theme.space.extraSmall
+        readonly property int keyboardMaximumWidth: metrics.touchTarget * 24
 
         readonly property int switchWidth: metrics.switchHeight + Theme.font.bodyMediumLine
         readonly property int switchHeight: metrics.headerButtonSize

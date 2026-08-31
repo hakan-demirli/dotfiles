@@ -36,38 +36,12 @@ tooltip {
 #custom-refresh-rate,
 #custom-screen-record,
 #custom-power,
-#custom-osk,
 #memory,
 #tray {
   background: alpha(@surface-container-high, 0.8);
   border-radius: {{radius-small}}px;
   padding: 1px;
   margin-right: 1px;
-}
-
-#custom-osk {
-  padding: {{space-small}}px 0;
-  margin-top: 2px;
-  margin-bottom: {{space-extra-small}}px;
-  font-size: {{text-headline-small}}px;
-}
-
-#custom-osk.osk-on {
-  color: @success;
-}
-
-#custom-osk.osk-off {
-  color: @on-surface;
-}
-
-#custom-osk.osk-hidden {
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  min-width: 0;
-  min-height: 0;
-  border: 0;
-  font-size: 0;
 }
 
 #tray {
