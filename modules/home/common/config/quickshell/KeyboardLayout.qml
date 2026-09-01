@@ -332,9 +332,13 @@ QtObject {
         return key.shifted !== undefined;
     }
 
+    function baseOf(key) {
+        return key.base === undefined ? "" : key.base;
+    }
+
     function shiftedOf(key) {
         if (key.shifted !== undefined)
             return key.shifted;
-        return key.base === undefined ? "" : key.base.toUpperCase();
+        return KeyboardLayout.baseOf(key).toUpperCase();
     }
 }

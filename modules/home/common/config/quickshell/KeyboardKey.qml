@@ -15,7 +15,7 @@ Rectangle {
     readonly property string caption: {
         if (root.kind !== KeyboardLayout.Kind.Character)
             return root.symbol ? root.key.icon : root.key.label;
-        return KeyboardService.upper ? KeyboardLayout.shiftedOf(root.key) : root.key.base;
+        return KeyboardService.upper ? KeyboardLayout.shiftedOf(root.key) : KeyboardLayout.baseOf(root.key);
     }
 
     implicitHeight: Theme.metrics.keyboardKeyHeight
@@ -51,7 +51,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Theme.space.extraSmall
         anchors.horizontalCenter: parent.horizontalCenter
-        text: root.key.base
+        text: KeyboardLayout.baseOf(root.key)
         color: KeyboardService.shifted ? ShellPalette.foregroundMuted : ShellPalette.foreground
         font.family: Theme.font.plain
         font.pixelSize: Theme.font.bodyMediumSize
