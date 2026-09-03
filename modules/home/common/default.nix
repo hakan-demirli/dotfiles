@@ -68,6 +68,7 @@ let
     "wgetrc"
     "wofi"
     "xdg-desktop-portal-termfilechooser"
+    "xdg-terminals.list"
     "xilinx"
     "xremap"
     "yazi"

@@ -155,6 +155,7 @@ rec {
       wl-clipboard
       wlr-randr
       wttrbar
+      xdg-terminal-exec
       xremap
       xwayland-satellite
       (pickNur "youtube_sync")
