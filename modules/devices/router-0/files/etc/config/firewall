@@ -1,21 +1,11 @@
-# Declarative firewall configuration for router-0.
-#
-# Standard OpenWrt defaults plus 'wwan' (wifi STA uplink) in the wan zone
-# so it's NAT'd and ingress-rejected like the wired wan.
-#
-# The 'tailscale' zone trusts input: peers are authenticated by headscale and
-# gated by the generated ACL, the same way NixOS fleet hosts trust tailscale0.
-# Its forward stays REJECT because this router advertises no subnet routes.
-
 config defaults
 	option syn_flood '1'
 	option input 'REJECT'
 	option output 'ACCEPT'
 	option forward 'REJECT'
-	# Software flow offload (nftables flowtable).
+
 	option flow_offloading '1'
-	# Hardware flow offload via MediaTek PPE/WED engine.
-	# Cuts CPU usage + thermals on sustained traffic.
+
 	option flow_offloading_hw '1'
 
 config zone
@@ -27,8 +17,6 @@ config zone
 
 config zone
 	option name 'wan'
-	list network 'wan'
-	list network 'wan6'
 	list network 'wwan'
 	option input 'REJECT'
 	option output 'ACCEPT'
@@ -46,8 +34,6 @@ config zone
 config forwarding
 	option src 'lan'
 	option dest 'wan'
-
-# --- Allowed inbound from wan (matches OpenWrt defaults) -------------------
 
 config rule
 	option name 'Allow-DHCP-Renew'

@@ -1,4 +1,3 @@
-# shellcheck shell=bash
 set -euo pipefail
 
 umask 077
@@ -255,8 +254,13 @@ for s in /etc/init.d/router-*; do
 done
 
 if [ -f /etc/config/travelmate ]; then
-  /etc/init.d/travelmate enable 2>/dev/null || true
-  /etc/init.d/travelmate restart 2>/dev/null || true
+  if [ "$(uci -q get travelmate.global.trm_enabled)" = "1" ]; then
+    /etc/init.d/travelmate enable 2>/dev/null || true
+    /etc/init.d/travelmate restart 2>/dev/null || true
+  else
+    /etc/init.d/travelmate stop 2>/dev/null || true
+    /etc/init.d/travelmate disable 2>/dev/null || true
+  fi
 fi
 
 i=0

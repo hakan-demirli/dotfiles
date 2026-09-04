@@ -1,0 +1,30 @@
+#!/bin/sh /etc/rc.common
+# shellcheck shell=sh
+# shellcheck disable=SC1091,SC2034,SC3043
+
+START=19
+STOP=01
+
+. /lib/router-ethernet.sh
+
+start() {
+  local desired actual
+  desired=$(router_ethernet_desired_mode)
+  actual=$(router_ethernet_mode)
+
+  [ "$desired" = "$actual" ] && return 0
+
+  logger -t router-ethernet "reconciling ethernet mode: $actual -> $desired"
+
+  if ! router_ethernet_stage "$desired"; then
+    uci -q revert network
+    uci -q revert firewall
+    logger -t router-ethernet "could not stage $desired, leaving $actual in place"
+    return 1
+  fi
+  router_ethernet_commit
+}
+
+stop() {
+  return 0
+}

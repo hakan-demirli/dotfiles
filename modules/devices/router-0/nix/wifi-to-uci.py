@@ -27,7 +27,6 @@ def quote(s: object) -> str:
 
 
 def resolve(networks: dict) -> list[dict]:
-    """Select networks marked as uplinks, failing loudly on a malformed record."""
     resolved: list[dict] = []
     for network_id, network in networks.items():
         radio = network.get("uplink_radio")
@@ -56,18 +55,35 @@ def resolve(networks: dict) -> list[dict]:
         if not network.get("ssid"):
             raise SystemExit(f"wifi-to-uci: uplink {network_id} is missing its ssid")
 
+        autostart = network.get("uplink_autostart", False)
+        if not isinstance(autostart, bool):
+            raise SystemExit(
+                f"wifi-to-uci: uplink {network_id} has non-boolean uplink_autostart"
+            )
+        radios = RADIO_EXPANSION[radio]
+        if autostart and len(radios) != 1:
+            raise SystemExit(
+                f"wifi-to-uci: autostart uplink {network_id} must select one radio"
+            )
+
         resolved.append(
             {
                 "id": network_id,
                 "ssid": network["ssid"],
                 "auth": auth,
                 "network": network,
-                "radios": RADIO_EXPANSION[radio],
+                "radios": radios,
                 "priority": int(network.get("uplink_priority", 50)),
+                "autostart": autostart,
             }
         )
 
     resolved.sort(key=lambda entry: (-entry["priority"], entry["ssid"]))
+    autostart = [entry for entry in resolved if entry["autostart"]]
+    if len(autostart) != 1:
+        raise SystemExit(
+            f"wifi-to-uci: expected exactly one autostart uplink, found {len(autostart)}"
+        )
     return resolved
 
 
@@ -101,7 +117,7 @@ def emit_wireless(entry: dict, radio: str, section: str) -> list[str]:
     elif auth == "open":
         out.append("\toption encryption 'none'")
 
-    out.append("\toption disabled '1'")
+    out.append(f"\toption disabled {quote(0 if entry['autostart'] else 1)}")
     return out
 
 
