@@ -1,0 +1,55 @@
+#!/bin/sh
+# shellcheck disable=SC1091
+
+. /lib/router-captive.sh
+
+json_string() {
+  [ -n "$1" ] || {
+    printf 'null'
+    return
+  }
+  printf '"%s"' "$(printf '%s' "$1" | tr -d '\000-\037' | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
+}
+
+json_bool() {
+  if "$@" > /dev/null 2>&1; then printf 'true'; else printf 'false'; fi
+}
+
+bypass_timeout=$(router_captive_cfg_int bypass_timeout 1800)
+enabled=$(router_captive_cfg enabled 1)
+
+state=$(router_captive_state) || state=
+url=$(router_captive_state_url) || url=
+age=$(router_captive_state_age) || age=
+
+portal_host=
+if [ "$state" = "portal" ] && [ -n "$url" ]; then
+  portal_host=$(router_captive_host_from_url "$url")
+fi
+
+started=$(router_captive_bypass_started)
+remaining=
+if [ -n "$started" ]; then
+
+  remaining=$((started + bypass_timeout - $(date +%s)))
+  [ "$remaining" -lt 0 ] && remaining=0
+fi
+
+printf '{"enabled":%s,"state":%s,"age":%s,"portal_url":%s,"portal_host":%s,"rebind_protection":%s,"bypass":{"active":%s,"remaining":%s,"domains":[' \
+  "$([ "$enabled" = "0" ] && printf false || printf true)" \
+  "$(json_string "$state")" \
+  "${age:-null}" \
+  "$(json_string "$url")" \
+  "$(json_string "$portal_host")" \
+  "$(json_bool router_captive_rebind_protected)" \
+  "$(json_bool router_captive_bypass_active)" \
+  "${remaining:-null}"
+
+separator=
+router_captive_bypass_domains | while IFS= read -r domain; do
+  [ -n "$domain" ] || continue
+  printf '%s%s' "$separator" "$(json_string "$domain")"
+  separator=,
+done
+
+printf ']}}\n'

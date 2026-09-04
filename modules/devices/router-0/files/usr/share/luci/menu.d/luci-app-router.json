@@ -3,19 +3,8 @@
     "title": "Router",
     "order": 5,
     "action": {
-      "type": "firstchild"
-    },
-    "depends": {
-      "acl": ["luci-app-router"]
-    }
-  },
-
-  "admin/router/hardware": {
-    "title": "Hardware",
-    "order": 1,
-    "action": {
       "type": "view",
-      "path": "router/hardware"
+      "path": "router/panel"
     },
     "depends": {
       "acl": ["luci-app-router"]

@@ -1,0 +1,75 @@
+#!/bin/sh
+# shellcheck disable=SC1091
+
+. /lib/router-captive.sh
+
+LOG_TAG=router-captive
+COOLDOWN=/var/run/router-captive.cooldown
+
+rm -f "$COOLDOWN"
+if router_captive_bypass_active; then
+  logger -t "$LOG_TAG" "startup: clearing stale dns bypass"
+  router_captive_restore
+fi
+
+while :; do
+  enabled=$(router_captive_cfg enabled 1)
+  interval=$(router_captive_cfg_int check_interval 30)
+  probe_url=$(router_captive_cfg probe_url 'http://connectivitycheck.gstatic.com/generate_204')
+  probe_timeout=$(router_captive_cfg_int probe_timeout 8)
+  bypass_timeout=$(router_captive_cfg_int bypass_timeout 1800)
+
+  sleep "$interval"
+
+  if [ "$enabled" = "0" ]; then
+    if router_captive_bypass_active; then
+      logger -t "$LOG_TAG" "disabled via uci, restoring dns rebind protection"
+      router_captive_restore
+    fi
+    continue
+  fi
+
+  probe=$(router_captive_probe "$probe_url" "$probe_timeout")
+  state=${probe%% *}
+  url=${probe#* }
+  router_captive_publish_state "$state" "$url"
+
+  case $state in
+    online)
+      rm -f "$COOLDOWN"
+      if router_captive_bypass_active; then
+        logger -t "$LOG_TAG" "uplink reachable, restoring dns rebind protection"
+        router_captive_restore
+      fi
+      ;;
+
+    offline)
+      rm -f "$COOLDOWN"
+      ;;
+
+    portal)
+      started=$(router_captive_bypass_started)
+      if [ -n "$started" ] && [ "$(($(date +%s) - started))" -ge "$bypass_timeout" ]; then
+        logger -t "$LOG_TAG" "bypass exceeded ${bypass_timeout}s, restoring dns rebind protection"
+        router_captive_restore
+        : > "$COOLDOWN"
+        continue
+      fi
+
+      [ -e "$COOLDOWN" ] && continue
+
+      host=$(router_captive_host_from_url "$url")
+      if [ -z "$host" ]; then
+        logger -t "$LOG_TAG" "portal detected but no host in '$url'"
+        continue
+      fi
+      if router_captive_is_ipv4 "$host"; then
+        logger -t "$LOG_TAG" "portal at $host is an address, no dns bypass needed"
+        continue
+      fi
+      if router_captive_bypass "$host"; then
+        logger -t "$LOG_TAG" "portal at $host, allowlisted against dns rebind protection"
+      fi
+      ;;
+  esac
+done

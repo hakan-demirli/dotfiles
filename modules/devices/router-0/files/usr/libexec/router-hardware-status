@@ -1,0 +1,72 @@
+#!/bin/sh
+
+find_hwmon() {
+	wanted="$1"
+	for directory in /sys/class/hwmon/hwmon*; do
+		[ -r "$directory/name" ] || continue
+		IFS= read -r name < "$directory/name" || continue
+		if [ "$name" = "$wanted" ]; then
+			printf '%s' "$directory"
+			return 0
+		fi
+	done
+	return 1
+}
+
+read_number() {
+	path="$1"
+	value=""
+	if [ -n "$path" ] && [ -r "$path" ]; then
+		IFS= read -r value < "$path" || value=""
+	fi
+
+	case "$value" in
+	-*) digits="${value#-}" ;;
+	*) digits="$value" ;;
+	esac
+	case "$digits" in
+	"" | *[!0-9]*) printf 'null' ;;
+	*) printf '%s' "$value" ;;
+	esac
+}
+
+cpu="$(find_hwmon cpu_thermal || true)"
+phy="$(find_hwmon mdio_bus:07 || true)"
+fan="$(find_hwmon pwmfan || true)"
+w2g="$(find_hwmon mt7996_phy0.0 || true)"
+w5g="$(find_hwmon mt7996_phy0.1 || true)"
+w6g="$(find_hwmon mt7996_phy0.2 || true)"
+
+printf '{"sensors":{"cpu":{"temp":'
+read_number "${cpu:+$cpu/temp1_input}"
+printf ',"throttle":null,"crit":null},"phy":{"temp":'
+read_number "${phy:+$phy/temp1_input}"
+printf ',"throttle":null,"crit":null},"w2g":{"temp":'
+read_number "${w2g:+$w2g/temp1_input}"
+printf ',"throttle":'
+read_number "${w2g:+$w2g/throttle1}"
+printf ',"crit":'
+read_number "${w2g:+$w2g/temp1_crit}"
+printf '},"w5g":{"temp":'
+read_number "${w5g:+$w5g/temp1_input}"
+printf ',"throttle":'
+read_number "${w5g:+$w5g/throttle1}"
+printf ',"crit":'
+read_number "${w5g:+$w5g/temp1_crit}"
+printf '},"w6g":{"temp":'
+read_number "${w6g:+$w6g/temp1_input}"
+printf ',"throttle":'
+read_number "${w6g:+$w6g/throttle1}"
+printf ',"crit":'
+read_number "${w6g:+$w6g/temp1_crit}"
+printf '}},"fan":{"rpm":'
+read_number "${fan:+$fan/fan1_input}"
+printf ',"pwm":'
+read_number "${fan:+$fan/pwm1}"
+printf ',"enable":'
+read_number "${fan:+$fan/pwm1_enable}"
+if [ -e /var/run/router-fan.override ]; then
+	printf ',"override":true}}\n'
+else
+	printf ',"override":false}}\n'
+fi

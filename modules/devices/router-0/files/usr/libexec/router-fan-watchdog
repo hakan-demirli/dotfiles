@@ -1,30 +1,13 @@
 #!/bin/sh
 # shellcheck disable=SC1091
-# router fan safety watchdog. Started by /etc/init.d/router-fan via procd.
-#
-# Polls hwmon temps every <router.fan.safety_interval> seconds. When fan mode
-# is 'quiet' or 'manual' and any monitored temp reaches >= router.fan.safety_temp
-# (millicelsius), override pwm1_enable to 2 (kernel auto) and drop a marker
-# file at /var/run/router-fan.override. The init.d script reads UCI. The
-# watchdog re-reads it each cycle so live mode changes from LuCI take effect
-# without a service restart.
-#
-# Suppressed lints:
-#   SC1091: /lib/router-fan-modes.sh lives on the router, not in the repo
 
 . /lib/router-fan-modes.sh
 
 OVERRIDE_FLAG=/var/run/router-fan.override
 
-TEMP_PATHS="/sys/class/thermal/thermal_zone0/temp \
-/sys/class/hwmon/hwmon1/temp1_input \
-/sys/class/hwmon/hwmon3/temp1_input \
-/sys/class/hwmon/hwmon4/temp1_input \
-/sys/class/hwmon/hwmon5/temp1_input"
-
 max_temp() {
 	max=0
-	for p in $TEMP_PATHS; do
+	for p in /sys/class/thermal/thermal_zone*/temp /sys/class/hwmon/hwmon*/temp*_input; do
 		[ -r "$p" ] || continue
 		t=$(cat "$p" 2>/dev/null)
 		[ -z "$t" ] && continue
@@ -47,10 +30,8 @@ while :; do
 
 	sleep "$interval"
 
-	# 0 disables the watchdog entirely.
 	[ "$safety_temp" = "0" ] && continue
 
-	# Safe modes - drop any override and let the user's choice stand.
 	if [ "$mode" = "auto" ] || [ "$mode" = "aggressive" ]; then
 		if [ -e "$OVERRIDE_FLAG" ]; then
 			router_fan_apply_mode "$mode" "$manual_pwm"
@@ -64,7 +45,7 @@ while :; do
 	if [ "$tmax" -ge "$safety_temp" ] 2>/dev/null; then
 		if [ ! -e "$OVERRIDE_FLAG" ]; then
 			logger -t router-fan "watchdog: temp ${tmax}mC >= ${safety_temp}mC. Overriding to auto (user mode=$mode)"
-			echo 2 > "$R01_PWM_DIR/pwm1_enable" 2>/dev/null
+			router_fan_apply_mode auto "$manual_pwm"
 			touch "$OVERRIDE_FLAG"
 		fi
 	else
