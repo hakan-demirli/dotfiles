@@ -1,48 +1,26 @@
 {
   "luci-app-router": {
-    "description": "Grant access to the router hardware page (read sensors, control fan)",
+    "description": "Grant access to the router panel",
     "read": {
+      "cgi-io": ["exec"],
       "file": {
-        "/sys/class/thermal/thermal_zone0/temp": ["read"],
-        "/sys/class/thermal/cooling_device0/cur_state": ["read"],
-        "/sys/class/thermal/cooling_device0/max_state": ["read"],
-        "/sys/class/hwmon/hwmon0/name": ["read"],
-        "/sys/class/hwmon/hwmon0/temp1_input": ["read"],
-        "/sys/class/hwmon/hwmon1/name": ["read"],
-        "/sys/class/hwmon/hwmon1/temp1_input": ["read"],
-        "/sys/class/hwmon/hwmon2/name": ["read"],
-        "/sys/class/hwmon/hwmon2/fan1_input": ["read"],
-        "/sys/class/hwmon/hwmon2/pwm1": ["read"],
-        "/sys/class/hwmon/hwmon2/pwm1_enable": ["read"],
-        "/sys/class/hwmon/hwmon3/name": ["read"],
-        "/sys/class/hwmon/hwmon3/temp1_input": ["read"],
-        "/sys/class/hwmon/hwmon3/temp1_max": ["read"],
-        "/sys/class/hwmon/hwmon3/temp1_crit": ["read"],
-        "/sys/class/hwmon/hwmon3/throttle1": ["read"],
-        "/sys/class/hwmon/hwmon4/name": ["read"],
-        "/sys/class/hwmon/hwmon4/temp1_input": ["read"],
-        "/sys/class/hwmon/hwmon4/temp1_max": ["read"],
-        "/sys/class/hwmon/hwmon4/temp1_crit": ["read"],
-        "/sys/class/hwmon/hwmon4/throttle1": ["read"],
-        "/sys/class/hwmon/hwmon5/name": ["read"],
-        "/sys/class/hwmon/hwmon5/temp1_input": ["read"],
-        "/sys/class/hwmon/hwmon5/temp1_max": ["read"],
-        "/sys/class/hwmon/hwmon5/temp1_crit": ["read"],
-        "/sys/class/hwmon/hwmon5/throttle1": ["read"],
-        "/var/run/router-fan.override": ["read"]
+        "/usr/libexec/router-hardware-status": ["exec"],
+        "/usr/libexec/router-captive-status": ["exec"],
+        "/usr/libexec/router-ethernet-status": ["exec"]
       },
       "ubus": {
-        "file": ["read", "stat"]
+        "file": ["exec"]
       },
       "uci": ["router"]
     },
     "write": {
+      "cgi-io": ["exec"],
       "file": {
-        "/sys/class/hwmon/hwmon2/pwm1": ["write"],
-        "/sys/class/hwmon/hwmon2/pwm1_enable": ["write"]
+        "/usr/libexec/router-ethernet-apply dual-lan": ["exec"],
+        "/usr/libexec/router-ethernet-apply wired-wan": ["exec"]
       },
       "ubus": {
-        "file": ["write"],
+        "file": ["exec"],
         "uci": [
           "set",
           "delete",

@@ -1,0 +1,34 @@
+#!/bin/sh
+# shellcheck disable=SC1091
+
+. /lib/router-ethernet.sh
+
+LOG_TAG=router-ethernet
+
+mode=$1
+case $mode in
+  dual-lan | wired-wan) ;;
+  *)
+    printf 'usage: router-ethernet-apply <dual-lan|wired-wan>\n' >&2
+    exit 2
+    ;;
+esac
+
+if ! router_ethernet_stage "$mode"; then
+  uci -q revert network
+  uci -q revert firewall
+  printf 'could not stage %s: br-lan device or wan zone missing\n' "$mode" >&2
+  exit 1
+fi
+
+uci -q set router.ethernet=router
+uci -q set "router.ethernet.mode=$mode"
+uci -q commit router
+router_ethernet_commit
+
+logger -t "$LOG_TAG" "applying ethernet mode $mode"
+
+/etc/init.d/network reload > /dev/null 2>&1
+/etc/init.d/firewall reload > /dev/null 2>&1
+
+printf '{"mode":"%s"}\n' "$(router_ethernet_mode)"

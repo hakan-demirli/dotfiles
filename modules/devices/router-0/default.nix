@@ -45,7 +45,7 @@ let
       export R0_DEFAULT_IP=${facts.labels.lan_ip}
       export R0_EXPECTED_REVISION=${openwrtSource.upstreamVersion}
     ''
-    + builtins.readFile ./nix/flash.sh;
+    + builtins.readFile ./nix/flash.bash;
   };
 
   config = pkgs.writeShellApplication {
@@ -67,7 +67,7 @@ let
       export R0_WIFI_TO_UCI=${./nix/wifi-to-uci.py}
       export R0_AUTHORIZED_KEYS=${authorizedKeys}
     ''
-    + builtins.readFile ./nix/config.sh;
+    + builtins.readFile ./nix/config.bash;
   };
 in
 {

@@ -104,7 +104,9 @@ pkgs.runCommand "router-0-config-overlay"
       install -Dm0755 "$f" "$out/root/etc/uci-defaults/$(basename "$f")"
     done
 
-    install -Dm0644 ${filesRoot}/lib/router-fan-modes.sh    $out/root/lib/router-fan-modes.sh
+    for f in ${filesRoot}/lib/router-*.sh; do
+      install -Dm0644 "$f" "$out/root/lib/$(basename "$f")"
+    done
 
     install -Dm0755 ${router-ui}/bin/router-ui                 $out/root/usr/bin/router-ui
     install -Dm0755 ${filesRoot}/usr/bin/router-ui-set-pin  $out/root/usr/bin/router-ui-set-pin

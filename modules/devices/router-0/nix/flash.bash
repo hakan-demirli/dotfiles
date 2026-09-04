@@ -1,4 +1,3 @@
-# shellcheck shell=bash
 set -euo pipefail
 
 usage() {

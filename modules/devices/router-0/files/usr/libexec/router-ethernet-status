@@ -1,0 +1,56 @@
+#!/bin/sh
+# shellcheck disable=SC1091
+
+. /lib/router-ethernet.sh
+
+json_string() {
+  [ -n "$1" ] || {
+    printf 'null'
+    return
+  }
+  printf '"%s"' "$(printf '%s' "$1" | tr -d '\000-\037' | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
+}
+
+port_carrier() (
+  read -r operstate < "/sys/class/net/$1/operstate" 2> /dev/null || {
+    printf 'null'
+    return
+  }
+  [ "$operstate" = "down" ] && {
+    printf 'false'
+    return
+  }
+  read -r carrier < "/sys/class/net/$1/carrier" 2> /dev/null || {
+    printf 'null'
+    return
+  }
+  case $carrier in
+    1) printf 'true' ;;
+    0) printf 'false' ;;
+    *) printf 'null' ;;
+  esac
+)
+
+mode=$(router_ethernet_mode)
+desired=$(router_ethernet_desired_mode)
+
+role_of_role_port=lan
+[ "$mode" = "wired-wan" ] && role_of_role_port=wan
+
+wan_up=false
+wan_address=
+if [ "$mode" = "wired-wan" ]; then
+  [ "$(ifstatus wan 2> /dev/null | jsonfilter -e '@.up' 2> /dev/null)" = "true" ] && wan_up=true
+  wan_address=$(ifstatus wan 2> /dev/null | jsonfilter -e '@["ipv4-address"][0].address' 2> /dev/null)
+fi
+
+printf '{"mode":%s,"desired":%s,"ports":{"%s":{"role":%s,"carrier":%s},"%s":{"role":"lan","carrier":%s}},"wan":{"up":%s,"address":%s}}\n' \
+  "$(json_string "$mode")" \
+  "$(json_string "$desired")" \
+  "$ROUTER_ETHERNET_ROLE_PORT" \
+  "$(json_string "$role_of_role_port")" \
+  "$(port_carrier "$ROUTER_ETHERNET_ROLE_PORT")" \
+  "$ROUTER_ETHERNET_LAN_PORT" \
+  "$(port_carrier "$ROUTER_ETHERNET_LAN_PORT")" \
+  "$wan_up" \
+  "$(json_string "$wan_address")"
