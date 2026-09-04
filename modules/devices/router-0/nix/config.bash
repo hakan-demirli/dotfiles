@@ -191,7 +191,7 @@ fi
 on_router true 2> /dev/null || die "cannot reach root@$router_ip over ssh"
 
 current=$(on_router 'cat /etc/router-deploy/stamp 2>/dev/null' || true)
-if [[ $current == "$stamp" ]] && ((!force)); then
+if [[ $current == "$stamp" ]] && ((! force)); then
   log "device already matches this configuration; nothing to do"
   exit 0
 fi
