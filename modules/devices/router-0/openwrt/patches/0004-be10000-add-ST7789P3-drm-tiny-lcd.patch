@@ -76,8 +76,8 @@ index 321a81fe08..ea896a24e0 100644
 + *   DC       : pio 22, active-high
 + *   TE       : pio 9,  active-high (tearing-effect line for VSYNC sync)
 + *   Backlight: pwm-backlight (PWM ch2, declared above)
-+ * SPI clock: start conservative at 16 MHz. Stock runs 52 MHz, but we
-+ * ramp after bring-up verifies signal integrity.
++ * SPI clock: 52 MHz, matching the stock firmware configuration validated
++ * for this board and panel connection.
 + */
 +&spic_pins {
 +	mux {
@@ -96,7 +96,7 @@ index 321a81fe08..ea896a24e0 100644
 +	panel@0 {
 +		compatible = "sitronix,st7789p3";
 +		reg = <0>;
-+		spi-max-frequency = <16000000>;
++		spi-max-frequency = <52000000>;
 +		rotation = <0>;
 +		backlight = <&backlight>;
 +		reset-gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
@@ -218,7 +218,7 @@ index 0000000000..d060384828
 ++        panel@0 {
 ++            compatible = "sitronix,st7789p3";
 ++            reg = <0>;
-++            spi-max-frequency = <16000000>;
+++            spi-max-frequency = <52000000>;
 ++            dc-gpios = <&pio 22 GPIO_ACTIVE_HIGH>;
 ++            reset-gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 ++            backlight = <&backlight>;
