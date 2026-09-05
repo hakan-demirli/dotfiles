@@ -73,7 +73,14 @@ Item {
 
         displaced: Transition {
             NumberAnimation {
-                property: "y"
+                properties: "x,y"
+                duration: Theme.duration.medium1
+                easing.type: Easing.OutCubic
+            }
+
+            NumberAnimation {
+                property: "opacity"
+                to: 1
                 duration: Theme.duration.medium1
                 easing.type: Easing.OutCubic
             }
