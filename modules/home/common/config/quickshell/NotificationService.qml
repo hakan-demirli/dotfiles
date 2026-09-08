@@ -10,12 +10,14 @@ Singleton {
     readonly property int lowTimeout: 5000
     readonly property int normalTimeout: 10000
     readonly property int criticalTimeout: 0
+    readonly property int popupBatchInterval: 500
 
     readonly property var codePattern: /\b(\d{4,8})\b/
 
     property bool doNotDisturb: false
 
     property var popupIds: []
+    property var pendingPopupIds: []
 
     property var arrivals: ({})
 
@@ -102,13 +104,28 @@ Singleton {
         return notification.actions.filter(action => action.identifier !== "default");
     }
 
+    function flushPopups() {
+        const activeIds = root.history.map(notification => notification.id);
+        const pendingIds = root.pendingPopupIds.filter(id => activeIds.includes(id) && !root.popupIds.includes(id));
+        root.pendingPopupIds = [];
+        if (pendingIds.length > 0)
+            root.popupIds = [...pendingIds, ...root.popupIds];
+    }
+
     function show(notification) {
-        if (!root.popupIds.includes(notification.id))
-            root.popupIds = [notification.id, ...root.popupIds];
+        if (root.popupIds.includes(notification.id) || root.pendingPopupIds.includes(notification.id))
+            return;
+
+        root.pendingPopupIds = [notification.id, ...root.pendingPopupIds];
+        if (!popupBatchTimer.running)
+            popupBatchTimer.start();
     }
 
     function hide(notification) {
+        root.pendingPopupIds = root.pendingPopupIds.filter(id => id !== notification.id);
         root.popupIds = root.popupIds.filter(id => id !== notification.id);
+        if (root.pendingPopupIds.length === 0)
+            popupBatchTimer.stop();
     }
 
     function retire(notification) {
@@ -133,6 +150,8 @@ Singleton {
     }
 
     function clear() {
+        popupBatchTimer.stop();
+        root.pendingPopupIds = [];
         for (const notification of root.history)
             notification.dismiss();
         root.popupIds = [];
@@ -140,8 +159,18 @@ Singleton {
 
     function toggleDoNotDisturb() {
         root.doNotDisturb = !root.doNotDisturb;
-        if (root.doNotDisturb)
+        if (root.doNotDisturb) {
+            popupBatchTimer.stop();
+            root.pendingPopupIds = [];
             root.popupIds = [];
+        }
+    }
+
+    Timer {
+        id: popupBatchTimer
+
+        interval: root.popupBatchInterval
+        onTriggered: root.flushPopups()
     }
 
     NotificationServer {

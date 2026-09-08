@@ -154,9 +154,13 @@ ShellRoot {
         margins.right: Theme.space.small
 
         implicitWidth: toasts.implicitWidth
-        implicitHeight: toasts.implicitHeight
+        implicitHeight: toastWindow.screen.height - Theme.space.small
 
         color: "transparent"
+
+        mask: Region {
+            item: toasts
+        }
 
         aboveWindows: true
         exclusionMode: ExclusionMode.Ignore
@@ -167,7 +171,10 @@ ShellRoot {
         NotificationToasts {
             id: toasts
 
-            anchors.fill: parent
+            anchors.top: parent.top
+            anchors.right: parent.right
+            width: implicitWidth
+            height: implicitHeight
         }
     }
 
