@@ -7,7 +7,7 @@ Item {
     id: root
 
     implicitWidth: Theme.metrics.menuWidth
-    implicitHeight: stack.contentHeight
+    implicitHeight: stack.implicitHeight
 
     SystemClock {
         id: clock
@@ -18,71 +18,37 @@ Item {
     ScriptModel {
         id: popupModel
 
+        objectProp: "id"
         values: NotificationService.popups
     }
 
-    ListView {
+    Column {
         id: stack
 
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         spacing: Theme.space.small
-        interactive: false
-        model: popupModel
 
-        delegate: NotificationPopup {
-            required property var modelData
-
-            width: stack.width
-            notification: modelData
-            now: clock.date
-        }
-
-        add: Transition {
-            NumberAnimation {
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: Theme.duration.medium2
-                easing.type: Easing.OutCubic
-            }
+        move: Transition {
+            id: moveTransition
 
             NumberAnimation {
-                property: "x"
-                from: stack.width
-                to: 0
-                duration: Theme.duration.medium2
+                property: "y"
+                duration: moveTransition.ViewTransition.targetItems.length === 0 ? Theme.duration.medium2 : 0
                 easing.type: Easing.OutCubic
             }
         }
 
-        remove: Transition {
-            NumberAnimation {
-                property: "opacity"
-                to: 0
-                duration: Theme.duration.short4
-                easing.type: Easing.InCubic
-            }
+        Repeater {
+            model: popupModel
 
-            NumberAnimation {
-                property: "x"
-                to: stack.width
-                duration: Theme.duration.short4
-                easing.type: Easing.InCubic
-            }
-        }
+            delegate: NotificationPopup {
+                required property var modelData
 
-        displaced: Transition {
-            NumberAnimation {
-                properties: "x,y"
-                duration: Theme.duration.medium1
-                easing.type: Easing.OutCubic
-            }
-
-            NumberAnimation {
-                property: "opacity"
-                to: 1
-                duration: Theme.duration.medium1
-                easing.type: Easing.OutCubic
+                width: stack.width
+                notification: modelData
+                now: clock.date
             }
         }
     }
