@@ -58,8 +58,22 @@ repo="$(realpath -m "$repo")"
 [[ $EUID -ne 0 ]] || die "run this command as the target user, not root"
 
 flake="path:$repo"
-configured_host="$(nix eval --raw "$flake#nixosConfigurations.$host.config.networking.hostName")"
+configured_host="$(
+  nix eval --raw "$flake#nixosConfigurations.$host.config.networking.hostName"
+)" || die "cannot evaluate NixOS configuration '$host'"
 [[ $configured_host == "$host" ]] || die "NixOS configuration does not match host: $host"
+fleet_secrets="$({
+  DOTFILES_FLAKE="$flake" DOTFILES_HOST="$host" nix eval --json --impure --expr '
+    let
+      flake = builtins.getFlake (builtins.getEnv "DOTFILES_FLAKE");
+      host = builtins.getEnv "DOTFILES_HOST";
+      secrets = (builtins.getAttr host flake.nixosConfigurations).config.sops.secrets;
+    in
+    builtins.hasAttr "ssh/id_ed25519_proton" secrets
+    && builtins.hasAttr "munge-key" secrets
+  '
+} 2> /dev/null)" || die "cannot evaluate fleet-secret selection for '$host'"
+[[ $fleet_secrets == true ]] || die "NixOS configuration '$host' does not select personal fleet secrets"
 sudo_command=/run/wrappers/bin/sudo
 [[ -x $sudo_command ]] || die "NixOS sudo wrapper is missing: $sudo_command"
 
