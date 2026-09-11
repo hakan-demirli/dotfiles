@@ -19,7 +19,12 @@ let
     let
       deploymentRoles = inventory.hosts.${hostId}.deployment_roles;
     in
-    if lib.elem "laptop" deploymentRoles then
+    if
+      lib.any (role: lib.elem role deploymentRoles) [
+        "laptop"
+        "shared-server"
+      ]
+    then
       "owner"
     else if
       lib.any (role: lib.elem role deploymentRoles) [
@@ -30,7 +35,20 @@ let
       "root"
     else
       throw "bootstrap-secrets: no password account policy for ${hostId}";
+  passwordSecretAccountFor =
+    hostId:
+    if passwordAccountFor hostId == "root" then "root" else inventory.hosts.${hostId}.ownership.owner;
   everyHost = predicate: lib.all (hostId: predicate hostId (configFor hostId)) hostIds;
+  fleetSecretHostIds = lib.filter (
+    hostId: (configFor hostId).sops.secrets ? "ssh/id_ed25519_proton"
+  ) hostIds;
+  everyFleetSecretHost =
+    predicate: lib.all (hostId: predicate hostId (configFor hostId)) fleetSecretHostIds;
+  tailscaleBootstrapHostIds = lib.filter (
+    hostId: (configFor hostId).systemd.services ? tailscale-bootstrap-secret
+  ) hostIds;
+  everyTailscaleBootstrapHost =
+    predicate: lib.all (hostId: predicate hostId (configFor hostId)) tailscaleBootstrapHostIds;
 
   passwordRecipient = lib.removeSuffix "\n" (
     builtins.readFile (self + /secrets/bootstrap/password.age.pub)
@@ -70,17 +88,20 @@ let
           && root.hashedPasswordFile == "/run/bootstrap-secrets/password-hash"
       )
     );
+    password-envelope-covers-every-host = lib.all (
+      hostId: lib.hasInfix "    ${hostId}:\n        ${passwordSecretAccountFor hostId}:\n" passwordSops
+    ) hostIds;
     password-runs-before-users = everyHost (
       _hostId: config: lib.elem "bootstrapPassword" config.system.activationScripts.users.deps
     );
-    tailscale-is-independent = everyHost (
+    tailscale-is-independent = everyTailscaleBootstrapHost (
       _hostId: config:
       !config.services.tailscale.useAuthKey
       && config.services.tailscale.authKeyFile == "/run/tailscale-bootstrap/preauth-key"
       && !(builtins.hasAttr "tailscale-key" config.sops.secrets)
       && lib.elem "tailscale-bootstrap-secret.service" config.systemd.services.tailscaled-autoconnect.requires
     );
-    tailscale-key-stays-file-backed = everyHost (
+    tailscale-key-stays-file-backed = everyTailscaleBootstrapHost (
       _hostId: config:
       let
         service = config.systemd.services.tailscaled-autoconnect;
@@ -96,7 +117,7 @@ let
     );
     munge-is-system-scoped =
       (inventory.clusters.user-0-fleet.secret_paths or { }) == { }
-      && everyHost (
+      && everyFleetSecretHost (
         _hostId: config:
         let
           munge = config.sops.secrets."munge-key";
@@ -105,6 +126,12 @@ let
         && munge.key == "munge-key"
         && munge.path == "/etc/munge/munge.key"
       );
+    shared-server-excludes-personal-system-secrets =
+      !(configFor "shared-server-1").sops.secrets ? "ssh/id_ed25519_proton"
+      && !(configFor "shared-server-1").sops.secrets ? "munge-key";
+    shared-server-keeps-existing-tailnet-identity =
+      (configFor "shared-server-1").services.tailscale.authKeyFile == null
+      && !((configFor "shared-server-1").systemd.services ? tailscale-bootstrap-secret);
     ssh-is-key-only = everyHost (
       _hostId: config:
       config.services.openssh.settings.PasswordAuthentication == false
