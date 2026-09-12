@@ -13,7 +13,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("blueman-applet")
   hl.exec_cmd("qs -n")
   hl.exec_cmd("awww-daemon")
-  hl.exec_cmd("gtk_applet_script_menu")
+  hl.exec_cmd("gtk-applet-script-menu")
   hl.exec_cmd("sh -c 'mkdir -p ~/.local/state && exec auto_refresh >>~/.local/state/auto_refresh.log 2>&1'")
   hl.exec_cmd("battery_status.py collect")
 
