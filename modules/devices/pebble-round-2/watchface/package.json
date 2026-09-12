@@ -1,0 +1,22 @@
+{
+  "name": "orbit",
+  "author": "emre",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Orbit",
+    "uuid": "81bfdc52-d76e-40b6-ac99-07e6dc5b4373",
+    "sdkVersion": "3",
+    "enableMultiJS": false,
+    "targetPlatforms": ["gabbro"],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": []
+    }
+  }
+}

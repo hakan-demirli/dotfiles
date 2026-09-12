@@ -31,6 +31,17 @@ let
     variant = "prf";
     releaseBuild = false;
   };
+
+  appSdk = pkgs.callPackage ./nix/app-sdk.nix {
+    inherit pebbleosSource pebbleosSdk;
+    board = "${facts.labels.board}@${facts.labels.board_revision}";
+    inherit (facts.labels) platform;
+  };
+
+  orbit = pkgs.callPackage ./nix/watchface.nix {
+    inherit appSdk pebbleosSdk;
+    src = ./watchface;
+  };
 in
 {
   packages = {
@@ -38,8 +49,10 @@ in
       firmware
       firmware-release
       firmware-prf
-      pebbleosSdk
+      orbit
       ;
+    app-sdk = appSdk;
+    pebbleos-sdk = pebbleosSdk;
     pebbleos-source = pebbleosSource;
   };
 

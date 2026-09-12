@@ -29,7 +29,7 @@ let
     "git"
     "gnome3-keybind-backup"
     "gnome-extensions"
-    "gtk_indicator"
+    "gtk-indicator"
     "helix"
     "hypr"
     "input-remapper-2"
