@@ -158,9 +158,9 @@ rec {
       xdg-terminal-exec
       xremap
       xwayland-satellite
-      (pickNur "youtube_sync")
+      (pickNur "youtube-sync")
       (pickNur "riveroftime")
-      (pickNur "gtk_applet")
+      (pickNur "gtk-applet")
       (pickNur "nix-treemap")
       (pickNur "umu-fzf")
     ];
