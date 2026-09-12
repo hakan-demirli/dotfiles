@@ -24,6 +24,7 @@ in
     (import ../pkgs/nix/state_autocommit.nix { })
     (import ../pkgs/nix/ntfy-listener.nix { })
     (import ../pkgs/nix/github_backup.nix { })
+    ../pkgs/nix/cmf_headphoned.nix
     ../pkgs/nix/screen-record.nix
   ]
   ++ lib.optional ((facts.location.kind or null) == "laptop") ../pkgs/nix/low_battery_notify.nix;
