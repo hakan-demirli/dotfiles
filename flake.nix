@@ -9,6 +9,7 @@
     infra-lib.url = "github:hakan-demirli/infra-lib";
 
     nixpkgs.follows = "infra-lib/nixpkgs";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-parts.follows = "infra-lib/flake-parts";
     import-tree.follows = "infra-lib/import-tree";
     disko.follows = "infra-lib/disko";
