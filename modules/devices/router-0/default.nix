@@ -55,6 +55,7 @@ let
       pkgs.coreutils
       pkgs.gnutar
       pkgs.gzip
+      pkgs.openssl
       pkgs.openssh
       pkgs.python3
       pkgs.remarshal
