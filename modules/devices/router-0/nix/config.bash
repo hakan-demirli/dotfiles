@@ -136,6 +136,62 @@ target.write_text(target.read_text().replace("__LAN_WIFI_PASSWORD__", sys.argv[2
     | remarshal -if yaml -of json > "$stage/deploy.json" \
     || die "could not decrypt secrets/router-0/deploy.yaml"
 
+  root_password="$(
+    python3 -c '
+import json, sys
+value = json.load(open(sys.argv[1]))["authentication"]["root_password"]
+if not isinstance(value, str) or len(value) < 32 or "\n" in value:
+    raise SystemExit("root password must be a single line with at least 32 characters")
+sys.stdout.write(value)
+' "$stage/deploy.json"
+  )" || die "could not resolve the router root password"
+  printf '%s' "$root_password" | openssl passwd -6 -stdin > "$stage/root-password-hash"
+  unset root_password
+  root_password_hash="$(cat "$stage/root-password-hash")"
+  [[ $root_password_hash == \$6\$* ]] || die "could not hash the router root password"
+  unset root_password_hash
+  chmod 0600 "$stage/root-password-hash"
+
+  log "resolving the switch-0 quarantine rule"
+  switch_mac="$(
+    SOPS_AGE_KEY_FILE="$operator_key" sops \
+      --config "$repo/secrets/switch-0/.sops.yaml" \
+      --decrypt --extract '["switchMac"]' \
+      "$repo/secrets/switch-0/deploy.yaml"
+  )" || die "could not read switchMac from secrets/switch-0/deploy.yaml"
+  [[ $switch_mac =~ ^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$ ]] \
+    || die "switchMac is not a MAC address: $switch_mac"
+
+  python3 -c '
+import pathlib, sys
+target = pathlib.Path(sys.argv[1])
+target.write_text(target.read_text().replace("__SWITCH_0_MAC__", sys.argv[2]))
+' "$stage/root/etc/config/firewall" "$switch_mac"
+
+  python3 -c '
+import json
+import pathlib
+import re
+import sys
+
+deploy = json.load(open(sys.argv[1]))["iot"]
+password = deploy["wifi_password"]
+mac = deploy["devices"]["plug_0_mac"]
+if not isinstance(password, str) or len(password) < 32 or "\n" in password:
+    raise SystemExit("IoT Wi-Fi password must be a single line with at least 32 characters")
+if not isinstance(mac, str) or not re.fullmatch(r"(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}", mac):
+    raise SystemExit("plug_0_mac must be a MAC address")
+for filename, token, value in (
+    (sys.argv[2], "__IOT_WIFI_PASSWORD__", password),
+    (sys.argv[3], "__SHELLY_PLUG_0_MAC__", mac),
+):
+    target = pathlib.Path(filename)
+    text = target.read_text()
+    if text.count(token) != 1:
+        raise SystemExit(f"expected one {token} in {filename}")
+    target.write_text(text.replace(token, value))
+' "$stage/deploy.json" "$stage/root/etc/config/wireless" "$stage/root/etc/config/dhcp"
+
   install -m0600 "$R0_AUTHORIZED_KEYS" "$stage/root/etc/dropbear/authorized_keys"
 
   if ((with_tailscale)); then
@@ -169,9 +225,11 @@ target.write_text(target.read_text().replace("__LAN_WIFI_PASSWORD__", sys.argv[2
   } >> "$secret_material"
 fi
 
-if grep -rlF '__LAN_WIFI_PASSWORD__' "$stage/root" > /dev/null 2>&1; then
-  die "unresolved __LAN_WIFI_PASSWORD__ token remains in the staged tree"
-fi
+for token in __IOT_WIFI_PASSWORD__ __LAN_WIFI_PASSWORD__ __SHELLY_PLUG_0_MAC__ __SWITCH_0_MAC__; do
+  if grep -rlF "$token" "$stage/root" > /dev/null 2>&1; then
+    die "unresolved $token token remains in the staged tree"
+  fi
+done
 
 (cd "$stage/root" && find . -type f -o -type l | LC_ALL=C sort | sed 's|^\./||') > "$stage/manifest"
 
@@ -201,6 +259,7 @@ on_router 'cat > /tmp/router-overlay.tar.gz' < "$stage/overlay.tar.gz"
 on_router 'cat > /tmp/router-manifest' < "$stage/manifest"
 
 if ((bootstrap == 0)); then
+  on_router 'umask 077; cat > /tmp/router-root-password-hash' < "$stage/root-password-hash"
   python3 -c '
 import json, sys
 d = json.load(open(sys.argv[1]))["router_ui"]
@@ -218,6 +277,20 @@ active_sta=$(uci show wireless 2>/dev/null \
   | sed -n "s/^wireless\.\(sta_[a-z0-9_]*\)\.disabled='0'$/\1/p" | head -1)
 
 tar -xzf /tmp/router-overlay.tar.gz -C /
+
+if [ -s /tmp/router-root-password-hash ]; then
+  root_password_hash=$(cat /tmp/router-root-password-hash)
+  awk -F: -v OFS=: -v hash="$root_password_hash" '
+    $1 == "root" { $2 = hash; found = 1 }
+    { print }
+    END { if (!found) exit 1 }
+  ' /etc/shadow > /tmp/router-shadow
+  chmod 0600 /tmp/router-shadow
+  chown root:root /tmp/router-shadow
+  mv /tmp/router-shadow /etc/shadow
+  unset root_password_hash
+  rm -f /tmp/router-root-password-hash
+fi
 
 if [ -f /etc/router-deploy/manifest ]; then
   while IFS= read -r path; do
@@ -238,7 +311,7 @@ fi
 printf '%s' "$STAMP" > /etc/router-deploy/stamp
 chmod 0600 /etc/router-deploy/stamp
 
-rm -f /tmp/router-overlay.tar.gz /tmp/router-manifest
+rm -f /tmp/router-overlay.tar.gz /tmp/router-manifest /tmp/router-root-password-hash
 
 if [ -x /sbin/reload_config ]; then
   /sbin/reload_config
@@ -249,9 +322,16 @@ fi
 
 for s in /etc/init.d/router-*; do
   [ -x "$s" ] || continue
+  [ "$s" = /etc/init.d/router-dns-telemetry ] && continue
   "$s" enable 2>/dev/null || true
   "$s" restart 2>/dev/null || true
 done
+
+if [ -x /etc/init.d/router-dns-telemetry ]; then
+  /etc/init.d/router-dns-telemetry enable
+  /etc/init.d/router-dns-telemetry restart
+  /etc/init.d/dnsmasq restart
+fi
 
 if [ -f /etc/config/travelmate ]; then
   if [ "$(uci -q get travelmate.global.trm_enabled)" = "1" ]; then

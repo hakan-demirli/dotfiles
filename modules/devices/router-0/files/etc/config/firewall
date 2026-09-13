@@ -16,6 +16,13 @@ config zone
 	option forward 'ACCEPT'
 
 config zone
+	option name 'iot'
+	list network 'iot'
+	option input 'REJECT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+
+config zone
 	option name 'wan'
 	list network 'wwan'
 	option input 'REJECT'
@@ -34,6 +41,55 @@ config zone
 config forwarding
 	option src 'lan'
 	option dest 'wan'
+
+config rule
+	option name 'Allow-IoT-DHCP'
+	option src 'iot'
+	option proto 'udp'
+	option src_port '68'
+	option dest_port '67'
+	option family 'ipv4'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-IoT-DNS'
+	option src 'iot'
+	option proto 'tcp udp'
+	option dest_port '53'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-IoT-NTP'
+	option src 'iot'
+	option proto 'udp'
+	option dest_port '123'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-Trusted-Shelly-Web'
+	option src 'lan'
+	option dest 'iot'
+	option dest_ip '192.168.70.2'
+	option proto 'tcp'
+	option dest_port '80 443'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Reject-IoT-Router'
+	option src 'iot'
+	option proto 'all'
+	option log '1'
+	option limit '10/minute'
+	option target 'REJECT'
+
+config rule
+	option name 'Reject-IoT-Forward'
+	option src 'iot'
+	option dest '*'
+	option proto 'all'
+	option log '1'
+	option limit '10/minute'
+	option target 'REJECT'
 
 config rule
 	option name 'Allow-DHCP-Renew'
