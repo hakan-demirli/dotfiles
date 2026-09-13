@@ -14,6 +14,13 @@
           current_boot_only = true;
         };
 
+        sources.router-syslog = {
+          type = "syslog";
+          address = "0.0.0.0:5514";
+          mode = "tcp";
+          max_length = 131072;
+        };
+
         transforms.label = {
           type = "remap";
           inputs = [ "journald" ];
@@ -39,9 +46,36 @@
           '';
         };
 
+        transforms.router-label = {
+          type = "remap";
+          inputs = [ "router-syslog" ];
+          source = ''
+            .observer = "router-0"
+            .host = "router-0"
+            .unit = to_string(.appname) ?? "openwrt"
+            .priority = to_string(.severity) ?? "info"
+
+            message = to_string(.message) ?? ""
+            dns, dns_err = parse_regex(message, r'^(?:[0-9]+ [^ ]+ )?query\[(?P<query_type>[^]]+)\] (?P<name>[^ ]+) from (?P<client>[^ ]+)$')
+            if dns_err == null {
+              .event_kind = "dns_query"
+              .dns = dns
+            }
+
+            lease, lease_err = parse_regex(message, r'^DHCPACK\((?P<interface>[^)]+)\) (?P<address>[^ ]+) (?P<mac>[^ ]+)(?: (?P<hostname>[^ ]+))?$')
+            if lease_err == null {
+              .event_kind = "dhcp_lease"
+              .lease = lease
+            }
+          '';
+        };
+
         sinks.victorialogs = {
           type = "http";
-          inputs = [ "label" ];
+          inputs = [
+            "label"
+            "router-label"
+          ];
           uri = "http://127.0.0.1:${toString config.services.cluster-victorialogs.listenPort}/insert/jsonline?_stream_fields=host,unit&_msg_field=message&_time_field=timestamp";
           method = "post";
           encoding.codec = "json";
@@ -67,7 +101,7 @@
 
     cluster-flow-collector = {
       enable = true;
-      listenAddress = "100.64.0.1";
+      listenAddress = "0.0.0.0";
     };
 
     vmalert.instances.default.settings = {
@@ -76,10 +110,21 @@
     };
   };
 
+  networking.firewall.interfaces.tailscale0 = {
+    allowedTCPPorts = [ 5514 ];
+    allowedUDPPorts = [ config.services.cluster-flow-collector.netflowPort ];
+  };
+
   systemd.services = {
     vector = {
-      wants = [ "victorialogs.service" ];
-      after = [ "victorialogs.service" ];
+      wants = [
+        "tailscaled.service"
+        "victorialogs.service"
+      ];
+      after = [
+        "tailscaled.service"
+        "victorialogs.service"
+      ];
     };
 
     vmalert-default = {

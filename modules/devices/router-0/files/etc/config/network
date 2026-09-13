@@ -19,6 +19,16 @@ config interface 'lan'
 	option netmask '255.255.255.0'
 	option ip6assign '60'
 
+config device
+	option name 'br-iot'
+	option type 'bridge'
+
+config interface 'iot'
+	option device 'br-iot'
+	option proto 'static'
+	option ipaddr '192.168.70.1'
+	option netmask '255.255.255.0'
+
 config interface 'wwan'
 	option proto 'dhcp'
 	option metric '20'

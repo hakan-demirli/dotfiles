@@ -10,6 +10,7 @@ let
   };
 
   upstreamCodegen = infra-lib.lib.mkCodegen { inherit lib inventory; };
+  extraHeadscaleAclRules = import ../../inventory/tailnet-acl.nix;
   emptyClusterRules = [
     "^secrets/cluster\\.yml$"
   ]
@@ -17,6 +18,33 @@ let
     lib.filterAttrs (_: cluster: (cluster.secret_paths or { }) == { }) inventory.clusters
   );
   codegen = upstreamCodegen // {
+    headscaleAcl =
+      args@{ pkgs, ... }:
+      let
+        generated = upstreamCodegen.headscaleAcl args;
+      in
+      pkgs.runCommand "headscale-acl"
+        {
+          nativeBuildInputs = [ pkgs.python3 ];
+          extraRules = builtins.toJSON extraHeadscaleAclRules;
+          passAsFile = [ "extraRules" ];
+        }
+        ''
+          mkdir -p $out
+          python3 - ${generated}/policy.hujson "$extraRulesPath" $out/policy.hujson <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          source = pathlib.Path(sys.argv[1]).read_text()
+          document = "\n".join(
+              line for line in source.splitlines() if not line.lstrip().startswith("//")
+          )
+          policy = json.loads(document)
+          policy["acls"].extend(json.loads(pathlib.Path(sys.argv[2]).read_text()))
+          pathlib.Path(sys.argv[3]).write_text(json.dumps(policy, separators=(",", ":")))
+          PY
+        '';
     sopsYaml =
       args@{ pkgs, ... }:
       let

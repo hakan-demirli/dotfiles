@@ -2254,6 +2254,80 @@ let
       weekStart = "";
     }
   );
+  lanActivityDashboard = pkgs.writeText "lan-activity.json" (
+    builtins.toJSON {
+      annotations.list = [ ];
+      description = "DNS activity, DHCP leases, and router events observed at the LAN gateway.";
+      editable = false;
+      fiscalYearStartMonth = 0;
+      graphTooltip = 1;
+      id = null;
+      links = [ ];
+      liveNow = false;
+      panels = [
+        (mkLogsBarGauge {
+          id = 1;
+          title = "Top DNS clients";
+          description = "Clients ranked by DNS queries in the selected time range.";
+          expression = "event_kind:dns_query dns.client:* | stats by (dns.client) count() as queries | sort by (queries desc) limit 15";
+          legend = "{{dns.client}}";
+          x = 0;
+          y = 0;
+          w = 12;
+          h = 10;
+        })
+        (mkLogsBarGauge {
+          id = 2;
+          title = "Top queried names";
+          description = "DNS names ranked by query count in the selected time range.";
+          expression = "event_kind:dns_query dns.name:* | stats by (dns.name) count() as queries | sort by (queries desc) limit 15";
+          legend = "{{dns.name}}";
+          x = 12;
+          y = 0;
+          w = 12;
+          h = 10;
+        })
+        (mkLogsPanel {
+          id = 3;
+          title = "DHCP leases";
+          description = "Recent DHCP acknowledgements with client address, MAC, and hostname.";
+          expression = "event_kind:dhcp_lease";
+          x = 0;
+          y = 10;
+          w = 12;
+          h = 12;
+        })
+        (mkLogsPanel {
+          id = 4;
+          title = "Router events";
+          description = "Raw router-0 syslog events, including unparsed DNS and DHCP messages.";
+          expression = ''{host="router-0"}'';
+          x = 12;
+          y = 10;
+          w = 12;
+          h = 12;
+        })
+      ];
+      refresh = "30s";
+      schemaVersion = 42;
+      tags = [
+        "dns"
+        "lan"
+        "security"
+      ];
+      templating.list = [ ];
+      time = {
+        from = "now-24h";
+        to = "now";
+      };
+      timepicker = { };
+      timezone = "browser";
+      title = "LAN Activity";
+      uid = "lan-activity";
+      version = 1;
+      weekStart = "";
+    }
+  );
   networkFlowsDashboard = pkgs.writeText "network-flows.json" (
     builtins.toJSON {
       annotations.list = [ ];
@@ -2461,6 +2535,10 @@ let
     {
       name = "network-flows.json";
       path = networkFlowsDashboard;
+    }
+    {
+      name = "lan-activity.json";
+      path = lanActivityDashboard;
     }
   ];
 in

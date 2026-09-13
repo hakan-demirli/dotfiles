@@ -32,6 +32,36 @@ let
   wirelessSource =
     if bootstrap then ../files/etc/config/wireless.bootstrap else ../files/etc/config/wireless;
 
+  uhttpdSource =
+    if bootstrap then pkgs.writeText "uhttpd-disabled" "" else ../files/etc/config/uhttpd;
+
+  switchWanBlock = pkgs.writeText "firewall-switch-0" (
+    lib.concatStringsSep "\n" [
+      ""
+      "config rule"
+      "\toption name 'Block-switch-0-wan'"
+      "\toption src 'lan'"
+      "\toption dest 'wan'"
+      "\toption src_mac '__SWITCH_0_MAC__'"
+      "\toption proto 'all'"
+      "\toption target 'DROP'"
+      ""
+    ]
+  );
+
+  shellyLease = pkgs.writeText "dhcp-shelly-plug-0" (
+    lib.concatStringsSep "\n" [
+      ""
+      "config host"
+      "\toption name 'plug-0'"
+      "\toption mac '__SHELLY_PLUG_0_MAC__'"
+      "\toption ip '192.168.70.2'"
+      "\toption leasetime 'infinite'"
+      "\toption dns '1'"
+      ""
+    ]
+  );
+
   routerTailscaleUci =
     if tailscaleLoginServer == null then
       null
@@ -45,7 +75,12 @@ pkgs.runCommand "router-0-config-overlay"
   {
     passthru = {
       inherit bootstrap hostname tailscaleLoginServer;
-      requiredTokens = lib.optionals (!bootstrap) [ "__LAN_WIFI_PASSWORD__" ];
+      requiredTokens = lib.optionals (!bootstrap) [
+        "__IOT_WIFI_PASSWORD__"
+        "__LAN_WIFI_PASSWORD__"
+        "__SHELLY_PLUG_0_MAC__"
+        "__SWITCH_0_MAC__"
+      ];
     };
   }
   ''
@@ -72,8 +107,16 @@ pkgs.runCommand "router-0-config-overlay"
 
     install -Dm0644 ${filesRoot}/etc/config/network    $out/root/etc/config/network
     install -Dm0644 ${filesRoot}/etc/config/firewall   $out/root/etc/config/firewall
+    ${lib.optionalString (!bootstrap) ''
+      cat ${switchWanBlock}                         >> $out/root/etc/config/firewall
+    ''}
     install -Dm0644 ${filesRoot}/etc/config/dhcp       $out/root/etc/config/dhcp
+    ${lib.optionalString (!bootstrap) ''
+      cat ${shellyLease}                            >> $out/root/etc/config/dhcp
+    ''}
+    install -Dm0644 ${filesRoot}/etc/config/dropbear   $out/root/etc/config/dropbear
     install -Dm0644 ${systemConfig}                    $out/root/etc/config/system
+    install -Dm0644 ${uhttpdSource}                    $out/root/etc/config/uhttpd
     install -Dm0644 ${filesRoot}/etc/config/router        $out/root/etc/config/router
     install -Dm0644 ${filesRoot}/etc/config/router-ui     $out/root/etc/config/router-ui
 
