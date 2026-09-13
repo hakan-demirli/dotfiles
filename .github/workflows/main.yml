@@ -1,211 +1,22 @@
 name: "Nix Build and Test"
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   workflow_dispatch:
   workflow_call:
 permissions:
   contents: read
 jobs:
-  fast-checks:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: ubuntu-latest
-            system: x86_64-linux
-          - runner: ubuntu-22.04-arm
-            system: aarch64-linux
-          - runner: macos-latest
-            system: aarch64-darwin
-    runs-on: ${{ matrix.runner }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - name: Run fast checks
-        run: |
-          set -euo pipefail
-          checks=$(nix eval --json ".#checks.${{ matrix.system }}" --apply 'builtins.attrNames' \
-            | jq -r '.[] | select((startswith("test-") or startswith("host-")) | not)')
-          if [[ -z $checks ]]; then
-            echo "No fast checks found for ${{ matrix.system }}"
-            exit 1
-          fi
-          while IFS= read -r check; do
-            if [[ "${{ matrix.system }}" == "aarch64-linux" && "$check" == "ephemeral-root" ]]; then
-              echo "Skipping $check on aarch64-linux (requires KVM)"
-              continue
-            fi
-            echo "Building checks.${{ matrix.system }}.$check"
-            nix build ".#checks.${{ matrix.system }}.$check"
-          done <<< "$checks"
-  discover-vm-tests:
-    runs-on: ubuntu-latest
-    outputs:
-      tests: ${{ steps.list.outputs.tests }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - id: list
-        run: |
-          tests=$(nix eval --json '.#checks.x86_64-linux' --apply 'builtins.attrNames' \
-            | jq -c 'map(select(startswith("test-")))')
-          echo "tests=$tests" >> "$GITHUB_OUTPUT"
-          echo "discovered: $tests"
-  vm-tests:
-    needs: [discover-vm-tests]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        test: ${{ fromJson(needs.discover-vm-tests.outputs.tests) }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Free disk space
-        uses: BRAINSia/free-disk-space@7048ffbf50819342ac964ef3998a51c2564a8a75
-        with:
-          tool-cache: false
-          mandb: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: false
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - name: Run ${{ matrix.test }}
-        run: nix build .#checks.x86_64-linux.${{ matrix.test }}
-  discover-hosts:
-    runs-on: ubuntu-latest
-    outputs:
-      hosts-x86: ${{ steps.list.outputs.hosts-x86 }}
-      hosts-arm: ${{ steps.list.outputs.hosts-arm }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - id: list
-        run: |
-          # shellcheck disable=SC2016
-          buckets=$(nix eval --json '.#lib.inventory.hosts' --apply '
-            cfgs:
-            let
-              keys = builtins.attrNames cfgs;
-              pick = arch: builtins.filter (n: cfgs.${n}.hardware.arch == arch) keys;
-            in
-            { x86 = pick "x86_64-linux"; arm = pick "aarch64-linux"; }')
-          built=$(nix eval --json '.#nixosConfigurations' --apply 'builtins.attrNames')
-          x86=$(jq -nc --argjson b "$buckets" --argjson built "$built" \
-            '$b.x86 | map(select(. as $h | $built | index($h)))')
-          arm=$(jq -nc --argjson b "$buckets" --argjson built "$built" \
-            '$b.arm | map(select(. as $h | $built | index($h)))')
-          echo "hosts-x86=$x86" >> "$GITHUB_OUTPUT"
-          echo "hosts-arm=$arm" >> "$GITHUB_OUTPUT"
-          echo "x86: $x86"
-          echo "arm: $arm"
-  discover-device-packages:
-    runs-on: ubuntu-latest
-    outputs:
-      packages: ${{ steps.list.outputs.packages }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - id: list
-        run: |
-          devices=$(nix eval --json '.#devices' --apply 'builtins.attrNames')
-          packages=$(nix eval --json '.#packages.x86_64-linux' --apply 'builtins.attrNames')
-          device_packages=$(jq -nc --argjson devices "$devices" --argjson packages "$packages" '
-            [$packages[] as $package
-              | select(any($devices[]; . as $device | $package | startswith($device + "-")))
-              | $package]
-          ')
-          if [[ $(jq length <<< "$device_packages") -eq 0 ]]; then
-            echo "No device packages found"
-            exit 1
-          fi
-          echo "packages=$device_packages" >> "$GITHUB_OUTPUT"
-          echo "discovered: $device_packages"
-  build-hosts-x86:
-    needs: [discover-hosts]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        host: ${{ fromJson(needs.discover-hosts.outputs.hosts-x86) }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Free disk space
-        uses: BRAINSia/free-disk-space@7048ffbf50819342ac964ef3998a51c2564a8a75
-        with:
-          tool-cache: false
-          mandb: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: false
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - name: Build ${{ matrix.host }}
-        run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
-  build-hosts-arm:
-    needs: [discover-hosts]
-    runs-on: ubuntu-22.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        host: ${{ fromJson(needs.discover-hosts.outputs.hosts-arm) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - name: Build ${{ matrix.host }}
-        run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
-  build-device-packages:
-    needs: [discover-device-packages]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJson(needs.discover-device-packages.outputs.packages) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - name: Build ${{ matrix.package }}
-        run: nix build .#${{ matrix.package }}
-  build-router-firmware:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Free disk space
-        uses: BRAINSia/free-disk-space@7048ffbf50819342ac964ef3998a51c2564a8a75
-        with:
-          tool-cache: false
-          mandb: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: false
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
-      - name: Build router-0 firmware
-        run: nix run .#router-0-firmware -- --clean
+  checks:
+    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@22e18d2a5126029f1229400e89766be95db5dc98
+  external-builds:
+    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@22e18d2a5126029f1229400e89766be95db5dc98
   flake-check:
-    name: flake-check
-    needs: [fast-checks, vm-tests, build-hosts-x86, build-hosts-arm, build-device-packages, build-router-firmware]
-    runs-on: ubuntu-latest
+    needs: [checks, external-builds]
     if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
-      - name: Verify all jobs passed
-        run: |
-          for r in \
-            "fast-checks=${{ needs.fast-checks.result }}" \
-            "vm-tests=${{ needs.vm-tests.result }}" \
-            "build-hosts-x86=${{ needs.build-hosts-x86.result }}" \
-            "build-hosts-arm=${{ needs.build-hosts-arm.result }}" \
-            "build-device-packages=${{ needs.build-device-packages.result }}" \
-            "build-router-firmware=${{ needs.build-router-firmware.result }}"
-          do
-            name="${r%=*}"; result="${r#*=}"
-            echo "$name: $result"
-            if [[ "$result" != "success" ]]; then exit 1; fi
-          done
+      - env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: jq -e 'length == 2 and all(.[]; .result == "success")' <<< "$RESULTS"

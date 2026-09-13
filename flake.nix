@@ -12,6 +12,10 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-parts.follows = "infra-lib/flake-parts";
     import-tree.follows = "infra-lib/import-tree";
+    nix-github-actions = {
+      url = "github:nix-community/nix-github-actions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     disko.follows = "infra-lib/disko";
     sops-nix.follows = "infra-lib/sops-nix";
     impermanence.follows = "infra-lib/impermanence";
