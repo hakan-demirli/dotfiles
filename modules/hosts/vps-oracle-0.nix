@@ -27,8 +27,6 @@
       "x86_64-linux"
       "riscv64-linux"
     ];
-    loader.efi.canTouchEfiVariables = true;
-    loader.grub.efiInstallAsRemovable = false;
   };
 
   networking.useDHCP = lib.mkDefault true;

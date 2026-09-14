@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+_: {
   perSystem =
     { pkgs, ... }:
     {
@@ -7,7 +6,12 @@
         pkgs.runCommand "statix"
           {
             nativeBuildInputs = [ pkgs.statix ];
-            src = inputs.self;
+            src = pkgs.lib.fileset.toSource {
+              root = ../../../..;
+              fileset = pkgs.lib.fileset.fileFilter (
+                file: file.hasExt "nix" || file.name == "statix.toml"
+              ) ../../../..;
+            };
           }
           ''
             cp -r $src ./src

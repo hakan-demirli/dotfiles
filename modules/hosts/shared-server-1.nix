@@ -15,10 +15,7 @@
     };
     kernelModules = [ "rtw88_8821cu" ];
     loader = {
-      efi.canTouchEfiVariables = lib.mkForce false;
-      systemd-boot.enable = lib.mkForce false;
       grub.default = lib.mkForce "0";
-      grub.efiInstallAsRemovable = lib.mkForce true;
     };
   };
 
