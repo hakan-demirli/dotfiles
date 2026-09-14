@@ -478,17 +478,57 @@ let
     or (${nodeStatusExpression})
     or (${smartStatusExpression})
   '';
+  diskStatusExpression = ''
+    (
+      (
+        smartctl_device_smart_status{job="fleet-smartctl"}
+        unless on(instance, device) (smartctl_device_critical_warning{job="fleet-smartctl"} > 0)
+        unless on(instance, device) (
+          smartctl_device_available_spare{job="fleet-smartctl"}
+          <= smartctl_device_available_spare_threshold{job="fleet-smartctl"}
+        )
+        or (smartctl_device_critical_warning{job="fleet-smartctl"} > 0) * 0
+        or (
+          smartctl_device_available_spare{job="fleet-smartctl"}
+          <= smartctl_device_available_spare_threshold{job="fleet-smartctl"}
+        ) * 0
+      )
+      and on(instance) (up{job="fleet-smartctl"} == 1)
+      and on(instance, device) (
+        timestamp(smartctl_device_smart_status{job="fleet-smartctl"}) > time() - 300
+      )
+      and on(instance, device) (smartctl_device_smartctl_exit_status{job="fleet-smartctl"} % 8 == 0)
+    )
+    or on(instance, device) (
+      max by(instance, device) (last_over_time(smartctl_device{job="fleet-smartctl"}[24h])) * 0 + 2
+    )
+  '';
+  diskDailyWritesExpression = ''
+    (
+      smartctl_device_bytes_written{job="fleet-smartctl"}
+      - smartctl_device_bytes_written{job="fleet-smartctl"} offset 24h
+    )
+    and (resets(smartctl_device_bytes_written{job="fleet-smartctl"}[24h]) == 0)
+    and on(instance, device) (
+      count by(instance, device) (
+        count by(instance, device, serial_number) (
+          last_over_time(smartctl_device{job="fleet-smartctl"}[24h])
+        )
+      ) == 1
+    )
+    and on(instance, device) ((${diskStatusExpression}) != 2)
+  '';
   diskHealthExpression = ''
     label_join(
       label_replace(
         (
-          label_replace(smartctl_device_smart_status{job="fleet-smartctl"}, "reading", "SMART", "__name__", ".*")
-          or label_replace(smartctl_device_temperature{job="fleet-smartctl",temperature_type="current"}, "reading", "Temperature", "__name__", ".*")
-          or label_replace(smartctl_device_percentage_used{job="fleet-smartctl"}, "reading", "Wear", "__name__", ".*")
+          label_replace((${diskStatusExpression}), "reading", "Health", "__name__", ".*")
+          or label_replace(smartctl_device_temperature{job="fleet-smartctl",temperature_type="current"}, "reading", "Temp", "__name__", ".*")
+          or label_replace(smartctl_device_percentage_used{job="fleet-smartctl"}, "reading", "Used", "__name__", ".*")
           or label_replace(smartctl_device_available_spare{job="fleet-smartctl"}, "reading", "Spare", "__name__", ".*")
-          or label_replace(smartctl_device_critical_warning{job="fleet-smartctl"}, "reading", "Critical warnings", "__name__", ".*")
-          or label_replace(smartctl_device_media_errors{job="fleet-smartctl"}, "reading", "Media errors", "__name__", ".*")
-          or label_replace(smartctl_device_power_on_seconds{job="fleet-smartctl"}, "reading", "Power-on time", "__name__", ".*")
+          or label_replace(smartctl_device_media_errors{job="fleet-smartctl"}, "reading", "Errors", "__name__", ".*")
+          or label_replace((${diskDailyWritesExpression}), "reading", "Writes/d", "__name__", ".*")
+          or on(instance, device, reading) label_replace((${diskStatusExpression}) * 0 - 1, "reading", "Writes/d", "__name__", ".*")
         ),
         "host", "$1", "instance", "([^.:]+).*"
       ),
@@ -1187,7 +1227,7 @@ let
         {
           id = 17;
           title = "Physical Disk Health";
-          description = "One row per SMART-capable physical disk. Hosts without SMART access do not appear here.";
+          description = "Physical disk health, NVMe endurance consumed, and host writes over the last 24 hours. Errors are reported media/data-integrity errors, not a NAND bad-block count. Hosts without SMART access do not appear here.";
           type = "table";
           inherit datasource;
           gridPos = {
@@ -1197,17 +1237,78 @@ let
             y = 32;
           };
           fieldConfig = {
-            defaults = { };
+            defaults = {
+              decimals = 0;
+              noValue = "N/A";
+              mappings = notAvailableMapping;
+              custom = {
+                align = "center";
+                minWidth = 50;
+                width = 65;
+              };
+            };
             overrides = [
               {
                 matcher = {
                   id = "byName";
-                  options = "SMART";
+                  options = "Host / Disk";
                 };
                 properties = [
                   {
+                    id = "custom.width";
+                    value = 230;
+                  }
+                  {
+                    id = "custom.align";
+                    value = "left";
+                  }
+                ];
+              }
+              {
+                matcher = {
+                  id = "byName";
+                  options = "Health";
+                };
+                properties = [
+                  {
+                    id = "description";
+                    value = "SMART status and NVMe critical warnings. FAIL also indicates spare capacity at or below the device threshold. UNKNOWN means missing, failed, or more than five-minute-old exporter data.";
+                  }
+                  {
+                    id = "custom.width";
+                    value = 95;
+                  }
+                  {
                     id = "mappings";
-                    value = healthMappings ++ notAvailableMapping;
+                    value = [
+                      {
+                        type = "value";
+                        options = {
+                          "0" = {
+                            color = "red";
+                            text = "FAIL";
+                          };
+                          "1" = {
+                            color = "green";
+                            text = "OK";
+                          };
+                          "2" = {
+                            color = "gray";
+                            text = "UNKNOWN";
+                          };
+                        };
+                      }
+                      {
+                        type = "special";
+                        options = {
+                          match = "null";
+                          result = {
+                            color = "gray";
+                            text = "UNKNOWN";
+                          };
+                        };
+                      }
+                    ];
                   }
                   {
                     id = "custom.cellOptions";
@@ -1221,9 +1322,13 @@ let
               {
                 matcher = {
                   id = "byName";
-                  options = "Temperature";
+                  options = "Temp";
                 };
                 properties = [
+                  {
+                    id = "description";
+                    value = "Current disk temperature.";
+                  }
                   {
                     id = "unit";
                     value = "celsius";
@@ -1264,9 +1369,13 @@ let
               {
                 matcher = {
                   id = "byName";
-                  options = "Wear";
+                  options = "Used";
                 };
                 properties = [
+                  {
+                    id = "description";
+                    value = "NVMe Percentage Used: manufacturer estimate of endurance consumed, not filesystem usage. Can exceed 100%; not a failure-date prediction.";
+                  }
                   {
                     id = "unit";
                     value = "percent";
@@ -1274,6 +1383,30 @@ let
                   {
                     id = "mappings";
                     value = notAvailableMapping;
+                  }
+                  {
+                    id = "thresholds";
+                    value = {
+                      mode = "absolute";
+                      steps = [
+                        {
+                          color = "green";
+                          value = null;
+                        }
+                        {
+                          color = "orange";
+                          value = 90;
+                        }
+                        {
+                          color = "red";
+                          value = 100;
+                        }
+                      ];
+                    };
+                  }
+                  {
+                    id = "custom.cellOptions";
+                    value.type = "color-text";
                   }
                 ];
               }
@@ -1284,6 +1417,10 @@ let
                 };
                 properties = [
                   {
+                    id = "description";
+                    value = "NVMe available spare capacity. Health reports FAIL at or below this disk's manufacturer threshold.";
+                  }
+                  {
                     id = "unit";
                     value = "percent";
                   }
@@ -1296,49 +1433,65 @@ let
               {
                 matcher = {
                   id = "byName";
-                  options = "Power-on time";
+                  options = "Writes/d";
                 };
                 properties = [
                   {
+                    id = "description";
+                    value = "Host bytes written over the last 24 hours, in decimal units. N/A until a full day of history exists, after a counter reset or disk replacement, or when SMART data is unavailable.";
+                  }
+                  {
+                    id = "custom.width";
+                    value = 90;
+                  }
+                  {
+                    id = "decimals";
+                    value = 1;
+                  }
+                  {
                     id = "unit";
-                    value = "s";
+                    value = "decbytes";
                   }
                   {
                     id = "mappings";
-                    value = notAvailableMapping;
+                    value = notAvailableMapping ++ [
+                      {
+                        type = "value";
+                        options = {
+                          "-1" = {
+                            color = "gray";
+                            text = "N/A";
+                          };
+                        };
+                      }
+                    ];
                   }
                 ];
               }
-            ]
-            ++
-              map
-                (name: {
-                  matcher = {
-                    id = "byName";
-                    options = name;
-                  };
-                  properties = [
-                    {
-                      id = "mappings";
-                      value = clearMappings ++ notAvailableMapping;
-                    }
-                    {
-                      id = "thresholds";
-                      value = warningThresholds;
-                    }
-                    {
-                      id = "custom.cellOptions";
-                      value = {
-                        mode = "basic";
-                        type = "color-background";
-                      };
-                    }
-                  ];
-                })
-                [
-                  "Critical warnings"
-                  "Media errors"
+              {
+                matcher = {
+                  id = "byName";
+                  options = "Errors";
+                };
+                properties = [
+                  {
+                    id = "description";
+                    value = "Lifetime NVMe media and data-integrity errors. Zero means none reported. Nonzero counts are highlighted; this is not a count of internally retired NAND blocks.";
+                  }
+                  {
+                    id = "thresholds";
+                    value = warningThresholds;
+                  }
+                  {
+                    id = "custom.cellOptions";
+                    value = {
+                      mode = "basic";
+                      type = "color-background";
+                    };
+                  }
                 ];
+              }
+            ];
           };
           options = {
             cellHeight = "sm";
@@ -1373,15 +1526,14 @@ let
               options = {
                 indexByName = {
                   "disk\\reading" = 0;
-                  SMART = 1;
-                  Temperature = 2;
-                  Wear = 3;
+                  Health = 1;
+                  Temp = 2;
+                  Used = 3;
                   Spare = 4;
-                  "Critical warnings" = 5;
-                  "Media errors" = 6;
-                  "Power-on time" = 7;
+                  Errors = 5;
+                  "Writes/d" = 6;
                 };
-                renameByName."disk\\reading" = "Host / Device";
+                renameByName."disk\\reading" = "Host / Disk";
               };
             }
           ];
