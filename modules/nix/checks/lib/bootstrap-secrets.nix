@@ -2,12 +2,32 @@
   pkgs,
   self,
   lib,
+  inputs,
 }:
 let
   system = pkgs.stdenv.hostPlatform.system;
   inventory = self.lib.inventory;
   hostIds = lib.attrNames self.nixosConfigurations;
   configFor = hostId: self.nixosConfigurations.${hostId}.config;
+  sourceIndependentHost = self.nixosConfigurations.laptop-0.extendModules {
+    specialArgs.inputs = inputs // {
+      self = self // {
+        outPath = builtins.path {
+          path = self;
+          name = "bootstrap-input-stability";
+        };
+      };
+    };
+  };
+  changedPasswordHost = self.nixosConfigurations.laptop-0.extendModules {
+    modules = [
+      {
+        services.sops.bootstrap.passwordSopsFile = builtins.toFile "password.yaml" (
+          builtins.readFile (self + /secrets/bootstrap/password.yaml) + "\n"
+        );
+      }
+    ];
+  };
   ownerUsernameFor =
     hostId:
     let
@@ -66,6 +86,12 @@ let
   tailscaleIdentity = if tailscaleIdentityExists then builtins.readFile tailscaleIdentityPath else "";
 
   checks = {
+    unrelated-source-path-keeps-host-derivation =
+      sourceIndependentHost.config.system.build.toplevel.drvPath == (configFor "laptop-0")
+      .system.build.toplevel.drvPath;
+    changed-password-input-changes-host-derivation =
+      changedPasswordHost.config.system.build.toplevel.drvPath != (configFor "laptop-0")
+      .system.build.toplevel.drvPath;
     password-account-policy = everyHost (
       hostId: config:
       let
@@ -122,7 +148,8 @@ let
         let
           munge = config.sops.secrets."munge-key";
         in
-        toString munge.sopsFile == toString (self + /secrets/system.yaml)
+        builtins.hashFile "sha256" munge.sopsFile
+        == builtins.hashFile "sha256" (self + /secrets/system.yaml)
         && munge.key == "munge-key"
         && munge.path == "/etc/munge/munge.key"
       );
