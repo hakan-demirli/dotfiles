@@ -84,6 +84,13 @@ in
       }
     ];
 
+    homepage.extraLan = [
+      {
+        name = "plug-0";
+        url = "http://plug-0.lan";
+      }
+    ];
+
     cluster-harmonia.signKey = {
       source = "sops";
       sopsKeyName = "nix-serve-key";

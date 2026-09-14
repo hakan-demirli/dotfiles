@@ -1,4 +1,4 @@
-{ inputs, lib, ... }:
+{ lib, ... }:
 let
   dtcg = import ./dtcg;
 
@@ -84,6 +84,12 @@ let
 
   homeRoot = "modules/home/common";
   configRoot = "${homeRoot}/config";
+  sourceFor =
+    fileset:
+    lib.fileset.toSource {
+      root = ../..;
+      inherit fileset;
+    };
 
   upperChars = lib.stringToCharacters "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   lowerChars = lib.stringToCharacters "abcdefghijklmnopqrstuvwxyz";
@@ -346,7 +352,7 @@ in
         diagrams-drift =
           pkgs.runCommand "check-diagrams-drift"
             {
-              src = inputs.self;
+              src = sourceFor (../../. + "/${diagramsPath}");
               generated = diagramsTheme;
             }
             ''
@@ -364,7 +370,7 @@ in
         theme-tones-drift =
           pkgs.runCommand "check-theme-tones-drift"
             {
-              src = inputs.self;
+              src = sourceFor (../../. + "/${tonesPath}");
               generated = tones;
             }
             ''
@@ -382,7 +388,7 @@ in
         dtcg-conformance =
           pkgs.runCommand "check-dtcg-conformance"
             {
-              src = inputs.self;
+              src = sourceFor (lib.fileset.fileFilter (file: lib.hasSuffix ".tokens.json" file.name) ../..);
               nativeBuildInputs = [
                 (pkgs.python3.withPackages (ps: [
                   ps.jsonschema
@@ -407,7 +413,7 @@ in
         theme-drift =
           pkgs.runCommand "check-theme-drift"
             {
-              src = inputs.self;
+              src = sourceFor (lib.fileset.unions (map (path: ../../. + "/${homeRoot}/${path}") renderedPaths));
               inherit rendered;
             }
             ''
@@ -443,7 +449,7 @@ in
           if pkgs.stdenv.hostPlatform.isLinux then
             pkgs.runCommand "check-theme-coverage"
               {
-                src = inputs.self;
+                src = sourceFor ../../modules/home/common/config/swaync/style.css;
                 nativeBuildInputs = [ pkgs.python3 ];
               }
               ''
@@ -522,7 +528,12 @@ in
         theme-tokens =
           pkgs.runCommand "check-theme-tokens"
             {
-              src = inputs.self;
+              src = sourceFor (
+                lib.fileset.unions [
+                  ../../modules/home/common/config
+                  ./templates
+                ]
+              );
               nativeBuildInputs = [ pkgs.ripgrep ];
             }
             ''
@@ -543,7 +554,7 @@ in
                       failed=1
                     fi
 
-              template="$src/modules/nix/theme/templates/$app.css.in"
+              template="$src/modules/theme/templates/$app.css.in"
 
               if [ -e "$template" ] && rg -n 'font-size:\s*[0-9.]+(px|rem|pt|em)' "$template"; then
                 echo "theme-tokens: $app.css.in has a font size outside the type scale." >&2

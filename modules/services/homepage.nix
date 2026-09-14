@@ -41,8 +41,10 @@ let
   ]
   ++ cfg.extraAddresses;
 
+  lan = cfg.extraLan;
+
   configJson = builtins.toFile "homepage-config.json" (
-    builtins.toJSON { inherit services addresses; }
+    builtins.toJSON { inherit services addresses lan; }
   );
 
   nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system};
@@ -68,6 +70,18 @@ in
     };
 
     extraAddresses = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption { type = lib.types.str; };
+            url = lib.mkOption { type = lib.types.str; };
+          };
+        }
+      );
+      default = [ ];
+    };
+
+    extraLan = lib.mkOption {
       type = lib.types.listOf (
         lib.types.submodule {
           options = {

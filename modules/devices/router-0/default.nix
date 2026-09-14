@@ -82,6 +82,13 @@ in
     openwrt-source = openwrtSource;
   };
 
+  externalBuilds.firmware = pkgs.writeShellApplication {
+    name = "build-firmware";
+    text = ''
+      exec ${pkgs.lib.getExe firmware} --output "''${CI_OUTPUT_DIR:?}"
+    '';
+  };
+
   apps = {
     firmware-flash = {
       type = "app";

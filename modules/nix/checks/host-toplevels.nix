@@ -36,7 +36,10 @@
             if cfg == null then
               pkgs.runCommand "missing-${h}" { } "echo missing ${h}; exit 1"
             else
-              cfg.config.system.build.toplevel;
+              pkgs.runCommand "check-host-${h}" { target = cfg.config.system.build.toplevel; } ''
+                test -e "$target"
+                touch "$out"
+              '';
         }) myHosts
       );
     in

@@ -100,7 +100,7 @@ rec {
   desktopAdditions =
     with pkgs;
     lib.filter (package: package != null) [
-      adb-sync
+      better-adb-sync
       android-tools
       autoRefresh
       awww

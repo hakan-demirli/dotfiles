@@ -42,10 +42,26 @@ in
         acc
         // (lib.mapAttrs' (name: app: lib.nameValuePair "${id}-${name}" app) (devices.${id}.apps or { }))
       ) { } (lib.attrNames devices);
+      externalBuilds = lib.concatMapAttrs (
+        id: device:
+        lib.mapAttrs' (name: drv: lib.nameValuePair "${id}-${name}" drv) (device.externalBuilds or { })
+      ) devices;
     in
     {
       packages = flatPackages;
       apps = flatApps;
+      legacyPackages.externalBuilds = lib.optionalAttrs (system == "x86_64-linux") externalBuilds;
+      checks = lib.optionalAttrs (system == "x86_64-linux") (
+        lib.mapAttrs' (
+          name: target:
+          lib.nameValuePair "device-${name}" (
+            pkgs.runCommand "check-device-${name}" { inherit target; } ''
+              test -e "$target"
+              touch "$out"
+            ''
+          )
+        ) flatPackages
+      );
     };
 
   flake.devices = lib.mapAttrs (

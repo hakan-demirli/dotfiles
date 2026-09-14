@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+_: {
   perSystem =
     { pkgs, ... }:
     {
@@ -7,7 +6,10 @@
         pkgs.runCommand "deadnix"
           {
             nativeBuildInputs = [ pkgs.deadnix ];
-            src = inputs.self;
+            src = pkgs.lib.fileset.toSource {
+              root = ../../../..;
+              fileset = pkgs.lib.fileset.fileFilter (file: file.hasExt "nix") ../../../..;
+            };
           }
           ''
             cp -r $src ./src

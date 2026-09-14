@@ -40,6 +40,8 @@
     ];
   };
 
+  boot.efi_registration = "fallback";
+
   disko = {
     root_disk = "/dev/disk/by-id/nvme-WD_BLACK_SN7100_1TB_25422J805576";
     layout = "btrfs-lvm";
@@ -51,12 +53,6 @@
     enable = true;
     rollback_backend = "btrfs";
     home_mode = "user-managed";
-    persisted_files = [
-      "/etc/ssh/ssh_host_ed25519_key"
-      "/etc/ssh/ssh_host_ed25519_key.pub"
-      "/etc/ssh/ssh_host_rsa_key"
-      "/etc/ssh/ssh_host_rsa_key.pub"
-    ];
     persisted_paths = [
       "/var/lib/docker"
       "/var/lib/systemd/pstore"

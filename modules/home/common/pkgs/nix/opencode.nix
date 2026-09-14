@@ -13,6 +13,8 @@ let
   nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { };
   opencodePlugins = nurPkgs.opencode-plugins or null;
   hasPlugins = opencodePlugins != null;
+  opencodePackage =
+    inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.opencode;
 
   serverUrl = "http://${address}:${toString port}";
 
@@ -49,7 +51,7 @@ let
 in
 {
   home = {
-    packages = [ pkgs.opencode ] ++ lib.optional hasPlugins opencodePlugins;
+    packages = [ opencodePackage ] ++ lib.optional hasPlugins opencodePlugins;
     sessionVariables.OPENCODE_URL = serverUrl;
   };
 
@@ -70,7 +72,7 @@ in
       EnvironmentFile = serviceEnvFile;
       Environment = commonServiceEnv;
       ExecStartPre = "${requireServerPassword}/bin/opencode-require-server-password";
-      ExecStart = "${pkgs.opencode}/bin/opencode serve --hostname ${address} --port ${toString port}";
+      ExecStart = "${opencodePackage}/bin/opencode serve --hostname ${address} --port ${toString port}";
       Restart = "always";
       RestartSec = 10;
       RestartSteps = 5;
