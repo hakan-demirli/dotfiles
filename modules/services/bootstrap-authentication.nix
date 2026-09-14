@@ -85,7 +85,10 @@ in
     };
     passwordSopsFile = lib.mkOption {
       type = lib.types.path;
-      default = inputs.self + /secrets/bootstrap/password.yaml;
+      default = builtins.path {
+        path = inputs.self + /secrets/bootstrap/password.yaml;
+        name = "password.yaml";
+      };
       description = "SOPS file containing host-scoped bootstrap password hashes.";
     };
   };

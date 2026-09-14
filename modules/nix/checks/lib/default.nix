@@ -7,7 +7,14 @@
 }:
 {
   bootstrap-authentication = import ./bootstrap-authentication.nix { inherit pkgs self inputs; };
-  bootstrap-secrets = import ./bootstrap-secrets.nix { inherit pkgs self lib; };
+  bootstrap-secrets = import ./bootstrap-secrets.nix {
+    inherit
+      pkgs
+      self
+      lib
+      inputs
+      ;
+  };
   codegen-smoke = import ./codegen-smoke.nix { inherit pkgs self inputs; };
   device-lock-cli = import ./device-lock-cli.nix { inherit pkgs self; };
   generated-headscale-policy = import ./generated-headscale-policy.nix {
