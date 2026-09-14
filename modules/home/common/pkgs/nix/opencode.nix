@@ -7,6 +7,7 @@
   lib,
   pkgs,
   inputs,
+  facts,
   ...
 }:
 let
@@ -52,7 +53,9 @@ in
 {
   home = {
     packages = [ opencodePackage ] ++ lib.optional hasPlugins opencodePlugins;
-    sessionVariables.OPENCODE_URL = serverUrl;
+    sessionVariables = lib.optionalAttrs ((import ../../lib.nix).allowsPersonalData facts) {
+      OPENCODE_URL = serverUrl;
+    };
   };
 
   xdg.configFile.opencode = lib.mkIf (opencodeConfigEntries != [ ]) {
@@ -60,7 +63,7 @@ in
     recursive = true;
   };
 
-  systemd.user.services.opencode-serve = {
+  systemd.user.services.opencode-serve = lib.mkIf ((import ../../lib.nix).allowsPersonalData facts) {
     Unit = {
       Description = "OpenCode node server on ${serverUrl}";
       Wants = [ "sops-nix.service" ];

@@ -25,11 +25,27 @@ let
       esac
     '';
   };
+  bootstrap = pkgs.writeShellScriptBin "bootstrap-home-secrets" ''
+    exec ${pkgs.coreutils}/bin/env \
+      ${
+        lib.concatStringsSep " " (
+          lib.mapAttrsToList (name: value: lib.escapeShellArg "${name}=${value}") config.sops.environment
+        )
+      } \
+      ${lib.escapeShellArg (builtins.head config.systemd.user.services.sops-nix.Service.ExecStart)}
+  '';
 in
 {
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
 
   options.homeSops = {
+    enable = lib.mkEnableOption "personal Home Manager secrets";
+    bootstrap = lib.mkOption {
+      type = lib.types.package;
+      readOnly = true;
+      internal = true;
+      description = "The configured secret installer and read-only Git credential helper.";
+    };
     identity = lib.mkOption {
       type = lib.types.str;
     };
@@ -39,7 +55,14 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf cfg.enable {
+    homeSops.bootstrap = pkgs.symlinkJoin {
+      name = "home-secrets-bootstrap";
+      paths = [
+        bootstrap
+        gitCredentialHelper
+      ];
+    };
     home = {
       packages = [ gitCredentialHelper ];
       activation = {

@@ -1,4 +1,11 @@
 {
+  allowsPersonalData =
+    facts:
+    builtins.elem (facts.ownership.class or null) [
+      "personal"
+      "leased"
+    ];
+
   mkHomeConfigurations =
     {
       inputs,
@@ -46,9 +53,18 @@
           profile,
           hasNvidia,
           opencode,
+          host ? null,
         }:
         let
-          facts = stubFacts { inherit name system hasNvidia; };
+          facts =
+            if host == null then
+              stubFacts { inherit name system hasNvidia; }
+            else
+              inputs.self.lib.hostFacts.${host.id}
+              // {
+                inherit system hasNvidia;
+                inherit (host) ownership;
+              };
         in
         inputs.home-manager.lib.homeManagerConfiguration {
           pkgs = mkPkgs system;
@@ -81,13 +97,38 @@
         };
       };
 
-      configurations = profiles // {
-        vps-oracle-0 = {
-          profile = "headless-minimal";
-          system = inputs.self.lib.inventory.hosts.vps-oracle-0.hardware.arch;
-          hasNvidia = false;
-        };
-      };
+      configurations =
+        uid:
+        profiles
+        //
+          lib.mapAttrs
+            (_: host: {
+              inherit host;
+              profile =
+                if lib.elem "laptop" host.deployment_roles then
+                  "desktop"
+                else if host.location.kind == "cloud-vm" then
+                  "headless-minimal"
+                else
+                  "headless";
+              system = host.hardware.arch;
+              hasNvidia = lib.elem host.hardware.gpu [
+                "nvidia"
+                "amd+nvidia"
+                "intel+nvidia"
+              ];
+            })
+            (
+              lib.filterAttrs (
+                _: host:
+                host.hardware.os == "linux"
+                && host.ownership.owner == uid
+                && !lib.elem host.state [
+                  "planned"
+                  "retired"
+                ]
+              ) inputs.self.lib.inventory.hosts
+            );
 
       opencodeEndpoint = {
         address = "127.0.0.1";
@@ -103,17 +144,28 @@
     lib.listToAttrs (
       lib.concatMap (
         uid:
-        lib.mapAttrsToList (pname: pcfg: {
-          name = "${uid}@${pname}";
-          value = mkHome (
-            pcfg
-            // {
-              user = uid;
-              name = "${uid}.${pname}";
-              opencode = opencodeEndpoint;
-            }
-          );
-        }) configurations
+        lib.concatLists (
+          lib.mapAttrsToList (
+            pname: pcfg:
+            let
+              value = mkHome (
+                pcfg
+                // {
+                  user = uid;
+                  name = "${uid}.${pname}";
+                  opencode = opencodeEndpoint;
+                }
+              );
+              names = lib.unique (
+                [ "${uid}@${pname}" ]
+                ++
+                  lib.optional (pcfg ? host)
+                    "${inputs.self.lib.inventory.users.${uid}.system_account.username}@${pname}"
+              );
+            in
+            map (name: { inherit name value; }) names
+          ) (configurations uid)
+        )
       ) discoveredUsers
     );
 }
