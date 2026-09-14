@@ -21,9 +21,6 @@ in
     ./headless.nix
 
     (import ../pkgs/nix/firefox.nix { username = "emre"; })
-    (import ../pkgs/nix/state_autocommit.nix { })
-    (import ../pkgs/nix/ntfy-listener.nix { })
-    (import ../pkgs/nix/github_backup.nix { })
     ../pkgs/nix/cmf_headphoned.nix
     ../pkgs/nix/screen-record.nix
   ]
@@ -31,10 +28,9 @@ in
 
   home = {
     file = {
-      ".local/state/bash".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Desktop/infra/state/.local/state/bash";
-      ".local/share/scratchpads".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Desktop/infra/state/scratchpads";
+      ".local/share/scratchpads" = lib.mkIf ((import ../lib.nix).allowsPersonalData facts) {
+        source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Desktop/infra/state/scratchpads";
+      };
       ".ssh/config".source = ../config/ssh/config;
 
       ".claude/settings.json" = lib.mkIf (builtins.pathExists ../config/claude/settings.json) {

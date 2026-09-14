@@ -53,6 +53,18 @@ if [ ! -d ".git" ] && ! git rev-parse --git-dir > /dev/null 2>&1; then
   exit 2
 fi
 
+git check-ref-format --branch "$BRANCH" > /dev/null
+if [[ $(git rev-parse --show-toplevel) != "$(pwd -P)" ]]; then
+  echo "state-autopush: repo path must be the working tree root" >&2
+  exit 2
+fi
+exec 9> "$(git rev-parse --git-path state-sync.lock)"
+flock -w 30 9
+if [[ $(git symbolic-ref --quiet --short HEAD) != "$BRANCH" ]]; then
+  echo "state-autopush: expected branch $BRANCH" >&2
+  exit 2
+fi
+
 echo "state-autopush: pushing $BRANCH from $REPO_PATH"
 if ! git push origin "$BRANCH"; then
   echo "state-autopush: git push failed for branch '$BRANCH'" >&2

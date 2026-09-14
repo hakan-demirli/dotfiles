@@ -8,6 +8,7 @@
   ...
 }:
 let
+  personal = (import ./lib.nix).allowsPersonalData facts;
   nixTailnetCache = "100.64.0.1:5101";
   nixTailnetCacheTag = "tag:nix-binary-cache";
   nixConfigDir = "${config.xdg.configHome}/nix";
@@ -26,7 +27,6 @@ let
     "firefoxcss"
     "gdb"
     "gdb-dashboard"
-    "git"
     "gnome3-keybind-backup"
     "gnome-extensions"
     "gtk-indicator"
@@ -163,7 +163,11 @@ in
   programs = {
     bash = {
       enable = true;
-      historyFile = "$HOME/.local/state/bash/history";
+      historyFile =
+        if personal then
+          "$HOME/.local/state/bash/history"
+        else
+          "\${XDG_RUNTIME_DIR:-/run/user/$UID}/bash/history";
       historyFileSize = -1;
       historySize = -1;
       historyControl = [
@@ -180,6 +184,7 @@ in
         "autocd"
       ];
       bashrcExtra = ''
+        export DOTFILES_HOST_OWNERSHIP=${lib.escapeShellArg (facts.ownership.class or "unknown")}
         export LESS='-R --use-color -Dd+r$Du+b'
         PROMPT_COMMAND="history -a; history -n"
       '';
@@ -193,6 +198,10 @@ in
   };
 
   home = {
+    sessionVariables = {
+      DOTFILES_HOST = facts.id;
+      DOTFILES_HOST_OWNERSHIP = facts.ownership.class or "unknown";
+    };
     file.".local/bin" = lib.mkIf (builtins.pathExists ./pkgs/bin) {
       source = ./pkgs/bin;
       recursive = true;
@@ -206,9 +215,11 @@ in
         export HOME_MANAGER_BACKUP_EXT=hm-backup
         export HOME_MANAGER_BACKUP_OVERWRITE=1
       '';
-      bashHistoryDir = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-        mkdir -p "$HOME/.local/state/bash"
-      '';
+      bashHistoryDir = lib.mkIf personal (
+        lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+          mkdir -p "$HOME/.local/state/bash"
+        ''
+      );
       factsAvailable = ''
         echo "infra-home activating for ${facts.id} (cluster=${toString facts.cluster}, deployment-roles=[${pkgs.lib.concatStringsSep "," facts.deploymentRoles}], topology-roles=[${pkgs.lib.concatStringsSep "," facts.topologyRoles}])"
       '';
@@ -218,7 +229,19 @@ in
     };
   };
 
-  xdg.configFile = lib.foldl' (acc: name: acc // (mkImmutable name)) { } immutableConfigEntries;
+  xdg.configFile = (lib.foldl' (acc: name: acc // (mkImmutable name)) { } immutableConfigEntries) // {
+    "git/ignore".source = ./config/git/ignore;
+    "git/config".text =
+      builtins.readFile ./config/git/config
+      + lib.optionalString personal ''
+
+        [include]
+            path = ./git_users
+            path = ./git_sign
+        [credential "https://github.com"]
+            helper = sops-readonly
+      '';
+  };
 
   systemd.user.services.nix-tailnet-cache = {
     Unit.Description = "Update Nix cache availability from Tailscale state";

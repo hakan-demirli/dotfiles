@@ -5,9 +5,9 @@
 }:
 let
   homes = {
-    desktop = self.homeConfigurations."user-0@desktop";
-    desktop-nvidia = self.homeConfigurations."user-0@desktop-nvidia";
-    headless = self.homeConfigurations."user-0@headless";
+    desktop = self.homeConfigurations."emre@laptop-1";
+    desktop-nvidia = self.homeConfigurations."emre@laptop-0";
+    headless = self.homeConfigurations."emre@server-dev-1";
     vps-oracle-0 = self.homeConfigurations."user-0@vps-oracle-0";
   };
   profiles = [
