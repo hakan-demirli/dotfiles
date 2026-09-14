@@ -369,27 +369,24 @@ def query_history(
         """,
         (battery, start, end),
     ).fetchone()
-    endpoints = connection.execute(
-        """
-        WITH bounds AS (
-            SELECT MIN(timestamp) AS first_timestamp, MAX(timestamp) AS last_timestamp
-            FROM battery_log
-            WHERE battery = ? AND timestamp >= ? AND timestamp <= ?
-        )
+    endpoint = """
         SELECT
             capacity,
             power_now / 1000000.0 AS power,
             voltage_now / 1000000.0 AS voltage,
             energy_now / 1000000.0 AS energy,
             energy_full * 100.0 / NULLIF(energy_full_design, 0) AS health
-        FROM battery_log, bounds
-        WHERE battery = ?
-          AND timestamp IN (bounds.first_timestamp, bounds.last_timestamp)
-        ORDER BY timestamp
-        """,
-        (battery, start, end, battery),
-    ).fetchall()
-    first_values, last_values = endpoints[0], endpoints[-1]
+        FROM battery_log
+        WHERE battery = ? AND timestamp >= ? AND timestamp <= ?
+        ORDER BY timestamp {order}
+        LIMIT 1
+    """
+    first_values = connection.execute(
+        endpoint.format(order="ASC"), (battery, start, end)
+    ).fetchone()
+    last_values = connection.execute(
+        endpoint.format(order="DESC"), (battery, start, end)
+    ).fetchone()
     summary = {}
     for key in ("capacity", "power", "voltage", "energy", "health"):
         summary[key] = tuple(

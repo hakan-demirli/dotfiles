@@ -15,6 +15,8 @@ Singleton {
     readonly property int power: readInteger(powerFile)
     readonly property int energy: readInteger(energyFile)
     readonly property int energyFull: readInteger(energyFullFile)
+    readonly property int energyFullDesign: readInteger(energyDesignFile)
+    readonly property int health: energyFull > 0 && energyFullDesign > 0 ? Math.round(energyFull * 100 / energyFullDesign) : -1
 
     readonly property int remainingMinutes: power > 0 && (status === "Charging" || status === "Discharging") ? Math.round((status === "Charging" ? Math.max(0, energyFull - energy) : energy) * 60 / power) : -1
     readonly property string remainingTime: remainingMinutes >= 0 ? formatDuration(remainingMinutes) : ""
@@ -66,6 +68,14 @@ Singleton {
     }
 
     FileView {
+        id: energyDesignFile
+
+        path: "/sys/class/power_supply/BAT0/energy_full_design"
+        preload: true
+        printErrors: false
+    }
+
+    FileView {
         id: powerFile
 
         path: "/sys/class/power_supply/BAT0/power_now"
@@ -82,6 +92,7 @@ Singleton {
             statusFile.reload();
             energyFile.reload();
             energyFullFile.reload();
+            energyDesignFile.reload();
             powerFile.reload();
         }
     }

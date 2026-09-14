@@ -154,7 +154,10 @@ in
   dconf.settings = {
     "org/gnome/desktop/interface".color-scheme = "prefer-dark";
 
-    "org/blueman/general".plugin-list = [ "!KillSwitch" ];
+    "org/blueman/general".plugin-list = [
+      "!KillSwitch"
+      "!ConnectionNotifier"
+    ];
 
     "org/virt-manager/virt-manager/connections" = {
       autoconnect = [ "qemu:///system" ];
