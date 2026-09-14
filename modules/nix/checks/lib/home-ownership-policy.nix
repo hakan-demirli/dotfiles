@@ -60,9 +60,8 @@ let
     trusted-hosts-have-personal-state = lib.all (
       home:
       home.config.homeSops.enable
-      && home.config.home.file ? ".local/state/bash"
-      && home.config.systemd.user.services ? state-autocommit
-      && home.config.systemd.user.services ? state-autopush
+      && home.config.systemd.user.services ? state-backup
+      && home.config.home.stateRepository.path == "/home/emre/.local/share/state"
       && home.config.sops.secrets ? git_tokens
       && home.config.systemd.user.services ? opencode-serve
     ) trusted;
@@ -73,6 +72,7 @@ let
       && !(home.config.home.file ? ".local/share/scratchpads")
       && !(home.config.systemd.user.services ? state-autocommit)
       && !(home.config.systemd.user.services ? state-autopush)
+      && !(home.config.systemd.user.services ? state-backup)
       && !(home.config.systemd.user.services ? github-backup)
       && !(home.config.systemd.user.services ? opencode-serve)
       && !(home.config.systemd.user.services ? sops-nix)
@@ -101,10 +101,15 @@ let
           "laptop-0"
           "laptop-1"
         ];
-    branch-check-precedes-linking = lib.all (
+    backup-is-independent-of-activation = lib.all (
       home:
-      lib.elem "checkLinkTargets" home.config.home.activation.checkStateRepository.before
-      && lib.elem "checkLinkTargets" home.config.home.activation.checkHostIdentity.before
+      !(home.config.home.activation ? checkStateRepository)
+      && !(home.config.home.activation ? prepareStateRepository)
+      && !(home.config.home.activation ? localStateHistory)
+      && !(home.config.home.file ? ".local/state/bash")
+      && home.config.systemd.user.services.state-backup.Service.Type == "oneshot"
+      && home.config.systemd.user.timers.state-backup.Timer.OnStartupSec == "1min"
+      && home.config.systemd.user.timers.state-backup.Timer.Persistent
     ) trusted;
   };
   failures = lib.attrNames (lib.filterAttrs (_: passed: !passed) checks);

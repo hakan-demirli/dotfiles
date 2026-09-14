@@ -21,8 +21,6 @@
         runtimeInputs = [
           inputs.home-manager.packages.${system}.default
           pkgs.inetutils
-          pkgs.git
-          pkgs.jq
           pkgs.age
           pkgs.coreutils
           pkgs.gnugrep

@@ -17,7 +17,7 @@ in
     (import ../../common/pkgs/nix/opencode.nix opencode)
   ]
   ++ lib.optionals personal [
-    (import ../../common/pkgs/nix/state_autocommit.nix {
+    (import ../../common/pkgs/nix/state_backup.nix {
       remote = "https://github.com/hakan-demirli/state";
       logBranch = if profile == "desktop" then "nocon" else "hosts/${facts.id}";
     })
@@ -65,6 +65,7 @@ in
     // lib.optionalAttrs personal {
       ".config/mozilla" = "persistent";
       ".config/sops/age" = "persistent";
+      ".local/share/state" = "persistent";
       ".local/share/opencode" = "persistent";
       ".local/state/opencode" = "persistent";
       ".local/state/wireplumber" = "persistent";
