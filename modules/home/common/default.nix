@@ -202,6 +202,9 @@ in
       DOTFILES_HOST = facts.id;
       DOTFILES_HOST_OWNERSHIP = facts.ownership.class or "unknown";
     };
+    file.".ssh/config" = lib.mkIf personal {
+      source = ./config/ssh/config;
+    };
     file.".local/bin" = lib.mkIf (builtins.pathExists ./pkgs/bin) {
       source = ./pkgs/bin;
       recursive = true;
