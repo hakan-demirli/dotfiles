@@ -83,6 +83,26 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
+            visible: BatteryService.health >= 0
+
+            Text {
+                Layout.fillWidth: true
+                text: "Health"
+                color: ShellPalette.foregroundMuted
+                font.family: Theme.font.plain
+                font.pixelSize: Theme.font.bodyMediumSize
+            }
+
+            Text {
+                text: `${BatteryService.health}%`
+                color: ShellPalette.foreground
+                font.family: Theme.font.mono
+                font.pixelSize: Theme.font.bodyMediumSize
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
 
             Text {
                 Layout.fillWidth: true
