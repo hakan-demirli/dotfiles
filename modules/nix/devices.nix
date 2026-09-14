@@ -52,7 +52,15 @@ in
       apps = flatApps;
       legacyPackages.externalBuilds = lib.optionalAttrs (system == "x86_64-linux") externalBuilds;
       checks = lib.optionalAttrs (system == "x86_64-linux") (
-        lib.mapAttrs' (name: drv: lib.nameValuePair "device-${name}" drv) flatPackages
+        lib.mapAttrs' (
+          name: target:
+          lib.nameValuePair "device-${name}" (
+            pkgs.runCommand "check-device-${name}" { inherit target; } ''
+              test -e "$target"
+              touch "$out"
+            ''
+          )
+        ) flatPackages
       );
     };
 
