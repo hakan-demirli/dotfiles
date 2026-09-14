@@ -8,9 +8,9 @@ permissions:
   contents: read
 jobs:
   checks:
-    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@6269750cf67d8017c271277045b9f6fa021f5922
+    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@11ac8e0b010f47a914ece6b410d80454f72f4399
   external-builds:
-    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@6269750cf67d8017c271277045b9f6fa021f5922
+    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@11ac8e0b010f47a914ece6b410d80454f72f4399
   flake-check:
     needs: [checks, external-builds]
     if: always()
