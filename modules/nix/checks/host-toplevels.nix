@@ -25,6 +25,7 @@
       myHosts = hostsForSystem system;
 
       cfgFor = h: inputs.self.nixosConfigurations.${h} or inputs.self.darwinConfigurations.${h} or null;
+      moduleCacheBudget = 256 * 1024 * 1024;
 
       hostChecks = lib.listToAttrs (
         map (h: {
@@ -32,13 +33,32 @@
           value =
             let
               cfg = cfgFor h;
+              kernelModules = lib.optionals pkgs.stdenv.hostPlatform.isLinux (
+                lib.unique cfg.config.boot.extraModulePackages
+              );
+              retainModule =
+                package:
+                let
+                  closure = pkgs.closureInfo { rootPaths = [ package ]; };
+                in
+                ''
+                  size=$(<${closure}/total-nar-size)
+                  if (( size <= remaining )); then
+                    ln -s ${package} "$out/$(basename ${package})"
+                    remaining=$((remaining - size))
+                  else
+                    echo "Skipping CI cache retention for ${package.name}: $size bytes exceeds remaining budget $remaining"
+                  fi
+                '';
             in
             if cfg == null then
               pkgs.runCommand "missing-${h}" { } "echo missing ${h}; exit 1"
             else
               pkgs.runCommand "check-host-${h}" { target = cfg.config.system.build.toplevel; } ''
                 test -e "$target"
-                touch "$out"
+                mkdir -p "$out"
+                remaining=${toString moduleCacheBudget}
+                ${lib.concatMapStringsSep "\n" retainModule kernelModules}
               '';
         }) myHosts
       );

@@ -6,8 +6,14 @@
   ...
 }:
 let
-  sopsFile = inputs.self + /secrets/system.yaml;
-  tailscaleSopsFile = inputs.self + /secrets/bootstrap/tailscale.yaml;
+  sopsFile = builtins.path {
+    path = inputs.self + /secrets/system.yaml;
+    name = "system.yaml";
+  };
+  tailscaleSopsFile = builtins.path {
+    path = inputs.self + /secrets/bootstrap/tailscale.yaml;
+    name = "tailscale.yaml";
+  };
 
   cfg = config.services.sops;
   tailscaleAuthKeyPath = "/run/tailscale-bootstrap/preauth-key";
