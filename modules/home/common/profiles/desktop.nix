@@ -31,8 +31,6 @@ in
       ".local/share/scratchpads" = lib.mkIf ((import ../lib.nix).allowsPersonalData facts) {
         source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Desktop/infra/state/scratchpads";
       };
-      ".ssh/config".source = ../config/ssh/config;
-
       ".claude/settings.json" = lib.mkIf (builtins.pathExists ../config/claude/settings.json) {
         source = ../config/claude/settings.json;
       };
