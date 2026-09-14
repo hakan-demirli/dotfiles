@@ -26,6 +26,15 @@
       ;
   };
   home-storage-policy = import ./home-storage-policy.nix { inherit pkgs self lib; };
+  home-ownership-policy = import ./home-ownership-policy.nix {
+    inherit
+      pkgs
+      self
+      lib
+      inputs
+      ;
+  };
+  home-state-automation = import ./home-state-automation.nix { inherit pkgs self; };
   remote-desktop-cli = import ./remote-desktop-cli.nix { inherit pkgs self; };
   ssh-targets = import ./ssh-targets.nix { inherit pkgs self; };
 }

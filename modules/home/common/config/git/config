@@ -1,6 +1,3 @@
-[include]
-    path = ./git_users
-
 [core]
 	fileMode = true
 	autocrlf = false
@@ -21,14 +18,8 @@
 [push]
     autoSetupRemote = true
 
-[credential "https://github.com"]
-	helper = sops-readonly
-
 [url "git@gitlab.ethz.ch:"]
 	insteadOf = https://gitlab.ethz.ch/
-
-[include]
-    path = ./git_sign
 
 [http]
 	postBuffer = 1048576000

@@ -1,10 +1,16 @@
 {
   repoPath ? null,
-  logBranch ? "nocon",
+  logBranch,
+  remote,
   commitOnCalendar ? "*:0/30",
   pushOnCalendar ? "*-*-* 00/2:00:00",
 }:
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   resolvedRepoPath =
     if repoPath == null then "${config.home.homeDirectory}/Desktop/infra/state" else repoPath;
@@ -16,6 +22,7 @@ let
       pkgs.coreutils
       pkgs.gawk
       pkgs.openssh
+      pkgs.util-linux
     ];
     text = builtins.readFile ../bin/state-autocommit.sh;
   };
@@ -27,50 +34,78 @@ let
       pkgs.git
       pkgs.coreutils
       pkgs.openssh
+      pkgs.util-linux
     ];
     text = builtins.readFile ../bin/state-autopush.sh;
   };
+  commitCommand = "${autocommit}/bin/state-autocommit.sh --repo-path ${lib.escapeShellArg resolvedRepoPath} --branch ${lib.escapeShellArg logBranch}";
 in
 {
-  systemd.user = {
-    services.state-autocommit = {
-      Unit.Description = "Auto-commit changes in ${resolvedRepoPath}";
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${autocommit}/bin/state-autocommit.sh --repo-path ${resolvedRepoPath}";
+  options.home.stateRepository = lib.mkOption {
+    type = lib.types.submodule {
+      options = {
+        path = lib.mkOption { type = lib.types.str; };
+        branch = lib.mkOption { type = lib.types.str; };
+        remote = lib.mkOption { type = lib.types.str; };
       };
     };
-
-    services.state-autopush = {
-      Unit = {
-        Description = "Auto-push ${logBranch} branch of ${resolvedRepoPath}";
-        StartLimitIntervalSec = 900;
-        StartLimitBurst = 6;
+    readOnly = true;
+    internal = true;
+    description = "The personal state checkout prepared during user provisioning.";
+  };
+  config = {
+    home = {
+      stateRepository = {
+        path = resolvedRepoPath;
+        branch = logBranch;
+        inherit remote;
       };
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${autopush}/bin/state-autopush.sh --repo-path ${resolvedRepoPath} --branch ${logBranch}";
-        Restart = "on-failure";
-        RestartSec = 30;
-      };
+      file.".local/state/bash".source =
+        config.lib.file.mkOutOfStoreSymlink "${resolvedRepoPath}/.local/state/bash";
+      activation.checkStateRepository = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+        run ${commitCommand} --check
+      '';
     };
-
-    timers.state-autocommit = {
-      Unit.Description = "Timer for state-autocommit";
-      Timer = {
-        OnCalendar = commitOnCalendar;
-        Persistent = true;
+    systemd.user = {
+      services.state-autocommit = {
+        Unit.Description = "Auto-commit changes in ${resolvedRepoPath}";
+        Service = {
+          Type = "oneshot";
+          ExecStart = commitCommand;
+        };
       };
-      Install.WantedBy = [ "timers.target" ];
-    };
 
-    timers.state-autopush = {
-      Unit.Description = "Timer for state-autopush";
-      Timer = {
-        OnCalendar = pushOnCalendar;
-        Persistent = true;
+      services.state-autopush = {
+        Unit = {
+          Description = "Auto-push ${logBranch} branch of ${resolvedRepoPath}";
+          StartLimitIntervalSec = 900;
+          StartLimitBurst = 6;
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${autopush}/bin/state-autopush.sh --repo-path ${lib.escapeShellArg resolvedRepoPath} --branch ${lib.escapeShellArg logBranch}";
+          Restart = "on-failure";
+          RestartSec = 30;
+        };
       };
-      Install.WantedBy = [ "timers.target" ];
+
+      timers.state-autocommit = {
+        Unit.Description = "Timer for state-autocommit";
+        Timer = {
+          OnCalendar = commitOnCalendar;
+          Persistent = true;
+        };
+        Install.WantedBy = [ "timers.target" ];
+      };
+
+      timers.state-autopush = {
+        Unit.Description = "Timer for state-autopush";
+        Timer = {
+          OnCalendar = pushOnCalendar;
+          Persistent = true;
+        };
+        Install.WantedBy = [ "timers.target" ];
+      };
     };
   };
 }

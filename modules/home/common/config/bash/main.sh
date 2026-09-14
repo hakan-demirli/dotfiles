@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 # shellcheck source-path=SCRIPTDIR
 
-privateEnvFile="$HOME/.config/secrets/environment"
-if [ -f "${privateEnvFile}" ] && [ -r "${privateEnvFile}" ]; then
-  set -a
-  # shellcheck source=/dev/null
-  source "${privateEnvFile}"
-  set +a
-fi
-
-privateBinDir="$HOME/.local/bin/private"
-if [ -d "$privateBinDir" ]; then
-  export PATH="$privateBinDir:$PATH"
-fi
+case "${DOTFILES_HOST_OWNERSHIP:-unknown}" in
+  personal | leased)
+    privateEnvFile="$HOME/.config/secrets/environment"
+    if [ -f "${privateEnvFile}" ] && [ -r "${privateEnvFile}" ]; then
+      set -a
+      # shellcheck source=/dev/null
+      source "${privateEnvFile}"
+      set +a
+    fi
+    privateBinDir="$HOME/.local/bin/private"
+    if [ -d "$privateBinDir" ]; then
+      export PATH="$privateBinDir:$PATH"
+    fi
+    ;;
+esac
 
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 

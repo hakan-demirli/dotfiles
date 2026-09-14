@@ -2,12 +2,16 @@
 set -euo pipefail
 
 REPO_PATH=""
+BRANCH=""
+CHECK_ONLY=false
 
 usage() {
   cat << USAGE >&2
-usage: $(basename "$0") --repo-path PATH
+usage: $(basename "$0") --repo-path PATH --branch NAME [--check]
 
   --repo-path PATH  Absolute path to a git working tree.
+  --branch NAME     Expected branch to commit.
+  --check           Check the repository and branch without committing.
 USAGE
 }
 
@@ -16,6 +20,14 @@ while [ $# -gt 0 ]; do
     --repo-path)
       REPO_PATH="$2"
       shift 2
+      ;;
+    --branch)
+      BRANCH="$2"
+      shift 2
+      ;;
+    --check)
+      CHECK_ONLY=true
+      shift
       ;;
     -h | --help)
       usage
@@ -29,8 +41,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -z "$REPO_PATH" ]; then
-  echo "state-autocommit: --repo-path is required" >&2
+if [ -z "$REPO_PATH" ] || [ -z "$BRANCH" ]; then
+  echo "state-autocommit: --repo-path and --branch are required" >&2
   usage
   exit 1
 fi
@@ -45,6 +57,21 @@ cd "$REPO_PATH"
 if [ ! -d ".git" ] && ! git rev-parse --git-dir > /dev/null 2>&1; then
   echo "state-autocommit: not a git repo: $REPO_PATH" >&2
   exit 2
+fi
+
+git check-ref-format --branch "$BRANCH" > /dev/null
+if [[ $(git rev-parse --show-toplevel) != "$(pwd -P)" ]]; then
+  echo "state-autocommit: repo path must be the working tree root" >&2
+  exit 2
+fi
+exec 9> "$(git rev-parse --git-path state-sync.lock)"
+flock -w 30 9
+if [[ $(git symbolic-ref --quiet --short HEAD) != "$BRANCH" ]]; then
+  echo "state-autocommit: expected branch $BRANCH" >&2
+  exit 2
+fi
+if [[ $CHECK_ONLY == true ]]; then
+  exit 0
 fi
 
 if [ -z "$(git status --porcelain)" ]; then
