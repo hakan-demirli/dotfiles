@@ -16,7 +16,9 @@ in
       external = inputs.nix-github-actions.lib.mkGithubMatrix {
         checks = lib.mapAttrs (_: packages: packages.externalBuilds or { }) inputs.self.legacyPackages;
         attrPrefix = "githubActions.external.checks";
-        inherit platforms;
+        platforms = platforms // {
+          x86_64-linux = "ubuntu-22.04";
+        };
       };
     };
 }
