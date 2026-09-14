@@ -58,11 +58,16 @@ nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
 
 ## Home Manager
 
+On the target host:
+
 ```bash
-home-manager switch --flake '.#user-0@desktop'
-home-manager switch --flake '.#user-0@desktop-nvidia'
-home-manager switch --flake '.#user-0@headless'
+home-manager switch --flake .
 home-manager switch --flake '.#user-0@vps-oracle-0'
+```
+
+Initial setup (personal/leased hosts):
+
+```bash
 nix run path:.#deploy-home-secrets
 ```
 

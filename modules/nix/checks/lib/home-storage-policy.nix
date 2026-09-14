@@ -21,6 +21,7 @@ let
     ".config/mozilla" = "persistent";
     ".config/sops/age" = "persistent";
     ".local/share/opencode" = "persistent";
+    ".local/share/state" = "persistent";
     ".local/state/opencode" = "persistent";
     ".local/state/wireplumber" = "persistent";
     Desktop = "persistent";
@@ -36,8 +37,7 @@ let
       [
         "github-backup"
         "ntfy-listener"
-        "state-autocommit"
-        "state-autopush"
+        "state-backup"
       ];
 
   checks = {

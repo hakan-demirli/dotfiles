@@ -4,32 +4,30 @@ pkgs.runCommand "home-state-automation"
     nativeBuildInputs = [
       pkgs.python3
       pkgs.git
-      pkgs.jq
       pkgs.util-linux
       pkgs.bash
       pkgs.coreutils
     ];
+    backupScript = ../../../home/common/pkgs/bin/state-backup.sh;
     deployScript = ../../pkgs/bin/deploy-home-secrets.sh;
-    commitScript = ../../../home/common/pkgs/bin/state-autocommit.sh;
-    pushScript = ../../../home/common/pkgs/bin/state-autopush.sh;
     historyFile = self.homeConfigurations."emre@shared-server-1".config.programs.bash.historyFile;
   }
   ''
     python3 - <<'PY'
-    import json
+    import http.server
     import os
     import pathlib
     import pwd
     import subprocess
     import tempfile
+    import threading
 
     git = "${pkgs.git}/bin/git"
     bash = "${pkgs.runtimeShell}"
-    username = pwd.getpwuid(os.getuid()).pw_name
     branch = "hosts/fixture-host"
 
     def execute(args, env, success=True):
-        result = subprocess.run(args, env=env, capture_output=True, text=True)
+        result = subprocess.run(args, env=env, capture_output=True, text=True, timeout=30)
         assert (result.returncode == 0) == success, result.stdout + result.stderr
         return result.stdout.strip()
 
@@ -39,167 +37,200 @@ pkgs.runCommand "home-state-automation"
 
     with tempfile.TemporaryDirectory() as directory:
         root = pathlib.Path(directory)
-        tools = root / "tools"
-        tools.mkdir()
-        bootstrap = root / "bootstrap"
-        (bootstrap / "bin").mkdir(parents=True)
-        repo = root / "dotfiles"
-        envelopes = repo / "secrets/identities"
-        envelopes.mkdir(parents=True)
-        (repo / "flake.nix").touch()
-        (envelopes / "home-user-0.age.key.enc").write_text("-----BEGIN AGE ENCRYPTED FILE-----\nfixture\n")
-        (envelopes / "home-user-0.age.pub").write_text("fixture-recipient\n")
-
-        executable(tools / "hostname", 'print("fixture-host")\n')
-        executable(tools / "nix", r"""
-    import json, os, pathlib, sys
-    target = sys.argv[-1]
-    assert 'homeConfigurations."' + os.environ["FIXTURE_USER"] + '@fixture-host"' in target
-    if target.endswith("homeSops.enable"):
-        print(os.environ.get("ALLOW_PERSONAL", "true"))
-    elif target.endswith("DOTFILES_HOST"):
-        print(os.environ.get("CONFIGURED_HOST", "fixture-host"))
-    elif target.endswith("home.username"):
-        print(os.environ["FIXTURE_USER"])
-    elif target.endswith("homeSops.identity"):
-        print("user-0")
-    elif target.endswith("homeSops.ageKeyFile"):
-        print(os.environ["HOME"] + "/.config/sops/age/keys.txt")
-    elif target.endswith("home.stateRepository"):
-        print(json.dumps({"path": os.environ["STATE_PATH"], "branch": "hosts/fixture-host", "remote": os.environ["STATE_REMOTE"]}))
-    elif target.endswith("homeSops.bootstrap"):
-        print(os.environ["BOOTSTRAP"])
-    else:
-        raise AssertionError(target)
-    """)
-        executable(tools / "age", r"""
-    import os, pathlib, sys
-    with open(os.environ["EVENTS"], "a") as log: log.write("decrypt\n")
-    pathlib.Path(sys.argv[sys.argv.index("--output") + 1]).write_text("fixture-identity\n")
-    """)
-        executable(tools / "age-keygen", 'print("fixture-recipient")\n')
-        executable(bootstrap / "bin/bootstrap-home-secrets", r"""
-    import os, pathlib
-    home = pathlib.Path(os.environ["HOME"])
-    assert (home / ".config/sops/age/keys.txt").is_file()
-    for name in [".config/git/git_users", ".config/sops-nix/secrets/git_tokens", ".ssh/id_ed25519", ".ssh/id_ed25519_proton", ".ssh/id_ed25519_sf"]:
-        path = home / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("fixture\n")
-    with open(os.environ["EVENTS"], "a") as log: log.write("install-secrets\n")
-    """)
-        executable(bootstrap / "bin/git-credential-sops-readonly", 'raise SystemExit(0)\n')
-        executable(tools / "git", r"""
-    import os, pathlib, sys
-    if "ls-remote" in sys.argv or "fetch" in sys.argv:
-        assert "install-secrets" in pathlib.Path(os.environ["EVENTS"]).read_text()
-        with open(os.environ["EVENTS"], "a") as log: log.write("network\n")
-    os.execv("${pkgs.git}/bin/git", ["git"] + sys.argv[1:])
-    """)
-        executable(tools / "home-manager", r"""
-    import os, pathlib, subprocess, sys
-    assert sys.argv[1:3] == ["switch", "--flake"]
-    assert sys.argv[3].endswith("#" + os.environ["FIXTURE_USER"] + "@fixture-host")
-    state = pathlib.Path(os.environ["STATE_PATH"])
-    assert (state / ".local/state/bash").is_dir()
-    branch = subprocess.check_output(["${pkgs.git}/bin/git", "-C", str(state), "symbolic-ref", "--short", "HEAD"], text=True).strip()
-    assert branch == "hosts/fixture-host"
-    with open(os.environ["EVENTS"], "a") as log: log.write("activate\n")
-    """)
-
         base = os.environ | {
-            "PATH": str(tools) + ":" + os.environ["PATH"],
             "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": "/dev/null",
             "GIT_AUTHOR_NAME": "Fixture", "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
             "GIT_COMMITTER_NAME": "Fixture", "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
-            "FIXTURE_USER": username, "BOOTSTRAP": str(bootstrap),
         }
         remote = root / "remote.git"
-        execute([git, "init", "--bare", str(remote)], base)
+        execute([git, "init", "--bare", "--initial-branch=nocon", str(remote)], base)
         seed = root / "seed"
         execute([git, "init", "--initial-branch=nocon", str(seed)], base)
-        (seed / "desktop-only").write_text("fixture desktop state\n")
+        seed_history = seed / ".local/state/bash/history"
+        seed_history.parent.mkdir(parents=True)
+        seed_history.write_text("remote history\n")
         execute([git, "-C", str(seed), "add", "."], base)
         execute([git, "-C", str(seed), "commit", "-m", "fixture"], base)
         execute([git, "-C", str(seed), "push", str(remote), "nocon"], base)
 
-        def environment(name, **extra):
+        def environment(name):
             home = root / name
             home.mkdir()
             runtime = home / "runtime"
             runtime.mkdir()
-            events = home / "events"
-            events.touch()
-            return base | {
-                "HOME": str(home), "XDG_CONFIG_HOME": str(home / ".config"),
-                "XDG_RUNTIME_DIR": str(runtime), "EVENTS": str(events),
-                "STATE_PATH": str(home / "Desktop/infra/state"), "STATE_REMOTE": str(remote),
-            } | extra
+            return base | {"HOME": str(home), "XDG_RUNTIME_DIR": str(runtime)}
 
-        deploy = [bash, os.environ["deployScript"], "--repo", str(repo)]
-        for name, extra in [
-            ("borrowed", {"ALLOW_PERSONAL": "false"}),
-            ("wrong-host", {"CONFIGURED_HOST": "another-host"}),
-        ]:
-            env = environment(name, **extra)
-            execute(deploy, env, success=False)
-            assert pathlib.Path(env["EVENTS"]).read_text() == ""
-            assert not (pathlib.Path(env["HOME"]) / ".config/sops/age/keys.txt").exists()
+        def paths(env):
+            home = pathlib.Path(env["HOME"])
+            return home / ".local/share/state", home / ".local/state/bash/history"
 
-        checked = environment("check-only")
-        execute(deploy + ["--check"], checked)
-        assert pathlib.Path(checked["EVENTS"]).read_text() == ""
-        assert not pathlib.Path(checked["STATE_PATH"]).exists()
+        def backup(env, origin=remote, success=True):
+            state, history = paths(env)
+            return execute([bash, os.environ["backupScript"], str(state), branch, str(origin), str(history)], env, success)
 
         first = environment("first")
-        execute(deploy, first)
-        state = pathlib.Path(first["STATE_PATH"])
-        events = pathlib.Path(first["EVENTS"]).read_text().splitlines()
-        assert events.index("install-secrets") < events.index("network") < events.index("activate")
-        assert not (state / "desktop-only").exists()
-        execute([git, "-C", str(state), "rev-parse", "--verify", "HEAD"], first, success=False)
-        history = state / ".local/state/bash/history"
-        history.write_text("gcc fixture.c\n")
-        commit = [bash, os.environ["commitScript"], "--repo-path", str(state), "--branch", branch]
-        execute(commit + ["--check"], first)
-        execute([git, "-C", str(state), "rev-parse", "--verify", "HEAD"], first, success=False)
-        execute(commit, first)
+        state, history = paths(first)
+        history.parent.mkdir(parents=True)
+        history.write_text("discard this local file\n")
+        backup(first)
+        assert history.is_symlink()
+        assert history.resolve() == state / ".local/state/bash/history"
+        assert history.read_text() == "remote history\n"
+        assert execute([git, "-C", str(state), "branch", "--show-current"], first) == branch
+        assert execute([git, "--git-dir", str(remote), "show", branch + ":.local/state/bash/history"], first) == "remote history"
+
+        history.write_text("remote history\nnew command\n")
+        (state / "unrelated").write_text("leave staged\n")
+        execute([git, "-C", str(state), "add", "unrelated"], first)
+        backup(first)
+        assert execute([git, "-C", str(state), "diff", "--cached", "--name-only"], first) == "unrelated"
+        assert execute([git, "-C", str(state), "show", "--format=", "--name-only", "HEAD"], first) == ".local/state/bash/history"
         head = execute([git, "-C", str(state), "rev-parse", "HEAD"], first)
-        execute(commit, first)
+        assert execute([git, "--git-dir", str(remote), "rev-parse", branch], first) == head
+        backup(first)
         assert execute([git, "-C", str(state), "rev-parse", "HEAD"], first) == head
-        execute([bash, os.environ["commitScript"], "--repo-path", str(state), "--branch", "nocon"], first, success=False)
-        execute([bash, os.environ["pushScript"], "--repo-path", str(state), "--branch", "nocon"], first, success=False)
-        execute([bash, os.environ["pushScript"], "--repo-path", str(state), "--branch", branch], first)
-        assert execute([git, "--git-dir", str(remote), "rev-parse", "refs/heads/" + branch], first) == head
-        execute(deploy, first)
-        assert execute([git, "-C", str(state), "rev-parse", "HEAD"], first) == head
-        assert history.read_text() == "gcc fixture.c\n"
+        assert not list(pathlib.Path(first["HOME"]).rglob("*hm-backup*"))
+
+        hook = remote / "hooks/pre-receive"
+        executable(hook, "raise SystemExit(1)\n")
+        history.write_text("remote history\nnew command\nretry this push\n")
+        backup(first, success=False)
+        unpushed = execute([git, "-C", str(state), "rev-parse", "HEAD"], first)
+        assert unpushed != head
+        assert execute([git, "--git-dir", str(remote), "rev-parse", branch], first) == head
+        hook.unlink()
+        backup(first)
+        assert execute([git, "--git-dir", str(remote), "rev-parse", branch], first) == unpushed
+        assert execute([git, "-C", str(state), "rev-parse", "HEAD"], first) == unpushed
 
         restored = environment("restored")
-        execute(deploy, restored)
-        assert (pathlib.Path(restored["STATE_PATH"]) / ".local/state/bash/history").read_text() == "gcc fixture.c\n"
+        restored_state, restored_history = paths(restored)
+        backup(restored)
+        assert restored_history.is_symlink()
+        assert restored_history.read_text() == history.read_text()
 
-        wrong = environment("wrong-checkout")
-        wrong_state = pathlib.Path(wrong["STATE_PATH"])
+        wrong = environment("wrong-branch")
+        wrong_state, wrong_history = paths(wrong)
         wrong_state.parent.mkdir(parents=True)
         execute([git, "clone", "--branch", "nocon", str(remote), str(wrong_state)], wrong)
-        execute(deploy, wrong, success=False)
-        assert (wrong_state / "desktop-only").read_text() == "fixture desktop state\n"
-        assert pathlib.Path(wrong["EVENTS"]).read_text() == ""
+        backup(wrong)
+        assert execute([git, "-C", str(wrong_state), "branch", "--show-current"], wrong) == branch
+        assert wrong_history.read_text() == history.read_text()
 
-        offline = environment("offline", STATE_REMOTE=str(root / "unavailable.git"))
-        execute(deploy, offline, success=False)
-        assert not pathlib.Path(offline["STATE_PATH"]).exists()
-        assert not list(pathlib.Path(offline["STATE_PATH"]).parent.glob("state.checkout.*"))
-        assert "activate" not in pathlib.Path(offline["EVENTS"]).read_text()
+        dirty = environment("dirty-branch")
+        dirty_state, dirty_history = paths(dirty)
+        dirty_state.parent.mkdir(parents=True)
+        execute([git, "clone", "--branch", "nocon", str(remote), str(dirty_state)], dirty)
+        (dirty_state / ".local/state/bash/history").write_text("uncommitted checkout history\n")
+        dirty_history.parent.mkdir(parents=True)
+        dirty_history.symlink_to(dirty_state / ".local/state/bash/history")
+        backup(dirty, success=False)
+        assert not dirty_history.is_symlink()
+        assert dirty_history.read_text() == "uncommitted checkout history\n"
+        assert execute([git, "-C", str(dirty_state), "branch", "--show-current"], dirty) == "nocon"
+        assert (dirty_state / ".local/state/bash/history").read_text() == "uncommitted checkout history\n"
 
-        shell = environment("shell", ALLOW_PERSONAL="false")
-        history_setup = 'HISTFILE="' + os.environ["historyFile"] + '"\nmkdir -p "$(dirname "$HISTFILE")"\nset -o history\n'
-        execute([bash, "--noprofile", "--norc", "-c", history_setup + "history -s 'gcc fixture.c'; history -a"], shell)
-        recalled = execute([bash, "--noprofile", "--norc", "-c", history_setup + "history -r; history"], shell)
-        assert "gcc fixture.c" in recalled
-        assert (pathlib.Path(shell["XDG_RUNTIME_DIR"]) / "bash/history").is_file()
-        assert not pathlib.Path(shell["STATE_PATH"]).exists()
+        offline = environment("offline")
+        offline_state, offline_history = paths(offline)
+        offline_history.parent.mkdir(parents=True)
+        offline_history.write_text("keep local\n")
+        backup(offline, root / "missing.git", success=False)
+        assert not offline_state.exists()
+        assert not offline_history.is_symlink()
+        assert offline_history.read_text() == "keep local\n"
+        assert not list(offline_state.parent.glob("state.checkout.*"))
+        backup(offline)
+        assert offline_history.is_symlink()
+        assert offline_history.read_text() == history.read_text()
+
+        class Denied(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(403)
+                self.end_headers()
+            def log_message(self, *args):
+                pass
+        server = http.server.HTTPServer(("127.0.0.1", 0), Denied)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        denied = environment("denied")
+        try:
+            backup(denied, "http://127.0.0.1:" + str(server.server_port) + "/state.git", success=False)
+        finally:
+            server.shutdown()
+            server.server_close()
+        denied_state, denied_history = paths(denied)
+        assert denied_history.is_file() and not denied_history.is_symlink()
+        assert not denied_state.exists()
+
+        empty = root / "empty.git"
+        execute([git, "init", "--bare", str(empty)], base)
+        new = environment("empty-remote")
+        backup(new, empty)
+        assert execute([git, "--git-dir", str(empty), "show", branch + ":.local/state/bash/history"], new) == ""
+
+        storage = environment("storage")
+        storage_state, storage_history = paths(storage)
+        persistent = root / "persistent-state"
+        persistent.mkdir()
+        storage_state.parent.mkdir(parents=True)
+        storage_state.symlink_to(persistent, target_is_directory=True)
+        backup(storage)
+        assert storage_state.is_symlink()
+        assert storage_history.resolve() == persistent / ".local/state/bash/history"
+
+        tools = root / "tools"
+        tools.mkdir()
+        executable(tools / "hostname", 'print("fixture-host")\n')
+        executable(tools / "nix", r"""
+    import os, sys
+    target = sys.argv[-1]
+    values = {"homeSops.enable": os.environ.get("ALLOW_PERSONAL", "true"),
+              "DOTFILES_HOST": os.environ.get("CONFIGURED_HOST", "fixture-host"),
+              "home.username": os.environ["FIXTURE_USER"], "homeSops.identity": "user-0",
+              "homeSops.ageKeyFile": os.environ["HOME"] + "/key", "homeSops.bootstrap": os.environ["BOOTSTRAP"]}
+    print(next(value for key, value in values.items() if target.endswith(key)))
+    """)
+        executable(tools / "age", r"""
+    import pathlib, sys
+    pathlib.Path(sys.argv[sys.argv.index("--output") + 1]).write_text("fixture")
+    """)
+        executable(tools / "age-keygen", 'print("fixture-recipient")\n')
+        bootstrap = root / "bootstrap/bin"
+        bootstrap.mkdir(parents=True)
+        executable(bootstrap / "bootstrap-home-secrets", r"""
+    import os, pathlib
+    home = pathlib.Path(os.environ["HOME"])
+    for name in [".config/git/git_users", ".config/sops-nix/secrets/git_tokens", ".ssh/id_ed25519", ".ssh/id_ed25519_proton", ".ssh/id_ed25519_sf"]:
+        path = home / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("fixture")
+    """)
+        executable(tools / "home-manager", r"""
+    import os, pathlib
+    home = pathlib.Path(os.environ["HOME"])
+    assert (home / ".config/sops-nix/secrets/git_tokens").is_file()
+    (home / "activated").touch()
+    """)
+        repo = root / "dotfiles"
+        envelopes = repo / "secrets/identities"
+        envelopes.mkdir(parents=True)
+        (repo / "flake.nix").touch()
+        (envelopes / "home-user-0.age.key.enc").write_text("-----BEGIN AGE ENCRYPTED FILE-----\n")
+        (envelopes / "home-user-0.age.pub").write_text("fixture-recipient\n")
+        deploy_env = environment("deploy") | {"PATH": str(tools) + ":" + base["PATH"],
+            "BOOTSTRAP": str(bootstrap.parent), "FIXTURE_USER": pwd.getpwuid(os.getuid()).pw_name}
+        deploy = [bash, os.environ["deployScript"], "--repo", str(repo)]
+        execute(deploy, deploy_env | {"ALLOW_PERSONAL": "false"}, success=False)
+        execute(deploy, deploy_env | {"CONFIGURED_HOST": "another-host"}, success=False)
+        execute(deploy + ["--check"], deploy_env)
+        assert not (pathlib.Path(deploy_env["HOME"]) / "key").exists()
+        execute(deploy, deploy_env)
+        assert (pathlib.Path(deploy_env["HOME"]) / "activated").exists()
+        assert not paths(deploy_env)[0].exists()
+
+        shell = environment("borrowed-shell")
+        setup = 'HISTFILE="' + os.environ["historyFile"] + '"\nmkdir -p "$(dirname "$HISTFILE")"\nset -o history\n'
+        execute([bash, "--noprofile", "--norc", "-c", setup + "history -s 'gcc fixture.c'; history -a"], shell)
+        assert "gcc fixture.c" in execute([bash, "--noprofile", "--norc", "-c", setup + "history -r; history"], shell)
     PY
     touch "$out"
   ''
