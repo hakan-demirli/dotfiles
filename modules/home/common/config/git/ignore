@@ -2,6 +2,7 @@
 .ruff_cache*
 .claude
 .opencode
+.agent
 .fuse_hidden*
 .Trash-*
 .nfs*
