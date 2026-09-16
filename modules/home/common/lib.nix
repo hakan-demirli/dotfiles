@@ -6,6 +6,16 @@
       "leased"
     ];
 
+  mkUnstablePkgs =
+    {
+      inputs,
+      pkgs,
+    }:
+    import inputs.nixpkgs-unstable {
+      inherit (pkgs.stdenv.hostPlatform) system;
+      inherit (pkgs) config;
+    };
+
   mkHomeConfigurations =
     {
       inputs,
