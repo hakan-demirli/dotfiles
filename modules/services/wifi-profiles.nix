@@ -45,14 +45,21 @@ let
 
       install -d -m 0700 "$output_dir"
       for f in "$staging/profiles"/*.nmconnection; do
-        install -m 0600 "$f" "$output_dir/$(basename "$f")"
+        uuid="$(basename "$f" .nmconnection)"
+        install -m 0600 "$f" "$output_dir/wifi-profiles-$uuid.nmconnection"
       done
 
-      for existing in "$output_dir"/*.nmconnection; do
+      for existing in "$output_dir"/wifi-profiles-*.nmconnection; do
         [[ -e $existing ]] || continue
         uuid="$(basename "$existing" .nmconnection)"
+        uuid="''${uuid#wifi-profiles-}"
         grep -qxF "$uuid" <<< "$managed" || rm -f "$existing"
       done
+
+      while IFS= read -r uuid; do
+        [[ -n $uuid ]] || continue
+        rm -f "$output_dir/$uuid.nmconnection"
+      done <<< "$managed"
 
       for persisted in "$persisted_dir"/*.nmconnection; do
         [[ -e $persisted ]] || continue
