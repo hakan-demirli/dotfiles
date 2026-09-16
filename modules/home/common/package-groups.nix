@@ -6,6 +6,7 @@
 let
   nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { };
   pickNur = name: nurPkgs.${name} or null;
+  unstablePkgs = (import ./lib.nix).mkUnstablePkgs { inherit inputs pkgs; };
   sendToLaptop = pkgs.callPackage ./pkgs/nix/send-to-laptop.nix { };
 
   autoRefresh = pkgs.writeShellApplication {
@@ -40,7 +41,7 @@ rec {
         bat
         cargo
         clang-tools
-        claude-code
+        unstablePkgs.claude-code
         clippy
         cmake-language-server
         diagnostic-languageserver
