@@ -15,6 +15,7 @@ alias cdf='cd "$(find . -type d | fzf)"'
 alias da='direnv allow'
 
 alias np='np.sh'
+alias hydrate='hydrate.py'
 alias txf='txf.sh'
 
 alias oc='opencode'
