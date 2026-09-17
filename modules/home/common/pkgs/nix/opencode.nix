@@ -24,6 +24,10 @@ let
         url = "https://github.com/anomalyco/opencode/commit/7f392ba6178ac1be6f2b6385293a61586cd98a87.patch";
         hash = "sha256-AnG+asHaWzDp9HpeviX5QrAWzGq5/vGjp3djm6en8Eo=";
       })
+      (pkgs.fetchurl {
+        url = "https://github.com/anomalyco/opencode/commit/98639ab00182513cc614461f6037d686a82489ec.patch";
+        hash = "sha256-d6Vo8zvp9zyoVyvaDnuakvYivnIZhE5r3LpPhrPyyg4=";
+      })
     ];
   });
 
@@ -35,6 +39,7 @@ let
   ];
 
   opencodeConfigDir = ../../config/opencode;
+  localPluginsDir = opencodeConfigDir + "/plugins";
   dotfileEntries =
     if builtins.pathExists opencodeConfigDir then
       lib.mapAttrsToList (name: _type: {
@@ -43,9 +48,15 @@ let
       }) (builtins.removeAttrs (builtins.readDir opencodeConfigDir) [ "plugins" ])
     else
       [ ];
-  pluginEntries = lib.optional hasPlugins {
+  mergedPlugins = pkgs.symlinkJoin {
+    name = "opencode-plugins";
+    paths =
+      lib.optional hasPlugins "${opencodePlugins}/plugins"
+      ++ lib.optional (builtins.pathExists localPluginsDir) localPluginsDir;
+  };
+  pluginEntries = lib.optional (hasPlugins || builtins.pathExists localPluginsDir) {
     name = "plugins";
-    path = "${opencodePlugins}/plugins";
+    path = mergedPlugins;
   };
   opencodeConfigEntries = dotfileEntries ++ pluginEntries;
   opencodeConfig = pkgs.linkFarm "opencode-config" opencodeConfigEntries;
