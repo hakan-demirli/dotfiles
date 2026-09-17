@@ -202,13 +202,17 @@ def fetch_claude(
             },
         )
 
-    except (
-        OSError,
-        ValueError,
-        json.JSONDecodeError,
-        urllib.error.URLError,
-    ):
-        return stale(previous, "request_failed")
+    except urllib.error.HTTPError as exc:
+        reason = f"http_{exc.code}"
+
+        if retry_after := exc.headers.get("Retry-After"):
+            reason += f" retry_after={retry_after}"
+
+        return stale(previous, reason)
+    except urllib.error.URLError as exc:
+        return stale(previous, f"request_failed: {exc.reason}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return stale(previous, f"request_failed: {exc}")
 
     limits = raw.get("limits") or []
 
@@ -477,12 +481,14 @@ def status_cell(
     available: bool,
     stale: bool,
     limited: bool = False,
+    stale_reason: str | None = None,
     width: int = 10,
 ) -> str:
     if not available:
         return colorize(pad("LOGGED OUT", width), "90")
     if stale:
-        return colorize(pad("STALE", width), "33")
+        label = "RATE LIMIT" if stale_reason == "http_429" else "STALE"
+        return colorize(pad(label, width), "33")
     if limited:
         return colorize(pad("LIMIT", width), "1;31")
     return colorize(pad("OK", width), "32")
@@ -561,6 +567,7 @@ def render_human(data: dict[str, Any]) -> None:
                         available=True,
                         stale=is_stale,
                         limited=limited,
+                        stale_reason=item.get("refresh_error"),
                         width=status_w,
                     ),
                 ]
