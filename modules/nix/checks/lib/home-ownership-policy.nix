@@ -5,12 +5,15 @@
   inputs,
 }:
 let
-  trustedNames = [
+  laptopNames = [
     "laptop-0"
     "laptop-1"
+  ];
+  headlessNames = [
     "server-dev-1"
     "vps-oracle-0"
   ];
+  trustedNames = laptopNames ++ headlessNames;
   borrowedNames = [
     "server-dev-2"
     "shared-server-1"
@@ -73,6 +76,7 @@ let
       && !(home.config.systemd.user.services ? state-autocommit)
       && !(home.config.systemd.user.services ? state-autopush)
       && !(home.config.systemd.user.services ? state-backup)
+      && !(home.config.systemd.user.services ? notes-backup)
       && !(home.config.systemd.user.services ? github-backup)
       && !(home.config.systemd.user.services ? opencode-serve)
       && !(home.config.systemd.user.services ? sops-nix)
@@ -89,18 +93,24 @@ let
       && lib.hasInfix "XDG_RUNTIME_DIR" home.config.programs.bash.historyFile
       && lib.hasInfix "history -a; history -n" home.config.programs.bash.bashrcExtra
     ) restricted;
-    headless-branches-are-host-specific =
-      lib.all (name: homes."emre@${name}".config.home.stateRepository.branch == "hosts/${name}")
-        [
-          "server-dev-1"
-          "vps-oracle-0"
-        ];
-    desktop-branch-is-preserved =
-      lib.all (name: homes."emre@${name}".config.home.stateRepository.branch == "nocon")
-        [
-          "laptop-0"
-          "laptop-1"
-        ];
+    branches-are-host-specific = lib.all (
+      name: homes."emre@${name}".config.home.stateRepository.branch == "hosts/${name}"
+    ) trustedNames;
+    laptops-publish-notes = lib.all (
+      name:
+      let
+        cfg = homes."emre@${name}".config;
+      in
+      cfg.systemd.user.services ? notes-backup
+      && cfg.home.notesRepository.branch == "nocon"
+      && cfg.home.notesRepository.remote == cfg.home.stateRepository.remote
+      && cfg.home.file ? ".local/share/${cfg.home.notesRepository.directory}"
+    ) laptopNames;
+    headless-hosts-have-no-notes = lib.all (
+      name:
+      !(homes."emre@${name}".config.systemd.user.services ? notes-backup)
+      && !(homes."emre@${name}".config.home.file ? ".local/share/scratchpads")
+    ) headlessNames;
     backup-is-independent-of-activation = lib.all (
       home:
       !(home.config.home.activation ? checkStateRepository)

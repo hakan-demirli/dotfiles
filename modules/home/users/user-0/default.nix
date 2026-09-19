@@ -8,6 +8,7 @@
 }:
 let
   personal = (import ../../common/lib.nix).allowsPersonalData facts;
+  stateRemote = "https://github.com/hakan-demirli/state";
 in
 {
   imports = [
@@ -18,14 +19,18 @@ in
   ]
   ++ lib.optionals personal [
     (import ../../common/pkgs/nix/state_backup.nix {
-      remote = "https://github.com/hakan-demirli/state";
-      logBranch = if profile == "desktop" then "nocon" else "hosts/${facts.id}";
+      remote = stateRemote;
+      logBranch = "hosts/${facts.id}";
     })
   ]
   ++ lib.optionals (personal && profile == "desktop") [
     ./wallpaper.nix
     (import ../../common/pkgs/nix/ntfy-listener.nix { })
     (import ../../common/pkgs/nix/github_backup.nix { })
+    (import ../../common/pkgs/nix/notes_backup.nix {
+      remote = stateRemote;
+      branch = "nocon";
+    })
   ];
 
   home = rec {
