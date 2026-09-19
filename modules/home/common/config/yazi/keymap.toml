@@ -68,7 +68,7 @@ keymap = [
     "<Space>",
     "y",
     "p",
-  ], run = "copy path", desc = "Copy the absolute path" },
+  ], run = 'shell -- echo -n "%h" | gclip.sh > /proc/$PPID/fd/1', desc = "Copy the absolute path" },
   { on = [
     "<Space>",
     "y",

@@ -9,6 +9,7 @@ pkgs.runCommand "home-state-automation"
       pkgs.coreutils
     ];
     backupScript = ../../../home/common/pkgs/bin/state-backup.sh;
+    notesScript = ../../../home/common/pkgs/bin/notes-backup.sh;
     deployScript = ../../pkgs/bin/deploy-home-secrets.sh;
     historyFile = self.homeConfigurations."emre@shared-server-1".config.programs.bash.historyFile;
   }
@@ -176,6 +177,72 @@ pkgs.runCommand "home-state-automation"
         backup(storage)
         assert storage_state.is_symlink()
         assert storage_history.resolve() == persistent / ".local/state/bash/history"
+
+        notes_remote = root / "notes.git"
+        execute([git, "init", "--bare", "--initial-branch=notes", str(notes_remote)], base)
+        notes_seed = root / "notes-seed"
+        execute([git, "init", "--initial-branch=notes", str(notes_seed)], base)
+        (notes_seed / "scratchpads").mkdir()
+        (notes_seed / "scratchpads/todo.md").write_text("seed\n")
+        (notes_seed / "keep.txt").write_text("seed\n")
+        execute([git, "-C", str(notes_seed), "add", "."], base)
+        execute([git, "-C", str(notes_seed), "commit", "-m", "notes fixture"], base)
+        execute([git, "-C", str(notes_seed), "push", str(notes_remote), "notes"], base)
+
+        notes = environment("notes")
+        notes_repo = pathlib.Path(notes["HOME"]) / "Desktop/infra/state"
+        note = notes_repo / "scratchpads/todo.md"
+
+        def publish(origin=notes_remote, success=True):
+            return execute([bash, os.environ["notesScript"], str(notes_repo), "notes", str(origin), "scratchpads"], notes, success)
+
+        def remote_head(origin=notes_remote):
+            return execute([git, "--git-dir", str(origin), "rev-parse", "notes"], notes)
+
+        publish()
+        assert not notes_repo.exists()
+
+        notes_repo.parent.mkdir(parents=True)
+        execute([git, "clone", "--branch", "notes", str(notes_remote), str(notes_repo)], notes)
+        seeded = remote_head()
+        publish()
+        assert execute([git, "-C", str(notes_repo), "rev-parse", "HEAD"], notes) == seeded
+
+        note.write_text("seed\nnew note\n")
+        (notes_repo / "keep.txt").write_text("untracked by the service\n")
+        publish()
+        head = execute([git, "-C", str(notes_repo), "rev-parse", "HEAD"], notes)
+        assert head != seeded
+        assert remote_head() == head
+        assert execute([git, "-C", str(notes_repo), "show", "--format=", "--name-only", "HEAD"], notes) == "scratchpads/todo.md"
+        assert execute([git, "-C", str(notes_repo), "status", "--porcelain"], notes) == "M keep.txt"
+
+        execute([git, "-C", str(notes_repo), "add", "keep.txt"], notes)
+        note.write_text("seed\nnew note\nanother\n")
+        publish()
+        assert execute([git, "-C", str(notes_repo), "diff", "--cached", "--name-only"], notes) == "keep.txt"
+        head = execute([git, "-C", str(notes_repo), "rev-parse", "HEAD"], notes)
+
+        publish(root / "missing.git", success=False)
+        assert execute([git, "-C", str(notes_repo), "rev-parse", "HEAD"], notes) == head
+
+        execute([git, "-C", str(notes_repo), "switch", "--quiet", "-c", "elsewhere"], notes)
+        note.write_text("seed\nnew note\nanother\nwrong branch\n")
+        publish(success=False)
+        assert execute([git, "-C", str(notes_repo), "branch", "--show-current"], notes) == "elsewhere"
+        assert execute([git, "-C", str(notes_repo), "rev-parse", "HEAD"], notes) == head
+        assert note.read_text() == "seed\nnew note\nanother\nwrong branch\n"
+        execute([git, "-C", str(notes_repo), "switch", "--quiet", "notes"], notes)
+
+        notes_hook = notes_remote / "hooks/pre-receive"
+        executable(notes_hook, "raise SystemExit(1)\n")
+        publish(success=False)
+        unpublished = execute([git, "-C", str(notes_repo), "rev-parse", "HEAD"], notes)
+        assert unpublished != head
+        assert remote_head() == head
+        notes_hook.unlink()
+        publish()
+        assert remote_head() == unpublished
 
         tools = root / "tools"
         tools.mkdir()

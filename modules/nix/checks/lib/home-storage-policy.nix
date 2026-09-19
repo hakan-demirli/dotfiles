@@ -36,6 +36,7 @@ let
     map (name: builtins.head actual.systemd.user.services.${name}.Service.ExecStart)
       [
         "github-backup"
+        "notes-backup"
         "ntfy-listener"
         "state-backup"
       ];
