@@ -16,7 +16,7 @@
   "lsp": false,
   "formatter": false,
   "snapshot": false,
-  "instructions": [".agent/*.md"],
+  "instructions": [".agent/*.md", ".hydrate/agent/*.md"],
   "provider": {
     "openai": {
       "models": {
