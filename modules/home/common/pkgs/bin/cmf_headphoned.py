@@ -16,7 +16,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 from dbus_fast import BusType, DBusError, Variant
-from dbus_fast.aio import MessageBus
+from dbus_fast.aio import MessageBus, ProxyInterface, ProxyObject
 from dbus_fast.constants import PropertyAccess
 from dbus_fast.service import ServiceInterface, dbus_property, method
 
@@ -26,18 +26,25 @@ TOTA_UUID = "aeac4a03-dff5-498f-843a-34487cf133eb"
 
 BLUEZ_SERVICE = "org.bluez"
 BLUEZ_ROOT = "/org/bluez"
+OBJECT_ROOT = "/"
 DBUS_SERVICE = "org.freedesktop.DBus"
 DBUS_PATH = "/org/freedesktop/DBus"
+DEVICE_INTERFACE = "org.bluez.Device1"
 PROFILE_INTERFACE = "org.bluez.Profile1"
 PROFILE_MANAGER_INTERFACE = "org.bluez.ProfileManager1"
 BATTERY_PROVIDER_INTERFACE = "org.bluez.BatteryProvider1"
 BATTERY_PROVIDER_MANAGER_INTERFACE = "org.bluez.BatteryProviderManager1"
+OBJECT_MANAGER_INTERFACE = "org.freedesktop.DBus.ObjectManager"
+PROPERTIES_INTERFACE = "org.freedesktop.DBus.Properties"
 
 PROFILE_PATH = "/org/cmf/headphoned/profile"
 PROVIDER_ROOT = "/org/cmf/headphoned/battery"
 PROVIDER_PATH = f"{PROVIDER_ROOT}/headphone"
 
 DEVICE_NODE_PREFIX = "dev_"
+CONNECTED_PROPERTY = "Connected"
+UUIDS_PROPERTY = "UUIDs"
+DEVICE_TRIGGERS = frozenset({CONNECTED_PROPERTY, "ServicesResolved", UUIDS_PROPERTY})
 ADDRESS_PATTERN = re.compile(r"[0-9A-F]{2}(?::[0-9A-F]{2}){5}")
 
 SIGNATURE_OBJECT_PATH = "o"
@@ -67,6 +74,9 @@ ANC_RETRY_DELAY = 0.5
 ANC_CONFIRM_TIMEOUT = 5.0
 
 LDAC_RESTART_TIMEOUT = 30.0
+
+VENDOR_ATTEMPTS = 3
+VENDOR_RETRY_DELAY = 2.0
 
 
 def log(message: str) -> None:
@@ -137,12 +147,29 @@ class State:
         return json.dumps(report).encode() + b"\n"
 
 
+@dataclass(frozen=True, slots=True)
+class Watch:
+    device: ProxyInterface
+    properties: ProxyInterface
+    handler: Callable[[str, dict[str, Variant], list[str]], None]
+
+
 def decode_address(device_path: str) -> str | None:
     node = device_path.rsplit("/", 1)[-1]
     if not node.startswith(DEVICE_NODE_PREFIX):
         return None
     address = node[len(DEVICE_NODE_PREFIX) :].replace("_", ":").upper()
     return address if ADDRESS_PATTERN.fullmatch(address) else None
+
+
+def is_connected(properties: dict[str, Variant]) -> bool:
+    entry = properties.get(CONNECTED_PROPERTY)
+    return entry is not None and entry.value is True
+
+
+def offers_vendor_channel(properties: dict[str, Variant]) -> bool:
+    entry = properties.get(UUIDS_PROPERTY)
+    return entry is not None and TOTA_UUID in {uuid.casefold() for uuid in entry.value}
 
 
 def crc16_modbus(data: bytes) -> int:
@@ -317,6 +344,9 @@ class Daemon:
         self._link: Link | None = None
         self._provider: BatteryProvider | None = None
         self._provider_adapter: str | None = None
+        self._objects: ProxyInterface | None = None
+        self._watches: dict[str, Watch] = {}
+        self._connecting: set[str] = set()
         self._server: asyncio.Server | None = None
         self._link_task: asyncio.Task | None = None
         self._restart_task: asyncio.Task | None = None
@@ -336,9 +366,14 @@ class Daemon:
         task.add_done_callback(self._tasks.discard)
         return task
 
-    async def _interface(self, path: str, name: str, service: str = BLUEZ_SERVICE):
+    async def _proxy(self, path: str, service: str = BLUEZ_SERVICE) -> ProxyObject:
         introspection = await self._bus.introspect(service, path)
-        proxy = self._bus.get_proxy_object(service, path, introspection)
+        return self._bus.get_proxy_object(service, path, introspection)
+
+    async def _interface(
+        self, path: str, name: str, service: str = BLUEZ_SERVICE
+    ) -> ProxyInterface:
+        proxy = await self._proxy(path, service)
         return proxy.get_interface(name)
 
     async def start(self) -> None:
@@ -347,7 +382,7 @@ class Daemon:
         dbus = await self._interface(DBUS_PATH, DBUS_SERVICE, service=DBUS_SERVICE)
         dbus.on_name_owner_changed(self._on_name_owner_changed)
         if await dbus.call_name_has_owner(BLUEZ_SERVICE):
-            await self._register_profile()
+            await self._bind()
         else:
             log("waiting for bluetoothd")
 
@@ -378,10 +413,92 @@ class Daemon:
         await self.detach(None)
         if self._server is not None:
             self._server.close()
+            for writer in tuple(self._clients):
+                writer.close()
             with contextlib.suppress(OSError):
                 await self._server.wait_closed()
             self._socket_path.unlink(missing_ok=True)
         self._bus.disconnect()
+
+    async def _bind(self) -> None:
+        await self._register_profile()
+        await self._observe()
+
+    async def _observe(self) -> None:
+        if self._objects is None:
+            self._objects = await self._interface(OBJECT_ROOT, OBJECT_MANAGER_INTERFACE)
+            self._objects.on_interfaces_added(self._track)
+            self._objects.on_interfaces_removed(self._on_interfaces_removed)
+        objects = await self._objects.call_get_managed_objects()
+        for path in tuple(self._watches):
+            if path not in objects:
+                self._untrack(path)
+        for path, interfaces in objects.items():
+            await self._track(path, interfaces)
+
+    async def _track(
+        self, path: str, interfaces: dict[str, dict[str, Variant]]
+    ) -> None:
+        if DEVICE_INTERFACE not in interfaces:
+            return
+        with contextlib.suppress(DBusError):
+            if path not in self._watches:
+                proxy = await self._proxy(path)
+                properties = proxy.get_interface(PROPERTIES_INTERFACE)
+                handler = self._watcher(path)
+                properties.on_properties_changed(handler)
+                self._watches[path] = Watch(
+                    proxy.get_interface(DEVICE_INTERFACE), properties, handler
+                )
+            await self._ensure(path)
+
+    def _untrack(self, path: str) -> None:
+        watch = self._watches.pop(path, None)
+        if watch is not None:
+            watch.properties.off_properties_changed(watch.handler)
+
+    def _watcher(
+        self, path: str
+    ) -> Callable[[str, dict[str, Variant], list[str]], None]:
+        def changed(
+            interface: str, values: dict[str, Variant], invalidated: list[str]
+        ) -> None:
+            if interface == DEVICE_INTERFACE and not DEVICE_TRIGGERS.isdisjoint(values):
+                self._spawn(self._ensure(path))
+
+        return changed
+
+    def _on_interfaces_removed(self, path: str, interfaces: list[str]) -> None:
+        if DEVICE_INTERFACE in interfaces:
+            self._untrack(path)
+
+    async def _ensure(self, path: str) -> None:
+        watch = self._watches.get(path)
+        if watch is None or self._link is not None or path in self._connecting:
+            return
+        with contextlib.suppress(DBusError):
+            properties = await watch.properties.call_get_all(DEVICE_INTERFACE)
+            if is_connected(properties) and offers_vendor_channel(properties):
+                await self._open(path, watch)
+
+    async def _open(self, path: str, watch: Watch) -> None:
+        self._connecting.add(path)
+        try:
+            for attempt in range(VENDOR_ATTEMPTS):
+                if attempt:
+                    await asyncio.sleep(VENDOR_RETRY_DELAY)
+                if self._link is not None:
+                    return
+                properties = await watch.properties.call_get_all(DEVICE_INTERFACE)
+                if not is_connected(properties):
+                    return
+                try:
+                    await watch.device.call_connect_profile(TOTA_UUID)
+                    return
+                except DBusError as error:
+                    log(f"vendor channel refused by {path}: {error.text}")
+        finally:
+            self._connecting.discard(path)
 
     async def _register_profile(self) -> None:
         manager = await self._interface(BLUEZ_ROOT, PROFILE_MANAGER_INTERFACE)
@@ -406,7 +523,7 @@ class Daemon:
         log("bluetoothd appeared, registering")
         self._provider_adapter = None
         await self._release()
-        await self._register_profile()
+        await self._bind()
 
     async def attach(self, device_path: str, descriptor: int) -> None:
         await self.detach(None)
