@@ -1,10 +1,12 @@
 name: Update Dependencies
 on:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '17 7 * * *'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
+  actions: write
 concurrency:
   group: dotfiles-dependency-update
   cancel-in-progress: false
@@ -13,19 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
-        id: bot
-        with:
-          app-id: ${{ vars.DEPENDENCY_APP_ID }}
-          private-key: ${{ secrets.DEPENDENCY_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }}
-          permission-contents: write
-          permission-pull-requests: write
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: main
-          token: ${{ steps.bot.outputs.token }}
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
       - run: nix flake update
       - run: |
@@ -41,7 +33,6 @@ jobs:
       - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         id: update
         with:
-          token: ${{ steps.bot.outputs.token }}
           base: main
           branch: automation/update-flake-inputs
           add-paths: |
@@ -53,8 +44,9 @@ jobs:
           body: ''
       - if: steps.update.outputs.pull-request-operation == 'created' || steps.update.outputs.pull-request-operation == 'updated'
         env:
-          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
           PR: ${{ steps.update.outputs.pull-request-number }}
+          BRANCH: automation/update-flake-inputs
         run: |
           set -euo pipefail
           allowed=$'flake.lock\n.github/workflows/main.yml'
@@ -64,3 +56,4 @@ jobs:
             [[ -n "$path" ]] || continue
             grep -qxF "$path" <<< "$allowed"
           done <<< "$changed"
+          gh workflow run main.yml --ref "$BRANCH"
