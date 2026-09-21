@@ -23,6 +23,16 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
           permission-workflows: write
+      - id: identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLUG: ${{ steps.bot.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          id=$(gh api "/users/$SLUG%5Bbot%5D" --jq .id)
+          [[ "$id" =~ ^[0-9]+$ ]]
+          echo "name=${SLUG}[bot]" >> "$GITHUB_OUTPUT"
+          echo "email=${id}+${SLUG}[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: main
@@ -45,6 +55,8 @@ jobs:
           token: ${{ steps.bot.outputs.token }}
           base: main
           branch: automation/update-flake-inputs
+          committer: ${{ steps.identity.outputs.name }} <${{ steps.identity.outputs.email }}>
+          author: ${{ steps.identity.outputs.name }} <${{ steps.identity.outputs.email }}>
           add-paths: |
             flake.lock
             .github/workflows/main.yml
