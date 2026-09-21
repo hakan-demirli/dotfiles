@@ -1,0 +1,66 @@
+name: Update Dependencies
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dotfiles-dependency-update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        id: bot
+        with:
+          app-id: ${{ vars.DEPENDENCY_APP_ID }}
+          private-key: ${{ secrets.DEPENDENCY_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          token: ${{ steps.bot.outputs.token }}
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
+      - run: nix flake update
+      - run: |
+          set -euo pipefail
+          rev=$(jq -er '.nodes["infra-lib"].locked.rev' flake.lock)
+          [[ "$rev" =~ ^[0-9a-f]{40}$ ]]
+          pin='hakan-demirli/infra-lib/\.github/workflows/[a-z-]+\.yml'
+          sed -i -E "s|($pin)@[0-9a-f]{40}|\1@$rev|g" .github/workflows/main.yml
+          total=$(grep -cE "$pin@[0-9a-f]{40}" .github/workflows/main.yml || true)
+          current=$(grep -cE "$pin@$rev\$" .github/workflows/main.yml || true)
+          test "$total" -gt 0
+          test "$total" -eq "$current"
+      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
+        id: update
+        with:
+          token: ${{ steps.bot.outputs.token }}
+          base: main
+          branch: automation/update-flake-inputs
+          add-paths: |
+            flake.lock
+            .github/workflows/main.yml
+          delete-branch: true
+          commit-message: 'chore: update flake inputs'
+          title: 'chore: update flake inputs'
+          body: ''
+      - if: steps.update.outputs.pull-request-operation == 'created' || steps.update.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          PR: ${{ steps.update.outputs.pull-request-number }}
+        run: |
+          set -euo pipefail
+          allowed=$'flake.lock\n.github/workflows/main.yml'
+          changed=$(gh pr diff "$PR" --name-only)
+          test -n "$changed"
+          while IFS= read -r path; do
+            [[ -n "$path" ]] || continue
+            grep -qxF "$path" <<< "$allowed"
+          done <<< "$changed"
