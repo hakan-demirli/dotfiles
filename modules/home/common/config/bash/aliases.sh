@@ -39,6 +39,7 @@ alias gc='git commit'
 alias gcm='git commit -m'
 alias gca='git commit --amend'
 alias gl='git --no-pager log --oneline --graph --first-parent -10'
+alias gsu='gsu.sh'
 
 alias bell='source $HOME/.local/bin/prompt-bell'
 alias tbell='source $HOME/.local/bin/prompt-tnotify.sh'

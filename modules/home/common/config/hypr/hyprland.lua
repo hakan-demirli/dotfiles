@@ -11,8 +11,13 @@ do
     local name = (h:read("*l") or ""):gsub("%s+", "")
     h:close()
     if name ~= "" then
-      local ok = pcall(require, "hosts." .. name)
+      local module = "hosts." .. name
+      local ok, err = pcall(require, module)
       if not ok then
+        local missing = "module '" .. module .. "' not found:"
+        if tostring(err):sub(1, #missing) ~= missing then
+          error(err, 0)
+        end
       end
     end
   end

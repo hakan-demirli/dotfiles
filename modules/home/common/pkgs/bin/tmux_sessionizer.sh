@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:session_path}" \
+current_session=${1-}
+last_session=${2-}
+
+if [[ -z $last_session ]] || ! tmux has-session -t "=$last_session" 2> /dev/null; then
+  last_session=$(tmux list-sessions -F "#{session_last_attached}|#{session_name}" \
+    | awk -F '|' -v current="$current_session" '
+      $2 != current && $1 > newest_time { newest_time = $1; newest = $2 }
+      END { print newest }
+    ')
+fi
+
+sessions=$(tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:session_path}" \
   | awk '
     BEGIN { FS="|"; OFS="|" }
     {
@@ -51,12 +62,24 @@ tmux list-sessions -F "#{session_name}|#{=15:session_name}: #{s|$HOME|~|:session
             print parts[1] "|" label_col " " session_col ": " new_path
         }
     }
-' \
-  | fzf --ansi -d '|' \
-    --with-nth 2 \
-    --preview 'tmux capture-pane -ep -t {1}' \
-    --bind 'enter:execute(tmux switch-client -t {1})+accept' \
-    --bind 'alt-u:pos(1)+execute(tmux switch-client -t {1})+accept' \
-    --bind 'alt-i:pos(2)+execute(tmux switch-client -t {1})+accept' \
-    --bind 'alt-o:pos(3)+execute(tmux switch-client -t {1})+accept' \
-    --bind 'alt-p:pos(4)+execute(tmux switch-client -t {1})+accept'
+')
+
+last_session_pos=$(awk -F '|' -v last="$last_session" '
+  $1 == last && pos == 0 { pos = NR }
+  END { print pos + 0 }
+' <<< "$sessions")
+
+fzf_bind_args=()
+if [[ $last_session_pos -gt 0 ]]; then
+  fzf_bind_args=(--sync "--bind=start:pos($last_session_pos)")
+fi
+
+fzf --ansi -d '|' "${fzf_bind_args[@]}" \
+  --with-nth 2 \
+  --preview 'tmux capture-pane -ep -t {1}' \
+  --bind 'enter:execute(tmux switch-client -t {1})+accept' \
+  --bind 'alt-u:pos(1)+execute(tmux switch-client -t {1})+accept' \
+  --bind 'alt-i:pos(2)+execute(tmux switch-client -t {1})+accept' \
+  --bind 'alt-o:pos(3)+execute(tmux switch-client -t {1})+accept' \
+  --bind 'alt-p:pos(4)+execute(tmux switch-client -t {1})+accept' \
+  <<< "$sessions"
