@@ -16,7 +16,12 @@
   };
 
   access = {
-    users = [ ];
+    users = [
+      {
+        user = "guest-0";
+        unix_tier = "admin";
+      }
+    ];
     teams = [
       {
         team = "team-user-0";

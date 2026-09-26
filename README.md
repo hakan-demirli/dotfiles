@@ -65,7 +65,7 @@ home-manager switch --flake .
 home-manager switch --flake '.#user-0@vps-oracle-0'
 ```
 
-Initial setup (personal/leased hosts):
+Initial setup (personal/leased hosts). Activation refuses to run until the Home Manager age key is installed:
 
 ```bash
 nix run path:.#deploy-home-secrets
@@ -95,6 +95,8 @@ Deploy Home Manager and NixOS secrets separately, as the target user:
 nix run path:.#deploy-home-secrets
 nix run path:.#deploy-system-secrets
 ```
+
+A missing key fails `sops-install-secrets.service` (system) or `sops-nix.service` (user). Fleet Overview lists both under Failed Units.
 
 ## Tailnet
 

@@ -66,9 +66,10 @@ in
     home = {
       packages = [ gitCredentialHelper ];
       activation = {
-        warnMissingSopsKey = lib.hm.dag.entryBefore [ "sops-nix" ] ''
-          if [[ ! -e ${lib.escapeShellArg cfg.ageKeyFile} ]]; then
-            echo "warning: SOPS age key ${cfg.ageKeyFile} not found. Skipping secret deployment" >&2
+        checkSopsKey = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
+          if [[ ! -s ${lib.escapeShellArg cfg.ageKeyFile} ]]; then
+            echo "SOPS age key ${cfg.ageKeyFile} is missing. Run: nix run path:.#deploy-home-secrets" >&2
+            exit 1
           fi
         '';
         removeGitTokenUrlRewrite = lib.hm.dag.entryAfter [ "sops-nix" ] ''
@@ -117,6 +118,6 @@ in
       };
     };
 
-    systemd.user.services.sops-nix.Unit.ConditionPathExists = cfg.ageKeyFile;
+    systemd.user.services.sops-nix.Unit.AssertFileNotEmpty = cfg.ageKeyFile;
   };
 }

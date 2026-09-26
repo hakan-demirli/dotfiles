@@ -58,6 +58,12 @@ let
   passwordSecretAccountFor =
     hostId:
     if passwordAccountFor hostId == "root" then "root" else inventory.hosts.${hostId}.ownership.owner;
+  passwordHashFile = account: "/run/bootstrap-secrets/${account}/password-hash";
+  expectedPasswordAccounts = builtins.toJSON (
+    lib.genAttrs hostIds (
+      hostId: lib.attrNames (configFor hostId).services.sops.bootstrap.passwordAccounts
+    )
+  );
   everyHost = predicate: lib.all (hostId: predicate hostId (configFor hostId)) hostIds;
   fleetSecretHostIds = lib.filter (
     hostId: (configFor hostId).sops.secrets ? "ssh/id_ed25519_proton"
@@ -98,25 +104,37 @@ let
         owner = config.users.users.${ownerUsernameFor hostId};
         root = config.users.users.root;
         account = passwordAccountFor hostId;
+        hashFile = passwordHashFile (passwordSecretAccountFor hostId);
       in
       config.services.sops.bootstrap.passwordAccount == account
       && !config.users.mutableUsers
       && (
         if account == "owner" then
           owner.hashedPassword == null
-          && owner.hashedPasswordFile == "/run/bootstrap-secrets/password-hash"
+          && owner.hashedPasswordFile == hashFile
           && root.hashedPassword == "!"
           && root.hashedPasswordFile == null
         else
           owner.hashedPassword == "!"
           && owner.hashedPasswordFile == null
           && root.hashedPassword == null
-          && root.hashedPasswordFile == "/run/bootstrap-secrets/password-hash"
+          && root.hashedPasswordFile == hashFile
+          && config.services.sops.bootstrap.passwordAccounts == { root = "root"; }
       )
     );
-    password-envelope-covers-every-host = lib.all (
-      hostId: lib.hasInfix "    ${hostId}:\n        ${passwordSecretAccountFor hostId}:\n" passwordSops
-    ) hostIds;
+    password-accounts-have-own-hashes = everyHost (
+      _hostId: config:
+      lib.all (
+        account:
+        config.users.users.${config.services.sops.bootstrap.passwordAccounts.${account}}.hashedPasswordFile
+        == passwordHashFile account
+      ) (lib.attrNames config.services.sops.bootstrap.passwordAccounts)
+    );
+    shared-server-guests-have-own-passwords =
+      (configFor "shared-server-1").services.sops.bootstrap.passwordAccounts == {
+        ${inventory.hosts.shared-server-1.ownership.owner} = ownerUsernameFor "shared-server-1";
+        guest-0 = inventory.users.guest-0.system_account.username;
+      };
     password-runs-before-users = everyHost (
       _hostId: config: lib.elem "bootstrapPassword" config.system.activationScripts.users.deps
     );
@@ -153,6 +171,11 @@ let
         && munge.key == "munge-key"
         && munge.path == "/etc/munge/munge.key"
       );
+    missing-system-key-fails = everyFleetSecretHost (
+      _hostId: config:
+      config.systemd.services.sops-install-secrets.unitConfig.AssertFileNotEmpty
+      == config.sops.age.keyFile
+    );
     shared-server-excludes-personal-system-secrets =
       !(configFor "shared-server-1").sops.secrets ? "ssh/id_ed25519_proton"
       && !(configFor "shared-server-1").sops.secrets ? "munge-key";
@@ -207,12 +230,34 @@ let
 in
 pkgs.runCommand "bootstrap-secrets-contract"
   {
+    nativeBuildInputs = [
+      pkgs.jq
+      pkgs.remarshal
+    ];
     failureCount = toString (lib.length failures);
     failureNames = lib.concatStringsSep "," failures;
+    passwordEnvelope = self + /secrets/bootstrap/password.yaml;
+    inherit expectedPasswordAccounts;
   }
   ''
     if [[ "$failureCount" != 0 ]]; then
       echo "failed bootstrap secret checks: $failureNames" >&2
+      exit 1
+    fi
+
+    remarshal -if yaml -of json -i "$passwordEnvelope" -o envelope.json
+    missing="$(jq -r --argjson expected "$expectedPasswordAccounts" '
+      . as $envelope
+      | $expected
+      | to_entries[]
+      | .key as $host
+      | .value[]
+      | select(($envelope.hosts[$host][.]["password-hash"] // "") | startswith("ENC[") | not)
+      | "\($host).\(.)"
+    ' envelope.json)"
+    if [[ -n "$missing" ]]; then
+      echo "password envelope lacks hashes for:" >&2
+      echo "$missing" >&2
       exit 1
     fi
     touch "$out"

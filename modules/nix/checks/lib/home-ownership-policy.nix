@@ -11,6 +11,7 @@ let
   ];
   headlessNames = [
     "server-dev-1"
+    "server-dev-3"
     "vps-oracle-0"
   ];
   trustedNames = laptopNames ++ headlessNames;
@@ -68,6 +69,18 @@ let
       && home.config.sops.secrets ? git_tokens
       && home.config.systemd.user.services ? opencode-serve
     ) trusted;
+    missing-home-key-fails = lib.all (
+      home:
+      home.config.systemd.user.services.sops-nix.Unit.AssertFileNotEmpty == home.config.sops.age.keyFile
+      && home.config.home.activation ? checkSopsKey
+    ) trusted;
+    trusted-owner-managers-linger = lib.all (
+      name:
+      let
+        username = homes."emre@${name}".config.home.username;
+      in
+      self.nixosConfigurations.${name}.config.users.users.${username}.linger == true
+    ) trustedNames;
     restricted-hosts-have-no-personal-state = lib.all (
       home:
       !home.config.homeSops.enable

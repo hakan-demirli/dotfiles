@@ -433,6 +433,11 @@ let
   '';
 
   withHost = expression: ''label_replace(${expression}, "host", "$1", "instance", "([^.:]+).*")'';
+  failedUnitStates = ''node_systemd_unit_state{job="fleet-node",state="failed"} or fleet_user_systemd_unit_failed{job="fleet-node"}'';
+  failedUnitsExpression = withHost ''
+    label_replace(node_systemd_unit_state{job="fleet-node",state="failed"} == 1, "manager", "system", "instance", ".*")
+    or label_replace(fleet_user_systemd_unit_failed{job="fleet-node"}, "manager", "$1", "user", "(.*)")
+  '';
   monitoringPolicyStatusExpression = ''
     label_replace(
       (
@@ -923,12 +928,12 @@ let
         (mkStat {
           id = 7;
           title = "Failed services";
-          expression = ''sum(node_systemd_unit_state{job="fleet-node",state="failed"})'';
+          expression = "sum(${failedUnitStates})";
           x = 20;
           y = 1;
           thresholds = warningThresholds;
           mappings = clearMappings;
-          description = "Total failed systemd units across online hosts.";
+          description = "Total failed systemd units across online hosts, including the host owner's user manager.";
         })
 
         {
@@ -1577,8 +1582,8 @@ let
         (mkBarGauge {
           id = 24;
           title = "Failed Systemd Units";
-          description = "Units in the failed state per host.";
-          expression = withHost ''sum by(instance) (node_systemd_unit_state{job="fleet-node",state="failed"})'';
+          description = "Failed system units and failed units of the host owner's user manager, per host.";
+          expression = withHost "sum by(instance) (${failedUnitStates})";
           legend = "{{host}}";
           x = 16;
           y = 41;
@@ -1609,11 +1614,43 @@ let
             })
           ];
         })
+        (mkTable {
+          id = 33;
+          title = "Failed Units";
+          description = "Failed units of the system manager and of the host owner's user manager. A missing SOPS age key fails sops-install-secrets.service (system) or sops-nix.service (user).";
+          expression = failedUnitsExpression;
+          x = 0;
+          y = 57;
+          w = 24;
+          fields = {
+            host = 0;
+            manager = 1;
+            name = 2;
+          };
+          renamedFields = {
+            host = "Host";
+            manager = "Manager";
+            name = "Unit";
+          };
+          excludedFields = {
+            Time = true;
+            Value = true;
+            __name__ = true;
+            always_on = true;
+            cluster = true;
+            exporter = true;
+            instance = true;
+            job = true;
+            state = true;
+            type = true;
+            user = true;
+          };
+        })
 
         (mkRow {
           id = 25;
           title = "Configuration Source";
-          y = 57;
+          y = 64;
         })
         (mkTable {
           id = 26;
@@ -1621,7 +1658,7 @@ let
           description = "Compares each active NixOS source with the current dotfiles main branch. Path and dirty-tree builds are intentionally reported as local.";
           expression = configurationFreshnessExpression;
           x = 0;
-          y = 58;
+          y = 65;
           w = 24;
           fields = {
             host = 0;
@@ -1676,7 +1713,7 @@ let
         (mkRow {
           id = 30;
           title = "Tailnet Drift";
-          y = 65;
+          y = 72;
         })
         (mkTable {
           id = 31;
@@ -1687,7 +1724,7 @@ let
             and on() (count(fleet_tailnet_node_tag_info) > 0)
           '';
           x = 0;
-          y = 66;
+          y = 73;
           w = 12;
           fields = {
             host = 0;
@@ -1704,7 +1741,7 @@ let
           description = "Tags headscale carries that the inventory does not list. Nodes left on tag:bootstrap appear here.";
           expression = "fleet_tailnet_node_tag_info unless on(host, tag) fleet_expected_tag_info";
           x = 12;
-          y = 66;
+          y = 73;
           w = 12;
           fields = {
             host = 0;
