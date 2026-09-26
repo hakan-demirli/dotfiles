@@ -6,6 +6,7 @@ USE_PROCD=1
 START=96
 
 AUTHKEY=/etc/tailscale/authkey
+PREFS=--accept-dns=false
 
 boot() {
 	start
@@ -15,18 +16,6 @@ start_service() {
 	procd_open_instance
 	procd_set_param command /bin/sh -c '
 		set -eu
-
-		LOGIN=$(uci -q get router-tailscale.main.login_server 2>/dev/null || true)
-
-		if [ -z "$LOGIN" ]; then
-			logger -t router-tailscale "router-tailscale UCI missing login_server. Skipping"
-			exit 0
-		fi
-
-		if [ ! -r '"$AUTHKEY"' ]; then
-			logger -t router-tailscale "no '"$AUTHKEY"'. Skipping first-boot registration"
-			exit 0
-		fi
 
 		i=0
 		STATE=
@@ -43,8 +32,31 @@ start_service() {
 			sleep 1
 		done
 
-		if [ "$STATE" != "NeedsLogin" ]; then
-			logger -t router-tailscale "backend state ${STATE:-unavailable} is not NeedsLogin. Nothing to do"
+		case "$STATE" in
+		NeedsLogin) ;;
+		NeedsMachineAuth | Stopped | Running)
+			if ! tailscale set '"$PREFS"'; then
+				logger -t router-tailscale "could not apply '"$PREFS"' in backend state $STATE"
+				exit 1
+			fi
+			logger -t router-tailscale "applied '"$PREFS"' in backend state $STATE"
+			exit 0
+			;;
+		*)
+			logger -t router-tailscale "backend state ${STATE:-unavailable}. Nothing to do"
+			exit 0
+			;;
+		esac
+
+		LOGIN=$(uci -q get router-tailscale.main.login_server 2>/dev/null || true)
+
+		if [ -z "$LOGIN" ]; then
+			logger -t router-tailscale "router-tailscale UCI missing login_server. Skipping"
+			exit 0
+		fi
+
+		if [ ! -r '"$AUTHKEY"' ]; then
+			logger -t router-tailscale "no '"$AUTHKEY"'. Skipping first-boot registration"
 			exit 0
 		fi
 
@@ -57,6 +69,7 @@ start_service() {
 			--login-server="https://$LOGIN" \
 			--auth-key="$AK" \
 			--hostname="$HOST" \
+			'"$PREFS"' \
 			>/tmp/tailscale-bootstrap.log 2>&1
 		then
 			logger -t router-tailscale "registration OK as tag:bootstrap. Promote with headscale nodes tag"
