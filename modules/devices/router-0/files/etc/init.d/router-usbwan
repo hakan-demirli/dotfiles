@@ -1,0 +1,17 @@
+#!/bin/sh /etc/rc.common
+# shellcheck shell=sh
+# shellcheck disable=SC1091,SC2034
+
+START=21
+STOP=01
+
+. /lib/router-usbwan.sh
+
+start() {
+  ubus -t 30 wait_for "network.interface.$ROUTER_USBWAN_INTERFACE" || return 1
+  router_usbwan_reconcile
+}
+
+stop() {
+  return 0
+}

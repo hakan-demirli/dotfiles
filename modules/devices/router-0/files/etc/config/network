@@ -29,6 +29,10 @@ config interface 'iot'
 	option ipaddr '192.168.70.1'
 	option netmask '255.255.255.0'
 
+config interface 'usbwan'
+	option proto 'dhcp'
+	option metric '15'
+
 config interface 'wwan'
 	option proto 'dhcp'
 	option metric '20'

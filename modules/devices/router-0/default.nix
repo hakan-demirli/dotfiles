@@ -44,6 +44,7 @@ let
     text = ''
       export R0_DEFAULT_IP=${facts.labels.lan_ip}
       export R0_EXPECTED_REVISION=${openwrtSource.upstreamVersion}
+      export R0_EXPECTED_BUILD_ID=${firmware.buildId}
     ''
     + builtins.readFile ./nix/flash.bash;
   };
