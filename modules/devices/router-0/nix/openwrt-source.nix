@@ -31,8 +31,9 @@ pkgs.runCommand "openwrt-source-be10000"
     git init -q .
     git config user.name  openwrt-be10000
     git config user.email openwrt-be10000@local
+    git config maintenance.auto false
     git add -A
-    git -c gc.auto=0 commit -q -m "upstream openwrt @ ${upstreamRev}"
+    git commit -q -m "upstream openwrt @ ${upstreamRev}"
 
     for patch in ${../openwrt/patches}/*.patch; do
       echo "applying $(basename "$patch")"
