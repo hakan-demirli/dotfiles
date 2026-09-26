@@ -32,6 +32,7 @@
       self
       ;
   };
+  home-storage-activation = import ./home-storage-activation.nix { inherit pkgs self inputs; };
   home-storage-policy = import ./home-storage-policy.nix { inherit pkgs self lib; };
   home-ownership-policy = import ./home-ownership-policy.nix {
     inherit
