@@ -158,6 +158,7 @@ let
       managed = "${home}/${path}";
       target = "${home}/.storage/${entry.storage}/${path}";
       legacyTarget = "${home}/.home-storage/${entry.storage}/${path}";
+      managedDir = builtins.dirOf managed;
       targetDir = builtins.dirOf target;
       ensureTarget =
         if entry.type == "directory" then
@@ -198,6 +199,7 @@ let
         ${pkgs.coreutils}/bin/mv ${lib.escapeShellArg managed} ${lib.escapeShellArg target}
         ${pkgs.coreutils}/bin/ln -s ${lib.escapeShellArg target} ${lib.escapeShellArg managed}
       else
+        ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg managedDir}
         ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg targetDir}
         ${ensureTarget}
         ${pkgs.coreutils}/bin/ln -s ${lib.escapeShellArg target} ${lib.escapeShellArg managed}
