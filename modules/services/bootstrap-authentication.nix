@@ -24,21 +24,23 @@ let
     else
       owner.system_account.username;
   passwordIsOwner = cfg.passwordAccount == "owner";
-  passwordSecretAccount = if passwordIsOwner then ownerId else "root";
-  passwordUsername = if passwordIsOwner then ownerUsername else "root";
   lockedUsername = if passwordIsOwner then "root" else ownerUsername;
   impermanenceEnabled = host.impermanence.enable or false;
-  passwordHashPath = "/run/bootstrap-secrets/password-hash";
+  passwordHashPath = secretAccount: "/run/bootstrap-secrets/${secretAccount}/password-hash";
+  sudoGuests = lib.filterAttrs (id: account: id != ownerId && account.sudo_capable) (
+    (inputs.infra-lib.lib.mkAccounts { inherit lib; }).onHost cluster host.id
+  );
 
-  installPassword = pkgs.writeShellApplication {
-    name = "install-bootstrap-password";
+  installPasswords = pkgs.writeShellApplication {
+    name = "install-bootstrap-passwords";
     runtimeInputs = [
       pkgs.coreutils
       pkgs.sops
     ];
     text = ''
       key_file=${lib.escapeShellArg cfg.passwordKeyFile}
-      output_file=${lib.escapeShellArg passwordHashPath}
+      staged=
+      trap '[[ -z "$staged" ]] || rm -f "$staged"' EXIT
 
       if [[ ! -s "$key_file" ]]; then
         echo "fatal: mandatory password bootstrap key is missing: $key_file" >&2
@@ -46,26 +48,37 @@ let
         exit 1
       fi
 
-      install -d -m 0700 "$(dirname "$output_file")"
-      staged="$(mktemp "$(dirname "$output_file")/.password-hash.XXXXXX")"
-      trap 'rm -f "$staged"' EXIT
+      install_password() {
+        local account=$1
+        local selector=$2
+        local output_file=$3
+        local password_hash
 
-      if ! SOPS_AGE_KEY_FILE="$key_file" sops --decrypt \
-        --extract ${lib.escapeShellArg "[\"hosts\"][\"${host.id}\"][\"${passwordSecretAccount}\"][\"password-hash\"]"} \
-        ${passwordSopsFile} > "$staged"; then
-        echo "fatal: cannot decrypt the mandatory password bootstrap secret" >&2
-        exit 1
-      fi
+        install -d -m 0700 "$(dirname "$output_file")"
+        staged="$(mktemp "$(dirname "$output_file")/.password-hash.XXXXXX")"
 
-      password_hash="$(<"$staged")"
-      if [[ ! $password_hash =~ ^\$(y|2a|2b|2y|5|6)\$ ]]; then
-        echo "fatal: password bootstrap secret is not a supported password hash" >&2
-        exit 1
-      fi
+        if ! SOPS_AGE_KEY_FILE="$key_file" sops --decrypt --extract "$selector" \
+          ${passwordSopsFile} > "$staged"; then
+          echo "fatal: cannot decrypt the mandatory password bootstrap secret for $account" >&2
+          exit 1
+        fi
 
-      chmod 0400 "$staged"
-      mv -f "$staged" "$output_file"
-      trap - EXIT
+        password_hash="$(<"$staged")"
+        if [[ ! $password_hash =~ ^\$(y|2a|2b|2y|5|6)\$ ]]; then
+          echo "fatal: password bootstrap secret for $account is not a supported password hash" >&2
+          exit 1
+        fi
+
+        chmod 0400 "$staged"
+        mv -f "$staged" "$output_file"
+        staged=
+      }
+
+      ${lib.concatStrings (
+        lib.mapAttrsToList (account: _: ''
+          install_password ${lib.escapeShellArg account} ${lib.escapeShellArg "[\"hosts\"][\"${host.id}\"][\"${account}\"][\"password-hash\"]"} ${lib.escapeShellArg (passwordHashPath account)}
+        '') cfg.passwordAccounts
+      )}
     '';
   };
 in
@@ -77,6 +90,17 @@ in
         "root"
       ];
       description = "Account receiving the mandatory bootstrap password hash on this host.";
+    };
+    passwordAccounts = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      readOnly = true;
+      default =
+        if passwordIsOwner then
+          { ${ownerId} = ownerUsername; } // lib.mapAttrs (_: account: account.account.username) sudoGuests
+        else
+          { root = "root"; };
+      defaultText = lib.literalMD "the owner and every other sudo-capable account, or root";
+      description = "Password envelope accounts installed on this host, mapped to their local usernames.";
     };
     passwordKeyFile = lib.mkOption {
       type = lib.types.str;
@@ -96,17 +120,20 @@ in
   config = {
     users = {
       mutableUsers = false;
-      users = {
-        ${passwordUsername}.hashedPasswordFile = passwordHashPath;
-        ${lockedUsername}.hashedPassword = "!";
-      };
+      users =
+        lib.mapAttrs' (
+          account: username: lib.nameValuePair username { hashedPasswordFile = passwordHashPath account; }
+        ) cfg.passwordAccounts
+        // {
+          ${lockedUsername}.hashedPassword = "!";
+        };
     };
 
     system.activationScripts = {
       bootstrapPassword = {
         deps = [ "specialfs" ];
         text = ''
-          ${installPassword}/bin/install-bootstrap-password || exit $?
+          ${installPasswords}/bin/install-bootstrap-passwords || exit $?
         '';
       };
       users.deps = lib.mkAfter [ "bootstrapPassword" ];

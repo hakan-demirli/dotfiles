@@ -1,4 +1,12 @@
-{ lib, ... }:
+{
+  lib,
+  host,
+  cluster,
+  ...
+}:
+let
+  ownerUsername = cluster.users.${host.ownership.owner}.system_account.username;
+in
 {
   services = {
     sops.bootstrap.passwordAccount = "root";
@@ -19,6 +27,8 @@
       Defaults:%wheel rootpw
     '';
   };
+
+  users.users.${ownerUsername}.linger = true;
 
   boot.binfmt.emulatedSystems = [
     "aarch64-linux"

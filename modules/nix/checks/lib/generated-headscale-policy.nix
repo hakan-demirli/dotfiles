@@ -7,12 +7,10 @@ let
   inherit (pkgs) lib;
   testlib = import (inputs.infra-lib + "/modules/nix/checks/lib/lib.nix") { inherit pkgs; };
   aclFile = "${self.packages.${pkgs.system}.headscale-acl}/policy.hujson";
-  guestPrincipals = (import ../../../../inventory/tailnet-acl.nix).groups."group:shared-server-users";
   headscaleUsers = lib.unique (
     lib.filter (username: username != null) (
       lib.mapAttrsToList (_: user: user.headscale_user or null) self.lib.inventory.users
     )
-    ++ map (lib.removeSuffix "@") guestPrincipals
   );
   createUsers = lib.concatMapStringsSep "\n" (
     username: ''headscale.succeed("headscale users create ${lib.escapeShellArg username}")''
@@ -31,16 +29,15 @@ pkgs.testers.runNixOSTest {
     from pathlib import Path
 
     policy = json.loads(Path("${aclFile}").read_text())
-    assert "guest-0@" in policy["groups"]["group:shared-server-users"]
-    assert policy["tagOwners"]["tag:shared-server-login"] == ["group:admin"]
     assert [
         rule for rule in policy["acls"]
-        if "group:shared-server-users" in rule["src"]
+        if "guest-0@" in rule["src"]
     ] == [{
         "action": "accept",
-        "src": ["group:shared-server-users"],
-        "dst": ["tag:shared-server-login:22"],
+        "src": ["guest-0@"],
+        "dst": ["tag:cluster-shared-server-1-login:*"],
     }]
+    assert "tag:shared-server-login" not in policy["tagOwners"]
 
     ${createUsers}
     headscale.succeed("headscale policy check --file ${aclFile}")
