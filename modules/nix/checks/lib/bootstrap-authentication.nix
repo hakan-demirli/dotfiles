@@ -105,6 +105,7 @@ let
 in
 pkgs.testers.runNixOSTest {
   name = "bootstrap-authentication";
+  globalTimeout = 300;
 
   nodes = {
     laptop = mkNode {
@@ -120,36 +121,46 @@ pkgs.testers.runNixOSTest {
   };
 
   testScript = ''
+    import datetime as dt
     import time
+
+    BOOT_TIMEOUT = dt.timedelta(minutes=2)
+    COMMAND_TIMEOUT = dt.timedelta(seconds=30)
+    SSH_DENIED = (255, "Permission denied (publickey)")
+    SUDO_PASSWORD_REJECTED = (1, "incorrect password attempt")
+    SUDO_PASSWORD_REQUIRED = (1, "a password is required")
 
     started = time.time()
 
     def stage(message):
         print(f"\n========== [t+{time.time() - started:6.1f}s] {message} ==========")
 
+    def succeed(machine, command):
+        return machine.succeed(command, timeout=COMMAND_TIMEOUT)
+
     def shadow_hash(machine, user):
-        return machine.succeed(f"getent shadow {user} | cut -d: -f2").strip()
+        return succeed(machine, f"getent shadow {user} | cut -d: -f2").strip()
 
-    def expect_failure(machine, command, message):
-        status, output = machine.execute(command, timeout=30)
-        assert status != 0, f"{message}: unexpectedly succeeded. output={output!r}"
+    def expect_denied(machine, command, denial, label):
+        expected_status, expected_reason = denial
+        status, output = machine.execute(f"{command} 2>&1", timeout=COMMAND_TIMEOUT)
+        assert status == expected_status and expected_reason in output, (
+            f"{label}: status={status}, expected_status={expected_status}, "
+            f"expected_reason={expected_reason!r}, output={output!r}"
+        )
 
-    def sudo_with_password(machine, password, should_succeed, label):
-        command = (
+    def sudo_command(password):
+        return (
             f"printf '%s\\n' '{password}' "
             "| runuser -u test-user -- sudo -S -k true"
-        )
-        status, output = machine.execute(command, timeout=30)
-        assert (status == 0) == should_succeed, (
-            f"{label}: status={status}, expected_success={should_succeed}, output={output!r}"
         )
 
     stage("boot both authentication policies")
     start_all()
     for machine in (laptop, server):
-        machine.wait_for_unit("multi-user.target", timeout=120)
-        machine.wait_for_unit("sshd.service", timeout=60)
-        machine.wait_for_open_port(22, timeout=60)
+        machine.wait_for_unit("multi-user.target", timeout=BOOT_TIMEOUT)
+        machine.wait_for_unit("sshd.service", timeout=COMMAND_TIMEOUT)
+        machine.wait_for_open_port(22, timeout=COMMAND_TIMEOUT)
 
     stage("password hashes target opposite accounts")
     assert shadow_hash(laptop, "test-user").startswith("$6$")
@@ -159,65 +170,77 @@ pkgs.testers.runNixOSTest {
 
     stage("install public test credential")
     for machine in (laptop, server):
-        machine.succeed("install -m 0600 ${testKeys.admin.privateKey} /tmp/test-identity")
+        succeed(machine, "install -m 0600 ${testKeys.admin.privateKey} /tmp/test-identity")
 
     ssh_key_options = (
-        "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
+        "-n -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
         "-o BatchMode=yes -o ConnectTimeout=10"
     )
     ssh_password_options = (
-        "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
+        "-n -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
         "-o PreferredAuthentications=password -o PubkeyAuthentication=no "
         "-o NumberOfPasswordPrompts=1 -o ConnectTimeout=10"
     )
 
     stage("normal users log in with keys, including locked server user")
     for machine in (laptop, server):
-        machine.succeed(
-            f"ssh {ssh_key_options} -i /tmp/test-identity test-user@localhost true"
-        )
+        succeed(machine, f"ssh {ssh_key_options} -i /tmp/test-identity test-user@localhost true")
 
     stage("direct root SSH is denied despite an authorized key")
     for machine in (laptop, server):
-        expect_failure(
+        expect_denied(
             machine,
             f"ssh {ssh_key_options} -i /tmp/test-identity root@localhost true",
+            SSH_DENIED,
             "root SSH",
         )
 
     stage("password SSH is denied even for accounts with valid passwords")
-    expect_failure(
+    expect_denied(
         laptop,
         f"sshpass -p laptop-password ssh {ssh_password_options} test-user@localhost true",
+        SSH_DENIED,
         "laptop user password SSH",
     )
-    expect_failure(
+    expect_denied(
         server,
         f"sshpass -p server-root-password ssh {ssh_password_options} root@localhost true",
+        SSH_DENIED,
         "server root password SSH",
     )
 
     stage("laptop sudo authenticates with owner password")
-    sudo_with_password(laptop, "laptop-password", True, "laptop owner password")
-    sudo_with_password(laptop, "server-root-password", False, "laptop root password")
+    succeed(laptop, sudo_command("laptop-password"))
+    expect_denied(
+        laptop,
+        sudo_command("server-root-password"),
+        SUDO_PASSWORD_REJECTED,
+        "laptop root password",
+    )
 
     stage("server sudo authenticates with root password")
-    sudo_with_password(server, "server-root-password", True, "server root password")
-    sudo_with_password(server, "laptop-password", False, "server user password")
+    succeed(server, sudo_command("server-root-password"))
+    expect_denied(
+        server,
+        sudo_command("laptop-password"),
+        SUDO_PASSWORD_REJECTED,
+        "server user password",
+    )
 
     stage("non-interactive sudo remains denied")
     for machine in (laptop, server):
-        expect_failure(
+        expect_denied(
             machine,
             "runuser -u test-user -- sudo -k -n true",
+            SUDO_PASSWORD_REQUIRED,
             "passwordless sudo",
         )
 
     stage("generated policy is explicit")
-    assert "Defaults:%wheel rootpw" not in laptop.succeed("cat /etc/sudoers")
-    assert "Defaults:%wheel rootpw" in server.succeed("cat /etc/sudoers")
+    assert "Defaults:%wheel rootpw" not in succeed(laptop, "cat /etc/sudoers")
+    assert "Defaults:%wheel rootpw" in succeed(server, "cat /etc/sudoers")
     for machine in (laptop, server):
-        sshd = machine.succeed("cat /etc/ssh/sshd_config")
+        sshd = succeed(machine, "cat /etc/ssh/sshd_config")
         assert "PasswordAuthentication no" in sshd
         assert "KbdInteractiveAuthentication no" in sshd
         assert "PermitRootLogin no" in sshd
