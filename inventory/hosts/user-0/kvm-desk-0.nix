@@ -35,7 +35,7 @@
     device_type = "sipeed-nanokvm-pro-desk";
     device_role = "kvm-oob";
     firmware_version = "1.2.15";
-    controls_host = "server-dev-1";
+    controls_host = "server-dev-3";
     tailscale_tag = "tag:kvm";
     tailscale_login_server = "sshr.polarbearvuzi.com";
     lan_cidr = "192.168.69.0/24";
