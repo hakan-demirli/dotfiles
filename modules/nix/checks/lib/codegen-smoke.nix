@@ -33,8 +33,13 @@ let
     ) activeClusters
   );
 
+  grantedUserIds = lib.unique (
+    lib.concatMap (grants: map (grant: grant.user) grants) (lib.attrValues inventory.usersOnHost)
+  );
   activeUserIds = lib.attrNames (
-    lib.filterAttrs (_: u: u.system_account != null && !(u.archived or false)) inventory.users
+    lib.filterAttrs (
+      id: u: lib.elem id grantedUserIds && u.system_account != null && !(u.archived or false)
+    ) inventory.users
   );
 
   tailnetAdminUserIds = map headscaleId (
