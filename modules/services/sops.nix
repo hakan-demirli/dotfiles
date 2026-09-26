@@ -96,8 +96,8 @@ in
     };
 
     system.activationScripts.warnMissingSopsKey = lib.stringAfter [ "specialfs" ] ''
-      if [[ ! -e ${lib.escapeShellArg cfg.ageKeyFile} ]]; then
-        echo "warning: SOPS age key ${cfg.ageKeyFile} not found. Skipping system secret deployment" >&2
+      if [[ ! -s ${lib.escapeShellArg cfg.ageKeyFile} ]]; then
+        echo "warning: SOPS age key ${cfg.ageKeyFile} is missing. Run: nix run path:.#deploy-system-secrets" >&2
       fi
     '';
 
@@ -107,7 +107,7 @@ in
     };
 
     systemd.services = {
-      sops-install-secrets.unitConfig.ConditionPathExists = cfg.ageKeyFile;
+      sops-install-secrets.unitConfig.AssertFileNotEmpty = cfg.ageKeyFile;
 
       tailscale-bootstrap-secret = {
         description = "Decrypt the optional Headscale bootstrap preauth key";

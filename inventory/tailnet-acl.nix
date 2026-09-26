@@ -1,14 +1,9 @@
 {
-  groups."group:shared-server-users" = [ "guest-0@" ];
+  groups = { };
 
-  tagOwners."tag:shared-server-login" = [ "group:admin" ];
+  tagOwners = { };
 
   acls = [
-    {
-      action = "accept";
-      src = [ "group:shared-server-users" ];
-      dst = [ "tag:shared-server-login:22" ];
-    }
     {
       action = "accept";
       src = [ "tag:cluster-router-0" ];

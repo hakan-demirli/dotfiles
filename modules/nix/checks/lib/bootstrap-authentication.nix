@@ -10,7 +10,31 @@ let
   passwordFixture = self + /modules/nix/checks/fixtures/bootstrap-password.yaml;
   ageIdentity = inputs.sops-nix + "/pkgs/sops-install-secrets/test-assets/age-keys.txt";
 
-  testCluster.users."user-test".system_account.username = "test-user";
+  testCluster = {
+    users = {
+      "user-test".system_account.username = "test-user";
+      "guest-test".system_account = {
+        username = "guest-user";
+        groups = [ ];
+      };
+    };
+    unixAccessTiers.admin = {
+      groups = [ "wheel" ];
+      root_ssh = false;
+      sudo.extra_rule = null;
+      ssh.allowed = true;
+    };
+    usersOnHost."shared-test" = [
+      {
+        user = "user-test";
+        unix_tier = "admin";
+      }
+      {
+        user = "guest-test";
+        unix_tier = "admin";
+      }
+    ];
+  };
   mkHost = hostId: {
     id = hostId;
     ownership.owner = "user-test";
@@ -29,6 +53,7 @@ let
       hostId,
       passwordAccount,
       rootPasswordSudo,
+      guests ? { },
     }:
     { lib, ... }:
     {
@@ -76,7 +101,8 @@ let
         // lib.optionalAttrs (passwordAccount == "owner") {
           hashedPasswordFile = lib.mkForce null;
         };
-      };
+      }
+      // guests;
 
       security.sudo = {
         wheelNeedsPassword = true;
@@ -118,6 +144,16 @@ pkgs.testers.runNixOSTest {
       passwordAccount = "root";
       rootPasswordSudo = true;
     };
+    shared = mkNode {
+      hostId = "shared-test";
+      passwordAccount = "owner";
+      rootPasswordSudo = false;
+      guests."guest-user" = {
+        isNormalUser = true;
+        uid = 1001;
+        extraGroups = [ "wheel" ];
+      };
+    };
   };
 
   testScript = ''
@@ -149,15 +185,15 @@ pkgs.testers.runNixOSTest {
             f"expected_reason={expected_reason!r}, output={output!r}"
         )
 
-    def sudo_command(password):
+    def sudo_command(password, user="test-user"):
         return (
             f"printf '%s\\n' '{password}' "
-            "| runuser -u test-user -- sudo -S -k true"
+            f"| runuser -u {user} -- sudo -S -k true"
         )
 
-    stage("boot both authentication policies")
+    stage("boot all authentication policies")
     start_all()
-    for machine in (laptop, server):
+    for machine in (laptop, server, shared):
         machine.wait_for_unit("multi-user.target", timeout=BOOT_TIMEOUT)
         machine.wait_for_unit("sshd.service", timeout=COMMAND_TIMEOUT)
         machine.wait_for_open_port(22, timeout=COMMAND_TIMEOUT)
@@ -167,6 +203,14 @@ pkgs.testers.runNixOSTest {
     assert shadow_hash(laptop, "root") == "!"
     assert shadow_hash(server, "test-user") == "!"
     assert shadow_hash(server, "root").startswith("$6$")
+
+    stage("shared host gives every sudo account its own password hash")
+    shared_owner_hash = shadow_hash(shared, "test-user")
+    shared_guest_hash = shadow_hash(shared, "guest-user")
+    assert shared_owner_hash.startswith("$6$")
+    assert shared_guest_hash.startswith("$6$")
+    assert shared_owner_hash != shared_guest_hash
+    assert shadow_hash(shared, "root") == "!"
 
     stage("install public test credential")
     for machine in (laptop, server):
@@ -227,8 +271,24 @@ pkgs.testers.runNixOSTest {
         "server user password",
     )
 
+    stage("shared host sudo authenticates each account with its own password")
+    succeed(shared, sudo_command("shared-owner-password"))
+    succeed(shared, sudo_command("guest-password", user="guest-user"))
+    expect_denied(
+        shared,
+        sudo_command("shared-owner-password", user="guest-user"),
+        SUDO_PASSWORD_REJECTED,
+        "guest with owner password",
+    )
+    expect_denied(
+        shared,
+        sudo_command("guest-password"),
+        SUDO_PASSWORD_REJECTED,
+        "owner with guest password",
+    )
+
     stage("non-interactive sudo remains denied")
-    for machine in (laptop, server):
+    for machine in (laptop, server, shared):
         expect_denied(
             machine,
             "runuser -u test-user -- sudo -k -n true",
@@ -238,8 +298,9 @@ pkgs.testers.runNixOSTest {
 
     stage("generated policy is explicit")
     assert "Defaults:%wheel rootpw" not in succeed(laptop, "cat /etc/sudoers")
+    assert "Defaults:%wheel rootpw" not in succeed(shared, "cat /etc/sudoers")
     assert "Defaults:%wheel rootpw" in succeed(server, "cat /etc/sudoers")
-    for machine in (laptop, server):
+    for machine in (laptop, server, shared):
         sshd = succeed(machine, "cat /etc/ssh/sshd_config")
         assert "PasswordAuthentication no" in sshd
         assert "KbdInteractiveAuthentication no" in sshd

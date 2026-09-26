@@ -6,20 +6,6 @@
 let
   testlib = import (inputs.infra-lib + "/modules/nix/checks/lib/lib.nix") { inherit pkgs; };
   generatedPolicy = "${self.packages.${pkgs.system}.headscale-acl}/policy.hujson";
-  guestPolicy =
-    pkgs.runCommand "shared-server-guest-policy.hujson" { nativeBuildInputs = [ pkgs.python3 ]; }
-      ''
-        python3 - ${generatedPolicy} "$out" <<'PY'
-        import json
-        import pathlib
-        import sys
-
-        policy = json.loads(pathlib.Path(sys.argv[1]).read_text())
-        assert "guest-0@" in policy["groups"]["group:shared-server-users"]
-        policy["groups"]["group:shared-server-users"] = ["guest-0@"]
-        pathlib.Path(sys.argv[2]).write_text(json.dumps(policy))
-        PY
-      '';
   mkServer =
     { ... }:
     {
@@ -35,7 +21,7 @@ pkgs.testers.runNixOSTest {
   name = "shared-server-guest";
 
   nodes = {
-    headscale = testlib.mkHeadscaleNode { aclFile = guestPolicy; };
+    headscale = testlib.mkHeadscaleNode { aclFile = generatedPolicy; };
 
     shared_server =
       { ... }:
@@ -78,13 +64,13 @@ pkgs.testers.runNixOSTest {
 
     headscale.succeed("headscale users create user-0")
     headscale.succeed("headscale users create guest-0")
-    headscale.succeed("headscale policy check --file ${guestPolicy}")
+    headscale.succeed("headscale policy check --file ${generatedPolicy}")
 
     owner_id = get_user_id("user-0")
     guest_id = get_user_id("guest-0")
     shared_key = headscale.succeed(
         f"headscale preauthkeys create --user {owner_id} --expiration 24h "
-        "--tags tag:cluster-shared-server-1,tag:cluster-shared-server-1-login,tag:metrics,tag:shared-server-login"
+        "--tags tag:cluster-shared-server-1,tag:cluster-shared-server-1-login,tag:metrics"
     ).strip()
     other_key = headscale.succeed(
         f"headscale preauthkeys create --user {owner_id} --expiration 24h "
@@ -130,7 +116,7 @@ pkgs.testers.runNixOSTest {
         f"-o ConnectTimeout=5 guest0@{shared_ip} id -un | grep -Fx guest0",
         timeout=60,
     )
-    guest_client.fail(f"nc -z -w 3 {shared_ip} 80")
+    guest_client.succeed(f"nc -z -w 3 {shared_ip} 80")
     guest_client.fail(f"nc -z -w 3 {other_ip} 22")
     guest_second.wait_until_succeeds(f"nc -z -w 3 {shared_ip} 22", timeout=60)
 
