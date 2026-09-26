@@ -34,7 +34,7 @@ config zone
 
 config zone
 	option name 'tailscale'
-	list network 'tailscale'
+	list device 'tailscale0'
 	option input 'ACCEPT'
 	option output 'ACCEPT'
 	option forward 'REJECT'

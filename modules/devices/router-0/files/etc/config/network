@@ -36,7 +36,3 @@ config interface 'usbwan'
 config interface 'wwan'
 	option proto 'dhcp'
 	option metric '20'
-
-config interface 'tailscale'
-	option proto 'none'
-	option device 'tailscale0'
