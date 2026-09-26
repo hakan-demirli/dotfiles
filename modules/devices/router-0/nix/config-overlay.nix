@@ -91,6 +91,7 @@ pkgs.runCommand "router-0-config-overlay"
     chmod 700 $out/root/etc/dropbear
     install -Dm0755 -d $out/root/etc/init.d
     install -Dm0755 -d $out/root/etc/uci-defaults
+    install -Dm0755 -d $out/root/etc/hotplug.d
     install -Dm0755 -d $out/root/etc/tailscale
     chmod 700 $out/root/etc/tailscale
     install -Dm0755 -d $out/root/usr/bin
@@ -145,6 +146,10 @@ pkgs.runCommand "router-0-config-overlay"
 
     for f in ${filesRoot}/etc/uci-defaults/*; do
       install -Dm0755 "$f" "$out/root/etc/uci-defaults/$(basename "$f")"
+    done
+
+    for f in ${filesRoot}/etc/hotplug.d/*/*; do
+      install -Dm0755 "$f" "$out/root/etc/hotplug.d/$(basename "$(dirname "$f")")/$(basename "$f")"
     done
 
     for f in ${filesRoot}/lib/router-*.sh; do

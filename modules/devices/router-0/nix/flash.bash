@@ -4,9 +4,10 @@ usage() {
   cat << 'EOF'
 Usage: router-0-firmware-flash [options]
 
-Streams a sysupgrade image to router-0 and flashes it. The image is verified
-on the device before anything is written, and the running revision is checked
-after the reboot.
+Streams a sysupgrade image to router-0 and flashes it. The image must carry the
+build ID of this repository's firmware configuration. The image is verified on
+the device before anything is written, and the booted revision and build ID are
+checked after the reboot.
 
 Options:
   --router-ip IP     Router address (default: the lan_ip inventory fact)
@@ -28,6 +29,7 @@ die() {
 
 router_ip=${R0_DEFAULT_IP:?internal error: R0_DEFAULT_IP unset}
 expected_revision=${R0_EXPECTED_REVISION:?internal error: R0_EXPECTED_REVISION unset}
+expected_build_id=${R0_EXPECTED_BUILD_ID:?internal error: R0_EXPECTED_BUILD_ID unset}
 firmware="./result-router-0/firmware.bin"
 wipe=0
 check_only=0
@@ -72,6 +74,12 @@ image_size=$(stat -c %s "$firmware")
 local_sum=$(sha256sum "$firmware" | cut -d' ' -f1)
 log "image $firmware ($image_size bytes, sha256 ${local_sum:0:16}...)"
 
+build_id_file="$firmware.build-id"
+[[ -f $build_id_file ]] || die "build ID not found: $build_id_file (run: nix run .#router-0-firmware)"
+image_build_id=$(< "$build_id_file")
+[[ $image_build_id == "$expected_build_id" ]] \
+  || die "image build $image_build_id does not match this repository (build $expected_build_id); run: nix run .#router-0-firmware"
+
 on_router true 2> /dev/null || die "cannot reach root@$router_ip over ssh"
 
 board=$(on_router 'cat /tmp/sysinfo/board_name' 2> /dev/null || true)
@@ -84,7 +92,8 @@ tmp_free_bytes=$((tmp_free * 1024))
   || die "device /tmp has $tmp_free_bytes bytes free, image needs $image_size"
 
 running=$(on_router 'sed -n "s/^DISTRIB_REVISION=.//p" /etc/openwrt_release | tr -d "\047"' || true)
-log "device is running $running, image expects $expected_revision"
+running_build_id=$(on_router 'cat /etc/router-0-build-id 2>/dev/null' || true)
+log "device is running $running build ${running_build_id:-unknown}, image is $expected_revision build $expected_build_id"
 
 if ((check_only)); then
   log "preflight passed for root@$router_ip"
@@ -116,7 +125,11 @@ booted=$(on_router 'sed -n "s/^DISTRIB_REVISION=.//p" /etc/openwrt_release | tr 
 [[ $booted == "$expected_revision" ]] \
   || die "device booted revision $booted, expected $expected_revision"
 
-log "flash complete, device is running $booted"
+booted_build_id=$(on_router 'cat /etc/router-0-build-id 2>/dev/null' || true)
+[[ $booted_build_id == "$expected_build_id" ]] \
+  || die "device booted build ${booted_build_id:-unknown}, expected $expected_build_id"
+
+log "flash complete, device is running $booted build $booted_build_id"
 if ((wipe)); then
   log "state was wiped: the device is on its default address until you push config"
 fi

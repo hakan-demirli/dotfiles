@@ -67,10 +67,9 @@ router_ethernet_set_wan_zone() (
   zone=$(router_ethernet_wan_zone) || return 1
 
   uci -q delete "firewall.$zone.network"
-  for entry in "$@"; do
+  for entry in "$@" usbwan wwan; do
     uci -q add_list "firewall.$zone.network=$entry"
   done
-  uci -q add_list "firewall.$zone.network=wwan"
 )
 
 router_ethernet_apply_dual_lan() (

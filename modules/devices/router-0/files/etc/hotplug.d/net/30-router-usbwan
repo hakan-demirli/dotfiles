@@ -1,0 +1,12 @@
+#!/bin/sh
+# shellcheck disable=SC1091
+
+. /lib/router-usbwan.sh
+
+case $ACTION in
+  add) router_usbwan_is_usb "$INTERFACE" || exit 0 ;;
+  remove) ;;
+  *) exit 0 ;;
+esac
+
+router_usbwan_reconcile
