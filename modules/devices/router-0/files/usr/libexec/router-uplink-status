@@ -1,0 +1,46 @@
+#!/bin/sh
+
+json_string() {
+  [ -n "$1" ] || {
+    printf 'null'
+    return
+  }
+  printf '"%s"' "$(printf '%s' "$1" | tr -d '\000-\037' | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
+}
+
+source_of() {
+  case $1 in
+    wan) printf 'ethernet' ;;
+    usbwan) printf 'usb' ;;
+    wwan) printf 'wifi' ;;
+  esac
+}
+
+active=
+active_metric=
+active_status=
+for interface in wan usbwan wwan; do
+  status=$(ifstatus "$interface" 2> /dev/null) || continue
+  [ "$(jsonfilter -s "$status" -e '@.up' 2> /dev/null)" = "true" ] || continue
+  [ -n "$(jsonfilter -s "$status" -e '@.route[@.target="0.0.0.0"].target' 2> /dev/null)" ] || continue
+  metric=$(jsonfilter -s "$status" -e '@.metric' 2> /dev/null)
+  metric=${metric:-0}
+  if [ -z "$active" ] || [ "$metric" -lt "$active_metric" ]; then
+    active=$interface
+    active_metric=$metric
+    active_status=$status
+  fi
+done
+
+device=
+address=
+if [ -n "$active" ]; then
+  device=$(jsonfilter -s "$active_status" -e '@.l3_device' 2> /dev/null)
+  address=$(jsonfilter -s "$active_status" -e '@["ipv4-address"][0].address' 2> /dev/null)
+fi
+
+printf '{"source":%s,"interface":%s,"device":%s,"address":%s}\n' \
+  "$(json_string "$(source_of "$active")")" \
+  "$(json_string "$active")" \
+  "$(json_string "$device")" \
+  "$(json_string "$address")"

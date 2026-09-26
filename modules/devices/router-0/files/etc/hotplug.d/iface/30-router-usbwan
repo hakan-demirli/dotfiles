@@ -1,0 +1,9 @@
+#!/bin/sh
+# shellcheck disable=SC1091
+
+. /lib/router-usbwan.sh
+
+[ "$ACTION" = ifup ] || exit 0
+[ "$INTERFACE" = "$ROUTER_USBWAN_INTERFACE" ] && exit 0
+
+router_usbwan_reconcile

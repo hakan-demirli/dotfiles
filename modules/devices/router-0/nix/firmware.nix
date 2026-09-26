@@ -29,6 +29,7 @@ let
     CONFIG_TARGET_mediatek_filogic_DEVICE_glinet_gl-be10000=y
 
     CONFIG_PACKAGE_wpad-openssl=y
+    # CONFIG_PACKAGE_wpad-basic-mbedtls is not set
 
     CONFIG_PACKAGE_luci=y
     CONFIG_PACKAGE_luci-ssl=y
@@ -50,6 +51,26 @@ let
     CONFIG_PACKAGE_ip-full=y
 
     CONFIG_PACKAGE_coreutils-base64=y
+
+    CONFIG_PACKAGE_kmod-usb-net-rtl8152=y
+    CONFIG_PACKAGE_kmod-usb-net-asix=y
+    CONFIG_PACKAGE_kmod-usb-net-asix-ax88179=y
+    CONFIG_PACKAGE_kmod-usb-net-cdc-ether=y
+    CONFIG_PACKAGE_kmod-usb-net-cdc-ncm=y
+    CONFIG_PACKAGE_kmod-usb-net-huawei-cdc-ncm=y
+    CONFIG_PACKAGE_kmod-usb-net-rndis=y
+    CONFIG_PACKAGE_kmod-usb-net-ipheth=y
+    CONFIG_PACKAGE_usbmuxd=y
+    CONFIG_PACKAGE_usbutils=y
+
+    CONFIG_PACKAGE_kmod-usb-storage=y
+    CONFIG_PACKAGE_kmod-usb-storage-uas=y
+    CONFIG_PACKAGE_kmod-fs-vfat=y
+    CONFIG_PACKAGE_kmod-fs-exfat=y
+    CONFIG_PACKAGE_kmod-nls-cp437=y
+    CONFIG_PACKAGE_kmod-nls-iso8859-1=y
+    CONFIG_PACKAGE_kmod-nls-utf8=y
+    CONFIG_PACKAGE_block-mount=y
 
     CONFIG_PACKAGE_kmod-spi-dev=y
     CONFIG_PACKAGE_spi-tools=y
@@ -84,6 +105,17 @@ let
 
   sourceKey = builtins.substring 0 32 (builtins.baseNameOf "${openwrtSource}");
   inherit (openwrtSource.passthru) upstreamVersion upstreamDateEpoch;
+
+  buildId = builtins.substring 0 16 (
+    builtins.hashString "sha256" (
+      builtins.concatStringsSep "\n" [
+        "${openwrtSource}"
+        "${seedConfig}"
+        feedsConfigText
+        "${router-ui}"
+      ]
+    )
+  );
 
   buildScript = pkgs.writeShellScript "router-0-firmware-build" ''
     set -euo pipefail
@@ -234,7 +266,27 @@ let
     echo ">>> configuring firmware"
     install -m0644 ${seedConfig} .config
     make defconfig
+
+    dropped=()
+    while IFS= read -r line; do
+      case $line in
+        CONFIG_*=*)
+          grep -qxF -- "$line" .config || dropped+=("$line")
+          ;;
+        "# CONFIG_"*" is not set")
+          option=''${line#\# }
+          option=''${option% is not set}
+          if grep -q -- "^$option=" .config; then
+            dropped+=("$line")
+          fi
+          ;;
+      esac
+    done < ${seedConfig}
+    (( ''${#dropped[@]} == 0 )) || die "defconfig did not honour the seed configuration: ''${dropped[*]}"
+
     install -Dm0755 ${router-ui}/bin/router-ui files/usr/bin/router-ui
+    mkdir -p files/etc
+    printf '%s\n' ${buildId} > files/etc/router-0-build-id
 
     echo ">>> downloading sources"
     make -j"$jobs" download
@@ -255,9 +307,11 @@ let
     mkdir -p "$output_dir"
     install -m0644 "''${firmware_images[0]}" "$output_dir/firmware.bin"
     (cd "$output_dir" && sha256sum firmware.bin > firmware.bin.sha256)
+    printf '%s\n' ${buildId} > "$output_dir/firmware.bin.build-id"
 
     printf 'Firmware: %s\n' "$output_dir/firmware.bin"
     printf 'Checksum: %s\n' "$output_dir/firmware.bin.sha256"
+    printf 'Build ID: %s\n' ${buildId}
   '';
 in
 pkgs.buildFHSEnv {
@@ -335,6 +389,7 @@ pkgs.buildFHSEnv {
 
   passthru = {
     inherit (openwrtSource.passthru or { }) upstreamRev;
+    inherit buildId;
   };
 
   meta = {
