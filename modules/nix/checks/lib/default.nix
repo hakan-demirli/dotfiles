@@ -43,5 +43,6 @@
   };
   home-state-automation = import ./home-state-automation.nix { inherit pkgs self; };
   remote-desktop-cli = import ./remote-desktop-cli.nix { inherit pkgs self; };
+  shared-server-guest = import ./shared-server-guest.nix { inherit pkgs self inputs; };
   ssh-targets = import ./ssh-targets.nix { inherit pkgs self; };
 }
