@@ -23,6 +23,7 @@
       nodes = [
         "server-dev-1"
         "server-dev-2"
+        "server-dev-3"
       ];
       default = false;
       max_time = "24:00:00";
@@ -35,6 +36,7 @@
       "laptop-1"
       "server-dev-1"
       "server-dev-2"
+      "server-dev-3"
       "vps-oracle-0"
     ];
     deployment_roles = [ ];
