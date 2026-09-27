@@ -51,6 +51,7 @@ in
     };
 
     slurm-cluster.enable = true;
+    cluster-slurm-metrics.enable = true;
 
     transmission-cluster = {
       inherit downloadDir incompleteDir;
