@@ -1830,6 +1830,125 @@ let
             tag = "Unexpected tag";
           };
         })
+        (mkRow {
+          id = 38;
+          title = "Slurm";
+          y = 95;
+        })
+        (mkStat {
+          id = 39;
+          title = "Controller";
+          description = "Whether the slurmctld metrics endpoint answers.";
+          expression = ''max(up{job=~"fleet-slurm-.+"}) or on() vector(0)'';
+          x = 0;
+          y = 96;
+          thresholds = healthyThresholds;
+          mappings = healthMappings;
+        })
+        (mkStat {
+          id = 40;
+          title = "Nodes Down";
+          description = "Nodes that slurmctld marks down. Run 'sinfo -R' for the reason.";
+          expression = "max(slurm_nodes_down)";
+          x = 4;
+          y = 96;
+          thresholds = warningThresholds;
+          mappings = clearMappings;
+        })
+        (mkStat {
+          id = 41;
+          title = "Not Responding";
+          description = "Nodes whose slurmd does not answer slurmctld.";
+          expression = "max(slurm_nodes_noresp)";
+          x = 8;
+          y = 96;
+          thresholds = warningThresholds;
+          mappings = clearMappings;
+        })
+        (mkStat {
+          id = 42;
+          title = "Drained";
+          description = "Nodes that accept no new jobs. Run 'sinfo -R' for the reason.";
+          expression = "max(slurm_nodes_drain)";
+          x = 12;
+          y = 96;
+          thresholds = alertWarningThresholds;
+          mappings = clearMappings;
+        })
+        (mkStat {
+          id = 43;
+          title = "Jobs Running";
+          expression = "max(slurm_jobs_running)";
+          x = 16;
+          y = 96;
+          colorMode = "none";
+        })
+        (mkStat {
+          id = 44;
+          title = "Jobs Pending";
+          expression = "max(slurm_jobs_pending)";
+          x = 20;
+          y = 96;
+          colorMode = "none";
+        })
+        (mkTimeSeries {
+          id = 45;
+          title = "Slurm Nodes";
+          description = "Node states over time. A node can be counted in more than one state, for example down and not responding.";
+          x = 0;
+          y = 100;
+          w = 12;
+          unit = "short";
+          min = 0;
+          targets = [
+            (mkTarget {
+              expression = "max(slurm_nodes_idle)";
+              legend = "Idle";
+              refId = "A";
+            })
+            (mkTarget {
+              expression = "max(slurm_nodes_alloc) + max(slurm_nodes_mixed)";
+              legend = "Busy";
+              refId = "B";
+            })
+            (mkTarget {
+              expression = "max(slurm_nodes_down)";
+              legend = "Down";
+              refId = "C";
+            })
+            (mkTarget {
+              expression = "max(slurm_nodes_drain)";
+              legend = "Drained";
+              refId = "D";
+            })
+            (mkTarget {
+              expression = "max(slurm_nodes_noresp)";
+              legend = "Not responding";
+              refId = "E";
+            })
+          ];
+        })
+        (mkTimeSeries {
+          id = 46;
+          title = "Slurm Jobs";
+          x = 12;
+          y = 100;
+          w = 12;
+          unit = "short";
+          min = 0;
+          targets = [
+            (mkTarget {
+              expression = "max(slurm_jobs_running)";
+              legend = "Running";
+              refId = "A";
+            })
+            (mkTarget {
+              expression = "max(slurm_jobs_pending)";
+              legend = "Pending";
+              refId = "B";
+            })
+          ];
+        })
       ];
       refresh = "30s";
       schemaVersion = 42;

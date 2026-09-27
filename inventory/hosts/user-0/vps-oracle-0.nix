@@ -47,6 +47,11 @@
     ];
   };
 
+  monitoring.exporters = [
+    "node"
+    "slurm"
+  ];
+
   keys = {
     ssh = [ ];
     age = [ "age1lrl3rcvqg4y8nmj32arjgagycwghxrnfmw69v43jjep78evv9pmqugdkxj" ];
