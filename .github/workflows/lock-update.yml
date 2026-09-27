@@ -35,7 +35,7 @@ jobs:
           echo "email=${id}+${SLUG}[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: main
+          ref: unstable
           token: ${{ steps.bot.outputs.token }}
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25
       - run: nix flake update
@@ -44,22 +44,22 @@ jobs:
           rev=$(jq -er '.nodes["infra-lib"].locked.rev' flake.lock)
           [[ "$rev" =~ ^[0-9a-f]{40}$ ]]
           pin='hakan-demirli/infra-lib/\.github/workflows/[a-z-]+\.yml'
-          sed -i -E "s|($pin)@[0-9a-f]{40}|\1@$rev|g" .github/workflows/main.yml
-          total=$(grep -cE "$pin@[0-9a-f]{40}" .github/workflows/main.yml || true)
-          current=$(grep -cE "$pin@$rev\$" .github/workflows/main.yml || true)
+          sed -i -E "s|($pin)@[0-9a-f]{40}|\1@$rev|g" .github/workflows/checks.yml
+          total=$(grep -cE "$pin@[0-9a-f]{40}" .github/workflows/checks.yml || true)
+          current=$(grep -cE "$pin@$rev\$" .github/workflows/checks.yml || true)
           test "$total" -gt 0
           test "$total" -eq "$current"
       - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         id: update
         with:
           token: ${{ steps.bot.outputs.token }}
-          base: main
+          base: unstable
           branch: automation/update-flake-inputs
           committer: ${{ steps.identity.outputs.name }} <${{ steps.identity.outputs.email }}>
           author: ${{ steps.identity.outputs.name }} <${{ steps.identity.outputs.email }}>
           add-paths: |
             flake.lock
-            .github/workflows/main.yml
+            .github/workflows/checks.yml
           delete-branch: true
           commit-message: 'chore: update flake inputs'
           title: 'chore: update flake inputs'
@@ -70,7 +70,7 @@ jobs:
           PR: ${{ steps.update.outputs.pull-request-number }}
         run: |
           set -euo pipefail
-          allowed=$'flake.lock\n.github/workflows/main.yml'
+          allowed=$'flake.lock\n.github/workflows/checks.yml'
           changed=$(gh pr diff "$PR" --name-only)
           test -n "$changed"
           while IFS= read -r path; do
