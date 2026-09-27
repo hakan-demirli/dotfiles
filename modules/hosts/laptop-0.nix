@@ -61,7 +61,6 @@ in
   };
 
   networking.useDHCP = lib.mkDefault true;
-  hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
 
   services.logind.settings.Login = {
     HandleLidSwitch = "ignore";

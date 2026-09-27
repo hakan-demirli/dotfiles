@@ -19,7 +19,6 @@
     };
   };
 
-  hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
   hardware.fpga = {
     enable = true;
     devices.v80 = {
