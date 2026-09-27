@@ -91,9 +91,12 @@ in
       }
     ];
 
-    cluster-harmonia.signKey = {
-      source = "sops";
-      sopsKeyName = "nix-serve-key";
+    cluster-harmonia = {
+      firewallInterface = config.services.tailscale.interfaceName;
+      signKey = {
+        source = "sops";
+        sopsKeyName = "nix-serve-key";
+      };
     };
 
     cluster-victoriametrics.targetDomain = "ts.sshr.polarbearvuzi.com";

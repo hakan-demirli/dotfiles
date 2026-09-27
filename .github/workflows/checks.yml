@@ -1,0 +1,10 @@
+name: "Checks"
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  checks:
+    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@09dd263a4c9dadbdf9f16340e217158495e741f8
+  external-builds:
+    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@09dd263a4c9dadbdf9f16340e217158495e741f8

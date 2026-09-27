@@ -10,9 +10,4 @@
   programs.nix-ld.enable = true;
 
   security.sudo.wheelNeedsPassword = true;
-
-  virtualisation.docker = {
-    enable = true;
-    storageDriver = "btrfs";
-  };
 }

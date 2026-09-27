@@ -54,11 +54,12 @@
     rollback_backend = "btrfs";
     home_mode = "user-managed";
     persisted_paths = [
-      "/var/lib/docker"
       "/var/lib/systemd/pstore"
       "/var/log"
     ];
   };
+
+  deploy.wave = 1;
 
   monitoring = {
     enabled = true;

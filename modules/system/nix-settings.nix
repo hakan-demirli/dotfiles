@@ -1,11 +1,25 @@
 {
   config,
   lib,
+  cluster,
+  inputs,
   host ? null,
   ...
 }:
 let
   cfg = config.nix.custom;
+
+  deployPlan = inputs.self.lib.intent.deployPlan;
+  deployController = if host == null then null else deployPlan.controller;
+  deployCacheKey =
+    if deployController == null then
+      null
+    else
+      cluster.hosts.${deployController}.labels.nix_cache_public_key or null;
+  useDeployCache =
+    deployController != null
+    && host.id != deployController
+    && (deployPlan.hosts.${host.id}.cache or false);
 
   hwGpu = if host == null then null else (host.hardware.gpu or null);
   hasNvidiaFromInventory = hwGpu != null && (builtins.match ".*nvidia.*" hwGpu) != null;
@@ -73,6 +87,10 @@ in
           || lib.elem "binary-cache-key:YUqGpOpjoO0zIREJVH0PAdjy9L3DWi917Z8/eFqQqy8=" config.nix.settings.trusted-public-keys;
         message = "nix.custom.hasTailscaleAuthority=true requires the tailnet cache public key.";
       }
+      {
+        assertion = deployController == null || deployCacheKey != null;
+        message = "deploy controller '${toString deployController}' requires labels.nix_cache_public_key.";
+      }
     ];
 
     nixpkgs.config = {
@@ -120,10 +138,13 @@ in
             tailnet = lib.optionals cfg.hasTailscaleAuthority [
               "http://100.64.0.1:5101?priority=60"
             ];
+            deploy = lib.optionals useDeployCache [
+              "http://${deployController}.ts.${config.services.tailscale.loginServerHost}:5101?priority=50"
+            ];
           in
           lib.filter (
             s: !(lib.lists.any (excluded: lib.strings.hasInfix excluded s) cfg.excludeSubstituters)
-          ) (base ++ nvidia ++ tailnet)
+          ) (base ++ nvidia ++ tailnet ++ deploy)
         );
 
         trusted-public-keys = lib.mkForce (
@@ -140,8 +161,9 @@ in
             tailnet = lib.optionals cfg.hasTailscaleAuthority [
               "binary-cache-key:YUqGpOpjoO0zIREJVH0PAdjy9L3DWi917Z8/eFqQqy8="
             ];
+            deploy = lib.optional useDeployCache deployCacheKey;
           in
-          base ++ nvidia ++ tailnet
+          base ++ nvidia ++ tailnet ++ deploy
         );
 
         experimental-features = [

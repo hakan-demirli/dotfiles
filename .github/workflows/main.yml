@@ -1,22 +1,58 @@
 name: "Nix Build and Test"
 on:
   push:
-    branches: [main]
+    branches: [unstable]
   workflow_dispatch:
-  workflow_call:
 permissions:
   contents: read
+concurrency:
+  group: dotfiles-channel-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   checks:
-    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@e136b2e53839728642fb09a5729df5da58ebc0dd
-  external-builds:
-    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@e136b2e53839728642fb09a5729df5da58ebc0dd
-  flake-check:
-    needs: [checks, external-builds]
+    uses: ./.github/workflows/checks.yml
+  channel-check:
+    needs: [checks]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - env:
-          RESULTS: ${{ toJSON(needs) }}
-        run: jq -e 'length == 2 and all(.[]; .result == "success")' <<< "$RESULTS"
+          RESULT: ${{ needs.checks.result }}
+          REF: ${{ github.ref }}
+        run: |
+          if [[ "$REF" != refs/heads/unstable ]]; then
+            echo "channel-check certifies only commits built on unstable, not $REF" >&2
+            exit 1
+          fi
+          test "$RESULT" = success
+  promote-main:
+    needs: [channel-check]
+    if: github.ref == 'refs/heads/unstable' && needs.channel-check.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    concurrency:
+      group: dotfiles-promotion
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main unstable
+          main_sha=$(git rev-parse origin/main)
+          unstable_sha=$(git rev-parse origin/unstable)
+          if git merge-base --is-ancestor "$CANDIDATE_SHA" "$main_sha"; then
+            exit 0
+          fi
+          git merge-base --is-ancestor "$main_sha" "$CANDIDATE_SHA"
+          git merge-base --is-ancestor "$CANDIDATE_SHA" "$unstable_sha"
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/main" \
+            -f sha="$CANDIDATE_SHA" -F force=false

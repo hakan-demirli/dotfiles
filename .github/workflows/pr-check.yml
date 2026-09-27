@@ -1,7 +1,7 @@
 name: PR Check
 on:
   pull_request:
-    branches: [main]
+    branches: [unstable]
 permissions:
   contents: read
 concurrency:
@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   checks:
-    uses: ./.github/workflows/main.yml
+    uses: ./.github/workflows/checks.yml
   flake-check:
     needs: [checks]
     if: always()

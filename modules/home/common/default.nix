@@ -150,6 +150,7 @@ in
   imports = [
     ./modules/portablehome.nix
     ./modules/home-storage.nix
+    ./modules/fleet-home-upgrade.nix
   ];
 
   nixpkgs.overlays = [
