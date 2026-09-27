@@ -1,6 +1,9 @@
 {
   id = "server-dev-3";
-  deployment_roles = [ "server-dev" ];
+  deployment_roles = [
+    "server-dev"
+    "fleet-deploy-controller"
+  ];
   topology_roles = [ "compute" ];
   state = "provisioned";
   slurm_features = [
@@ -50,7 +53,10 @@
   labels = {
     tailscale_authority = "true";
     nixos_hardware = "framework/desktop/amd-ai-max-300-series";
+    nix_cache_public_key = "fleet-deploy-cache-1:AUwjF2bmOUGf3avvHUkJ6mKafc6O76ir5tCSWAxrIP4=";
   };
+
+  deploy.controller = true;
 
   monitoring = {
     enabled = true;

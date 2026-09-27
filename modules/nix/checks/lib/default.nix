@@ -6,6 +6,7 @@
   ...
 }:
 {
+  alert-rules = import ./alert-rules.nix { inherit pkgs self; };
   bootstrap-authentication = import ./bootstrap-authentication.nix { inherit pkgs self inputs; };
   bootstrap-secrets = import ./bootstrap-secrets.nix {
     inherit
@@ -43,6 +44,7 @@
       ;
   };
   home-state-automation = import ./home-state-automation.nix { inherit pkgs self; };
+  fleet-home-upgrade = import ./fleet-home-upgrade.nix { inherit pkgs self inputs; };
   remote-desktop-cli = import ./remote-desktop-cli.nix { inherit pkgs self; };
   shared-server-guest = import ./shared-server-guest.nix { inherit pkgs self inputs; };
   ssh-targets = import ./ssh-targets.nix { inherit pkgs self; };

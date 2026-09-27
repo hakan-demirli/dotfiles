@@ -1711,9 +1711,87 @@ let
           ];
         })
         (mkRow {
+          id = 34;
+          title = "Deployment";
+          y = 72;
+        })
+        (mkTable {
+          id = 35;
+          title = "Upgrade State";
+          description = "Latest fleet-upgrade run of each host. Hosts only switch; they never reboot. 'held' means a local generation or an inventory hold, 'waiting' means the rollout gate has not reached the host yet.";
+          expression = ''label_replace(fleet_upgrade_state == 1, "target", "$1", "revision", "(.{0,12}).*")'';
+          x = 0;
+          y = 73;
+          w = 12;
+          fields = {
+            host = 0;
+            state = 1;
+            reason = 2;
+            target = 3;
+          };
+          renamedFields = {
+            host = "Host";
+            state = "State";
+            reason = "Reason";
+            target = "Target";
+          };
+        })
+        (mkTable {
+          id = 36;
+          title = "Reboot Required";
+          description = "Boot components of the active generation that differ from the booted one. They take effect only after a reboot, which nothing does automatically.";
+          expression = "fleet_nixos_reboot_required == 1";
+          x = 12;
+          y = 73;
+          w = 12;
+          fields = {
+            host = 0;
+            component = 1;
+          };
+          renamedFields = {
+            host = "Host";
+            component = "Changed component";
+          };
+        })
+        (mkTable {
+          id = 37;
+          title = "Rollout Waves";
+          description = "Revision approved for each wave and the state of the gate to the next deploy revision. A wave takes a revision after the previous wave ran it without failed units for the soak time.";
+          expression = ''
+            label_replace(
+              label_replace(fleet_deploy_wave_info, "approved", "$1", "revision", "(.{0,12}).*"),
+              "next", "$1", "candidate", "(.{0,12}).*"
+            )
+          '';
+          x = 0;
+          y = 80;
+          w = 24;
+          fields = {
+            wave = 0;
+            approved = 1;
+            next = 2;
+            state = 3;
+          };
+          renamedFields = {
+            wave = "Wave";
+            approved = "Approved";
+            next = "Next";
+            state = "Gate";
+          };
+          excludedFields = {
+            Time = true;
+            Value = true;
+            __name__ = true;
+            candidate = true;
+            instance = true;
+            job = true;
+            revision = true;
+          };
+        })
+        (mkRow {
           id = 30;
           title = "Tailnet Drift";
-          y = 72;
+          y = 87;
         })
         (mkTable {
           id = 31;
@@ -1724,7 +1802,7 @@ let
             and on() (count(fleet_tailnet_node_tag_info) > 0)
           '';
           x = 0;
-          y = 73;
+          y = 88;
           w = 12;
           fields = {
             host = 0;
@@ -1741,7 +1819,7 @@ let
           description = "Tags headscale carries that the inventory does not list. Nodes left on tag:bootstrap appear here.";
           expression = "fleet_tailnet_node_tag_info unless on(host, tag) fleet_expected_tag_info";
           x = 12;
-          y = 73;
+          y = 88;
           w = 12;
           fields = {
             host = 0;
