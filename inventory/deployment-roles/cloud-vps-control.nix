@@ -15,6 +15,7 @@
     "infra:services/reverse-ssh-server"
     "infra:services/harmonia"
     "infra:services/slurm"
+    "infra:services/slurm-metrics"
     "self:services/homepage"
     "infra:services/jellyfin"
     "infra:services/transmission"
