@@ -40,10 +40,10 @@
   impermanence = {
     enable = true;
     rollback_backend = "btrfs";
+    home_mode = "user-managed";
     persisted_paths = [
       "/var/lib/libvirt"
       "/var/log"
-      "/persist/xilinx"
     ];
   };
 

@@ -1,6 +1,5 @@
 {
   lib,
-  config,
   pkgs,
   ...
 }:
@@ -90,7 +89,6 @@ in
   systemd.tmpfiles.rules = [ "d /run/hp-power 0755 root root -" ];
 
   hardware = {
-    cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
     sensor.iio.enable = true;
     firmware = [ ishFirmware ];
   };
