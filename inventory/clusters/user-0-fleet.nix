@@ -16,7 +16,7 @@
     controllers = [ "vps-oracle-0" ];
     partitions.laptops = {
       nodes = [ "laptop-0" ];
-      default = true;
+      default = false;
       max_time = "01:00:00";
     };
     partitions.servers = {
@@ -25,7 +25,7 @@
         "server-dev-2"
         "server-dev-3"
       ];
-      default = false;
+      default = true;
       max_time = "24:00:00";
     };
   };
