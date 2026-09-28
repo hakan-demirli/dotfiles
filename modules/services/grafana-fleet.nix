@@ -220,19 +220,28 @@ let
       }
     ];
   };
-  healthMappings = [
+  neutralThresholds = {
+    mode = "absolute";
+    steps = [
+      {
+        color = "blue";
+        value = null;
+      }
+    ];
+  };
+  upMappings = [
     {
       type = "value";
       options = {
         "0" = {
           color = "red";
           index = 0;
-          text = "DEGRADED";
+          text = "DOWN";
         };
         "1" = {
           color = "green";
           index = 1;
-          text = "HEALTHY";
+          text = "UP";
         };
       };
     }
@@ -257,9 +266,9 @@ let
           text = "DOWN";
         };
         "1" = {
-          color = "orange";
+          color = "gray";
           index = 1;
-          text = "DOWN";
+          text = "OFFLINE";
         };
         "2" = {
           color = "green";
@@ -317,7 +326,7 @@ let
           text = "NOT ENROLLED";
         };
         "1" = {
-          color = "orange";
+          color = "gray";
           index = 1;
           text = "OFFLINE";
         };
@@ -336,17 +345,17 @@ let
         "0" = {
           color = "red";
           index = 0;
-          text = "DEGRADED";
+          text = "DOWN";
         };
         "1" = {
           color = "gray";
           index = 1;
-          text = "N/A";
+          text = "OFFLINE";
         };
         "2" = {
           color = "green";
           index = 2;
-          text = "HEALTHY";
+          text = "UP";
         };
         "3" = {
           color = "gray";
@@ -374,7 +383,7 @@ let
       type = "value";
       options = {
         "0" = {
-          color = "red";
+          color = "blue";
           index = 0;
           text = "BEHIND";
         };
@@ -540,6 +549,110 @@ let
       "disk", " / ", "host", "device"
     )
   '';
+  activeAlertAge =
+    selector:
+    ''(time() - ALERTS_FOR_STATE{${selector}}) * ignoring(alertstate) ALERTS{alertstate="firing",${selector}}'';
+  activeAlertsExpression = ''
+    sort(
+      label_replace(
+        label_join(
+          label_replace(
+            label_replace(
+              label_replace(
+                label_replace(
+                  (
+                    label_replace(${activeAlertAge ''severity=~"critical|warning",host=""''}, "host", "$1", "instance", "([^.:]+).*")
+                    or ${activeAlertAge ''severity=~"critical|warning",host!=""''}
+                  ),
+                  "resource", "wave $1", "wave", "(.+)"
+                ),
+                "resource", "partition $1", "partition", "(.+)"
+              ),
+              "resource", "$1", "device", "(.+)"
+            ),
+            "resource", "$1", "mountpoint", "(.+)"
+          ),
+          "where", " ", "host", "resource"
+        ),
+        "where", "$1", "where", "\\s*(.*?)\\s*"
+      )
+    )
+  '';
+
+  fleetUid = "fleet-revisions";
+  fleetCpuPanel = 9;
+  fleetMemoryPanel = 10;
+  fleetRootPanel = 11;
+  fleetDiskHealthPanel = 17;
+  fleetConnectivityPanel = 28;
+  fleetFailedUnitsPanel = 33;
+  alertmanagerUrl = "http://100.64.0.1:${toString config.services.cluster-alertmanager.listenPort}/";
+  vmalertUrl = "http://100.64.0.1:${toString config.services.cluster-vmalert.listenPort}/";
+
+  mkPanelLink =
+    {
+      uid,
+      panel,
+      title,
+    }:
+    {
+      inherit title;
+      url = "/d/${uid}?viewPanel=${toString panel}&\${__url_time_range}";
+      targetBlank = false;
+    };
+  mkExternalLink =
+    {
+      title,
+      url,
+    }:
+    {
+      inherit title url;
+      targetBlank = true;
+    };
+  mkAlertmanagerLink =
+    {
+      title,
+      matchers,
+    }:
+    mkExternalLink {
+      inherit title;
+      url = "${alertmanagerUrl}#/alerts?filter=${lib.escapeURL "{${matchers}}"}";
+    };
+  slurmAlertLinks = [
+    (mkAlertmanagerLink {
+      title = "Show the Slurm alerts";
+      matchers = ''alertgroup="slurm"'';
+    })
+  ];
+  fleetDashboardLinks = [
+    {
+      asDropdown = false;
+      icon = "dashboard";
+      includeVars = false;
+      keepTime = true;
+      tags = [ "fleet" ];
+      targetBlank = false;
+      title = "Fleet dashboards";
+      tooltip = "";
+      type = "dashboards";
+      url = "";
+    }
+  ];
+  mkSeriesColor = name: color: {
+    matcher = {
+      id = "byName";
+      options = name;
+    };
+    properties = [
+      {
+        id = "color";
+        value = {
+          mode = "fixed";
+          fixedColor = color;
+        };
+      }
+    ];
+  };
   mkTarget =
     {
       expression,
@@ -593,6 +706,9 @@ let
       thresholds ? percentThresholds,
       mappings ? [ ],
       colorMode ? "background",
+      textMode ? "auto",
+      legend ? "",
+      links ? [ ],
       description ? "",
     }:
     {
@@ -616,12 +732,13 @@ let
             max
             thresholds
             mappings
+            links
             ;
         };
         overrides = [ ];
       };
       options = {
-        inherit colorMode;
+        inherit colorMode textMode;
         graphMode = "area";
         justifyMode = "auto";
         orientation = "auto";
@@ -631,13 +748,11 @@ let
           values = false;
         };
         showPercentChange = false;
-        textMode = "auto";
         wideLayout = true;
       };
       targets = [
         (mkTarget {
-          inherit expression;
-          legend = "";
+          inherit expression legend;
           refId = "A";
           instant = true;
         })
@@ -654,6 +769,7 @@ let
       unit,
       min ? null,
       max ? null,
+      overrides ? [ ],
       description ? "",
     }:
     {
@@ -695,7 +811,7 @@ let
           };
           thresholds = percentThresholds;
         };
-        overrides = [ ];
+        inherit overrides;
       };
       options = {
         legend = {
@@ -789,19 +905,9 @@ let
       w,
       fields,
       renamedFields,
+      h ? 7,
       overrides ? [ ],
-      excludedFields ? {
-        Time = true;
-        Value = true;
-        __name__ = true;
-        always_on = true;
-        closure = true;
-        cluster = true;
-        exporter = true;
-        instance = true;
-        job = true;
-        revision = true;
-      },
+      sortBy ? [ ],
     }:
     {
       inherit
@@ -812,14 +918,19 @@ let
         ;
       type = "table";
       gridPos = {
-        h = 7;
-        inherit w x y;
+        inherit
+          h
+          w
+          x
+          y
+          ;
       };
       fieldConfig = {
         defaults = { };
         inherit overrides;
       };
       options = {
+        inherit sortBy;
         cellHeight = "sm";
         showHeader = true;
         footer.show = false;
@@ -839,12 +950,109 @@ let
           options.mode = "columns";
         }
         {
+          id = "filterFieldsByName";
+          options.include.names = lib.attrNames fields;
+        }
+        {
           id = "organize";
           options = {
-            excludeByName = excludedFields;
             indexByName = fields;
             renameByName = renamedFields;
           };
+        }
+      ];
+    };
+  mkAlertsTable =
+    {
+      id,
+      y,
+      h,
+    }:
+    mkTable {
+      inherit id y h;
+      title = "Active alerts";
+      description = "Firing alerts, critical first. Click an alert for its details and silences.";
+      expression = activeAlertsExpression;
+      x = 0;
+      w = 24;
+      fields = {
+        severity = 0;
+        alertname = 1;
+        where = 2;
+        Value = 3;
+      };
+      renamedFields = {
+        severity = "Severity";
+        alertname = "Alert";
+        where = "Where";
+        Value = "Firing for";
+      };
+      sortBy = [
+        {
+          displayName = "Severity";
+          desc = false;
+        }
+      ];
+      overrides = [
+        {
+          matcher = {
+            id = "byName";
+            options = "Severity";
+          };
+          properties = [
+            {
+              id = "mappings";
+              value = severityMappings;
+            }
+            {
+              id = "custom.cellOptions";
+              value = {
+                mode = "basic";
+                type = "color-background";
+              };
+            }
+            {
+              id = "custom.width";
+              value = 110;
+            }
+          ];
+        }
+        {
+          matcher = {
+            id = "byName";
+            options = "Alert";
+          };
+          properties = [
+            {
+              id = "links";
+              value = [
+                (mkExternalLink {
+                  title = "Show the alert in Alertmanager";
+                  url = "${alertmanagerUrl}#/alerts?filter=${lib.escapeURL "{alertname=\""}\${__value.raw}${lib.escapeURL "\"}"}";
+                })
+              ];
+            }
+          ];
+        }
+        {
+          matcher = {
+            id = "byName";
+            options = "Firing for";
+          };
+          properties = [
+            {
+              id = "unit";
+              value = "dtdurations";
+            }
+            {
+              id = "decimals";
+              value = 0;
+            }
+            {
+              id = "custom.width";
+              value = 200;
+            }
+          ];
         }
       ];
     };
@@ -857,7 +1065,7 @@ let
       fiscalYearStartMonth = 0;
       graphTooltip = 1;
       id = null;
-      links = [ ];
+      links = fleetDashboardLinks;
       liveNow = false;
       panels = [
         (mkRow {
@@ -867,63 +1075,102 @@ let
         })
         (mkStat {
           id = 2;
-          title = "Fleet status";
-          expression = ''min(up{job=~"fleet-(node|smartctl)",always_on="true"})'';
+          title = "Unreachable hosts";
+          expression = "count(count by(host) (${withHost ''up{job=~"fleet-(node|smartctl)",always_on="true"} == 0''})) or vector(0)";
           x = 0;
           y = 1;
           min = 0;
-          max = 1;
-          thresholds = healthyThresholds;
-          mappings = healthMappings;
-          description = "All always-on node and SMART exporters are reachable. Disabled and optional targets do not degrade this status.";
+          thresholds = warningThresholds;
+          mappings = clearMappings;
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = fleetConnectivityPanel;
+              title = "Show the hosts";
+            })
+          ];
+          description = "Always-on hosts with an exporter down. Click for the host table.";
         })
         (mkStat {
           id = 3;
           title = "Highest CPU";
-          expression = ''max((1 - avg by(instance) (rate(node_cpu_seconds_total{job="fleet-node",mode="idle"}[5m]))) * 100)'';
+          expression = "topk(1, ${withHost ''(1 - avg by(instance) (rate(node_cpu_seconds_total{job="fleet-node",mode="idle"}[5m]))) * 100''})";
+          legend = "{{host}}";
+          textMode = "value_and_name";
           x = 4;
           y = 1;
           unit = "percent";
           decimals = 1;
           min = 0;
           max = 100;
-          description = "Busiest host over the last five minutes.";
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = fleetCpuPanel;
+              title = "Show the history of all hosts";
+            })
+          ];
+          description = "Busiest host, last 5 minutes. Click for all hosts.";
         })
         (mkStat {
           id = 4;
           title = "Highest memory";
-          expression = ''max((1 - node_memory_MemAvailable_bytes{job="fleet-node"} / node_memory_MemTotal_bytes{job="fleet-node"}) * 100)'';
+          expression = "topk(1, ${withHost ''(1 - node_memory_MemAvailable_bytes{job="fleet-node"} / node_memory_MemTotal_bytes{job="fleet-node"}) * 100''})";
+          legend = "{{host}}";
+          textMode = "value_and_name";
           x = 8;
           y = 1;
           unit = "percent";
           decimals = 1;
           min = 0;
           max = 100;
-          description = "Highest memory utilization across online hosts.";
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = fleetMemoryPanel;
+              title = "Show the history of all hosts";
+            })
+          ];
+          description = "Click for all hosts.";
         })
         (mkStat {
           id = 5;
           title = "Highest root usage";
-          expression = ''max((1 - node_filesystem_avail_bytes{job="fleet-node",mountpoint="/"} / node_filesystem_size_bytes{job="fleet-node",mountpoint="/"}) * 100)'';
+          expression = "topk(1, ${withHost ''(1 - node_filesystem_avail_bytes{job="fleet-node",mountpoint="/"} / node_filesystem_size_bytes{job="fleet-node",mountpoint="/"}) * 100''})";
+          legend = "{{host}}";
+          textMode = "value_and_name";
           x = 12;
           y = 1;
           unit = "percent";
           decimals = 1;
           min = 0;
           max = 100;
-          description = "Most utilized root filesystem in the fleet.";
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = fleetRootPanel;
+              title = "Show the history of all hosts";
+            })
+          ];
+          description = "Click for all hosts.";
         })
         (mkStat {
           id = 6;
-          title = "Disk health";
-          expression = ''min(smartctl_device_smart_status{job="fleet-smartctl"})'';
+          title = "Failing disks";
+          expression = "count((${diskStatusExpression}) == 0) or vector(0)";
           x = 16;
           y = 1;
           min = 0;
-          max = 1;
-          thresholds = healthyThresholds;
-          mappings = healthMappings;
-          description = "SMART status for physical disks that expose health data.";
+          thresholds = warningThresholds;
+          mappings = clearMappings;
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = fleetDiskHealthPanel;
+              title = "Show the disks";
+            })
+          ];
+          description = "Disks with Health FAIL. Click for the disk table.";
         })
         (mkStat {
           id = 7;
@@ -933,11 +1180,23 @@ let
           y = 1;
           thresholds = warningThresholds;
           mappings = clearMappings;
-          description = "Total failed systemd units across online hosts, including the host owner's user manager.";
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = fleetFailedUnitsPanel;
+              title = "Show the units";
+            })
+          ];
+          description = "Failed system and user units. Click for the unit table.";
+        })
+        (mkAlertsTable {
+          id = 47;
+          y = 5;
+          h = 8;
         })
 
         {
-          id = 28;
+          id = fleetConnectivityPanel;
           title = "Fleet Connectivity And Monitoring";
           description = "Tailnet reports Headscale node state; exporter columns report metric reachability. Disabled exporters are N/A, and optional failures do not degrade fleet health.";
           type = "table";
@@ -946,7 +1205,7 @@ let
             h = 8;
             w = 24;
             x = 0;
-            y = 5;
+            y = 13;
           };
           fieldConfig = {
             defaults = { };
@@ -1108,13 +1367,13 @@ let
         (mkRow {
           id = 8;
           title = "Host Resources";
-          y = 13;
+          y = 21;
         })
         (mkTimeSeries {
-          id = 9;
+          id = fleetCpuPanel;
           title = "CPU Utilization";
           x = 0;
-          y = 14;
+          y = 22;
           w = 8;
           unit = "percent";
           min = 0;
@@ -1128,10 +1387,10 @@ let
           ];
         })
         (mkTimeSeries {
-          id = 10;
+          id = fleetMemoryPanel;
           title = "Memory Utilization";
           x = 8;
-          y = 14;
+          y = 22;
           w = 8;
           unit = "percent";
           min = 0;
@@ -1145,10 +1404,10 @@ let
           ];
         })
         (mkTimeSeries {
-          id = 11;
+          id = fleetRootPanel;
           title = "Root Filesystem Utilization";
           x = 16;
-          y = 14;
+          y = 22;
           w = 8;
           unit = "percent";
           min = 0;
@@ -1165,13 +1424,13 @@ let
         (mkRow {
           id = 12;
           title = "Traffic And I/O";
-          y = 22;
+          y = 30;
         })
         (mkTimeSeries {
           id = 13;
           title = "Network Throughput";
           x = 0;
-          y = 23;
+          y = 31;
           w = 12;
           unit = "Bps";
           min = 0;
@@ -1192,7 +1451,7 @@ let
           id = 14;
           title = "Physical Disk Throughput";
           x = 12;
-          y = 23;
+          y = 31;
           w = 12;
           unit = "Bps";
           min = 0;
@@ -1214,7 +1473,7 @@ let
         (mkRow {
           id = 15;
           title = "Storage And Disk Health";
-          y = 31;
+          y = 39;
         })
         (mkBarGauge {
           id = 16;
@@ -1222,7 +1481,7 @@ let
           expression = withHost ''100 * (1 - node_filesystem_avail_bytes{job="fleet-node",mountpoint=~"/|/boot|/home"} / node_filesystem_size_bytes{job="fleet-node",mountpoint=~"/|/boot|/home"})'';
           legend = "{{host}}  {{mountpoint}}";
           x = 0;
-          y = 32;
+          y = 40;
           w = 8;
           unit = "percent";
           min = 0;
@@ -1230,7 +1489,7 @@ let
           description = "Usage for root, boot, and dedicated home filesystems.";
         })
         {
-          id = 17;
+          id = fleetDiskHealthPanel;
           title = "Physical Disk Health";
           description = "Physical disk health, NVMe endurance consumed, and host writes over the last 24 hours. Errors are reported media/data-integrity errors, not a NAND bad-block count. Hosts without SMART access do not appear here.";
           type = "table";
@@ -1239,7 +1498,7 @@ let
             h = 8;
             w = 16;
             x = 8;
-            y = 32;
+            y = 40;
           };
           fieldConfig = {
             defaults = {
@@ -1547,16 +1806,16 @@ let
         (mkRow {
           id = 21;
           title = "System State";
-          y = 40;
+          y = 48;
         })
         (mkBarGauge {
           id = 29;
           title = "Availability";
-          description = "Share of the selected time range in which the node exporter scrape succeeded. Restricted to always-on hosts because optional hosts are expected to be offline. A host absent from service discovery for part of the range is not counted as down.";
+          description = "Share of the time range in which the node exporter answered. Always-on hosts only.";
           expression = withHost ''avg_over_time(up{job="fleet-node",always_on="true"}[$__range]) * 100'';
           legend = "{{host}}";
           x = 0;
-          y = 41;
+          y = 49;
           w = 8;
           unit = "percent";
           decimals = 2;
@@ -1568,11 +1827,11 @@ let
         (mkBarGauge {
           id = 22;
           title = "Uptime";
-          description = "Time since last boot. This is a duration, not an availability ratio; bar length compares hosts against the longest-running host. Use Availability for the reachability percentage.";
+          description = "Time since last boot.";
           expression = withHost ''time() - node_boot_time_seconds{job="fleet-node"}'';
           legend = "{{host}}";
           x = 8;
-          y = 41;
+          y = 49;
           w = 8;
           unit = "s";
           min = 0;
@@ -1586,7 +1845,7 @@ let
           expression = withHost "sum by(instance) (${failedUnitStates})";
           legend = "{{host}}";
           x = 16;
-          y = 41;
+          y = 49;
           w = 8;
           min = 0;
           thresholds = warningThresholds;
@@ -1597,7 +1856,7 @@ let
           id = 23;
           title = "System Load";
           x = 0;
-          y = 49;
+          y = 57;
           w = 24;
           unit = "short";
           min = 0;
@@ -1615,12 +1874,12 @@ let
           ];
         })
         (mkTable {
-          id = 33;
+          id = fleetFailedUnitsPanel;
           title = "Failed Units";
           description = "Failed units of the system manager and of the host owner's user manager. A missing SOPS age key fails sops-install-secrets.service (system) or sops-nix.service (user).";
           expression = failedUnitsExpression;
           x = 0;
-          y = 57;
+          y = 65;
           w = 24;
           fields = {
             host = 0;
@@ -1632,33 +1891,20 @@ let
             manager = "Manager";
             name = "Unit";
           };
-          excludedFields = {
-            Time = true;
-            Value = true;
-            __name__ = true;
-            always_on = true;
-            cluster = true;
-            exporter = true;
-            instance = true;
-            job = true;
-            state = true;
-            type = true;
-            user = true;
-          };
         })
 
         (mkRow {
           id = 25;
           title = "Configuration Source";
-          y = 64;
+          y = 72;
         })
         (mkTable {
           id = 26;
           title = "Configuration Freshness";
-          description = "Compares each active NixOS source with the current dotfiles main branch. Path and dirty-tree builds are intentionally reported as local.";
+          description = "Deployed source compared with dotfiles main. BEHIND is normal during a rollout. Path and dirty-tree builds show as local.";
           expression = configurationFreshnessExpression;
           x = 0;
-          y = 65;
+          y = 73;
           w = 24;
           fields = {
             host = 0;
@@ -1673,16 +1919,6 @@ let
             main_revision = "Desired main";
             Value = "Status";
             version = "NixOS version";
-          };
-          excludedFields = {
-            Time = true;
-            __name__ = true;
-            closure = true;
-            generation = true;
-            instance = true;
-            job = true;
-            revision = true;
-            revision_kind = true;
           };
           overrides = [
             {
@@ -1713,15 +1949,15 @@ let
         (mkRow {
           id = 34;
           title = "Deployment";
-          y = 72;
+          y = 80;
         })
         (mkTable {
           id = 35;
           title = "Upgrade State";
-          description = "Latest fleet-upgrade run of each host. Hosts only switch; they never reboot. 'held' means a local generation or an inventory hold, 'waiting' means the rollout gate has not reached the host yet.";
+          description = "Latest fleet-upgrade run per host. held: local generation or inventory hold. waiting: the rollout has not reached the host.";
           expression = ''label_replace(fleet_upgrade_state == 1, "target", "$1", "revision", "(.{0,12}).*")'';
           x = 0;
-          y = 73;
+          y = 81;
           w = 12;
           fields = {
             host = 0;
@@ -1739,10 +1975,10 @@ let
         (mkTable {
           id = 36;
           title = "Reboot Required";
-          description = "Boot components of the active generation that differ from the booted one. They take effect only after a reboot, which nothing does automatically.";
+          description = "Boot components that change at the next reboot.";
           expression = "fleet_nixos_reboot_required == 1";
           x = 12;
-          y = 73;
+          y = 81;
           w = 12;
           fields = {
             host = 0;
@@ -1764,7 +2000,7 @@ let
             )
           '';
           x = 0;
-          y = 80;
+          y = 88;
           w = 24;
           fields = {
             wave = 0;
@@ -1778,20 +2014,11 @@ let
             next = "Next";
             state = "Gate";
           };
-          excludedFields = {
-            Time = true;
-            Value = true;
-            __name__ = true;
-            candidate = true;
-            instance = true;
-            job = true;
-            revision = true;
-          };
         })
         (mkRow {
           id = 30;
           title = "Tailnet Drift";
-          y = 87;
+          y = 95;
         })
         (mkTable {
           id = 31;
@@ -1802,7 +2029,7 @@ let
             and on() (count(fleet_tailnet_node_tag_info) > 0)
           '';
           x = 0;
-          y = 88;
+          y = 96;
           w = 12;
           fields = {
             host = 0;
@@ -1819,7 +2046,7 @@ let
           description = "Tags headscale carries that the inventory does not list. Nodes left on tag:bootstrap appear here.";
           expression = "fleet_tailnet_node_tag_info unless on(host, tag) fleet_expected_tag_info";
           x = 12;
-          y = 88;
+          y = 96;
           w = 12;
           fields = {
             host = 0;
@@ -1833,54 +2060,58 @@ let
         (mkRow {
           id = 38;
           title = "Slurm";
-          y = 95;
+          y = 103;
         })
         (mkStat {
           id = 39;
           title = "Controller";
-          description = "Whether the slurmctld metrics endpoint answers.";
+          description = "Whether the slurmctld metrics endpoint answers. Click for the Slurm alerts.";
           expression = ''max(up{job=~"fleet-slurm-.+"}) or on() vector(0)'';
           x = 0;
-          y = 96;
+          y = 104;
           thresholds = healthyThresholds;
-          mappings = healthMappings;
+          mappings = upMappings;
+          links = slurmAlertLinks;
         })
         (mkStat {
           id = 40;
           title = "Nodes Down";
-          description = "Nodes that slurmctld marks down. Run 'sinfo -R' for the reason.";
+          description = "Nodes that slurmctld marks down. Run 'sinfo -R' for the reason. Click for the Slurm alerts.";
           expression = "max(slurm_nodes_down)";
           x = 4;
-          y = 96;
+          y = 104;
           thresholds = warningThresholds;
           mappings = clearMappings;
+          links = slurmAlertLinks;
         })
         (mkStat {
           id = 41;
           title = "Not Responding";
-          description = "Nodes whose slurmd does not answer slurmctld.";
+          description = "Nodes whose slurmd does not answer slurmctld. Click for the Slurm alerts.";
           expression = "max(slurm_nodes_noresp)";
           x = 8;
-          y = 96;
+          y = 104;
           thresholds = warningThresholds;
           mappings = clearMappings;
+          links = slurmAlertLinks;
         })
         (mkStat {
           id = 42;
           title = "Drained";
-          description = "Nodes that accept no new jobs. Run 'sinfo -R' for the reason.";
+          description = "Nodes that accept no new jobs. Run 'sinfo -R' for the reason. Click for the Slurm alerts.";
           expression = "max(slurm_nodes_drain)";
           x = 12;
-          y = 96;
+          y = 104;
           thresholds = alertWarningThresholds;
           mappings = clearMappings;
+          links = slurmAlertLinks;
         })
         (mkStat {
           id = 43;
           title = "Jobs Running";
           expression = "max(slurm_jobs_running)";
           x = 16;
-          y = 96;
+          y = 104;
           colorMode = "none";
         })
         (mkStat {
@@ -1888,7 +2119,7 @@ let
           title = "Jobs Pending";
           expression = "max(slurm_jobs_pending)";
           x = 20;
-          y = 96;
+          y = 104;
           colorMode = "none";
         })
         (mkTimeSeries {
@@ -1896,10 +2127,17 @@ let
           title = "Slurm Nodes";
           description = "Node states over time. A node can be counted in more than one state, for example down and not responding.";
           x = 0;
-          y = 100;
+          y = 108;
           w = 12;
           unit = "short";
           min = 0;
+          overrides = [
+            (mkSeriesColor "Idle" "blue")
+            (mkSeriesColor "Busy" "green")
+            (mkSeriesColor "Down" "red")
+            (mkSeriesColor "Drained" "orange")
+            (mkSeriesColor "Not responding" "dark-red")
+          ];
           targets = [
             (mkTarget {
               expression = "max(slurm_nodes_idle)";
@@ -1932,10 +2170,14 @@ let
           id = 46;
           title = "Slurm Jobs";
           x = 12;
-          y = 100;
+          y = 108;
           w = 12;
           unit = "short";
           min = 0;
+          overrides = [
+            (mkSeriesColor "Running" "green")
+            (mkSeriesColor "Pending" "blue")
+          ];
           targets = [
             (mkTarget {
               expression = "max(slurm_jobs_running)";
@@ -1980,7 +2222,7 @@ let
       timepicker = { };
       timezone = "browser";
       title = "Fleet Overview";
-      uid = "fleet-revisions";
+      uid = fleetUid;
       version = 8;
       weekStart = "";
     }
@@ -1993,7 +2235,7 @@ let
       fiscalYearStartMonth = 0;
       graphTooltip = 1;
       id = null;
-      links = [
+      links = fleetDashboardLinks ++ [
         {
           asDropdown = false;
           icon = "external link";
@@ -2004,7 +2246,7 @@ let
           title = "Alertmanager";
           tooltip = "Inspect active alerts, routing, and silences.";
           type = "link";
-          url = "http://100.64.0.1:${toString config.services.cluster-alertmanager.listenPort}/";
+          url = alertmanagerUrl;
         }
         {
           asDropdown = false;
@@ -2016,7 +2258,7 @@ let
           title = "vmalert rules";
           tooltip = "Inspect rule groups, evaluations, and expressions.";
           type = "link";
-          url = "http://100.64.0.1:${toString config.services.cluster-vmalert.listenPort}/";
+          url = vmalertUrl;
         }
       ];
       liveNow = false;
@@ -2030,7 +2272,14 @@ let
           w = 6;
           min = 0;
           thresholds = warningThresholds;
-          description = "Firing critical alerts, excluding the Watchdog heartbeat.";
+          mappings = clearMappings;
+          links = [
+            (mkAlertmanagerLink {
+              title = "Show the critical alerts in Alertmanager";
+              matchers = ''severity="critical"'';
+            })
+          ];
+          description = "Click for details in Alertmanager.";
         })
         (mkStat {
           id = 2;
@@ -2041,7 +2290,14 @@ let
           w = 6;
           min = 0;
           thresholds = alertWarningThresholds;
-          description = "Firing warning alerts, excluding the Watchdog heartbeat.";
+          mappings = clearMappings;
+          links = [
+            (mkAlertmanagerLink {
+              title = "Show the warnings in Alertmanager";
+              matchers = ''severity="warning"'';
+            })
+          ];
+          description = "Click for details in Alertmanager.";
         })
         (mkStat {
           id = 3;
@@ -2051,8 +2307,15 @@ let
           y = 0;
           w = 6;
           min = 0;
-          thresholds = alertWarningThresholds;
-          description = "Alerts whose conditions are true but whose hold duration has not elapsed.";
+          thresholds = neutralThresholds;
+          mappings = clearMappings;
+          links = [
+            (mkExternalLink {
+              title = "Show the pending alerts in vmalert";
+              url = "${vmalertUrl}vmalert/alerts";
+            })
+          ];
+          description = "Conditions are true, but the hold time is not over. No action yet. Click for vmalert.";
         })
         (mkStat {
           id = 4;
@@ -2064,67 +2327,28 @@ let
           min = 0;
           max = 1;
           thresholds = healthyThresholds;
-          mappings = healthMappings;
-          description = "The Watchdog proves vmalert is evaluating rules and persisting alert state.";
-        })
-        (mkTable {
-          id = 5;
-          title = "Active alerts";
-          description = "Actionable pending and firing alerts. Open Alertmanager above for annotations, routing, and silences.";
-          expression = ''ALERTS{alertstate=~"pending|firing",severity!="none"}'';
-          x = 0;
-          y = 4;
-          w = 24;
-          fields = {
-            severity = 0;
-            alertname = 1;
-            instance = 2;
-            alertgroup = 3;
-            alertstate = 4;
-          };
-          renamedFields = {
-            severity = "Severity";
-            alertname = "Alert";
-            instance = "Instance";
-            alertgroup = "Group";
-            alertstate = "State";
-          };
-          excludedFields = {
-            Time = true;
-            Value = true;
-            __name__ = true;
-            always_on = true;
-            cluster = true;
-            exported_alertname = true;
-            exporter = true;
-            job = true;
-          };
-          overrides = [
-            {
-              matcher = {
-                id = "byName";
-                options = "Severity";
-              };
-              properties = [
-                {
-                  id = "mappings";
-                  value = severityMappings;
-                }
-                {
-                  id = "custom.cellOptions";
-                  value = {
-                    mode = "basic";
-                    type = "color-background";
-                  };
-                }
-              ];
-            }
+          mappings = upMappings;
+          links = [
+            (mkExternalLink {
+              title = "Show the rule groups in vmalert";
+              url = "${vmalertUrl}vmalert/groups";
+            })
           ];
+          description = "DOWN means alerting is broken. Click for vmalert.";
+        })
+        (mkAlertsTable {
+          id = 5;
+          y = 4;
+          h = 9;
         })
         (mkTimeSeries {
           id = 6;
           title = "Firing alerts by severity";
           description = "Historical count of actionable firing alerts from vmalert's persisted state.";
+          overrides = [
+            (mkSeriesColor "critical" "red")
+            (mkSeriesColor "warning" "orange")
+          ];
           targets = [
             (mkTarget {
               expression = ''sum by (severity) (ALERTS{alertstate="firing",severity!="none"})'';
@@ -2133,7 +2357,7 @@ let
             })
           ];
           x = 0;
-          y = 11;
+          y = 13;
           w = 24;
           unit = "short";
           min = 0;
@@ -2188,6 +2412,9 @@ let
   sshInternetAccepted = ''${sshAcceptedParsed} | source_ip:!~"${nonInternetSourcePattern}"'';
 
   sshAccessUid = "ssh-access";
+  networkFlowsUid = "network-flows";
+  flowsTopSourcesPanel = 3;
+  flowsRawPanel = 5;
   sshAcceptedPanel = 9;
   sshConnectionsPanel = 10;
   sshInternetAcceptedPanel = 14;
@@ -2217,18 +2444,14 @@ let
       title,
       description,
       expression,
-      detailPanel,
+      links,
       x,
       y,
-      thresholds ? {
-        mode = "absolute";
-        steps = [
-          {
-            color = "blue";
-            value = null;
-          }
-        ];
-      },
+      w ? 6,
+      h ? 4,
+      unit ? "short",
+      decimals ? 0,
+      thresholds ? neutralThresholds,
     }:
     {
       inherit
@@ -2239,22 +2462,21 @@ let
       type = "stat";
       datasource = logsDatasource;
       gridPos = {
-        h = 4;
-        w = 6;
-        inherit x y;
+        inherit
+          h
+          w
+          x
+          y
+          ;
       };
       fieldConfig = {
         defaults = {
-          decimals = 0;
-          unit = "short";
-          inherit thresholds;
-          links = [
-            {
-              title = "Show the matching events";
-              url = "/d/${sshAccessUid}?viewPanel=${toString detailPanel}&\${__url_time_range}";
-              targetBlank = false;
-            }
-          ];
+          inherit
+            decimals
+            unit
+            thresholds
+            links
+            ;
         };
         overrides = [ ];
       };
@@ -2306,15 +2528,7 @@ let
         defaults = {
           inherit unit;
           min = 0;
-          thresholds = {
-            mode = "absolute";
-            steps = [
-              {
-                color = "blue";
-                value = null;
-              }
-            ];
-          };
+          thresholds = neutralThresholds;
         };
         overrides = [ ];
       };
@@ -2394,7 +2608,7 @@ let
       fiscalYearStartMonth = 0;
       graphTooltip = 1;
       id = null;
-      links = [ ];
+      links = fleetDashboardLinks;
       liveNow = false;
       panels = [
         (mkRow {
@@ -2407,7 +2621,13 @@ let
           title = "Accepted authentications";
           description = "Successful OpenSSH authentication events. Click the value for the source, account, method, and key of each one.";
           expression = "${sshAccepted} | stats count() as logins";
-          detailPanel = sshAcceptedPanel;
+          links = [
+            (mkPanelLink {
+              uid = sshAccessUid;
+              panel = sshAcceptedPanel;
+              title = "Show the matching events";
+            })
+          ];
           x = 0;
           y = 1;
         })
@@ -2416,7 +2636,13 @@ let
           title = "Accepted via internet";
           description = "Successful authentications from outside private, loopback, link-local, and Tailscale CGNAT ranges. Any value warrants identity review; click the value for the events behind it.";
           expression = "${sshInternetAccepted} | stats count() as logins";
-          detailPanel = sshInternetAcceptedPanel;
+          links = [
+            (mkPanelLink {
+              uid = sshAccessUid;
+              panel = sshInternetAcceptedPanel;
+              title = "Show the matching events";
+            })
+          ];
           x = 6;
           y = 1;
           thresholds = warningThresholds;
@@ -2426,7 +2652,13 @@ let
           title = "Internet connections";
           description = "TCP connections to fleet SSH endpoints from public source addresses; this is exposure volume, not successful authentication. Click the value for the individual attempts.";
           expression = "${sshInternetConnections} | stats count() as connections";
-          detailPanel = sshConnectionsPanel;
+          links = [
+            (mkPanelLink {
+              uid = sshAccessUid;
+              panel = sshConnectionsPanel;
+              title = "Show the matching events";
+            })
+          ];
           x = 12;
           y = 1;
         })
@@ -2435,7 +2667,13 @@ let
           title = "Credential rejections";
           description = "Failed credentials, invalid users, and maximum-attempt events. A connection can produce more than one rejection event. Click the value for the raw messages.";
           expression = "${sshCredentialFailures} | stats count() as rejections";
-          detailPanel = sshRejectionsPanel;
+          links = [
+            (mkPanelLink {
+              uid = sshAccessUid;
+              panel = sshRejectionsPanel;
+              title = "Show the matching events";
+            })
+          ];
           x = 18;
           y = 1;
           thresholds = {
@@ -2648,7 +2886,7 @@ let
       fiscalYearStartMonth = 0;
       graphTooltip = 1;
       id = null;
-      links = [ ];
+      links = fleetDashboardLinks;
       liveNow = false;
       panels = [
         (mkLogsBarGauge {
@@ -2698,6 +2936,7 @@ let
       schemaVersion = 42;
       tags = [
         "dns"
+        "fleet"
         "lan"
         "security"
       ];
@@ -2722,112 +2961,48 @@ let
       fiscalYearStartMonth = 0;
       graphTooltip = 1;
       id = null;
-      links = [ ];
+      links = fleetDashboardLinks;
       liveNow = false;
       panels = [
-        {
+        (mkLogsStat {
           id = 1;
           title = "Estimated bytes";
-          description = "Total sampling-adjusted bytes represented by flow records in the selected time range.";
-          type = "stat";
-          datasource = logsDatasource;
-          gridPos = {
-            h = 5;
-            w = 12;
-            x = 0;
-            y = 0;
-          };
-          fieldConfig = {
-            defaults = {
-              color.mode = "thresholds";
-              unit = "bytes";
-              thresholds = {
-                mode = "absolute";
-                steps = [
-                  {
-                    color = "blue";
-                    value = null;
-                  }
-                ];
-              };
-            };
-            overrides = [ ];
-          };
-          options = {
-            colorMode = "value";
-            graphMode = "none";
-            justifyMode = "auto";
-            orientation = "auto";
-            reduceOptions = {
-              calcs = [ "lastNotNull" ];
-              fields = "";
-              values = false;
-            };
-            textMode = "auto";
-            wideLayout = true;
-          };
-          targets = [
-            {
-              datasource = logsDatasource;
-              editorMode = "code";
-              expr = "event_kind:network_flow | stats sum(flow.estimated_bytes) as bytes";
-              queryType = "stats";
-              refId = "A";
-            }
+          description = "Sampling-adjusted bytes in the time range. Click for the top sources.";
+          expression = "event_kind:network_flow | stats sum(flow.estimated_bytes) as bytes";
+          links = [
+            (mkPanelLink {
+              uid = networkFlowsUid;
+              panel = flowsTopSourcesPanel;
+              title = "Show the top sources";
+            })
           ];
-        }
-        {
+          x = 0;
+          y = 0;
+          w = 12;
+          h = 5;
+          unit = "bytes";
+          decimals = null;
+        })
+        (mkLogsStat {
           id = 2;
           title = "Flow records";
-          description = "Number of decoded IPFIX records in the selected time range.";
-          type = "stat";
-          datasource = logsDatasource;
-          gridPos = {
-            h = 5;
-            w = 12;
-            x = 12;
-            y = 0;
-          };
-          fieldConfig = {
-            defaults = {
-              color.mode = "thresholds";
-              thresholds = {
-                mode = "absolute";
-                steps = [
-                  {
-                    color = "blue";
-                    value = null;
-                  }
-                ];
-              };
-            };
-            overrides = [ ];
-          };
-          options = {
-            colorMode = "value";
-            graphMode = "none";
-            justifyMode = "auto";
-            orientation = "auto";
-            reduceOptions = {
-              calcs = [ "lastNotNull" ];
-              fields = "";
-              values = false;
-            };
-            textMode = "auto";
-            wideLayout = true;
-          };
-          targets = [
-            {
-              datasource = logsDatasource;
-              editorMode = "code";
-              expr = "event_kind:network_flow | stats count() as flows";
-              queryType = "stats";
-              refId = "A";
-            }
+          description = "Decoded IPFIX records in the time range. Click for the raw records.";
+          expression = "event_kind:network_flow | stats count() as flows";
+          links = [
+            (mkPanelLink {
+              uid = networkFlowsUid;
+              panel = flowsRawPanel;
+              title = "Show the raw records";
+            })
           ];
-        }
+          x = 12;
+          y = 0;
+          w = 12;
+          h = 5;
+          decimals = null;
+        })
         (mkLogsBarGauge {
-          id = 3;
+          id = flowsTopSourcesPanel;
           title = "Top source addresses";
           description = "Sources ranked by sampling-adjusted bytes in observed flow records.";
           expression = "event_kind:network_flow flow.src_addr:* | stats by (flow.src_addr) sum(flow.estimated_bytes) as bytes | sort by (bytes desc) limit 12";
@@ -2851,7 +3026,7 @@ let
           unit = "bytes";
         })
         {
-          id = 5;
+          id = flowsRawPanel;
           title = "Raw flow records";
           description = "Decoded GoFlow2 records; expand a row to inspect all IPFIX fields.";
           type = "logs";
@@ -2888,6 +3063,7 @@ let
       refresh = "30s";
       schemaVersion = 42;
       tags = [
+        "fleet"
         "network"
         "security"
         "ipfix"
@@ -2900,7 +3076,7 @@ let
       timepicker = { };
       timezone = "browser";
       title = "Network Flows";
-      uid = "network-flows";
+      uid = networkFlowsUid;
       version = 2;
       weekStart = "";
     }

@@ -175,6 +175,7 @@ ShellRoot {
             anchors.right: parent.right
             width: implicitWidth
             height: implicitHeight
+            onRequestPanel: shell.activeMenu = "notifications"
         }
     }
 

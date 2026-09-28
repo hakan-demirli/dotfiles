@@ -1,3 +1,6 @@
+let
+  inherit (import ./_templates.nix) host;
+in
 {
   groups = [
     {
@@ -10,8 +13,8 @@
           for = "5m";
           labels.severity = "critical";
           annotations = {
-            summary = "{{ $labels.instance }} SMART overall-health FAILED on {{ $labels.device }}";
-            description = "The disk {{ $labels.device }} on {{ $labels.instance }} reports SMART overall-health as failing. Replace the drive.";
+            summary = "${host} disk {{ $labels.device }} is failing";
+            description = "SMART health check failed. Replace the disk.";
           };
         }
 
@@ -21,8 +24,8 @@
           for = "5m";
           labels.severity = "critical";
           annotations = {
-            summary = "{{ $labels.instance }} NVMe media errors on {{ $labels.device }}";
-            description = "NVMe media_errors counter increased on {{ $labels.device }} in the last hour. The drive is silently corrupting reads.";
+            summary = "${host} disk {{ $labels.device }} has media errors";
+            description = "{{ humanize $value }} new errors in the last hour. Back up the data and replace the disk.";
           };
         }
 
@@ -32,8 +35,8 @@
           for = "30m";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.instance }} NVMe wearout past 90% on {{ $labels.device }}";
-            description = "SSD lifetime-used indicator for {{ $labels.device }} on {{ $labels.instance }} is over 90%. Plan a replacement.";
+            summary = "${host} disk {{ $labels.device }} is over 90% worn";
+            description = "Plan a replacement.";
           };
         }
 
@@ -43,8 +46,8 @@
           for = "15m";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.instance }} disk temp over 75C on {{ $labels.device }}";
-            description = "Disk {{ $labels.device }} on {{ $labels.instance }} has been above 75C for 15m. Check airflow / heatsink.";
+            summary = "${host} disk {{ $labels.device }} is hot";
+            description = "{{ humanize $value }}°C for 15 minutes. Check the cooling.";
           };
         }
       ];

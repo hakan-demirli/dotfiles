@@ -1,3 +1,6 @@
+let
+  inherit (import ./_templates.nix) host;
+in
 {
   groups = [
     {
@@ -10,8 +13,8 @@
           for = "5m";
           labels.severity = "critical";
           annotations = {
-            summary = "{{ $labels.instance }} has been unreachable for 5m";
-            description = "VictoriaMetrics could not scrape node_exporter on {{ $labels.instance }} (always-on host) for 5 minutes.";
+            summary = "${host} is unreachable";
+            description = "node_exporter does not answer. Check power and the tailnet.";
           };
         }
 
@@ -21,8 +24,8 @@
           for = "30m";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.instance }} not seen for over a week";
-            description = "Sleep-eligible host {{ $labels.instance }} has not been reachable for more than 7 days. Either it is retired, dead, or off-fleet.";
+            summary = "${host} offline for 7 days";
+            description = "Optional host. Bring it online or retire it in the inventory.";
           };
         }
 
@@ -38,8 +41,8 @@
           for = "10m";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.instance }} {{ $labels.mountpoint }} over 90% full";
-            description = "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} is above 90% for 10m.";
+            summary = "${host} {{ $labels.mountpoint }} is over 90% full";
+            description = "{{ $value | humanizePercentage }} used.";
           };
         }
 
@@ -55,8 +58,8 @@
           for = "2m";
           labels.severity = "critical";
           annotations = {
-            summary = "{{ $labels.instance }} {{ $labels.mountpoint }} over 97% full";
-            description = "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} is above 97%. Free space or the box will fall over.";
+            summary = "${host} {{ $labels.mountpoint }} is over 97% full";
+            description = "{{ $value | humanizePercentage }} used. Free space now.";
           };
         }
 
@@ -66,8 +69,8 @@
           for = "15m";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.instance }} MemAvailable under 10% for 15m";
-            description = "Available memory on {{ $labels.instance }} is below 10% of total for 15 minutes. Something is leaking or the workload is heavier than provisioned.";
+            summary = "${host} is low on memory";
+            description = "{{ $value | humanizePercentage }} of memory available.";
           };
         }
 
@@ -81,8 +84,8 @@
           for = "30m";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.instance }} load15 over 2x CPU count";
-            description = "15-minute load average on {{ $labels.instance }} is more than 2x the CPU count for 30 minutes. Sustained overcommit.";
+            summary = "${host} is overloaded";
+            description = "15-minute load is {{ printf \"%.1f\" $value }}× the CPU count.";
           };
         }
       ];
