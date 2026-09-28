@@ -9,7 +9,7 @@ data_file="$cache_dir/$tmux_cwd_hash.csv"
 status_line=$(tmux capture-pane -pS -3 | tail -n 3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3' || true)
 read -r buffer_path cursor_row cursor_col <<< "$status_line"
 
-IFS='|' read -r tmux_session tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name}|#{window_index}|#{pane_current_command}|#{pane_current_path}')"
+IFS='|' read -r tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{window_index}|#{pane_current_command}|#{pane_current_path}')"
 tmux_window=${tmux_window//@/}
 
 if [[ $tmux_command == "yazi" ]]; then
@@ -89,7 +89,7 @@ if [[ $populated -eq 0 ]]; then
       echo "$default_line"
     done
     echo
-    echo "# session_name: $tmux_session"
+    echo "# session_name: $(basename "$tmux_cwd")"
     echo "# pane_id , command , file_name:r:c , file_path , workspace_dir"
   } >> "$data_file"
 fi
