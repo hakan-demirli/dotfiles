@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Services.Notifications
 import Quickshell.Widgets
 
 Item {
@@ -13,19 +12,27 @@ Item {
     required property date now
 
     property bool showApplication: true
+    property int bodyLineLimit: Theme.metrics.notificationBodyLineLimit
 
     readonly property bool live: notification !== null
 
-    readonly property bool critical: live && notification.urgency === NotificationUrgency.Critical
+    readonly property int tier: live ? NotificationPolicy.tier(notification) : NotificationPolicy.Tier.Active
+    readonly property bool critical: tier === NotificationPolicy.Tier.Critical
+    readonly property bool passive: tier === NotificationPolicy.Tier.Passive
+    readonly property var record: live ? NotificationService.record(notification) : null
+    readonly property bool unseen: record !== null && !record.seen && tier >= NotificationPolicy.Tier.Active
+    readonly property int repeats: record !== null ? record.repeats : 1
     readonly property string summary: live ? notification.summary : ""
     readonly property string body: live ? notification.body : ""
     readonly property string image: live ? notification.image : ""
     readonly property string icon: live && notification.appIcon.length > 0 ? Quickshell.iconPath(notification.appIcon, true) : ""
     readonly property string application: live ? NotificationService.applicationName(notification) : ""
     readonly property string age: live ? NotificationService.relativeTime(notification, now) : ""
-    readonly property string code: live ? NotificationService.code(notification) : ""
+    readonly property string code: live ? NotificationPolicy.code(notification) : ""
     readonly property var actions: live ? NotificationService.buttonActions(notification) : []
-    readonly property var fallback: live ? NotificationService.defaultAction(notification) : null
+    readonly property bool activatable: live && NotificationService.activatable(notification)
+
+    signal closeRequested
 
     implicitHeight: layout.implicitHeight + Theme.space.medium * 2
 
@@ -39,9 +46,9 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        enabled: root.fallback !== null
+        enabled: root.activatable
         cursorShape: Qt.PointingHandCursor
-        onClicked: NotificationService.invoke(root.notification, root.fallback)
+        onClicked: NotificationService.activate(root.notification)
     }
 
     RowLayout {
@@ -96,14 +103,31 @@ Item {
                 Layout.fillWidth: true
                 spacing: Theme.space.small
 
+                Rectangle {
+                    visible: root.unseen
+                    implicitWidth: Theme.space.small
+                    implicitHeight: Theme.space.small
+                    radius: Theme.shape.full
+                    color: Theme.palette.m3primary
+                }
+
                 Text {
                     Layout.fillWidth: true
                     text: root.summary
-                    color: ShellPalette.foreground
+                    color: root.passive ? ShellPalette.foregroundMuted : ShellPalette.foreground
                     elide: Text.ElideRight
                     font.family: Theme.font.plain
                     font.pixelSize: Theme.font.bodyLargeSize
                     font.weight: Theme.font.titleMediumWeight
+                }
+
+                Text {
+                    visible: root.repeats > 1
+                    text: `×${root.repeats}`
+                    color: ShellPalette.foregroundMuted
+                    font.family: Theme.font.plain
+                    font.pixelSize: Theme.font.labelSmallSize
+                    font.weight: Theme.font.labelSmallWeight
                 }
 
                 Text {
@@ -119,7 +143,7 @@ Item {
                     implicitWidth: Theme.metrics.compactIconButtonSize
                     implicitHeight: Theme.metrics.compactIconButtonSize
                     icon: "\ue5cd"
-                    onActivated: NotificationService.dismiss(root.notification)
+                    onActivated: root.closeRequested()
                 }
             }
 
@@ -143,7 +167,7 @@ Item {
                 linkColor: Theme.palette.m3primary
                 wrapMode: Text.Wrap
                 elide: Text.ElideRight
-                maximumLineCount: Theme.metrics.notificationBodyLineLimit
+                maximumLineCount: root.bodyLineLimit
                 font.family: Theme.font.plain
                 font.pixelSize: Theme.font.bodyMediumSize
                 onLinkActivated: link => Quickshell.execDetached(["xdg-open", link])

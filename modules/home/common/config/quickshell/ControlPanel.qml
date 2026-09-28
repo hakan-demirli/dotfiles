@@ -107,7 +107,7 @@ Item {
                 Layout.fillWidth: true
                 icon: NotificationService.doNotDisturb ? "\ue51d" : "\ue7f4"
                 title: "Notifications"
-                subtitle: NotificationService.doNotDisturb ? "Do not disturb" : NotificationService.count > 0 ? `${NotificationService.count} waiting` : "Nothing waiting"
+                subtitle: NotificationService.doNotDisturb ? "Do not disturb" : NotificationService.unseen > 0 ? `${NotificationService.unseen} new` : NotificationService.count > 0 ? "Nothing new" : "Nothing waiting"
                 onActivated: root.requestMenu("notifications")
             }
 
