@@ -6,6 +6,8 @@ import Quickshell
 Item {
     id: root
 
+    signal requestPanel
+
     implicitWidth: Theme.metrics.menuWidth
     implicitHeight: stack.implicitHeight
 
@@ -49,6 +51,37 @@ Item {
                 width: stack.width
                 notification: modelData
                 now: clock.date
+            }
+        }
+
+        Rectangle {
+            visible: NotificationService.overflow > 0
+            anchors.right: parent.right
+            implicitWidth: overflowLabel.implicitWidth + Theme.space.large * 2
+            implicitHeight: Theme.metrics.compactButtonHeight
+            radius: Theme.shape.full
+            color: overflowArea.containsMouse ? Qt.alpha(ShellPalette.foreground, Theme.state.hoverOpacity) : ShellPalette.surface
+            border.width: Theme.metrics.stroke
+            border.color: ShellPalette.indicator
+
+            Text {
+                id: overflowLabel
+
+                anchors.centerIn: parent
+                text: `${NotificationService.overflow} more in notifications`
+                color: ShellPalette.foreground
+                font.family: Theme.font.plain
+                font.pixelSize: Theme.font.labelMediumSize
+                font.weight: Theme.font.labelMediumWeight
+            }
+
+            MouseArea {
+                id: overflowArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.requestPanel()
             }
         }
     }

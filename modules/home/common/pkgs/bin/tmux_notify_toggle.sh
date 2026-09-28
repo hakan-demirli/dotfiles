@@ -5,7 +5,7 @@ set -euo pipefail
 STATE_DIR="/tmp/tmux_notify_locks"
 mkdir -p "$STATE_DIR"
 
-NTFY_URL="http://vm-oracle-aarch64:8111/emre-$(hostname)"
+NTFY_URL="http://vps-oracle-0:8111/emre-tmux"
 
 PANE_ID=""
 SHELL_PID=""
@@ -19,14 +19,15 @@ send_telegram() {
 }
 
 trigger_desktop_action() {
-  local msg="$1"
-  local do_desktop="$2"
-  local do_sound="$3"
+  local title="$1"
+  local msg="$2"
+  local do_desktop="$3"
+  local do_sound="$4"
 
   if [[ -n ${DISPLAY:-} || -n ${WAYLAND_DISPLAY:-} ]]; then
     if [[ $do_desktop -eq 1 ]]; then
       if command -v notify-send > /dev/null 2>&1; then
-        notify-send "Tmux Task Finished" "$msg"
+        notify-send -a tmux "$title" "$msg"
       fi
     fi
 
@@ -38,7 +39,7 @@ trigger_desktop_action() {
   else
     if [[ $do_desktop -eq 1 || $do_sound -eq 1 ]]; then
       if command -v curl > /dev/null 2>&1; then
-        curl -s -H "Title: Tmux Task Finished" -d "$msg" "$NTFY_URL" > /dev/null
+        curl -s -H "Title: $title" -d "$msg" "$NTFY_URL" > /dev/null
       fi
     fi
   fi
@@ -80,16 +81,15 @@ toggle_watcher() {
       sleep 2
     done
 
+    local title="$cmd_name finished"
     local msg
-    msg="Task Finished on $(hostname)
-Command: $cmd_name
-Pane: $PANE_ID"
+    msg="on $(hostname), pane $PANE_ID"
 
     if [[ $do_telegram -eq 1 ]]; then
-      send_telegram "$msg"
+      send_telegram "$title $msg"
     fi
 
-    trigger_desktop_action "$msg" "$do_desktop" "$do_sound"
+    trigger_desktop_action "$title" "$msg" "$do_desktop" "$do_sound"
 
     rm -f "$lock_file"
   ) > /dev/null 2>&1 &

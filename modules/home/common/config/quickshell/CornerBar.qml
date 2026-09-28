@@ -139,9 +139,9 @@ Item {
         height: root.blockSize
         icon: "\ue5c3"
 
-        badgeIcon: NotificationService.doNotDisturb ? "\ue51d" : NotificationService.count > 0 ? "\ue7f4" : ""
+        badgeIcon: NotificationService.doNotDisturb ? "\ue51d" : NotificationService.unseen > 0 ? "\ue7f4" : ""
         active: true
-        tooltip: NotificationService.doNotDisturb ? "Do not disturb" : NotificationService.count > 0 ? `${NotificationService.count} notifications` : "Control centre"
+        tooltip: NotificationService.doNotDisturb ? "Do not disturb" : NotificationService.unseen > 0 ? `${NotificationService.unseen} new notifications` : "Control centre"
         tooltipPlacement: "top"
         onActivated: root.menuRequested("control")
         onContextActivated: root.menuRequested("notifications")

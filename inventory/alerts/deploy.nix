@@ -10,8 +10,8 @@
           for = "1h";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.host }} needs a reboot to finish its upgrade";
-            description = "The active generation on {{ $labels.host }} changes a boot component (kernel, initrd, kernel modules or kernel parameters). Nothing reboots automatically. Reboot the host when its work allows it.";
+            summary = "{{ $labels.host }} needs a reboot";
+            description = "Kernel or boot settings changed. Reboot to apply.";
           };
         }
 
@@ -21,8 +21,8 @@
           for = "15m";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.host }} failed to upgrade ({{ $labels.reason }})";
-            description = "fleet-upgrade.service on {{ $labels.host }} failed with reason '{{ $labels.reason }}'. The host keeps its current generation. Read 'journalctl -u fleet-upgrade' on the host.";
+            summary = "{{ $labels.host }} upgrade failed ({{ $labels.reason }})";
+            description = "Still on the previous generation. Check: journalctl -u fleet-upgrade";
           };
         }
 
@@ -32,8 +32,8 @@
           for = "1h";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.host }} has not run its planned generation for 3 days";
-            description = "{{ $labels.host }} is not held, but it has not matched its planned generation for 3 days. It may be offline in every upgrade window, fail to build, or wait for a Slurm controller that does not upgrade. Read 'journalctl -u fleet-upgrade' on the host and the plan on the deploy controller.";
+            summary = "{{ $labels.host }} has not upgraded for 3 days";
+            description = "Check: journalctl -u fleet-upgrade";
           };
         }
 
@@ -43,8 +43,8 @@
           for = "15m";
           labels.severity = "warning";
           annotations = {
-            summary = "The deploy controller cannot build {{ $labels.host }}";
-            description = "The deploy controller failed to build {{ $labels.host }} at {{ $labels.revision }}. The host keeps its current generation. Read 'journalctl -u fleet-deploy-controller' on the controller.";
+            summary = "Build failed for {{ $labels.host }}";
+            description = "Revision {{ reReplaceAll \"^(.{12}).*$\" \"$1\" $labels.revision }}. Check: journalctl -u fleet-deploy-controller";
           };
         }
 
@@ -54,8 +54,8 @@
           for = "1h";
           labels.severity = "warning";
           annotations = {
-            summary = "Rollout wave {{ $labels.wave }} is stopped ({{ $labels.state }})";
-            description = "Wave {{ $labels.wave }} stays on {{ $labels.revision }} and does not take {{ $labels.candidate }}. 'blocked': a trusted host of the previous wave that runs a newer revision has failed units, failed its upgrade, or went down. 'metrics-unreachable': the controller cannot query VictoriaMetrics. 'no-canary': the previous wave has no trusted host that is not held.";
+            summary = "Rollout wave {{ $labels.wave }} is blocked";
+            description = "{{ if eq $labels.state \"blocked\" }}A host in the previous wave failed.{{ else if eq $labels.state \"metrics-unreachable\" }}The controller cannot query VictoriaMetrics.{{ else }}The previous wave has no usable canary host.{{ end }}";
           };
         }
 
@@ -65,8 +65,8 @@
           for = "15m";
           labels.severity = "warning";
           annotations = {
-            summary = "The deploy controller has not completed a run for 3 hours";
-            description = "No host receives new generations while the controller is stale. Read 'journalctl -u fleet-deploy-controller' on the controller.";
+            summary = "Deploy controller stalled";
+            description = "No run for 3 hours. Check: journalctl -u fleet-deploy-controller";
           };
         }
       ];

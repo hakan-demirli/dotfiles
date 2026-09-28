@@ -55,5 +55,6 @@ Item {
         }
         notification: root.notification
         now: root.now
+        onCloseRequested: NotificationService.close(root.notification)
     }
 }

@@ -15,8 +15,8 @@
           for = "1h";
           labels.severity = "warning";
           annotations = {
-            summary = "VictoriaMetrics on-disk data projected to exceed VPS root FS within 7 days";
-            description = "Based on the last 6 hours of growth, VictoriaMetrics will fill the VPS root filesystem in under 7 days. Reduce retention_period or add ingest filtering.";
+            summary = "VictoriaMetrics will fill the disk within 7 days";
+            description = "Lower the retention or filter ingest.";
           };
         }
 
@@ -32,8 +32,8 @@
           for = "30m";
           labels.severity = "warning";
           annotations = {
-            summary = "Over 50% of scrapes for {{ $labels.job }} failing for 30m";
-            description = "VictoriaMetrics scrape job {{ $labels.job }} is failing more than half its attempts. Either the exporter is broken or a firewall/network changed.";
+            summary = "Scrapes failing for {{ $labels.job }}";
+            description = "Over half of the scrapes fail.";
           };
         }
 
@@ -44,7 +44,7 @@
           labels.severity = "none";
           annotations = {
             summary = "vmalert alive";
-            description = "This alert should always fire. Its absence means the alerting pipeline is broken.";
+            description = "Always fires. If it stops, alerting is broken.";
           };
         }
 
@@ -54,8 +54,8 @@
           for = "5m";
           labels.severity = "warning";
           annotations = {
-            summary = "Watchdog alert not firing";
-            description = "The always-firing Watchdog alert is missing. vmalert is either not evaluating rules or cannot reach VictoriaMetrics.";
+            summary = "Alerting is broken";
+            description = "The Watchdog alert is missing. Check vmalert and VictoriaMetrics.";
           };
         }
       ];

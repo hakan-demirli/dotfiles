@@ -1,3 +1,6 @@
+let
+  inherit (import ./_templates.nix) host;
+in
 {
   groups = [
     {
@@ -10,8 +13,8 @@
           for = "5m";
           labels.severity = "critical";
           annotations = {
-            summary = "{{ $labels.instance }} btrfs {{ $labels.type }} error on {{ $labels.device }}";
-            description = "{{ $value }} new {{ $labels.type }} errors in the last hour. data=single, so nothing is repairable.";
+            summary = "${host} btrfs {{ $labels.type }} errors on {{ $labels.device }}";
+            description = "{{ humanize $value }} new errors in the last hour. The data has no redundancy. Back it up now.";
           };
         }
       ];

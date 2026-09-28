@@ -2,11 +2,8 @@
   "notification": true,
   "command": {
     "enabled": true,
-    "path": "sh",
-    "args": [
-      "-c",
-      "HN=$(hostname); if [ \"$HN\" != \"laptop-1\" ]; then tnotify.sh \"opencode done on $HN in {projectName}\"; curl -d \"opencode done on $HN in {projectName}\" -H \"Title: Opencode ($HN) [{projectName}]\" http://vps-oracle-0:8111/emre-laptop; fi"
-    ]
+    "path": "opencode-ntfy.sh",
+    "args": ["{event}", "{projectName}"]
   },
   "events": {
     "user_message": {
