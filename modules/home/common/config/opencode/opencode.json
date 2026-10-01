@@ -18,6 +18,64 @@
   "snapshot": false,
   "instructions": [".agent/*.md", ".hydrate/agent/*.md"],
   "provider": {
+    "gufo": {
+      "name": "Gufo",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8080/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "coding": {
+          "name": "Gufo Coding",
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "input": 253952,
+            "output": 8192
+          },
+          "options": {
+            "reasoningEffort": "medium"
+          },
+          "variants": {
+            "off": {
+              "reasoningEffort": "none"
+            },
+            "minimal": {
+              "reasoningEffort": "minimal"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        }
+      }
+    },
     "openai": {
       "models": {
         "gpt-5.6-sol": {
