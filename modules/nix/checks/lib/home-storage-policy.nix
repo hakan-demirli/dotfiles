@@ -20,6 +20,7 @@ let
     ".cache" = "persistent";
     ".config/mozilla" = "persistent";
     ".config/sops/age" = "persistent";
+    ".local/share/direnv" = "persistent";
     ".local/share/opencode" = "persistent";
     ".local/share/state" = "persistent";
     ".local/state/opencode" = "persistent";
