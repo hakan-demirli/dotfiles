@@ -62,6 +62,7 @@ in
     ++ lib.optional personal "removeGitTokenUrlRewrite";
     paths = {
       ".cache" = "persistent";
+      ".local/share/direnv" = "persistent";
       Desktop = "persistent";
       Documents = "persistent";
       Downloads = "persistent";
