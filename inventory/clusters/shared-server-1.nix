@@ -21,6 +21,10 @@
         user = "guest-0";
         unix_tier = "admin";
       }
+      {
+        user = "guest-1";
+        unix_tier = "admin";
+      }
     ];
     teams = [
       {
