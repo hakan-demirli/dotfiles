@@ -3574,10 +3574,10 @@ in
 
       fleet-tailnet-metrics = {
         description = "Export Headscale node state for fleet monitoring";
-        requires = [ "headscale.service" ];
         after = [ "headscale.service" ];
         serviceConfig = {
           Type = "oneshot";
+          ExecCondition = "${config.systemd.package}/bin/systemctl is-active --quiet headscale.service";
           ExecStart = lib.getExe tailnetMetricsCollector;
           User = "root";
           Group = "root";
