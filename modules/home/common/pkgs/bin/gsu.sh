@@ -40,8 +40,8 @@ git config --local remote.pushDefault origin
 git config --local push.default current
 git config --local push.autoSetupRemote true
 
-git config --local pull.rebase false
-git config --local "branch.$branch.rebase" false
+git config --local pull.rebase true
+git config --local "branch.$branch.rebase" true
 
 git config --local "branch.$branch.remote" origin
 git config --local "branch.$branch.merge" "refs/heads/$branch"

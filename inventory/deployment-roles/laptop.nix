@@ -27,7 +27,6 @@
     "infra:services/yubikey"
     "self:services/sops"
     "infra:services/apptainer"
-    "infra:services/earlyoom"
     "self:deployment-roles/laptop"
   ];
 }
