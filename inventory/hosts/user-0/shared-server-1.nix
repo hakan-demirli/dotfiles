@@ -59,8 +59,6 @@
     ];
   };
 
-  deploy.wave = 1;
-
   monitoring = {
     enabled = true;
     always_on = true;
