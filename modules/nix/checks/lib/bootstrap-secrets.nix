@@ -59,10 +59,24 @@ let
     hostId:
     if passwordAccountFor hostId == "root" then "root" else inventory.hosts.${hostId}.ownership.owner;
   passwordHashFile = account: "/run/bootstrap-secrets/${account}/password-hash";
+  accounts = inputs.infra-lib.lib.mkAccounts { inherit lib; };
+  passwordAccountsFor =
+    hostId:
+    if passwordAccountFor hostId == "root" then
+      { root = "root"; }
+    else
+      let
+        ownerId = inventory.hosts.${hostId}.ownership.owner;
+        sudoGuests = lib.filterAttrs (id: account: id != ownerId && account.sudo_capable) (
+          accounts.onHost inventory hostId
+        );
+      in
+      {
+        ${ownerId} = ownerUsernameFor hostId;
+      }
+      // lib.mapAttrs (_: account: account.account.username) sudoGuests;
   expectedPasswordAccounts = builtins.toJSON (
-    lib.genAttrs hostIds (
-      hostId: lib.attrNames (configFor hostId).services.sops.bootstrap.passwordAccounts
-    )
+    lib.genAttrs hostIds (hostId: lib.attrNames (passwordAccountsFor hostId))
   );
   everyHost = predicate: lib.all (hostId: predicate hostId (configFor hostId)) hostIds;
   fleetSecretHostIds = lib.filter (
@@ -130,11 +144,9 @@ let
         == passwordHashFile account
       ) (lib.attrNames config.services.sops.bootstrap.passwordAccounts)
     );
-    shared-server-guests-have-own-passwords =
-      (configFor "shared-server-1").services.sops.bootstrap.passwordAccounts == {
-        ${inventory.hosts.shared-server-1.ownership.owner} = ownerUsernameFor "shared-server-1";
-        guest-0 = inventory.users.guest-0.system_account.username;
-      };
+    password-accounts-match-inventory = everyHost (
+      hostId: config: config.services.sops.bootstrap.passwordAccounts == passwordAccountsFor hostId
+    );
     password-runs-before-users = everyHost (
       _hostId: config: lib.elem "bootstrapPassword" config.system.activationScripts.users.deps
     );
