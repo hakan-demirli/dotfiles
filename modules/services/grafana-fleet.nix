@@ -586,6 +586,8 @@ let
   fleetDiskHealthPanel = 17;
   fleetConnectivityPanel = 28;
   fleetFailedUnitsPanel = 33;
+  fleetLogsUid = "fleet-logs";
+  serviceFailuresUid = "service-failures";
   alertmanagerUrl = "http://100.64.0.1:${toString config.services.cluster-alertmanager.listenPort}/";
   vmalertUrl = "http://100.64.0.1:${toString config.services.cluster-vmalert.listenPort}/";
 
@@ -600,6 +602,76 @@ let
       url = "/d/${uid}?viewPanel=${toString panel}&\${__url_time_range}";
       targetBlank = false;
     };
+  mkDashboardLink =
+    {
+      uid,
+      title,
+      host ? ".*",
+      manager ? ".*",
+      unit ? ".*",
+      timeRange ? "\${__url_time_range}",
+    }:
+    {
+      inherit title;
+      url = "/d/${uid}?var-host=${host}&var-manager=${manager}&var-unit=${unit}&${timeRange}";
+      targetBlank = false;
+    };
+  mkHostLogsLink =
+    host:
+    mkDashboardLink {
+      uid = fleetLogsUid;
+      title = "Show this host's journal";
+      inherit host;
+    };
+  mkFailureLink =
+    host:
+    mkDashboardLink {
+      uid = serviceFailuresUid;
+      title = "Show failed units and failure messages";
+      inherit host;
+      timeRange = "from=now-30d&to=now";
+    };
+  mkExploreLink = source: targets: {
+    title = "Inspect the source queries in Explore";
+    targetBlank = false;
+    url =
+      let
+        variables = [
+          "\${datasource}"
+          "\${__from}"
+          "\${__to}"
+        ];
+        replacements = [
+          "\${datasource:percentencode}"
+          "\${__from}"
+          "\${__to}"
+        ];
+        panes = builtins.toJSON {
+          A = {
+            datasource = source.uid;
+            queries = map (target: target // { datasource = source; }) targets;
+            range = {
+              from = "\${__from}";
+              to = "\${__to}";
+            };
+          };
+        };
+      in
+      "/explore?schemaVersion=1&panes="
+      + lib.replaceStrings (map lib.escapeURL variables) replacements (lib.escapeURL panes);
+  };
+  mkFieldLinks = name: links: {
+    matcher = {
+      id = "byName";
+      options = name;
+    };
+    properties = [
+      {
+        id = "links";
+        value = links;
+      }
+    ];
+  };
   mkExternalLink =
     {
       title,
@@ -622,6 +694,12 @@ let
     (mkAlertmanagerLink {
       title = "Show the Slurm alerts";
       matchers = ''alertgroup="slurm"'';
+    })
+    (mkDashboardLink {
+      uid = fleetLogsUid;
+      title = "Show Slurm controller and worker messages";
+      manager = "system";
+      unit = lib.escapeURL "slurmctld.service|slurmd.service";
     })
   ];
   fleetDashboardLinks = [
@@ -732,8 +810,20 @@ let
             max
             thresholds
             mappings
-            links
             ;
+          links =
+            links
+            ++ lib.optionals (lib.hasInfix "{{host}}" legend) [
+              (mkHostLogsLink "\${__field.labels.host:percentencode}")
+            ]
+            ++ [
+              (mkExploreLink datasource [
+                {
+                  expr = expression;
+                  refId = "A";
+                }
+              ])
+            ];
         };
         overrides = [ ];
       };
@@ -769,6 +859,7 @@ let
       unit,
       min ? null,
       max ? null,
+      links ? [ ],
       overrides ? [ ],
       description ? "",
     }:
@@ -788,6 +879,12 @@ let
       fieldConfig = {
         defaults = {
           inherit unit min max;
+          links =
+            links
+            ++ lib.optionals (lib.any (target: lib.hasInfix "{{host}}" target.legendFormat) targets) [
+              (mkHostLogsLink "\${__field.labels.host:percentencode}")
+            ]
+            ++ [ (mkExploreLink datasource targets) ];
           color.mode = "palette-classic";
           custom = {
             axisCenteredZero = false;
@@ -843,6 +940,7 @@ let
       thresholds ? percentThresholds,
       mappings ? [ ],
       displayMode ? "gradient",
+      links ? [ ],
       description ? "",
     }:
     {
@@ -867,6 +965,15 @@ let
             thresholds
             mappings
             ;
+          links = links ++ [
+            (mkHostLogsLink "\${__field.labels.host:percentencode}")
+            (mkExploreLink datasource [
+              {
+                expr = expression;
+                refId = "A";
+              }
+            ])
+          ];
         };
         overrides = [ ];
       };
@@ -908,6 +1015,8 @@ let
       h ? 7,
       overrides ? [ ],
       sortBy ? [ ],
+      links ? [ ],
+      transformations ? [ ],
     }:
     {
       inherit
@@ -926,8 +1035,19 @@ let
           ;
       };
       fieldConfig = {
-        defaults = { };
-        inherit overrides;
+        defaults.links = links ++ [
+          (mkExploreLink datasource [
+            {
+              expr = expression;
+              refId = "A";
+            }
+          ])
+        ];
+        overrides =
+          overrides
+          ++ lib.optionals ((renamedFields.host or "") == "Host") [
+            (mkFieldLinks "Host" [ (mkHostLogsLink "\${__data.fields[\"Host\"]:percentencode}") ])
+          ];
       };
       options = {
         inherit sortBy;
@@ -960,7 +1080,8 @@ let
             renameByName = renamedFields;
           };
         }
-      ];
+      ]
+      ++ transformations;
     };
   mkAlertsTable =
     {
@@ -1181,13 +1302,13 @@ let
           thresholds = warningThresholds;
           mappings = clearMappings;
           links = [
-            (mkPanelLink {
-              uid = fleetUid;
-              panel = fleetFailedUnitsPanel;
-              title = "Show the units";
+            (mkDashboardLink {
+              uid = serviceFailuresUid;
+              title = "Show failed units and failure messages";
+              timeRange = "from=now-30d&to=now";
             })
           ];
-          description = "Failed system and user units. Click for the unit table.";
+          description = "Failed system and user units. Click for units and journal messages that explain each failure.";
         })
         (mkAlertsTable {
           id = 47;
@@ -1208,8 +1329,16 @@ let
             y = 13;
           };
           fieldConfig = {
-            defaults = { };
+            defaults.links = [
+              (mkExploreLink datasource [
+                {
+                  expr = monitoringStatusExpression;
+                  refId = "A";
+                }
+              ])
+            ];
             overrides = [
+              (mkFieldLinks "Host" [ (mkHostLogsLink "\${__data.fields[\"Host\"]:percentencode}") ])
               {
                 matcher = {
                   id = "byName";
@@ -1502,6 +1631,14 @@ let
           };
           fieldConfig = {
             defaults = {
+              links = [
+                (mkExploreLink datasource [
+                  {
+                    expr = diskHealthExpression;
+                    refId = "A";
+                  }
+                ])
+              ];
               decimals = 0;
               noValue = "N/A";
               mappings = notAvailableMapping;
@@ -1841,7 +1978,7 @@ let
         (mkBarGauge {
           id = 24;
           title = "Failed Systemd Units";
-          description = "Failed system units and failed units of the host owner's user manager, per host.";
+          description = "Failed system and owner user units per host. Click a host's bar for its failed units and failure messages.";
           expression = withHost "sum by(instance) (${failedUnitStates})";
           legend = "{{host}}";
           x = 16;
@@ -1851,6 +1988,7 @@ let
           thresholds = warningThresholds;
           mappings = clearMappings;
           displayMode = "basic";
+          links = [ (mkFailureLink "\${__field.labels.host:percentencode}") ];
         })
         (mkTimeSeries {
           id = 23;
@@ -1876,7 +2014,7 @@ let
         (mkTable {
           id = fleetFailedUnitsPanel;
           title = "Failed Units";
-          description = "Failed units of the system manager and of the host owner's user manager. A missing SOPS age key fails sops-install-secrets.service (system) or sops-nix.service (user).";
+          description = "Current failed system and owner user units. Click a unit for its journal, including application errors and exit results. Failure state can remain after the original event leaves this dashboard's time range.";
           expression = failedUnitsExpression;
           x = 0;
           y = 65;
@@ -1891,6 +2029,18 @@ let
             manager = "Manager";
             name = "Unit";
           };
+          overrides = [
+            (mkFieldLinks "Unit" [
+              (mkDashboardLink {
+                uid = serviceFailuresUid;
+                title = "Show this unit's failure messages and journal";
+                host = "\${__data.fields[\"Host\"]:percentencode}";
+                manager = "\${__data.fields[\"Manager\"]:percentencode}";
+                unit = "\${__data.fields[\"Unit\"]:percentencode}";
+                timeRange = "from=now-30d&to=now";
+              })
+            ])
+          ];
         })
 
         (mkRow {
@@ -2113,6 +2263,13 @@ let
           x = 16;
           y = 104;
           colorMode = "none";
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = 46;
+              title = "Show job history";
+            })
+          ];
         })
         (mkStat {
           id = 44;
@@ -2121,6 +2278,13 @@ let
           x = 20;
           y = 104;
           colorMode = "none";
+          links = [
+            (mkPanelLink {
+              uid = fleetUid;
+              panel = 46;
+              title = "Show job history";
+            })
+          ];
         })
         (mkTimeSeries {
           id = 45;
@@ -2223,7 +2387,7 @@ let
       timezone = "browser";
       title = "Fleet Overview";
       uid = fleetUid;
-      version = 8;
+      version = 9;
       weekStart = "";
     }
   );
@@ -2475,8 +2639,16 @@ let
             decimals
             unit
             thresholds
-            links
             ;
+          links = links ++ [
+            (mkExploreLink logsDatasource [
+              {
+                expr = expression;
+                queryType = "stats";
+                refId = "A";
+              }
+            ])
+          ];
         };
         overrides = [ ];
       };
@@ -2507,6 +2679,7 @@ let
       w,
       h,
       unit ? "short",
+      links ? [ ],
     }:
     {
       inherit
@@ -2527,6 +2700,15 @@ let
       fieldConfig = {
         defaults = {
           inherit unit;
+          links = links ++ [
+            (mkExploreLink logsDatasource [
+              {
+                expr = expression;
+                queryType = "stats";
+                refId = "A";
+              }
+            ])
+          ];
           min = 0;
           thresholds = neutralThresholds;
         };
@@ -2582,6 +2764,15 @@ let
           y
           ;
       };
+      links = lib.optionals (!lib.hasInfix "\${host:json}" expression) [
+        (mkExploreLink logsDatasource [
+          {
+            expr = expression;
+            queryType = "instant";
+            refId = "A";
+          }
+        ])
+      ];
       options = {
         dedupStrategy = "none";
         enableLogDetails = true;
@@ -2600,6 +2791,211 @@ let
         })
       ];
     };
+  journalVariables =
+    map
+      ({ name, label }: {
+        current = {
+          text = ".*";
+          value = ".*";
+        };
+        hide = 0;
+        inherit name label;
+        query = ".*";
+        options = [ ];
+        skipUrlSync = false;
+        type = "textbox";
+      })
+      [
+        {
+          name = "host";
+          label = "Host (regex)";
+        }
+        {
+          name = "manager";
+          label = "Manager (system or username, regex)";
+        }
+        {
+          name = "unit";
+          label = "Unit (regex)";
+        }
+      ];
+  metricsDatasourceVariable = {
+    current = { };
+    hide = 2;
+    includeAll = false;
+    multi = false;
+    name = "datasource";
+    options = [ ];
+    query = "prometheus";
+    refresh = 1;
+    regex = "VictoriaMetrics";
+    skipUrlSync = false;
+    type = "datasource";
+  };
+  selectedJournal = ''
+    {host=~''${host:json}}
+    (manager:~''${manager:json} OR manager:"")
+    (unit:~''${unit:json} OR _SYSTEMD_USER_UNIT:~''${unit:json} OR USER_UNIT:~''${unit:json} OR UNIT:~''${unit:json})
+  '';
+  failureJournal = ''${selectedJournal} _msg:~"(?i)(fail|error|fatal|panic|timed? out|timeout|uncorrectable|unable to|could not|cannot|permission denied|no space left|exit.code|status=[1-9])"'';
+  serviceFailuresDashboard = pkgs.writeText "service-failures.json" (
+    builtins.toJSON {
+      annotations.list = [ ];
+      description = "Current failed units and their journal evidence. Filter by host, manager, and unit; historical messages do not imply that a unit is still failed.";
+      editable = false;
+      id = null;
+      links = fleetDashboardLinks;
+      panels = [
+        (mkTable {
+          id = 1;
+          title = "Currently Failed Units";
+          description = "Current metric state, independent of the journal time range. Click a unit to filter the messages below. If the cause is missing, widen the time range and check the full journal.";
+          expression = failedUnitsExpression;
+          x = 0;
+          y = 0;
+          w = 24;
+          h = 7;
+          fields = {
+            host = 0;
+            manager = 1;
+            name = 2;
+          };
+          renamedFields = {
+            host = "Host";
+            manager = "Manager";
+            name = "Unit";
+          };
+          overrides = [
+            (mkFieldLinks "Unit" [
+              (mkDashboardLink {
+                uid = serviceFailuresUid;
+                title = "Show this unit's failure messages";
+                host = "\${__data.fields[\"Host\"]:percentencode}";
+                manager = "\${__data.fields[\"Manager\"]:percentencode}";
+                unit = "\${__data.fields[\"Unit\"]:percentencode}";
+              })
+            ])
+          ];
+          transformations = [
+            {
+              id = "filterByValue";
+              options = {
+                type = "include";
+                match = "all";
+                filters =
+                  map
+                    ({ field, variable }: {
+                      fieldName = field;
+                      config = {
+                        id = "regex";
+                        options.value = "^\${${variable}:raw}$";
+                      };
+                    })
+                    [
+                      {
+                        field = "Host";
+                        variable = "host";
+                      }
+                      {
+                        field = "Manager";
+                        variable = "manager";
+                      }
+                      {
+                        field = "Unit";
+                        variable = "unit";
+                      }
+                    ];
+              };
+            }
+          ];
+        })
+        (mkLogsPanel {
+          id = 2;
+          title = "Failure Messages";
+          description = "Error-like journal messages for the selected host, manager, and unit. Includes application errors such as DNS failures and scrub checksum errors. This text filter is a shortcut; the full journal below includes messages it does not match.";
+          expression = failureJournal;
+          x = 0;
+          y = 7;
+          w = 24;
+          h = 12;
+        })
+        (mkLogsPanel {
+          id = 3;
+          title = "Full Unit Journal";
+          description = "All collected journal messages for the selection, newest first. Expand a line for invocation IDs, exit results, and original journal fields. Messages require successful log shipping and must fall within the selected time range.";
+          expression = selectedJournal;
+          x = 0;
+          y = 19;
+          w = 24;
+          h = 14;
+        })
+      ];
+      refresh = "30s";
+      schemaVersion = 42;
+      tags = [
+        "fleet"
+        "systemd"
+        "logs"
+      ];
+      templating.list = [ metricsDatasourceVariable ] ++ journalVariables;
+      time = {
+        from = "now-30d";
+        to = "now";
+      };
+      timepicker = { };
+      timezone = "browser";
+      title = "Service Failures";
+      uid = serviceFailuresUid;
+      version = 1;
+    }
+  );
+  fleetLogsDashboard = pkgs.writeText "fleet-logs.json" (
+    builtins.toJSON {
+      annotations.list = [ ];
+      description = "Host and unit journal details behind fleet health, storage, deployment, and connectivity panels.";
+      editable = false;
+      id = null;
+      links = fleetDashboardLinks;
+      panels = [
+        (mkLogsPanel {
+          id = 1;
+          title = "Errors And Failure Messages";
+          description = "Error-like messages for the selection. Use the full journal for context and messages outside the text filter.";
+          expression = failureJournal;
+          x = 0;
+          y = 0;
+          w = 24;
+          h = 12;
+        })
+        (mkLogsPanel {
+          id = 2;
+          title = "Full Journal";
+          description = "Collected journal messages for the selected host, manager, and unit. Expand a line for original fields. Change the regex filters or widen the time range if necessary.";
+          expression = selectedJournal;
+          x = 0;
+          y = 12;
+          w = 24;
+          h = 16;
+        })
+      ];
+      refresh = "30s";
+      schemaVersion = 42;
+      tags = [
+        "fleet"
+        "logs"
+      ];
+      templating.list = journalVariables;
+      time = {
+        from = "now-24h";
+        to = "now";
+      };
+      timepicker = { };
+      timezone = "browser";
+      title = "Fleet Logs";
+      uid = fleetLogsUid;
+      version = 1;
+    }
+  );
   sshAccessDashboard = pkgs.writeText "ssh-access.json" (
     builtins.toJSON {
       annotations.list = [ ];
@@ -3082,6 +3478,14 @@ let
     }
   );
   dashboards = pkgs.linkFarm "grafana-fleet-dashboards" [
+    {
+      name = "service-failures.json";
+      path = serviceFailuresDashboard;
+    }
+    {
+      name = "fleet-logs.json";
+      path = fleetLogsDashboard;
+    }
     {
       name = "fleet-overview.json";
       path = dashboard;
