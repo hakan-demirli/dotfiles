@@ -19,6 +19,7 @@
     "infra:system/automount"
     "infra:system/v4l2loopback"
     "self:system/nix-settings"
+    "self:services/journal-labels"
     "self:system/fleet-deploy"
     "infra:services/desktop/hyprland"
     "infra:services/tailscale"

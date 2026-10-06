@@ -8,6 +8,7 @@
     "infra:system/impermanence"
     "infra:system/ephemeral-root"
     "self:system/nix-settings"
+    "self:services/journal-labels"
     "self:system/fleet-deploy"
     "infra:services/headscale"
     "infra:services/tailscale"
