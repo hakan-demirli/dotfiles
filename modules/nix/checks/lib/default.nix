@@ -21,6 +21,7 @@
   generated-headscale-policy = import ./generated-headscale-policy.nix {
     inherit pkgs self inputs;
   };
+  grafana-navigation = import ./grafana-navigation.nix { inherit pkgs self; };
   file-transfer = import ./file-transfer.nix { inherit pkgs self lib; };
   intent = import ./intent.nix { inherit pkgs self; };
   inventory-eval = import ./inventory-eval.nix { inherit pkgs self lib; };

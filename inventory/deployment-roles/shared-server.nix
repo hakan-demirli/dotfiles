@@ -8,6 +8,7 @@
     "infra:system/boot/grub"
     "infra:system/locale"
     "self:system/nix-settings"
+    "self:services/journal-labels"
     "self:system/fleet-deploy"
     "infra:system/impermanence"
     "infra:system/ephemeral-root"

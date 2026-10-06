@@ -6,6 +6,7 @@
     "infra:system/base"
     "infra:system/server-base"
     "self:system/nix-settings"
+    "self:services/journal-labels"
     "self:system/fleet-deploy"
     "infra:system/impermanence"
     "infra:system/ephemeral-root"
