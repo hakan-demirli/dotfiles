@@ -126,8 +126,14 @@ pkgs.testers.runNixOSTest {
         assert generation() == "${planned}"
         upgrade("current (none)")
         assert generation() == "${running}"
-        assert as_user("cat ~/.local/state/nix/profiles/home-manager/fleet-revision").strip() == "${running}"
+        assert as_user("cat ~/.local/state/home-manager/gcroots/current-home/fleet-revision").strip() == "${running}"
         upgrade("current (none)")
+
+    with subtest("a replayed generation without a Home Manager profile follows the system revision"):
+        as_user("${base}/activate")
+        as_user("rm -f ~/.local/state/nix/profiles/home-manager ~/.local/state/nix/profiles/home-manager-*-link")
+        upgrade("current (none)")
+        assert generation() == "${running}"
 
     with subtest("a dirty generation is left alone"):
         as_user("${local}/activate")
