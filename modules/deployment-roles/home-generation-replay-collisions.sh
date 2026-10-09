@@ -182,6 +182,8 @@ done < <(find "$home_files" \( -type f -o -type l \) -print0)
 prepare_managed_link "$profile_directory/profile-1-link" "" "home-manager-path"
 prepare_managed_link "$profile_directory/profile" "profile-1-link" ""
 prepare_managed_link "$home/.nix-profile" "$profile_directory/profile" ""
+prepare_managed_link "$profile_directory/home-manager-1-link" "" "home-manager-generation"
+prepare_managed_link "$profile_directory/home-manager" "home-manager-1-link" ""
 prepare_managed_link "$home/.local/state/home-manager/gcroots/current-home" "" "home-manager-generation"
 
 echo "home-generation-replay-collisions: prepared $username for $generation"

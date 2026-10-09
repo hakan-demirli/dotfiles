@@ -21,10 +21,6 @@ let
   opencodePackage = unstablePkgs.opencode.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [
       (pkgs.fetchurl {
-        url = "https://github.com/anomalyco/opencode/commit/7f392ba6178ac1be6f2b6385293a61586cd98a87.patch";
-        hash = "sha256-AnG+asHaWzDp9HpeviX5QrAWzGq5/vGjp3djm6en8Eo=";
-      })
-      (pkgs.fetchurl {
         url = "https://github.com/anomalyco/opencode/commit/98639ab00182513cc614461f6037d686a82489ec.patch";
         hash = "sha256-d6Vo8zvp9zyoVyvaDnuakvYivnIZhE5r3LpPhrPyyg4=";
       })

@@ -23,14 +23,14 @@ let
       configuration=${lib.escapeShellArg cfg.configuration}
       plan_url=${lib.escapeShellArg cfg.planUrl}
       flake=${lib.escapeShellArg cfg.flake}
-      profile="''${XDG_STATE_HOME:-$HOME/.local/state}/nix/profiles/home-manager"
+      active="''${XDG_STATE_HOME:-$HOME/.local/state}/home-manager/gcroots/current-home"
 
       finish() {
         echo "fleet-home-upgrade: $1 ($2)"
         exit 0
       }
 
-      current="$(cat "$profile/fleet-revision" 2>/dev/null || true)"
+      current="$(cat "$active/fleet-revision" 2>/dev/null || true)"
       system="$(/run/current-system/sw/bin/nixos-version --configuration-revision 2>/dev/null || true)"
       plan="$(curl -fsS --connect-timeout 10 --max-time 60 "$plan_url")" || finish offline plan-unreachable
       deployed() {
