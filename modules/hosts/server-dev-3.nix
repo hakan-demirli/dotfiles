@@ -9,5 +9,6 @@
       "sd_mod"
     ];
     kernelModules = [ "kvm-amd" ];
+    kernelParams = [ "ttm.pages_limit=33554432" ];
   };
 }
