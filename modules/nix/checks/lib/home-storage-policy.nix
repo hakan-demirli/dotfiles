@@ -23,6 +23,7 @@ let
     ".local/share/direnv" = "persistent";
     ".local/share/opencode" = "persistent";
     ".local/share/state" = "persistent";
+    ".local/state/bash" = "persistent";
     ".local/state/opencode" = "persistent";
     ".local/state/wireplumber" = "persistent";
     Desktop = "persistent";
