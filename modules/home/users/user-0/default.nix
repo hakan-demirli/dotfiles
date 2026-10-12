@@ -73,6 +73,7 @@ in
       ".config/sops/age" = "persistent";
       ".local/share/state" = "persistent";
       ".local/share/opencode" = "persistent";
+      ".local/state/bash" = "persistent";
       ".local/state/opencode" = "persistent";
       ".local/state/wireplumber" = "persistent";
     };
