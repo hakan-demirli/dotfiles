@@ -97,7 +97,6 @@ in
       RestartSec = 10;
       RestartSteps = 5;
       RestartMaxDelaySec = 300;
-      MemoryMax = "8G";
     };
     Install.WantedBy = [ "default.target" ];
   };
