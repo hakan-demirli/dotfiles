@@ -1,6 +1,7 @@
 # Language
 
 - Use ASD-STE100 Simplified Technical English
+- Do not use "pkill -f" it matches itself. Use PID based kill if required.
 
 # Authentication and Authorization
 
