@@ -8,13 +8,12 @@ data_file="$cache_dir/$tmux_cwd_hash.csv"
 
 temp_file="$cache_dir/$tmux_cwd_hash.tmp"
 
-IFS='|' read -r tmux_window_current tmux_command_current tmux_pane_path_current <<< "$(tmux display-message -p '#{window_index}|#{pane_current_command}|#{pane_current_path}')"
+IFS='|' read -r tmux_window_current tmux_command_current tmux_pane_path_current <<< "$(tmux display-message -p '#{window_id}|#{pane_current_command}|#{pane_current_path}')"
 
 status_line=$(tmux capture-pane -pS -3 | tail -n 3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3' || true)
 read -r buffer_path cursor_row_current cursor_col_current <<< "$status_line"
 
-IFS='|' read -r _tmux_session tmux_window _tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name}|#{window_index}|#{pane_current_command}|#{pane_current_path}')"
-tmux_window=${tmux_window//@/}
+IFS='|' read -r _tmux_session _tmux_window _tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{session_name}|#{window_id}|#{pane_current_command}|#{pane_current_path}')"
 
 if [[ $tmux_command_current == "yazi" ]]; then
   if [[ -n $status_line ]]; then
@@ -52,6 +51,10 @@ fi
 
 buffer_dir_current="$(dirname "$buffer_path")"
 buffer_name_current="$(basename "$buffer_path")"
+
+if [[ ! -f $data_file ]]; then
+  exit
+fi
 
 found_line_number=0
 current_line_number=0
