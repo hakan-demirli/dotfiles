@@ -65,17 +65,12 @@ in
     };
     home = {
       packages = [ gitCredentialHelper ];
-      activation = {
-        checkSopsKey = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
-          if [[ ! -s ${lib.escapeShellArg cfg.ageKeyFile} ]]; then
-            echo "SOPS age key ${cfg.ageKeyFile} is missing. Run: nix run path:.#deploy-home-secrets" >&2
-            exit 1
-          fi
-        '';
-        removeGitTokenUrlRewrite = lib.hm.dag.entryAfter [ "sops-nix" ] ''
-          run ${pkgs.coreutils}/bin/rm -f ${lib.escapeShellArg "${cfgHome}/git/git_tokens"}
-        '';
-      };
+      activation.checkSopsKey = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
+        if [[ ! -s ${lib.escapeShellArg cfg.ageKeyFile} ]]; then
+          echo "SOPS age key ${cfg.ageKeyFile} is missing. Run: nix run path:.#deploy-home-secrets" >&2
+          exit 1
+        fi
+      '';
     };
 
     sops = {

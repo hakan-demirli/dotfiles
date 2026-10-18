@@ -23,7 +23,6 @@ let
       key_file=${lib.escapeShellArg cfg.keyFile}
       sops_file=${lib.escapeShellArg cfg.sopsFile}
       output_dir=${lib.escapeShellArg cfg.profilesDirectory}
-      persisted_dir=${lib.escapeShellArg cfg.persistedDirectory}
 
       if [[ ! -s "$key_file" ]]; then
         echo "wifi-profiles: identity is missing: $key_file" >&2
@@ -56,20 +55,6 @@ let
         grep -qxF "$uuid" <<< "$managed" || rm -f "$existing"
       done
 
-      while IFS= read -r uuid; do
-        [[ -n $uuid ]] || continue
-        rm -f "$output_dir/$uuid.nmconnection"
-      done <<< "$managed"
-
-      for persisted in "$persisted_dir"/*.nmconnection; do
-        [[ -e $persisted ]] || continue
-        uuid="$(sed -n 's/^uuid=//p' "$persisted" | head -1)"
-        [[ -n $uuid ]] || continue
-        if grep -qxF "$uuid" <<< "$managed"; then
-          rm -f "$persisted"
-        fi
-      done
-
       nmcli connection reload
     '';
   };
@@ -92,12 +77,6 @@ in
       type = lib.types.str;
       default = "/run/NetworkManager/system-connections";
       description = "Where rendered profiles are installed.";
-    };
-
-    persistedDirectory = lib.mkOption {
-      type = lib.types.str;
-      default = "/etc/NetworkManager/system-connections";
-      description = "Scanned for managed profiles to remove, avoiding duplicates.";
     };
   };
 

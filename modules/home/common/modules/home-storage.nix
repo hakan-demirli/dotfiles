@@ -47,9 +47,7 @@ let
       component != "" && component != "." && component != ".." && builtins.stringLength component <= 255
     ) (components path)
     && path != ".storage"
-    && !lib.hasPrefix ".storage/" path
-    && path != ".home-storage"
-    && !lib.hasPrefix ".home-storage/" path;
+    && !lib.hasPrefix ".storage/" path;
   invalidPaths = lib.filter (path: !validPath path) paths;
   overlaps = lib.filter (pair: pair.left != pair.right && lib.hasPrefix "${pair.left}/" pair.right) (
     lib.concatMap (left: map (right: { inherit left right; }) paths) paths
@@ -151,61 +149,18 @@ let
     ) dconfDatabases
   );
 
-  autoMigrate = lib.concatMapStringsSep "\n" (
-    path:
-    let
-      entry = entries.${path};
-      managed = "${home}/${path}";
-      target = "${home}/.storage/${entry.storage}/${path}";
-      legacyTarget = "${home}/.home-storage/${entry.storage}/${path}";
-      managedDir = builtins.dirOf managed;
-      targetDir = builtins.dirOf target;
-      ensureTarget =
-        if entry.type == "directory" then
-          ''
-            ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg target}
-            if [[ ! -d ${lib.escapeShellArg target} ]]; then
-              echo "home-storage: expected a directory at ${lib.escapeShellArg target}" >&2
-              exit 1
-            fi
-          ''
-        else
-          ''
-            ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg targetDir}
-            if [[ ! -e ${lib.escapeShellArg target} && ! -L ${lib.escapeShellArg target} ]]; then
-              ${pkgs.coreutils}/bin/install -m 0600 /dev/null ${lib.escapeShellArg target}
-            elif [[ ! -f ${lib.escapeShellArg target} ]]; then
-              echo "home-storage: expected a file at ${lib.escapeShellArg target}" >&2
-              exit 1
-            fi
-          '';
-    in
-    ''
-      if [[ -L ${lib.escapeShellArg managed} ]] && [[ "$(${pkgs.coreutils}/bin/readlink ${lib.escapeShellArg managed})" == ${lib.escapeShellArg target} ]]; then
-        ${ensureTarget}
-      elif [[ -L ${lib.escapeShellArg managed} ]] && [[ "$(${pkgs.coreutils}/bin/readlink ${lib.escapeShellArg managed})" == ${lib.escapeShellArg legacyTarget} ]]; then
-        echo "home-storage: relinking legacy path ${lib.escapeShellArg managed} -> ${lib.escapeShellArg target}" >&2
-        ${ensureTarget}
-        migrated=${lib.escapeShellArg "${managed}.storage-migration-"}$$
-        ${pkgs.coreutils}/bin/ln -s ${lib.escapeShellArg target} "$migrated"
-        ${pkgs.coreutils}/bin/mv -Tf "$migrated" ${lib.escapeShellArg managed}
-      elif [[ -e ${lib.escapeShellArg managed} || -L ${lib.escapeShellArg managed} ]]; then
-        echo "home-storage: migrating unmanaged path ${lib.escapeShellArg managed} -> ${lib.escapeShellArg target}" >&2
-        ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg targetDir}
-        if [[ -e ${lib.escapeShellArg target} ]]; then
-          ${pkgs.coreutils}/bin/rmdir ${lib.escapeShellArg target} >/dev/null 2>&1 \
-            || { echo "home-storage: cannot migrate because target ${lib.escapeShellArg target} is not empty" >&2; exit 1; }
-        fi
-        ${pkgs.coreutils}/bin/mv ${lib.escapeShellArg managed} ${lib.escapeShellArg target}
-        ${pkgs.coreutils}/bin/ln -s ${lib.escapeShellArg target} ${lib.escapeShellArg managed}
-      else
-        ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg managedDir}
-        ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg targetDir}
-        ${ensureTarget}
-        ${pkgs.coreutils}/bin/ln -s ${lib.escapeShellArg target} ${lib.escapeShellArg managed}
-      fi
-    ''
-  ) paths;
+  storageMounted =
+    lib.concatMapStringsSep " && "
+      (bucket: "${pkgs.util-linux}/bin/mountpoint -q ${lib.escapeShellArg "${home}/.storage/${bucket}"}")
+      [
+        "persistent"
+        "temporary"
+        "control"
+      ];
+  shellArray = values: "(${lib.escapeShellArgs values})";
+  managedPaths = map (path: "${home}/${path}") paths;
+  targetPaths = map (path: "${home}/.storage/${entries.${path}.storage}/${path}") paths;
+  pathTypes = map (path: entries.${path}.type) paths;
 in
 {
   options.homeStorage = {
@@ -242,7 +197,7 @@ in
     assertions = [
       {
         assertion = invalidPaths == [ ];
-        message = "homeStorage paths must be normalized, relative, nonempty UTF-8 paths with components no longer than 255 bytes. .storage and legacy .home-storage are reserved. Invalid: ${lib.concatStringsSep ", " invalidPaths}";
+        message = "homeStorage paths must be normalized, relative, nonempty UTF-8 paths with components no longer than 255 bytes. .storage is reserved. Invalid: ${lib.concatStringsSep ", " invalidPaths}";
       }
       {
         assertion = overlaps == [ ];
@@ -251,37 +206,74 @@ in
     ];
 
     home = {
-      activationGenerateGcRoot = false;
       extraBuilderCommands = ''
         ln -s ${policyGeneration} "$out/home-storage-policy"
         ln -s ${bootReplay} "$out/boot-replay"
       '';
       activation = {
-        protectHomeStorageGeneration = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
-          run ${pkgs.coreutils}/bin/mkdir -p "$(${pkgs.coreutils}/bin/dirname "$newGenGcPath")"
-          trap '${pkgs.coreutils}/bin/rm -f "$newGenGcPath" || true' EXIT
-          run --silence ${pkgs.nix}/bin/nix-store --realise "$newGenPath" --add-root "$newGenGcPath"
+        checkHomeStorage = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
+          function checkHomeStorageLayout() {
+            local -a managed=${shellArray managedPaths}
+            local -a targets=${shellArray targetPaths}
+            local -a types=${shellArray pathTypes}
+            local -a problems=()
+            local index path target type
+
+            for index in "''${!managed[@]}"; do
+              path=''${managed[index]}
+              target=''${targets[index]}
+              type=''${types[index]}
+
+              if [[ -L $path ]]; then
+                if [[ "$(readlink -- "$path")" != "$target" ]]; then
+                  problems+=("$path links to $(readlink -- "$path") instead of $target")
+                fi
+              elif [[ -e $path ]]; then
+                problems+=("$path is not managed by home-storage; move its contents into $target and remove it")
+              fi
+
+              if [[ -L $target ]] \
+                || [[ $type == directory && -e $target && ! -d $target ]] \
+                || [[ $type == file && -e $target && ! -f $target ]]; then
+                problems+=("$target must be a $type")
+              fi
+            done
+
+            if (( ''${#problems[@]} > 0 )); then
+              printf 'home-storage: %s\n' "''${problems[@]}" >&2
+              errorEcho "home-storage: ''${#problems[@]} path(s) need attention; nothing was changed" >&2
+              exit 1
+            fi
+          }
+
+          if ${storageMounted}; then
+            checkHomeStorageLayout
+          else
+            verboseEcho "home-storage: storage facility unavailable; leaving the home layout unchanged"
+          fi
+          unset -f checkHomeStorageLayout
         '';
 
-        homeStoragePolicy = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! ${pkgs.util-linux}/bin/mountpoint -q ${lib.escapeShellArg "${home}/.storage/persistent"} \
-            || ! ${pkgs.util-linux}/bin/mountpoint -q ${lib.escapeShellArg "${home}/.storage/temporary"} \
-            || ! ${pkgs.util-linux}/bin/mountpoint -q ${lib.escapeShellArg "${home}/.storage/control"}; then
-            verboseEcho "home-storage facility unavailable. Leaving standalone Home Manager behavior unchanged"
-          else
-            ${autoMigrate}
+        applyHomeStorage = lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
+          if ${storageMounted}; then
+            run ${pkgs.systemd}/bin/systemd-tmpfiles --user --create ${lib.escapeShellArg "${policyGeneration}/layout.conf"}
           fi
         '';
 
         publishHomeStorageGeneration =
-          lib.hm.dag.entryAfter ([ "homeStoragePolicy" ] ++ cfg.publishAfter)
+          lib.hm.dag.entryAfter
+            (
+              [
+                "applyHomeStorage"
+                "installPackages"
+              ]
+              ++ cfg.publishAfter
+            )
             ''
               control=${lib.escapeShellArg "${home}/.storage/control"}
               persistentControl=${lib.escapeShellArg "/persist/home/${config.home.username}/control"}
 
-              if ${pkgs.util-linux}/bin/mountpoint -q ${lib.escapeShellArg "${home}/.storage/persistent"} \
-                && ${pkgs.util-linux}/bin/mountpoint -q ${lib.escapeShellArg "${home}/.storage/temporary"} \
-                && ${pkgs.util-linux}/bin/mountpoint -q "$control"; then
+              if ${storageMounted}; then
                 profileGeneration="$(${pkgs.coreutils}/bin/readlink -e "$genProfilePath" 2>/dev/null || true)"
                 if [[ "$profileGeneration" != "$newGenPath" ]]; then
                   verboseEcho "home-storage: not publishing a Home Manager test generation"
@@ -334,27 +326,11 @@ in
                     fi
                   done
 
-                  run ${pkgs.coreutils}/bin/mkdir -p "$(${pkgs.coreutils}/bin/dirname "$currentGenGcPath")"
-                  standardNext="$currentGenGcPath.next-$$"
-                  run ${pkgs.coreutils}/bin/ln -s "$persistentGeneration" "$standardNext"
-                  run ${pkgs.coreutils}/bin/mv -Tf "$standardNext" "$currentGenGcPath"
-
-                  if [[ -e "$legacyGenGcPath" ]]; then
-                    run ${pkgs.coreutils}/bin/rm "$legacyGenGcPath"
-                  fi
-
                   next="$control/.current-$(${pkgs.coreutils}/bin/id -u)-$$"
                   run ${pkgs.coreutils}/bin/ln -s \
                     "generations/$generationId/home-storage-policy" "$next"
                   run ${pkgs.coreutils}/bin/mv -Tf "$next" "$control/current"
                 fi
-              else
-                run ${pkgs.coreutils}/bin/mkdir -p "$(${pkgs.coreutils}/bin/dirname "$currentGenGcPath")"
-                if [[ -e "$legacyGenGcPath" ]]; then
-                  run ${pkgs.coreutils}/bin/rm "$legacyGenGcPath"
-                fi
-                run --silence ${pkgs.nix}/bin/nix-store \
-                  --realise "$newGenPath" --add-root "$currentGenGcPath"
               fi
             '';
       };

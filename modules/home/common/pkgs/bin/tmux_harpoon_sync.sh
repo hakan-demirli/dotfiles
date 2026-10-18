@@ -11,13 +11,12 @@ cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
 header="# window_id , command , file_name:r:c , file_path , workspace_dir"
 
-declare -A window_by_index window_default_line
+declare -A window_default_line
 session_windows=()
-while IFS='|' read -r window_index window_id window_command window_path; do
-  window_by_index[$window_index]=$window_id
+while IFS='|' read -r window_id window_command window_path; do
   window_default_line[$window_id]="$window_id,$window_command,::,,$window_path"
   session_windows+=("$window_id")
-done < <(tmux list-windows -t "$tmux_session_id" -F '#{window_index}|#{window_id}|#{pane_current_command}|#{pane_current_path}')
+done < <(tmux list-windows -t "$tmux_session_id" -F '#{window_id}|#{pane_current_command}|#{pane_current_path}')
 
 entries=()
 comments=()
@@ -27,8 +26,6 @@ if [[ -f $data_file ]]; then
     original+="$line"$'\n'
     if [[ -z $line ]]; then
       continue
-    elif [[ $line == '# pane_id ,'* ]]; then
-      comments+=("$header")
     elif [[ $line == '#'* ]]; then
       comments+=("$line")
     else
@@ -59,8 +56,6 @@ for i in "${!entries[@]}"; do
 
   if [[ -n $bind_line && $((i + 1)) == "$bind_line" ]]; then
     id=$bind_window
-  elif [[ $id =~ ^[0-9]+$ ]]; then
-    id=${window_by_index[$id]-}
   fi
   if [[ -z $id || -z ${window_default_line[$id]-} ]]; then
     id=""
