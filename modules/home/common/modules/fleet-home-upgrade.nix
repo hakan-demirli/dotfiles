@@ -90,6 +90,7 @@ in
           Description = "Activate the Home Manager generation of the running system revision";
           ConditionACPower = true;
           StartLimitIntervalSec = 0;
+          X-SwitchMethod = "keep-old";
         };
         Service = {
           Type = "oneshot";

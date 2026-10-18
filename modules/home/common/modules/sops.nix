@@ -110,6 +110,14 @@ in
         "questa_license.dat" = {
           path = "${cfgHome}/secrets/questa_license.dat";
         };
+        "claude/ehd" = {
+          path = "${cfgHome}/secrets/claude/ehd";
+          mode = "0400";
+        };
+        "claude/etz" = {
+          path = "${cfgHome}/secrets/claude/etz";
+          mode = "0400";
+        };
       };
     };
 
