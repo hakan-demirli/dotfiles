@@ -84,6 +84,8 @@ in
       packages = [
         "npm:pi-subagents"
         "npm:pi-web-access"
+        "npm:@gotgenes/pi-anthropic-auth"
+        "npm:pi-multi-pass"
       ];
     };
   };

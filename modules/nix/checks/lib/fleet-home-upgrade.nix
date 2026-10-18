@@ -23,20 +23,29 @@ let
       };
       modules = [
         (self + /modules/home/common/modules/fleet-home-upgrade.nix)
-        {
-          home = {
-            inherit username;
-            homeDirectory = home;
-            stateVersion = "26.11";
-            file.".fleet-generation".text = revision;
-          };
-          fleetHomeUpgrade = {
-            inherit revision;
-            planUrl = "http://127.0.0.1:8000/plan.json";
-            flake = "path:${source}";
-            configuration = "${username}@machine";
-          };
-        }
+        (
+          { lib, ... }:
+          {
+            home = {
+              inherit username;
+              homeDirectory = home;
+              stateVersion = "26.11";
+              file.".fleet-generation".text = revision;
+              activation.recordCompletion = lib.hm.dag.entryAfter [ "reloadSystemd" ] ''
+                printf '%s\n' ${lib.escapeShellArg revision} > "$HOME/.fleet-completed"
+              '';
+            };
+            systemd.user.services.fleet-home-upgrade.Service.Environment = [
+              "FLEET_HOME_GENERATION=${revision}"
+            ];
+            fleetHomeUpgrade = {
+              inherit revision;
+              planUrl = "http://127.0.0.1:8000/plan.json";
+              flake = "path:${source}";
+              configuration = "${username}@machine";
+            };
+          }
+        )
       ];
     }).activationPackage;
 
@@ -89,10 +98,15 @@ pkgs.testers.runNixOSTest {
     def generation():
         return as_user("cat ~/.fleet-generation").strip()
 
+    def completed():
+        return as_user("cat ~/.fleet-completed").strip()
+
     def upgrade(expected):
-        as_user("systemctl --user start fleet-home-upgrade.service")
+        machine.execute("su - ${username} -c 'XDG_RUNTIME_DIR=/run/user/1000 systemctl --user start fleet-home-upgrade.service'")
         log = as_user("journalctl --user -u fleet-home-upgrade.service -o cat")
         run = log.rsplit("Starting ", 1)[-1]
+        result = as_user("systemctl --user show --property=Result --value fleet-home-upgrade.service").strip()
+        assert result == "success", f"fleet-home-upgrade.service result={result}\n{log}"
         assert f"fleet-home-upgrade: {expected}" in run, log
 
     machine.wait_for_unit("user@1000.service")
@@ -124,8 +138,10 @@ pkgs.testers.runNixOSTest {
     with subtest("a deployed generation follows the system revision"):
         as_user("${base}/activate")
         assert generation() == "${planned}"
+        assert completed() == "${planned}"
         upgrade("current (none)")
         assert generation() == "${running}"
+        assert completed() == "${running}"
         assert as_user("cat ~/.local/state/home-manager/gcroots/current-home/fleet-revision").strip() == "${running}"
         upgrade("current (none)")
 
@@ -134,6 +150,7 @@ pkgs.testers.runNixOSTest {
         as_user("rm -f ~/.local/state/nix/profiles/home-manager ~/.local/state/nix/profiles/home-manager-*-link")
         upgrade("current (none)")
         assert generation() == "${running}"
+        assert completed() == "${running}"
 
     with subtest("a dirty generation is left alone"):
         as_user("${local}/activate")

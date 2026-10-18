@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
 opencode() {
-  if [ "$#" -eq 0 ] && [ -n "${OPENCODE_URL:-}" ]; then
-    command opencode attach "$OPENCODE_URL" --dir "$PWD"
-  else
-    command opencode "$@"
+  if [ -n "${OPENCODE_URL:-}" ]; then
+    case "${1:-}" in
+      "" | -s | --session | --session=* | -c | --continue | --fork | --mini)
+        command opencode attach "$OPENCODE_URL" --dir "$PWD" "$@"
+        return
+        ;;
+    esac
   fi
+  command opencode "$@"
 }
 
 lf_cd() {
