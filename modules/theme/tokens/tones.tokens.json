@@ -173,6 +173,59 @@
         }
       }
     },
+    "accentSurface": {
+      "cyan": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.0, 0.23137254901960785, 0.26666666666666666],
+          "hex": "#003b44"
+        }
+      },
+      "green": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.0, 0.24313725490196078, 0.08235294117647059],
+          "hex": "#003e15"
+        }
+      },
+      "orange": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.30980392156862746, 0.17647058823529413, 0.0],
+          "hex": "#4f2d00"
+        }
+      },
+      "pink": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.4117647058823529, 0.0, 0.2901960784313726],
+          "hex": "#69004a"
+        }
+      },
+      "purple": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.27450980392156865, 0.10196078431372549, 0.48627450980392156
+          ],
+          "hex": "#461a7c"
+        }
+      },
+      "red": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.44313725490196076, 0.0, 0.054901960784313725],
+          "hex": "#71000e"
+        }
+      },
+      "yellow": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.2, 0.2196078431372549, 0.0],
+          "hex": "#333800"
+        }
+      }
+    },
     "accentContainer": {
       "cyan": {
         "$value": {

@@ -253,6 +253,7 @@
   palette = {
     error = "#ff5555";
     errorContainer = "#930016";
+    errorSurface = "#71000e";
     inverseOnSurface = "#2e303c";
     inverseSurface = "#e1e1f1";
     onError = "#5c000a";
@@ -275,6 +276,7 @@
     primaryContainer = "#593090";
     primaryFixed = "#eddcff";
     primaryFixedDim = "#d7baff";
+    primarySurface = "#461a7c";
     scrim = "#000000";
     secondary = "#ff79c6";
     secondaryContainer = "#860f60";
@@ -283,6 +285,7 @@
     shadow = "#000000";
     success = "#50fa7b";
     successContainer = "#00531e";
+    successSurface = "#003e15";
     surface = "#11131e";
     surfaceBright = "#373845";
     surfaceContainer = "#1d1f2b";
