@@ -104,33 +104,18 @@ def state_path():
     return Path(directory) / "kitty-window-selector" / name
 
 
-def migrate_label(label, fallback):
-    if label.startswith("󰍹 ") or (label.startswith("/") and "/.ssh/" in label):
-        return fallback
-    if "@" in label and "." in label.rsplit("@", 1)[-1]:
-        return label.rsplit("@", 1)[-1].split(".", 1)[0]
-    return label
-
-
 def apply_state(windows, path):
-    legacy = not path.is_file() and path.with_suffix(".tsv").is_file()
-    source = path.with_suffix(".tsv") if legacy else path
-    if not source.is_file():
+    if not path.is_file():
         return windows
 
     by_id = {window.id: window for window in windows}
     ordered = []
-    for line in source.read_text().splitlines():
-        if legacy:
-            label, separator, window_id = line.rpartition("\t")
-        else:
-            window_id, separator, label = line.partition(",")
+    for line in path.read_text().splitlines():
+        window_id, separator, label = line.partition(",")
         if not separator or not window_id.isdecimal():
             continue
         window = by_id.pop(int(window_id), None)
         if window is not None:
-            if legacy:
-                label = migrate_label(label, window.label)
             ordered.append(Window(window.id, label.strip() or window.label))
     ordered.extend(by_id.values())
     return ordered
