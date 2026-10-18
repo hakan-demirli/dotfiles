@@ -19,12 +19,14 @@ let
   expectedPaths = {
     ".cache" = "persistent";
     ".config/mozilla" = "persistent";
+    ".config/pi" = "persistent";
     ".config/sops/age" = "persistent";
     ".local/share/direnv" = "persistent";
     ".local/share/opencode" = "persistent";
     ".local/share/state" = "persistent";
     ".local/state/bash" = "persistent";
     ".local/state/opencode" = "persistent";
+    ".local/state/pi" = "persistent";
     ".local/state/wireplumber" = "persistent";
     Desktop = "persistent";
     Documents = "persistent";

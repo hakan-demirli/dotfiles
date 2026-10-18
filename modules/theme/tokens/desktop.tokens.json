@@ -152,11 +152,20 @@
     },
     "color": {
       "$type": "color",
+      "primarySurface": {
+        "$value": "{tones.accentSurface.purple}"
+      },
+      "errorSurface": {
+        "$value": "{tones.accentSurface.red}"
+      },
       "success": {
         "$value": "{dracula.color.green}"
       },
       "onSuccess": {
         "$value": "{tones.onAccent.green}"
+      },
+      "successSurface": {
+        "$value": "{tones.accentSurface.green}"
       },
       "successContainer": {
         "$value": "{tones.accentContainer.green}"
