@@ -60,7 +60,7 @@ in
       "nixTailnetCache"
       "reloadSystemd"
     ]
-    ++ lib.optional personal "removeGitTokenUrlRewrite";
+    ++ lib.optional personal "sops-nix";
     paths = {
       ".cache" = "persistent";
       ".local/share/direnv" = "persistent";

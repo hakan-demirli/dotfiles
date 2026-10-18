@@ -2,6 +2,7 @@
   pkgs,
   self,
   lib,
+  inputs,
 }:
 let
   homes = {
@@ -34,8 +35,31 @@ let
     Videos = "persistent";
   };
   actual = homes.desktop.config;
-  activation = actual.home.activation.homeStoragePolicy.data;
   publication = actual.home.activation.publishHomeStorageGeneration;
+  storageEntries = [
+    "checkHomeStorage"
+    "applyHomeStorage"
+    "publishHomeStorageGeneration"
+  ];
+  activationOrder =
+    home:
+    let
+      activation = home.config.home.activation;
+      names = map (entry: entry.name) (inputs.home-manager.lib.hm.dag.topoSort activation).result;
+      at = name: lib.lists.findFirstIndex (candidate: candidate == name) null names;
+      precedes = first: second: at first < at second;
+      references = lib.concatMap (
+        name: activation.${name}.before ++ activation.${name}.after
+      ) storageEntries;
+    in
+    lib.all (name: activation ? ${name}) storageEntries
+    && lib.all (name: activation ? ${name}) references
+    && precedes "checkHomeStorage" "writeBoundary"
+    && precedes "writeBoundary" "applyHomeStorage"
+    && precedes "applyHomeStorage" "linkGeneration"
+    && lib.all (
+      name: precedes name "publishHomeStorageGeneration"
+    ) activation.publishHomeStorageGeneration.after;
   userServiceCommands =
     map (name: builtins.head actual.systemd.user.services.${name}.Service.ExecStart)
       [
@@ -54,14 +78,9 @@ let
       home:
       home.config.homeStorage.default == "temporary" && home.config.homeStorage.paths == expectedPaths
     ) profiles;
-    facility-is-optional = lib.hasInfix "home-storage facility unavailable" activation;
-    storage-namespace-is-user-owned =
-      lib.hasInfix "/home/emre/.storage/persistent" activation
-      && lib.hasInfix "/home/emre/.storage/temporary" activation
-      && lib.hasInfix "/home/emre/.storage/control" activation;
-    legacy-links-are-relinked =
-      lib.hasInfix "/home/emre/.home-storage/" activation
-      && lib.hasInfix "relinking legacy path" activation;
+    storage-is-checked-before-writes-and-applied-before-links = lib.all activationOrder (
+      lib.attrValues self.homeConfigurations
+    );
     publication-is-atomic = lib.hasInfix ''mv -Tf "$next" "$control/current"'' publication.data;
     current-is-the-only-commit-pointer = !lib.hasInfix "replay-required" publication.data;
     generation-is-persistently-installed =
@@ -82,22 +101,24 @@ let
     generation-collisions-are-refused =
       lib.hasInfix "refusing generation ID collision" publication.data
       && lib.hasInfix ''readlink -e "$persistentGeneration"'' publication.data;
-    existing-paths-are-migrated = lib.hasInfix "migrating unmanaged path" activation;
     publication-follows-effectful-activation = lib.all (name: lib.elem name publication.after) (
-      [ "homeStoragePolicy" ] ++ actual.homeStorage.publishAfter
+      [
+        "applyHomeStorage"
+        "installPackages"
+      ]
+      ++ actual.homeStorage.publishAfter
     );
+    publication-leaves-gc-roots-to-home-manager = lib.all (name: !lib.hasInfix name publication.data) [
+      "newGenGcPath"
+      "currentGenGcPath"
+      "legacyGenGcPath"
+    ];
     generation-contains-boot-artifacts =
       lib.hasInfix "$out/home-storage-policy" actual.home.extraBuilderCommands
       && lib.hasInfix "$out/boot-replay" actual.home.extraBuilderCommands;
-    built-in-publication-is-disabled = !actual.home.activationGenerateGcRoot;
-    activation-has-temporary-gc-root = lib.hasInfix ''--add-root "$newGenGcPath"'' actual.home.activation.protectHomeStorageGeneration.data;
     user-service-paths-are-resolved = lib.all (
       command: lib.hasInfix "/home/emre/" command && !lib.hasInfix "$HOME" command
     ) userServiceCommands;
-    no-daemon-client =
-      !lib.hasInfix "home-storagectl" activation
-      && !lib.hasInfix "D-Bus" activation
-      && !lib.hasInfix "home-layout" activation;
   };
   failures = lib.attrNames (lib.filterAttrs (_: passed: !passed) checks);
 in

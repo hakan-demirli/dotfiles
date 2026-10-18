@@ -25,14 +25,6 @@ case "$current_target" in
     generation_id="${current_target#generations/}"
     generation_id="${generation_id%/home-storage-policy}"
     ;;
-  generations/*)
-    legacy_id="${current_target#generations/}"
-    if [[ -n $legacy_id && $legacy_id != */* ]]; then
-      exit 0
-    fi
-    echo "home-generation-replay-collisions: invalid current target: $current_target" >&2
-    exit 1
-    ;;
   *)
     echo "home-generation-replay-collisions: invalid current target: $current_target" >&2
     exit 1
