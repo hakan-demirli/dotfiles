@@ -16,15 +16,14 @@ function update_cache() {
   fi
 }
 
-if [[ $# -gt 0 ]]; then
-  if [[ $1 == "pull" ]]; then
-    update_cache
-    exit 0
-  else
-    echo "Error: Unknown argument '$1'"
-    echo "Usage: $(basename "$0") [pull]"
-    exit 1
-  fi
+if [[ $# -gt 1 ]]; then
+  echo "Usage: $(basename "$0") [pull|template]" >&2
+  exit 1
+fi
+
+if [[ ${1:-} == "pull" ]]; then
+  update_cache
+  exit 0
 fi
 
 if [ ! -d "$CACHE_DIR" ]; then
@@ -38,7 +37,23 @@ for dir in "${IGNORE_DIRS[@]}"; do
 done
 find_args+=(-printf "%f\n")
 
-selected=$(find "${find_args[@]}" | sort | fzf)
+mapfile -t templates < <(find "${find_args[@]}" | sort)
+
+if [[ $# -eq 1 ]]; then
+  selected=""
+  for template in "${templates[@]}"; do
+    if [[ $template == "$1" ]]; then
+      selected=$template
+      break
+    fi
+  done
+  if [[ -z $selected ]]; then
+    echo "Error: Unknown template '$1'" >&2
+    exit 1
+  fi
+else
+  selected=$(printf '%s\n' "${templates[@]}" | fzf)
+fi
 
 if [ -n "$selected" ]; then
   if [ -d "$selected" ]; then

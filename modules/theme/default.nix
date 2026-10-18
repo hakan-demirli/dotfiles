@@ -198,6 +198,80 @@ let
       ${pair "mark1_background" theme.dracula.red}
     '';
 
+  piTheme =
+    let
+      inherit (theme) dracula palette;
+    in
+    builtins.toJSON {
+      "$schema" =
+        "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json";
+      name = "dracula";
+      colors = {
+        accent = dracula.purple;
+        border = dracula.purple;
+        borderAccent = dracula.pink;
+        borderMuted = dracula.comment;
+        success = dracula.green;
+        error = dracula.red;
+        warning = dracula.yellow;
+        muted = dracula.comment;
+        dim = dracula.comment;
+        text = dracula.foreground;
+        thinkingText = dracula.comment;
+
+        selectedBg = dracula.selection;
+        userMessageBg = palette.surfaceContainerHighest;
+        userMessageText = dracula.foreground;
+        customMessageBg = palette.primarySurface;
+        customMessageText = dracula.foreground;
+        customMessageLabel = dracula.purple;
+        toolPendingBg = palette.surfaceContainer;
+        toolSuccessBg = palette.successSurface;
+        toolErrorBg = palette.errorSurface;
+        toolTitle = dracula.foreground;
+        toolOutput = dracula.comment;
+
+        mdHeading = dracula.orange;
+        mdLink = dracula.cyan;
+        mdLinkUrl = dracula.comment;
+        mdCode = dracula.green;
+        mdCodeBlock = dracula.foreground;
+        mdCodeBlockBorder = dracula.comment;
+        mdQuote = dracula.comment;
+        mdQuoteBorder = dracula.comment;
+        mdHr = dracula.comment;
+        mdListBullet = dracula.pink;
+
+        toolDiffAdded = dracula.green;
+        toolDiffRemoved = dracula.red;
+        toolDiffContext = dracula.comment;
+
+        syntaxComment = dracula.comment;
+        syntaxKeyword = dracula.pink;
+        syntaxFunction = dracula.green;
+        syntaxVariable = dracula.foreground;
+        syntaxString = dracula.yellow;
+        syntaxNumber = dracula.purple;
+        syntaxType = dracula.cyan;
+        syntaxOperator = dracula.pink;
+        syntaxPunctuation = dracula.foreground;
+
+        thinkingOff = palette.outlineVariant;
+        thinkingMinimal = dracula.comment;
+        thinkingLow = dracula.cyan;
+        thinkingMedium = dracula.purple;
+        thinkingHigh = dracula.pink;
+        thinkingXhigh = dracula.red;
+
+        bashMode = dracula.green;
+      };
+      export = {
+        pageBg = palette.surfaceContainerLow;
+        cardBg = palette.surfaceContainer;
+        infoBg = palette.surfaceContainerHighest;
+      };
+    };
+
   files =
     lib.listToAttrs (
       lib.concatMap (app: [
@@ -207,6 +281,7 @@ let
     )
     // {
       "config/kitty/dracula.conf" = kittyTheme;
+      "config/pi/themes/dracula.json" = piTheme;
       "config/tofi/config" = template hashBanner "tofi.config.in";
       "config/hypr/hyprlock.conf" = template hashBanner "hyprlock.conf.in";
       "config/quickshell/Theme.qml" = template cssBanner "quickshell.Theme.qml.in";
@@ -316,6 +391,7 @@ in
             fi
 
             find "$out" -name '*.css' -exec prettier --write --parser css {} + > /dev/null
+            find "$out" -name '*.json' -exec prettier --write --parser json {} + > /dev/null
             find "$out" -name '*.qml' -exec qmlformat --inplace --ignore-settings --indent-width 4 {} +
             find "$out" -name '*.nix' -exec nixfmt {} +
           '';

@@ -18,6 +18,7 @@ in
     (import ../../common/pkgs/nix/opencode.nix opencode)
   ]
   ++ lib.optionals personal [
+    ../../common/pkgs/nix/pi.nix
     (import ../../common/pkgs/nix/state_backup.nix {
       remote = stateRemote;
       logBranch = "hosts/${facts.id}";
@@ -70,11 +71,13 @@ in
     }
     // lib.optionalAttrs personal {
       ".config/mozilla" = "persistent";
+      ".config/pi" = "persistent";
       ".config/sops/age" = "persistent";
       ".local/share/state" = "persistent";
       ".local/share/opencode" = "persistent";
       ".local/state/bash" = "persistent";
       ".local/state/opencode" = "persistent";
+      ".local/state/pi" = "persistent";
       ".local/state/wireplumber" = "persistent";
     };
   };

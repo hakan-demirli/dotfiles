@@ -14,6 +14,7 @@
 
 @define-color error #ff5555;
 @define-color error-container #930016;
+@define-color error-surface #71000e;
 @define-color inverse-on-surface #2e303c;
 @define-color inverse-surface #e1e1f1;
 @define-color on-error #5c000a;
@@ -36,6 +37,7 @@
 @define-color primary-container #593090;
 @define-color primary-fixed #eddcff;
 @define-color primary-fixed-dim #d7baff;
+@define-color primary-surface #461a7c;
 @define-color scrim #000000;
 @define-color secondary #ff79c6;
 @define-color secondary-container #860f60;
@@ -44,6 +46,7 @@
 @define-color shadow #000000;
 @define-color success #50fa7b;
 @define-color success-container #00531e;
+@define-color success-surface #003e15;
 @define-color surface #11131e;
 @define-color surface-bright #373845;
 @define-color surface-container #1d1f2b;

@@ -14,6 +14,7 @@ ACCENTS = ["cyan", "green", "orange", "pink", "purple", "red", "yellow"]
 NEUTRAL_TONES = [0, 4, 6, 10, 12, 17, 20, 22, 24, 30, 60, 80, 90]
 
 ON_ACCENT_START_TONE = 20
+ACCENT_SURFACE_TONE = 22
 ACCENT_CONTAINER_TONE = 30
 ON_ACCENT_CONTAINER_START_TONE = 90
 MIN_CONTRAST = 4.5
@@ -102,6 +103,7 @@ def main(argv: list[str]) -> int:
 
     groups = {
         "onAccent": {},
+        "accentSurface": {},
         "accentContainer": {},
         "onAccentContainer": {},
         "accentFixed": {},
@@ -124,6 +126,7 @@ def main(argv: list[str]) -> int:
             continue
 
         groups["onAccent"][name] = token(on_accent)
+        groups["accentSurface"][name] = token(palette.tone(ACCENT_SURFACE_TONE))
         groups["accentContainer"][name] = token(container_argb)
         groups["onAccentContainer"][name] = token(on_container)
         groups["accentFixed"][name] = token(palette.tone(ACCENT_FIXED_TONE))
