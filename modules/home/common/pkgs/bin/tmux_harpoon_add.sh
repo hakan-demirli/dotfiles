@@ -9,8 +9,7 @@ data_file="$cache_dir/$tmux_cwd_hash.csv"
 status_line=$(tmux capture-pane -pS -3 | tail -n 3 | rg -e "(?:NOR\s+|NORMAL|INS\s+|INSERT|SEL\s+|SELECT)[\p{Braille}]*\s+(\S*)\s[^│]* (\d+):(\d+).*" -o --replace '$1 $2 $3' || true)
 read -r buffer_path cursor_row cursor_col <<< "$status_line"
 
-IFS='|' read -r tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{window_index}|#{pane_current_command}|#{pane_current_path}')"
-tmux_window=${tmux_window//@/}
+IFS='|' read -r tmux_window tmux_command tmux_pane_path <<< "$(tmux display-message -p '#{window_id}|#{pane_current_command}|#{pane_current_path}')"
 
 if [[ $tmux_command == "yazi" ]]; then
   if [[ -n $status_line ]]; then
@@ -53,43 +52,12 @@ else
   buffer_name="$(basename "$buffer_path")"
 fi
 
-populated=1
-if [[ ! -f $data_file ]]; then
-  populated=0
-  mkdir -p "$cache_dir"
-  touch "$data_file"
-elif [[ ! -s $data_file ]]; then
-  populated=0
-fi
+tmux_harpoon_sync.sh
 
-if [[ $buffer_path != *"/default_path"* ]]; then
-  if grep -q "^$buffer_path:" "$data_file"; then
-    tmux_harpoon_update.sh
-  else
-    new_line="$tmux_window,$tmux_command,$buffer_name:$cursor_row:$cursor_col,$buffer_dir,$tmux_pane_path"
-    if [[ ! -s $data_file ]]; then
-      echo "$new_line" >> "$data_file"
-    else
-      sed -i "1i$new_line" "$data_file"
-    fi
-  fi
+if [[ $buffer_path != *"/default_path"* ]] && grep -q "^$buffer_path:" "$data_file"; then
+  tmux_harpoon_update.sh
 else
   new_line="$tmux_window,$tmux_command,$buffer_name:$cursor_row:$cursor_col,$buffer_dir,$tmux_pane_path"
-  if [[ ! -s $data_file ]]; then
-    echo "$new_line" >> "$data_file"
-  else
-    sed -i "1i$new_line" "$data_file"
-  fi
-fi
-
-if [[ $populated -eq 0 ]]; then
-  {
-    for i in {0..2}; do
-      default_line="$i,bash,::,,$tmux_pane_path"
-      echo "$default_line"
-    done
-    echo
-    echo "# session_name: $(basename "$tmux_cwd")"
-    echo "# pane_id , command , file_name:r:c , file_path , workspace_dir"
-  } >> "$data_file"
+  sed -i "1i$new_line" "$data_file"
+  tmux_harpoon_sync.sh
 fi
