@@ -24,6 +24,9 @@ in
       logBranch = "hosts/${facts.id}";
     })
   ]
+  ++ lib.optionals (facts.id == "server-dev-3") [
+    ../../common/pkgs/nix/cliproxyapi.nix
+  ]
   ++ lib.optionals (personal && profile == "desktop") [
     ./wallpaper.nix
     (import ../../common/pkgs/nix/ntfy-listener.nix { })
@@ -76,6 +79,7 @@ in
       ".local/share/state" = "persistent";
       ".local/share/opencode" = "persistent";
       ".local/state/bash" = "persistent";
+      ".local/state/cliproxyapi" = "persistent";
       ".local/state/opencode" = "persistent";
       ".local/state/pi" = "persistent";
       ".local/state/wireplumber" = "persistent";
