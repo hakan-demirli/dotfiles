@@ -226,8 +226,8 @@ let
         customMessageText = dracula.foreground;
         customMessageLabel = dracula.purple;
         toolPendingBg = palette.surfaceContainer;
-        toolSuccessBg = palette.successSurface;
-        toolErrorBg = palette.errorSurface;
+        toolSuccessBg = palette.surfaceContainer;
+        toolErrorBg = palette.surfaceContainer;
         toolTitle = dracula.foreground;
         toolOutput = dracula.comment;
 

@@ -76,6 +76,99 @@
         }
       }
     },
+    "proxy-anthropic": {
+      "name": "Proxy Anthropic",
+      "npm": "@ai-sdk/anthropic",
+      "options": {
+        "baseURL": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8317/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "claude-opus-5-5": {
+          "name": "Claude Opus 5.5",
+          "reasoning": true,
+          "tool_call": true,
+          "attachment": true,
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          }
+        },
+        "claude-sonnet-5-5": {
+          "name": "Claude Sonnet 5.5",
+          "reasoning": true,
+          "tool_call": true,
+          "attachment": true,
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          }
+        },
+        "claude-fable-5-1": {
+          "name": "Claude Fable 5.1",
+          "reasoning": true,
+          "tool_call": true,
+          "attachment": true,
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          }
+        },
+        "claude-haiku-4-5-20251001": {
+          "name": "Claude Haiku 4.5",
+          "reasoning": true,
+          "tool_call": true,
+          "attachment": true,
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          }
+        }
+      }
+    },
+    "proxy-openai": {
+      "name": "Proxy OpenAI",
+      "npm": "@ai-sdk/openai",
+      "options": {
+        "baseURL": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8317/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gpt-6-astra": {
+          "name": "GPT-6 Astra",
+          "reasoning": true,
+          "tool_call": true,
+          "attachment": true,
+          "limit": {
+            "context": 1050000,
+            "input": 922000,
+            "output": 128000
+          }
+        },
+        "gpt-6.1-sol": {
+          "name": "GPT-6.1 Sol",
+          "reasoning": true,
+          "tool_call": true,
+          "attachment": true,
+          "limit": {
+            "context": 1050000,
+            "input": 922000,
+            "output": 128000
+          }
+        },
+        "gpt-6-luna": {
+          "name": "GPT-6 Luna",
+          "reasoning": true,
+          "tool_call": true,
+          "attachment": true,
+          "limit": {
+            "context": 1050000,
+            "input": 922000,
+            "output": 128000
+          }
+        }
+      }
+    },
     "openai": {
       "models": {
         "gpt-5.6-sol": {
