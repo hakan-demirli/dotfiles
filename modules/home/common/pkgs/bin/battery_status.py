@@ -8,11 +8,10 @@ import re
 import sqlite3
 import sys
 import time
+import tomllib
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-
-import tomllib
 
 DEFAULT_POWER_SUPPLY = Path("/sys/class/power_supply")
 DEFAULT_INTERVAL = 60
