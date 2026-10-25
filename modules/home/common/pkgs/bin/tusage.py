@@ -71,7 +71,7 @@ def ttl_seconds() -> int:
 
 
 def utc_now() -> dt.datetime:
-    return dt.datetime.now(dt.timezone.utc)
+    return dt.datetime.now(dt.UTC)
 
 
 def read_json(path: Path) -> dict[str, Any]:

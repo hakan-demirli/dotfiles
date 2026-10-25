@@ -6,13 +6,16 @@ let
 in
 {
   perSystem =
-    { pkgs, ... }:
+    { pkgs, system, ... }:
+    let
+      qmlPkgs = inputs.nixpkgs-qmllint.legacyPackages.${system};
+    in
     {
       checks.qmllint =
         if pkgs.stdenv.hostPlatform.isLinux then
           pkgs.runCommand "check-qmllint"
             {
-              nativeBuildInputs = [ pkgs.qt6.qtdeclarative ];
+              nativeBuildInputs = [ qmlPkgs.qt6.qtdeclarative ];
               src = inputs.self;
               LANG = "C.UTF-8";
             }
@@ -36,8 +39,8 @@ in
                 --ignore-settings
                 --bare
                 --max-warnings 0
-                -I ${pkgs.qt6.qtdeclarative}/lib/qt-6/qml
-                -I ${pkgs.quickshell}/lib/qt-6/qml
+                -I ${qmlPkgs.qt6.qtdeclarative}/lib/qt-6/qml
+                -I ${qmlPkgs.quickshell}/lib/qt-6/qml
                 --unused-imports error
                 --unresolved-type disable
                 --uncreatable-type disable
@@ -49,11 +52,12 @@ in
                 case "$file" in
                   ${lib.concatStringsSep " | " groupedPropertyExempt}) continue ;;
                 esac
-                qualified+=("$file")
+                qualified+=("$PWD/$file")
               done
+              exempt=(${lib.escapeShellArgs groupedPropertyExempt})
 
               qmllint "''${flags[@]}" --unqualified error "''${qualified[@]}"
-              qmllint "''${flags[@]}" --unqualified disable ${lib.escapeShellArgs groupedPropertyExempt}
+              qmllint "''${flags[@]}" --unqualified disable "''${exempt[@]/#/$PWD/}"
 
               touch $out
             ''

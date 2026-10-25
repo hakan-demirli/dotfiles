@@ -10,6 +10,7 @@
 
     nixpkgs.follows = "infra-lib/nixpkgs";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-qmllint.url = "github:NixOS/nixpkgs/fe13242281a67641c0102cdb1087f0ebe586c7df";
     flake-parts.follows = "infra-lib/flake-parts";
     import-tree.follows = "infra-lib/import-tree";
     nix-github-actions = {
