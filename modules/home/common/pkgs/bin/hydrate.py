@@ -10,7 +10,7 @@ import subprocess
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -53,7 +53,7 @@ class ProjectContext:
 
 
 def now_utc() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
 def default_hydration_root() -> Path:

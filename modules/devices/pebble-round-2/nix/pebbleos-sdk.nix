@@ -7,8 +7,20 @@ let
     stdenv
     lib
     fetchurl
+    fetchpatch
     autoPatchelfHook
+    patchelf
     ;
+
+  patchelfFixed = patchelf.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [
+      (fetchpatch {
+        url = "https://github.com/NixOS/patchelf/commit/59acc3d98b4961cfddf02090d9426ac735603218.patch";
+        includes = [ "src/*" ];
+        hash = "sha256-rQWWZlCa4IRrcPcxMD2xrTTD4nLOsWfdZLOk9UoIOIs=";
+      })
+    ];
+  });
 
   bundles = {
     "aarch64-darwin" = {
@@ -77,6 +89,10 @@ stdenv.mkDerivation {
       done
     done
     runHook postInstall
+  '';
+
+  preFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    export PATH="${patchelfFixed}/bin:$PATH"
   '';
 
   meta = {
