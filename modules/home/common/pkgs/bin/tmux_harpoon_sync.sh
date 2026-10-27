@@ -43,7 +43,6 @@ if [[ ${#comments[@]} -eq 0 ]]; then
 fi
 
 declare -A referenced
-order=()
 for i in "${!entries[@]}"; do
   entry=${entries[i]}
   if [[ $entry == *,* ]]; then
@@ -57,19 +56,40 @@ for i in "${!entries[@]}"; do
   if [[ -n $bind_line && $((i + 1)) == "$bind_line" ]]; then
     id=$bind_window
   fi
-  if [[ -z $id || -z ${window_default_line[$id]-} ]]; then
+  if [[ -z $id || -z ${window_default_line[$id]-} || -n ${referenced[$id]-} ]]; then
     id=""
-  elif [[ -z ${referenced[$id]-} ]]; then
+  else
     referenced[$id]=1
-    order+=("$id")
   fi
 
   entries[i]="$id,$rest"
 done
 
+unreferenced=()
 for id in "${session_windows[@]}"; do
   if [[ -z ${referenced[$id]-} ]]; then
-    entries+=("${window_default_line[$id]}")
+    unreferenced+=("$id")
+  fi
+done
+
+for i in "${!entries[@]}"; do
+  if [[ ${#unreferenced[@]} -eq 0 ]]; then
+    break
+  fi
+  if [[ ${entries[i]} == ,*,::,,* ]]; then
+    entries[i]=${window_default_line[${unreferenced[0]}]}
+    unreferenced=("${unreferenced[@]:1}")
+  fi
+done
+
+for id in "${unreferenced[@]}"; do
+  entries+=("${window_default_line[$id]}")
+done
+
+order=()
+for entry in "${entries[@]}"; do
+  id=${entry%%,*}
+  if [[ -n $id ]]; then
     order+=("$id")
   fi
 done
