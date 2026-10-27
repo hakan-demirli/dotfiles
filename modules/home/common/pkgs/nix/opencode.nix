@@ -19,12 +19,13 @@ let
     plugins: plugins.override { inherit (unstablePkgs) claude-code; }
   ) basePlugins;
   opencodePackage = unstablePkgs.opencode.overrideAttrs (old: {
-    patches = (old.patches or [ ]) ++ [
-      (pkgs.fetchurl {
-        url = "https://github.com/anomalyco/opencode/commit/98639ab00182513cc614461f6037d686a82489ec.patch";
-        hash = "sha256-d6Vo8zvp9zyoVyvaDnuakvYivnIZhE5r3LpPhrPyyg4=";
-      })
-    ];
+    patches = (old.patches or [ ]) ++ [ ./patches/opencode-copilot-auto.patch ];
+    doCheck = true;
+    checkPhase = ''
+      runHook preCheck
+      bun test --cwd ../core test/github-copilot test/plugin/provider-github-copilot.test.ts
+      runHook postCheck
+    '';
   });
 
   serverUrl = "http://${address}:${toString port}";

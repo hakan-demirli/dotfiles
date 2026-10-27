@@ -105,6 +105,19 @@ pkgs.testers.runNixOSTest {
             )
             machine.succeed(as_user("alice", "command -v hello"))
 
+    for legacy in ["${generationId "alice"}", "00000000000000000000000000000000-home-manager-generation"]:
+        with subtest(f"a legacy GC root into the control directory is replaced: {legacy}"):
+            machine.succeed(
+                as_user(
+                    "alice",
+                    f"ln -sfnT /persist/home/alice/control/generations/{legacy} ~/.local/state/home-manager/gcroots/current-home",
+                )
+            )
+            machine.succeed(as_user("alice", "${generations.alice}/activate"))
+            machine.succeed(
+                "test \"$(readlink /home/alice/.local/state/home-manager/gcroots/current-home)\" = ${generations.alice}",
+            )
+
     with subtest("unmanaged paths stop activation before any write"):
         mount_storage("bob")
         machine.succeed(
