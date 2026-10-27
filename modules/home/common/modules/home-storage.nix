@@ -158,6 +158,7 @@ let
         "control"
       ];
   shellArray = values: "(${lib.escapeShellArgs values})";
+  persistentControl = "/persist/home/${config.home.username}/control";
   managedPaths = map (path: "${home}/${path}") paths;
   targetPaths = map (path: "${home}/.storage/${entries.${path}.storage}/${path}") paths;
   pathTypes = map (path: entries.${path}.type) paths;
@@ -260,6 +261,16 @@ in
           fi
         '';
 
+        migrateHomeStorageGcRoot = lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
+          if [[ -L "$currentGenGcPath" ]]; then
+            case "$(${pkgs.coreutils}/bin/readlink -- "$currentGenGcPath")" in
+              ${lib.escapeShellArg "${persistentControl}/generations/"}*)
+                run ${pkgs.coreutils}/bin/rm -- "$currentGenGcPath"
+                ;;
+            esac
+          fi
+        '';
+
         publishHomeStorageGeneration =
           lib.hm.dag.entryAfter
             (
@@ -271,7 +282,7 @@ in
             )
             ''
               control=${lib.escapeShellArg "${home}/.storage/control"}
-              persistentControl=${lib.escapeShellArg "/persist/home/${config.home.username}/control"}
+              persistentControl=${lib.escapeShellArg persistentControl}
 
               if ${storageMounted}; then
                 profileGeneration="$(${pkgs.coreutils}/bin/readlink -e "$genProfilePath" 2>/dev/null || true)"

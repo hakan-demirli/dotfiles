@@ -1,0 +1,613 @@
+diff --git a/packages/core/src/github-copilot/auto.ts b/packages/core/src/github-copilot/auto.ts
+new file mode 100644
+index 0000000..7685829
+--- /dev/null
++++ b/packages/core/src/github-copilot/auto.ts
+@@ -0,0 +1,131 @@
++export * as CopilotAuto from "./auto.js"
++
++import type { LanguageModelV3, LanguageModelV3CallOptions, LanguageModelV3Prompt } from "@ai-sdk/provider"
++import { Option, Schema } from "effect"
++import { autoModelID } from "./models.js"
++
++const requestTimeout = 5_000
++const sessionExpiryMargin = 30
++
++const Session = Schema.Struct({
++  available_models: Schema.optional(Schema.Array(Schema.String)),
++  selected_model: Schema.optional(Schema.String),
++  session_token: Schema.String,
++  expires_at: Schema.Number,
++})
++const Intent = Schema.Struct({ chosen_model: Schema.optional(Schema.String) })
++const decodeSession = Schema.decodeUnknownSync(Session)
++const decodeIntent = Schema.decodeUnknownOption(Intent)
++
++type Fetch = (input: Parameters<typeof fetch>[0], init?: RequestInit) => Promise<Response>
++
++export interface Input {
++  readonly baseURL: string
++  readonly fetch: Fetch
++  /** Resolves a model that the router selected to the Copilot transport that serves it. */
++  readonly language: (modelID: string) => LanguageModelV3
++}
++
++interface RouterSession {
++  readonly availableModels: readonly string[]
++  readonly selectedModel: string
++  readonly token: string
++  readonly expiresAt: number
++}
++
++export function create(input: Input): LanguageModelV3 {
++  return new AutoLanguageModel(input)
++}
++
++// Copilot exposes Auto as a routing service, not as a model. A session names the models that
++// the plan may route to, and an intent call selects one of them for each turn. Free and
++// Student plans have no other path to inference.
++class AutoLanguageModel implements LanguageModelV3 {
++  readonly specificationVersion = "v3"
++  readonly provider = "github-copilot.auto"
++  readonly modelId = autoModelID
++  readonly supportedUrls = {}
++  private session: RouterSession | undefined
++
++  constructor(private readonly input: Input) {}
++
++  async doGenerate(options: LanguageModelV3CallOptions) {
++    const routed = await this.route(options)
++    return routed.language.doGenerate(routed.options)
++  }
++
++  async doStream(options: LanguageModelV3CallOptions) {
++    const routed = await this.route(options)
++    return routed.language.doStream(routed.options)
++  }
++
++  private async route(options: LanguageModelV3CallOptions) {
++    const session = await this.open(options.abortSignal)
++    // The router is advisory: the session already names a usable model, so a routing
++    // failure falls back to that model instead of failing the request.
++    const modelID = await this.intent(session, options).catch(() => undefined)
++    return {
++      language: this.input.language(modelID ?? session.selectedModel),
++      options: {
++        ...options,
++        headers: { ...options.headers, "copilot-session-token": session.token },
++      },
++    }
++  }
++
++  private async open(abort: AbortSignal | undefined) {
++    const now = Math.floor(Date.now() / 1000)
++    if (this.session && this.session.expiresAt > now + sessionExpiryMargin) return this.session
++
++    const response = await this.input.fetch(`${this.input.baseURL}/models/session`, {
++      method: "POST",
++      headers: { "Content-Type": "text/plain;charset=UTF-8" },
++      body: JSON.stringify({ auto_mode: { model_hints: [autoModelID] } }),
++      signal: signal(abort),
++    })
++    if (!response.ok) throw new Error(`Failed to create Copilot auto session: ${response.status}`)
++    const session = decodeSession(await response.json())
++    if (!session.selected_model) throw new Error("Copilot auto session did not select a model")
++    this.session = {
++      availableModels: session.available_models ?? [session.selected_model],
++      selectedModel: session.selected_model,
++      token: session.session_token,
++      expiresAt: session.expires_at,
++    }
++    return this.session
++  }
++
++  private async intent(session: RouterSession, options: LanguageModelV3CallOptions) {
++    const prompt = promptText(options.prompt)
++    const response = await this.input.fetch(`${this.input.baseURL}/models/session/intent`, {
++      method: "POST",
++      headers: { "Content-Type": "text/plain;charset=UTF-8", "copilot-session-token": session.token },
++      body: JSON.stringify({
++        prompt,
++        available_models: session.availableModels,
++        session_id: `opencode-session://${autoModelID}`,
++        reference_count: 0,
++        prompt_char_count: prompt.length,
++        turn_number: options.prompt.filter((message) => message.role === "user").length,
++        routing_method: "hydra",
++        copilot_plan: "individual",
++      }),
++      signal: signal(options.abortSignal),
++    })
++    if (!response.ok) throw new Error(`Failed to route Copilot auto model: ${response.status}`)
++    const chosen = Option.getOrUndefined(decodeIntent(await response.json()))?.chosen_model
++    // Never route to a model that the session did not offer.
++    return chosen && session.availableModels.includes(chosen) ? chosen : undefined
++  }
++}
++
++function signal(abort: AbortSignal | undefined) {
++  const timeout = AbortSignal.timeout(requestTimeout)
++  return abort ? AbortSignal.any([abort, timeout]) : timeout
++}
++
++function promptText(prompt: LanguageModelV3Prompt) {
++  const message = prompt.findLast((item) => item.role === "user")
++  if (message?.role !== "user") return ""
++  return message.content.flatMap((part) => (part.type === "text" ? [part.text] : [])).join("\n")
++}
+diff --git a/packages/core/src/github-copilot/models.ts b/packages/core/src/github-copilot/models.ts
+index 8af9fbf..c395b51 100644
+--- a/packages/core/src/github-copilot/models.ts
++++ b/packages/core/src/github-copilot/models.ts
+@@ -60,6 +60,14 @@ const RemoteModel = Schema.Struct({
+ const Response = Schema.Struct({ data: Schema.Array(Schema.Unknown) })
+ const decodeResponse = Schema.decodeUnknownSync(Response)
+ const decodeModel = Schema.decodeUnknownOption(RemoteModel)
++const AutoSession = Schema.Struct({ available_models: Schema.optional(Schema.Array(Schema.String)) })
++const decodeAutoSession = Schema.decodeUnknownOption(AutoSession)
++
++export const autoModelID = "auto"
++const autoContextFallback = 128_000
++const autoOutputFallback = 16_384
++
++export type Endpoint = "messages" | "responses" | "chat"
+ 
+ type RemoteModel = typeof RemoteModel.Type
+ type UsableModel = RemoteModel & {
+@@ -79,18 +87,81 @@ export async function get(baseURL: string, headers: RequestInit["headers"], exis
+ export type Snapshot = ReadonlyMap<string, UsableModel>
+ 
+ export async function load(baseURL: string, headers: RequestInit["headers"]): Promise<Snapshot> {
+-  const response = await fetch(`${baseURL}/models`, {
+-    headers,
+-    signal: AbortSignal.timeout(5_000),
+-  })
++  const [response, routable] = await Promise.all([
++    fetch(`${baseURL}/models`, {
++      headers,
++      signal: AbortSignal.timeout(5_000),
++    }),
++    autoRoutable(baseURL, headers),
++  ])
+   if (!response.ok) throw new Error(`Failed to fetch Copilot models: ${response.status}`)
+ 
+-  return new Map(
++  const models = new Map(
+     decodeResponse(await response.json()).data.flatMap((raw) => {
+       const model = Option.getOrUndefined(decodeModel(raw))
+       return model && usable(model) ? ([[model.id, model]] as const) : []
+     }),
+   )
++  // Auto is a routing service that /models never lists. Free and Student plans disable the
++  // picker on every listed model, so without it the provider has nothing to select.
++  models.set(autoModelID, autoModel(models, routable))
++  return models
++}
++
++export function endpoint(remote: Pick<RemoteModel, "supported_endpoints">): Endpoint | undefined {
++  if (remote.supported_endpoints?.includes("/v1/messages")) return "messages"
++  if (remote.supported_endpoints?.includes("/responses")) return "responses"
++  if (remote.supported_endpoints?.includes("/chat/completions")) return "chat"
++  return undefined
++}
++
++// The Auto session is the only authoritative list of the models Auto may route to: /models
++// also lists utility models that Auto never selects.
++async function autoRoutable(baseURL: string, headers: RequestInit["headers"]) {
++  const request = new Headers(headers)
++  request.set("Content-Type", "text/plain;charset=UTF-8")
++  return fetch(`${baseURL}/models/session`, {
++    method: "POST",
++    headers: request,
++    body: JSON.stringify({ auto_mode: { model_hints: [autoModelID] } }),
++    signal: AbortSignal.timeout(5_000),
++  })
++    .then(async (response) => {
++      if (!response.ok) return undefined
++      const models = Option.getOrUndefined(decodeAutoSession(await response.json()))?.available_models
++      return models?.length ? models : undefined
++    })
++    .catch(() => undefined)
++}
++
++// Size Auto from the models it can route to, so compaction triggers before the smallest of
++// them overflows. Without that list, use conservative defaults instead of the smallest model
++// on the account, which is usually a utility model that Auto never selects.
++function autoModel(models: Snapshot, routable: readonly string[] | undefined): UsableModel {
++  const limits = (routable ?? []).flatMap((id) => {
++    const model = models.get(id)
++    return model ? [model.capabilities.limits] : []
++  })
++  const min = (pick: (limit: UsableModel["capabilities"]["limits"]) => number | undefined, fallback: number) => {
++    const values = limits.map(pick).filter((value): value is number => value !== undefined && value > 0)
++    return values.length ? Math.min(...values) : fallback
++  }
++  const prompt = min((limit) => limit.max_prompt_tokens, autoContextFallback)
++  return {
++    model_picker_enabled: true,
++    id: autoModelID,
++    name: "Auto",
++    version: autoModelID,
++    capabilities: {
++      family: autoModelID,
++      limits: {
++        max_context_window_tokens: min((limit) => limit.max_context_window_tokens ?? limit.max_prompt_tokens, prompt),
++        max_output_tokens: min((limit) => limit.max_output_tokens, autoOutputFallback),
++        max_prompt_tokens: prompt,
++      },
++      supports: { streaming: true, tool_calls: true },
++    },
++  }
+ }
+ 
+ /** Combine remote facts with source templates, never a previously transformed model result. */
+@@ -127,14 +198,8 @@ function usable(model: RemoteModel): model is UsableModel {
+ }
+ 
+ function build(id: Model.ID, remote: UsableModel, baseURL: string, previous?: Model.Info) {
+-  const messages = remote.supported_endpoints?.includes("/v1/messages") ?? false
+-  const endpoint = messages
+-    ? "messages"
+-    : remote.supported_endpoints?.includes("/responses")
+-      ? "responses"
+-      : remote.supported_endpoints?.includes("/chat/completions")
+-        ? "chat"
+-        : undefined
++  const route = endpoint(remote)
++  const messages = route === "messages"
+   const image =
+     (remote.capabilities.supports.vision ?? false) ||
+     (remote.capabilities.limits.vision?.supported_media_types ?? []).some((item) => item.startsWith("image/"))
+@@ -162,7 +227,7 @@ function build(id: Model.ID, remote: UsableModel, baseURL: string, previous?: Mo
+     package: messages ? "@opencode/ai/providers/anthropic" : Provider.aisdk("@ai-sdk/github-copilot"),
+     settings: Provider.mergeOverlay(previous?.settings, {
+       baseURL: messages ? `${baseURL}/v1` : baseURL,
+-      ...(endpoint ? { endpoint } : {}),
++      ...(route ? { endpoint: route } : {}),
+     }),
+     headers: previous?.headers,
+     body: previous?.body,
+diff --git a/packages/core/src/plugin/provider/github-copilot.ts b/packages/core/src/plugin/provider/github-copilot.ts
+index 19de498..003f738 100644
+--- a/packages/core/src/plugin/provider/github-copilot.ts
++++ b/packages/core/src/plugin/provider/github-copilot.ts
+@@ -4,6 +4,8 @@ import { Effect, Option, Schema, Semaphore, Stream } from "effect"
+ import { IntegrationConnection } from "../../integration/connection.js"
+ import { Credential } from "../../credential.js"
+ import { Bus } from "../../bus.js"
++import type { LanguageEvent } from "../../aisdk.js"
++import { CopilotAuto } from "../../github-copilot/auto.js"
+ import { CopilotModels } from "../../github-copilot/models.js"
+ import { App } from "../../app.js"
+ import { Integration } from "../../integration.js"
+@@ -330,33 +332,40 @@ export const GithubCopilotPlugin = define({
+       "language",
+       Effect.fn(function* (evt) {
+         if (evt.model.providerID !== Provider.ID.githubCopilot) return
+-        if (evt.sdk.responses === undefined && evt.sdk.chat === undefined) {
+-          evt.language = evt.sdk.languageModel(evt.model.modelID ?? evt.model.id)
+-          return
+-        }
+-        if (evt.options.endpoint === "responses" && evt.sdk.responses) {
+-          evt.language = evt.sdk.responses(evt.model.modelID ?? evt.model.id)
+-          return
+-        }
+-        if (evt.options.endpoint === "chat" && evt.sdk.chat) {
+-          evt.language = evt.sdk.chat(evt.model.modelID ?? evt.model.id)
++        const id = evt.model.modelID ?? evt.model.id
++        if (id !== CopilotModels.autoModelID) {
++          evt.language = language(evt.sdk, id, evt.options.endpoint)
+           return
+         }
+-        const id = evt.model.modelID ?? evt.model.id
+-        // Copilot serves Grok and MAI Code only on /responses, and Gemini only on
+-        // /chat/completions; advertised endpoint metadata above wins whenever the
+-        // live model list provides it.
+-        const gpt = /^gpt-(\d+)/.exec(id)
+-        const responses =
+-          (gpt !== null && Number(gpt[1]) >= 5 && !id.startsWith("gpt-5-mini")) ||
+-          id.startsWith("grok-") ||
+-          id.startsWith("mai-code-")
+-        evt.language = responses ? evt.sdk.responses(id) : evt.sdk.chat(id)
++        const apiKey = typeof evt.options.apiKey === "string" ? evt.options.apiKey : undefined
++        evt.language = CopilotAuto.create({
++          baseURL: typeof evt.options.baseURL === "string" ? evt.options.baseURL : (loaded.baseURL ?? baseURL()),
++          fetch: copilotFetch(apiKey, undefined, ctx.app),
++          language: (routed) => {
++            const remote = loaded.models?.get(routed)
++            return language(evt.sdk, routed, remote && CopilotModels.endpoint(remote))
++          },
++        })
+       }),
+     )
+   }),
+ } satisfies PluginInternal.InternalPlugin)
+ 
++function language(sdk: LanguageEvent["sdk"], id: string, endpoint: unknown) {
++  if (sdk.responses === undefined && sdk.chat === undefined) return sdk.languageModel(id)
++  if (endpoint === "responses" && sdk.responses) return sdk.responses(id)
++  if (endpoint === "chat" && sdk.chat) return sdk.chat(id)
++  // Copilot serves Grok and MAI Code only on /responses, and Gemini only on
++  // /chat/completions; advertised endpoint metadata above wins whenever the
++  // live model list provides it.
++  const gpt = /^gpt-(\d+)/.exec(id)
++  const responses =
++    (gpt !== null && Number(gpt[1]) >= 5 && !id.startsWith("gpt-5-mini")) ||
++    id.startsWith("grok-") ||
++    id.startsWith("mai-code-")
++  return responses ? sdk.responses(id) : sdk.chat(id)
++}
++
+ function normalizeDomain(input: string) {
+   return input.replace(/^https?:\/\//, "").replace(/\/$/, "")
+ }
+diff --git a/packages/core/test/github-copilot/auto.test.ts b/packages/core/test/github-copilot/auto.test.ts
+new file mode 100644
+index 0000000..c424437
+--- /dev/null
++++ b/packages/core/test/github-copilot/auto.test.ts
+@@ -0,0 +1,104 @@
++import type { LanguageModelV3, LanguageModelV3CallOptions } from "@ai-sdk/provider"
++import { expect, test } from "bun:test"
++import { CopilotAuto } from "@opencode/core/github-copilot/auto"
++
++type Route = (url: string, init?: RequestInit) => Response
++
++const options = {
++  prompt: [
++    { role: "system", content: "You are a coding agent." },
++    { role: "user", content: [{ type: "text", text: "first" }] },
++    { role: "assistant", content: [{ type: "text", text: "done" }] },
++    { role: "user", content: [{ type: "text", text: "refactor the parser" }] },
++  ],
++} satisfies LanguageModelV3CallOptions
++
++const session = (expiresIn = 3600) =>
++  Response.json({
++    available_models: ["big", "small"],
++    selected_model: "big",
++    session_token: "session",
++    expires_at: Math.floor(Date.now() / 1000) + expiresIn,
++  })
++
++function router(route: Route) {
++  const requests: Array<{ url: string; init?: RequestInit }> = []
++  const calls: Array<{ modelID: string; headers: LanguageModelV3CallOptions["headers"] }> = []
++  const model = CopilotAuto.create({
++    baseURL: "https://api.githubcopilot.com",
++    fetch: async (input, init) => {
++      const url = String(input)
++      requests.push({ url, init })
++      return route(url, init)
++    },
++    language: (modelID) =>
++      ({
++        specificationVersion: "v3",
++        provider: "test",
++        modelId: modelID,
++        supportedUrls: {},
++        doGenerate: async (call: LanguageModelV3CallOptions) => {
++          calls.push({ modelID, headers: call.headers })
++          return { modelID } as unknown as Awaited<ReturnType<LanguageModelV3["doGenerate"]>>
++        },
++        doStream: async (call: LanguageModelV3CallOptions) => {
++          calls.push({ modelID, headers: call.headers })
++          return { modelID } as unknown as Awaited<ReturnType<LanguageModelV3["doStream"]>>
++        },
++      }) satisfies LanguageModelV3,
++  })
++  return { model, requests, calls }
++}
++
++test("routes each turn to the model that the router chooses", async () => {
++  const { model, requests, calls } = router((url) =>
++    url.endsWith("/models/session") ? session() : Response.json({ chosen_model: "small" }),
++  )
++
++  await model.doStream(options)
++
++  expect(model.modelId).toBe("auto")
++  expect(calls).toEqual([{ modelID: "small", headers: { "copilot-session-token": "session" } }])
++  expect(requests.map((request) => request.url)).toEqual([
++    "https://api.githubcopilot.com/models/session",
++    "https://api.githubcopilot.com/models/session/intent",
++  ])
++  expect(new Headers(requests[1]?.init?.headers).get("copilot-session-token")).toBe("session")
++  expect(JSON.parse(String(requests[1]?.init?.body))).toMatchObject({
++    prompt: "refactor the parser",
++    available_models: ["big", "small"],
++    prompt_char_count: "refactor the parser".length,
++    turn_number: 2,
++  })
++})
++
++test("falls back to the session model when routing fails or picks a model that the session did not offer", async () => {
++  const intents = [new Response("unavailable", { status: 503 }), Response.json({ chosen_model: "elsewhere" })]
++  const { model, calls } = router((url) => (url.endsWith("/models/session") ? session() : intents.shift()!))
++
++  await model.doGenerate(options)
++  await model.doGenerate(options)
++
++  expect(calls.map((call) => call.modelID)).toEqual(["big", "big"])
++})
++
++test("reuses the router session until it is about to expire", async () => {
++  const opened = async (expiresIn: number) => {
++    const { model, requests } = router((url) =>
++      url.endsWith("/models/session") ? session(expiresIn) : Response.json({ chosen_model: "small" }),
++    )
++    await model.doGenerate(options)
++    await model.doGenerate(options)
++    return requests.filter((request) => request.url.endsWith("/models/session")).length
++  }
++
++  expect(await opened(3600)).toBe(1)
++  expect(await opened(10)).toBe(2)
++})
++
++test("fails the request when Copilot refuses the router session", async () => {
++  const { model, calls } = router(() => new Response("unauthorized", { status: 401 }))
++
++  await expect(model.doGenerate(options)).rejects.toThrow("Failed to create Copilot auto session: 401")
++  expect(calls).toEqual([])
++})
+diff --git a/packages/core/test/github-copilot/models.test.ts b/packages/core/test/github-copilot/models.test.ts
+index 0080cf0..ac488a1 100644
+--- a/packages/core/test/github-copilot/models.test.ts
++++ b/packages/core/test/github-copilot/models.test.ts
+@@ -119,6 +119,93 @@ test("defensively syncs advertised Copilot models", async () => {
+   }
+ })
+ 
++const limited = (id: string, limits: Record<string, number>, extra: Record<string, unknown> = {}) => ({
++  model_picker_enabled: true,
++  id,
++  name: id,
++  version: `${id}-2026-08-01`,
++  capabilities: { family: id, limits, supports: { streaming: true, tool_calls: true } },
++  ...extra,
++})
++
++test("keeps Copilot selectable when the plan disables every model picker flag", async () => {
++  // Free and Student plans disable the picker on every listed model and only reach inference through Auto.
++  const server = Bun.serve({
++    port: 0,
++    fetch: (request) =>
++      new URL(request.url).pathname === "/models"
++        ? Response.json({
++            data: [
++              limited(
++                "gpt-5-mini",
++                { max_context_window_tokens: 128000, max_output_tokens: 16384, max_prompt_tokens: 128000 },
++                { model_picker_enabled: false, policy: { state: "enabled" } },
++              ),
++              limited(
++                "claude-opus-5",
++                { max_context_window_tokens: 400000, max_output_tokens: 128000, max_prompt_tokens: 272000 },
++                { model_picker_enabled: false, policy: { state: "disabled" } },
++              ),
++            ],
++          })
++        : new Response("not found", { status: 404 }),
++  })
++
++  try {
++    const models = await CopilotModels.get(server.url.origin, {}, [])
++    const auto = models.get(Model.ID.make("auto"))
++
++    expect(auto?.enabled).toBe(true)
++    expect(auto?.modelID).toBe(Model.ID.make("auto"))
++    expect(auto?.package).toBe(Provider.aisdk("@ai-sdk/github-copilot"))
++    expect(auto?.settings).toEqual({ baseURL: server.url.origin })
++    expect(auto?.capabilities.tools).toBe(true)
++    expect(auto?.limit).toEqual({ context: 128000, input: 128000, output: 16384 })
++    expect(models.get(Model.ID.make("gpt-5-mini"))?.enabled).toBe(false)
++    expect(models.has(Model.ID.make("claude-opus-5"))).toBe(false)
++  } finally {
++    await server.stop(true)
++  }
++})
++
++test("sizes Auto from the models that its session can route to", async () => {
++  const sessions: Array<{ authorization: string | null; contentType: string | null }> = []
++  const server = Bun.serve({
++    port: 0,
++    fetch: (request) => {
++      if (new URL(request.url).pathname === "/models/session") {
++        sessions.push({
++          authorization: request.headers.get("authorization"),
++          contentType: request.headers.get("content-type"),
++        })
++        return Response.json({
++          available_models: ["big", "small"],
++          selected_model: "big",
++          session_token: "session",
++          expires_at: Math.floor(Date.now() / 1000) + 3600,
++        })
++      }
++      return Response.json({
++        data: [
++          // Listed on the account but never routed to, so it must not shrink the context of Auto.
++          limited("utility", { max_context_window_tokens: 16384, max_output_tokens: 4096, max_prompt_tokens: 16384 }),
++          limited("big", { max_context_window_tokens: 400000, max_output_tokens: 128000, max_prompt_tokens: 272000 }),
++          limited("small", { max_context_window_tokens: 64000, max_output_tokens: 8192, max_prompt_tokens: 64000 }),
++        ],
++      })
++    },
++  })
++
++  try {
++    const models = await CopilotModels.get(server.url.origin, { Authorization: "Bearer token" }, [])
++
++    expect(models.get(Model.ID.make("auto"))?.limit).toEqual({ context: 64000, input: 64000, output: 8192 })
++    expect(sessions).toEqual([{ authorization: "Bearer token", contentType: "text/plain;charset=UTF-8" }])
++  } finally {
++    await server.stop(true)
++  }
++})
++
+ test("prices cache reads from either token price spelling", async () => {
+   // API version 2026-08-01 renamed cache_price to cache_read_price; older payloads still use cache_price.
+   const item = (id: string, prices: Record<string, number>) => ({
+diff --git a/packages/core/test/plugin/provider-github-copilot.test.ts b/packages/core/test/plugin/provider-github-copilot.test.ts
+index 17f764b..561364b 100644
+--- a/packages/core/test/plugin/provider-github-copilot.test.ts
++++ b/packages/core/test/plugin/provider-github-copilot.test.ts
+@@ -612,6 +612,57 @@ describe("GithubCopilotPlugin", () => {
+     }),
+   )
+ 
++  it.live("routes the Copilot auto model to the transport of the model that the router selects", () =>
++    Effect.gen(function* () {
++      const aisdk = yield* AISDK.Service
++      const calls: string[] = []
++      const requests: Array<{ path: string; authorization: string | null }> = []
++      const server = Bun.serve({
++        port: 0,
++        fetch: (request) => {
++          const path = new URL(request.url).pathname
++          requests.push({ path, authorization: request.headers.get("authorization") })
++          return path === "/models/session"
++            ? Response.json({
++                available_models: ["gpt-5", "claude-sonnet-4"],
++                selected_model: "claude-sonnet-4",
++                session_token: "session",
++                expires_at: Math.floor(Date.now() / 1000) + 3600,
++              })
++            : Response.json({ chosen_model: "gpt-5" })
++        },
++      })
++      yield* Effect.addFinalizer(() => Effect.promise(() => server.stop(true)))
++      const transport = (method: string) => (id: string) => {
++        calls.push(`${method}:${id}`)
++        return { specificationVersion: "v3", provider: method, modelId: id, doGenerate: async () => ({}) }
++      }
++      yield* addPlugin()
++      const result = yield* aisdk.runLanguage({
++        model: Model.Info.make({
++          ...Model.Info.default(Provider.ID.make("github-copilot"), Model.ID.make("auto")),
++          modelID: Model.ID.make("auto"),
++          package: "aisdk:test-provider",
++        }),
++        sdk: { responses: transport("responses"), chat: transport("chat") },
++        options: { apiKey: "token", baseURL: server.url.origin },
++      })
++      expect(result.language?.modelId).toBe("auto")
++      expect(calls).toEqual([])
++
++      yield* Effect.promise(() =>
++        required(result.language).doGenerate({
++          prompt: [{ role: "user", content: [{ type: "text", text: "hello" }] }],
++        }),
++      )
++      expect(calls).toEqual(["responses:gpt-5"])
++      expect(requests).toEqual([
++        { path: "/models/session", authorization: "Bearer token" },
++        { path: "/models/session/intent", authorization: "Bearer token" },
++      ])
++    }),
++  )
++
+   it.effect("disables gpt-5-chat-latest before Copilot language selection", () =>
+     Effect.gen(function* () {
+       const providers = yield* Provider.Service

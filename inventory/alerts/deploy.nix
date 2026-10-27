@@ -27,6 +27,17 @@
         }
 
         {
+          alert = "HomeUpgradeFailed";
+          expr = ''fleet_user_systemd_unit_failed{name="fleet-home-upgrade.service"} == 1'';
+          for = "15m";
+          labels.severity = "warning";
+          annotations = {
+            summary = "{{ $labels.host }} home upgrade failed";
+            description = "{{ $labels.user }} is still on the previous Home Manager generation. Check: journalctl --user -u fleet-home-upgrade";
+          };
+        }
+
+        {
           alert = "UpgradeStalled";
           expr = ''(time() - fleet_upgrade_last_success_timestamp_seconds) > 3 * 86400 unless on(host) fleet_upgrade_state{state="held"} == 1'';
           for = "1h";

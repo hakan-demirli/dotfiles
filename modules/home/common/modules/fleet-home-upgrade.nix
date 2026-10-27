@@ -30,7 +30,13 @@ let
         exit 0
       }
 
-      current="$(cat "$active/fleet-revision" 2>/dev/null || true)"
+      fail() {
+        echo "fleet-home-upgrade: failed ($1)" >&2
+        exit 1
+      }
+
+      generation="$(readlink -e "$active")" || fail no-active-generation
+      current="$(cat "$generation/fleet-revision")" || fail no-generation-revision
       system="$(/run/current-system/sw/bin/nixos-version --configuration-revision 2>/dev/null || true)"
       plan="$(curl -fsS --connect-timeout 10 --max-time 60 "$plan_url")" || finish offline plan-unreachable
       deployed() {

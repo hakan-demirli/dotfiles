@@ -101,12 +101,12 @@ pkgs.testers.runNixOSTest {
     def completed():
         return as_user("cat ~/.fleet-completed").strip()
 
-    def upgrade(expected):
+    def upgrade(expected, outcome="success"):
         machine.execute("su - ${username} -c 'XDG_RUNTIME_DIR=/run/user/1000 systemctl --user start fleet-home-upgrade.service'")
         log = as_user("journalctl --user -u fleet-home-upgrade.service -o cat")
         run = log.rsplit("Starting ", 1)[-1]
         result = as_user("systemctl --user show --property=Result --value fleet-home-upgrade.service").strip()
-        assert result == "success", f"fleet-home-upgrade.service result={result}\n{log}"
+        assert result == outcome, f"fleet-home-upgrade.service result={result}\n{log}"
         assert f"fleet-home-upgrade: {expected}" in run, log
 
     machine.wait_for_unit("user@1000.service")
@@ -155,6 +155,13 @@ pkgs.testers.runNixOSTest {
     with subtest("a dirty generation is left alone"):
         as_user("${local}/activate")
         upgrade("held (local)")
+        assert generation() == "${running}-dirty"
+
+    with subtest("an unreadable active generation fails instead of holding"):
+        as_user("ln -sfnT /nix/store/00000000000000000000000000000000-home-manager-generation ~/.local/state/home-manager/gcroots/current-home")
+        upgrade("failed (no-active-generation)", "exit-code")
+        as_user("ln -sfnT ${base}/home-files ~/.local/state/home-manager/gcroots/current-home")
+        upgrade("failed (no-generation-revision)", "exit-code")
         assert generation() == "${running}-dirty"
   '';
 }
