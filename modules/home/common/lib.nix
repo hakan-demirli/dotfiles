@@ -1,22 +1,5 @@
-{
-  allowsPersonalData =
-    facts:
-    builtins.elem (facts.ownership.class or null) [
-      "personal"
-      "leased"
-    ];
-
-  mkUnstablePkgs =
-    {
-      inputs,
-      pkgs,
-    }:
-    import inputs.nixpkgs-unstable {
-      inherit (pkgs.stdenv.hostPlatform) system;
-      inherit (pkgs) config;
-    };
-
-  mkHomeConfigurations =
+let
+  mkHomeTargets =
     {
       inputs,
       homeRoot,
@@ -151,31 +134,61 @@
         else
           lib.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir homeRoot));
     in
-    lib.listToAttrs (
-      lib.concatMap (
-        uid:
-        lib.concatLists (
-          lib.mapAttrsToList (
-            pname: pcfg:
-            let
-              value = mkHome (
-                pcfg
-                // {
-                  user = uid;
-                  name = "${uid}.${pname}";
-                  opencode = opencodeEndpoint;
-                }
-              );
-              names = lib.unique (
-                [ "${uid}@${pname}" ]
-                ++
-                  lib.optional (pcfg ? host)
-                    "${inputs.self.lib.inventory.users.${uid}.system_account.username}@${pname}"
-              );
-            in
-            map (name: { inherit name value; }) names
-          ) (configurations uid)
-        )
-      ) discoveredUsers
+    lib.concatMap (
+      uid:
+      lib.mapAttrsToList (
+        pname: pcfg:
+        let
+          name = "${uid}@${pname}";
+        in
+        {
+          inherit name;
+          inherit (pcfg) system;
+          aliases = lib.remove name (
+            lib.optional (pcfg ? host)
+              "${inputs.self.lib.inventory.users.${uid}.system_account.username}@${pname}"
+          );
+          configuration = mkHome (
+            pcfg
+            // {
+              user = uid;
+              name = "${uid}.${pname}";
+              opencode = opencodeEndpoint;
+            }
+          );
+        }
+      ) (configurations uid)
+    ) discoveredUsers;
+in
+{
+  allowsPersonalData =
+    facts:
+    builtins.elem (facts.ownership.class or null) [
+      "personal"
+      "leased"
+    ];
+
+  mkUnstablePkgs =
+    {
+      inputs,
+      pkgs,
+    }:
+    import inputs.nixpkgs-unstable {
+      inherit (pkgs.stdenv.hostPlatform) system;
+      inherit (pkgs) config;
+    };
+
+  inherit mkHomeTargets;
+
+  mkHomeConfigurations =
+    args:
+    builtins.listToAttrs (
+      builtins.concatMap (
+        target:
+        map (name: {
+          inherit name;
+          value = target.configuration;
+        }) ([ target.name ] ++ target.aliases)
+      ) (mkHomeTargets args)
     );
 }
