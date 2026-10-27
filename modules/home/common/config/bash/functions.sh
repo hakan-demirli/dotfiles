@@ -3,8 +3,13 @@
 opencode() {
   if [ -n "${OPENCODE_URL:-}" ]; then
     case "${1:-}" in
-      "" | -s | --session | --session=* | -c | --continue | --fork | --mini)
-        command opencode attach "$OPENCODE_URL" --dir "$PWD" "$@"
+      "" | -s | --session | --session=* | -c | --continue | --prompt | --prompt=* | --auto)
+        command opencode --server "$OPENCODE_URL" "$@"
+        return
+        ;;
+      mini)
+        shift
+        command opencode mini --server "$OPENCODE_URL" "$@"
         return
         ;;
     esac
