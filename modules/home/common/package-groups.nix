@@ -7,6 +7,9 @@ let
   nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { };
   pickNur = name: nurPkgs.${name} or null;
   unstablePkgs = (import ./lib.nix).mkUnstablePkgs { inherit inputs pkgs; };
+  claudeMulti = lib.mapNullable (package: package.override { inherit (unstablePkgs) claude-code; }) (
+    pickNur "opencode-plugins"
+  );
   sendToLaptop = pkgs.callPackage ./pkgs/nix/send-to-laptop.nix { };
 
   autoRefresh = pkgs.writeShellApplication {
@@ -42,6 +45,7 @@ rec {
         cargo
         clang-tools
         unstablePkgs.claude-code
+        claudeMulti
         clippy
         cmake-language-server
         diagnostic-languageserver

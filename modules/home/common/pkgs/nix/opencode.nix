@@ -12,12 +12,7 @@
 }:
 let
   unstablePkgs = (import ../../lib.nix).mkUnstablePkgs { inherit inputs pkgs; };
-  nurPkgs = inputs.nur.packages.${pkgs.stdenv.hostPlatform.system} or { };
-  basePlugins = nurPkgs.opencode-plugins or null;
-  hasPlugins = basePlugins != null;
-  opencodePlugins = lib.mapNullable (
-    plugins: plugins.override { inherit (unstablePkgs) claude-code; }
-  ) basePlugins;
+  supportedMajorVersion = "2";
   opencodePackage = unstablePkgs.opencode.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [ ./patches/opencode-copilot-auto.patch ];
     doCheck = true;
@@ -36,26 +31,14 @@ let
   ];
 
   opencodeConfigDir = ../../config/opencode;
-  localPluginsDir = opencodeConfigDir + "/plugins";
-  dotfileEntries =
+  opencodeConfigEntries =
     if builtins.pathExists opencodeConfigDir then
       lib.mapAttrsToList (name: _type: {
         inherit name;
         path = opencodeConfigDir + "/${name}";
-      }) (builtins.removeAttrs (builtins.readDir opencodeConfigDir) [ "plugins" ])
+      }) (builtins.readDir opencodeConfigDir)
     else
       [ ];
-  mergedPlugins = pkgs.symlinkJoin {
-    name = "opencode-plugins";
-    paths =
-      lib.optional hasPlugins "${opencodePlugins}/plugins"
-      ++ lib.optional (builtins.pathExists localPluginsDir) localPluginsDir;
-  };
-  pluginEntries = lib.optional (hasPlugins || builtins.pathExists localPluginsDir) {
-    name = "plugins";
-    path = mergedPlugins;
-  };
-  opencodeConfigEntries = dotfileEntries ++ pluginEntries;
   opencodeConfig = pkgs.linkFarm "opencode-config" opencodeConfigEntries;
 
   requireServerPassword = pkgs.writeShellApplication {
@@ -69,8 +52,15 @@ let
   };
 in
 {
+  assertions = [
+    {
+      assertion = lib.versions.major opencodePackage.version == supportedMajorVersion;
+      message = "opencode ${opencodePackage.version} is not major version ${supportedMajorVersion}. A major release breaks the plugin and server APIs, so review opencode.json and the plugins before raising supportedMajorVersion.";
+    }
+  ];
+
   home = {
-    packages = [ opencodePackage ] ++ lib.optional hasPlugins opencodePlugins;
+    packages = [ opencodePackage ];
     sessionVariables = lib.optionalAttrs ((import ../../lib.nix).allowsPersonalData facts) {
       OPENCODE_URL = serverUrl;
     };

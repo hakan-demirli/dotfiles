@@ -1,42 +1,79 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": {
-    "external_directory": {
-      "/nix/store/**": "allow",
-      "/tmp/**": "allow",
-      "/sys/**": "allow",
-      "/proc/**": "allow",
-      "/bin/**": "allow",
-      "/boot/**": "allow",
-      "~/Desktop/**": "allow",
-      "~/.storage/persistent/Desktop/**": "allow"
+  "permissions": [
+    {
+      "action": "external_directory",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/nix/store/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/tmp/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/sys/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/proc/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/bin/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/boot/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/Desktop/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.storage/persistent/Desktop/*",
+      "effect": "allow"
     }
-  },
-  "autoupdate": false,
+  ],
+  "update": "disable",
   "lsp": false,
   "formatter": false,
-  "snapshot": false,
+  "snapshots": false,
   "instructions": [".agent/*.md", ".hydrate/agent/*.md"],
-  "provider": {
+  "providers": {
     "gufo": {
       "name": "Gufo",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
+      "package": "aisdk:@ai-sdk/openai-compatible",
+      "settings": {
         "baseURL": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8080/v1",
         "apiKey": "local"
       },
       "models": {
         "coding": {
           "name": "Gufo Coding",
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "modalities": {
+          "capabilities": {
+            "tools": true,
+            "temperature": true,
             "input": ["text"],
-            "output": ["text"]
+            "output": ["text"],
+            "reasoning": {
+              "supported": true
+            }
+          },
+          "compatibility": {
+            "reasoningField": "reasoning_content"
           },
           "cost": {
             "input": 0,
@@ -47,48 +84,67 @@
             "input": 253952,
             "output": 8192
           },
-          "options": {
+          "settings": {
             "reasoningEffort": "medium"
           },
-          "variants": {
-            "off": {
-              "reasoningEffort": "none"
+          "variants": [
+            {
+              "id": "off",
+              "settings": {
+                "reasoningEffort": "none"
+              }
             },
-            "minimal": {
-              "reasoningEffort": "minimal"
+            {
+              "id": "minimal",
+              "settings": {
+                "reasoningEffort": "minimal"
+              }
             },
-            "low": {
-              "reasoningEffort": "low"
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low"
+              }
             },
-            "medium": {
-              "reasoningEffort": "medium"
+            {
+              "id": "medium",
+              "settings": {
+                "reasoningEffort": "medium"
+              }
             },
-            "high": {
-              "reasoningEffort": "high"
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high"
+              }
             },
-            "xhigh": {
-              "reasoningEffort": "xhigh"
+            {
+              "id": "xhigh",
+              "settings": {
+                "reasoningEffort": "xhigh"
+              }
             },
-            "max": {
-              "reasoningEffort": "max"
+            {
+              "id": "max",
+              "settings": {
+                "reasoningEffort": "max"
+              }
             }
-          }
+          ]
         }
       }
     },
     "proxy-anthropic": {
       "name": "Proxy Anthropic",
-      "npm": "@ai-sdk/anthropic",
-      "options": {
+      "canonical": "anthropic",
+      "package": "aisdk:@ai-sdk/anthropic",
+      "settings": {
         "baseURL": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
         "apiKey": "local"
       },
       "models": {
         "claude-opus-5-5": {
           "name": "Claude Opus 5.5",
-          "reasoning": true,
-          "tool_call": true,
-          "attachment": true,
           "limit": {
             "context": 1000000,
             "output": 128000
@@ -96,9 +152,6 @@
         },
         "claude-sonnet-5-5": {
           "name": "Claude Sonnet 5.5",
-          "reasoning": true,
-          "tool_call": true,
-          "attachment": true,
           "limit": {
             "context": 1000000,
             "output": 128000
@@ -106,9 +159,6 @@
         },
         "claude-fable-5-1": {
           "name": "Claude Fable 5.1",
-          "reasoning": true,
-          "tool_call": true,
-          "attachment": true,
           "limit": {
             "context": 1000000,
             "output": 128000
@@ -116,9 +166,6 @@
         },
         "claude-haiku-4-5-20251001": {
           "name": "Claude Haiku 4.5",
-          "reasoning": true,
-          "tool_call": true,
-          "attachment": true,
           "limit": {
             "context": 200000,
             "output": 64000
@@ -128,17 +175,15 @@
     },
     "proxy-openai": {
       "name": "Proxy OpenAI",
-      "npm": "@ai-sdk/openai",
-      "options": {
+      "canonical": "openai",
+      "package": "aisdk:@ai-sdk/openai",
+      "settings": {
         "baseURL": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
         "apiKey": "local"
       },
       "models": {
         "gpt-6-astra": {
           "name": "GPT-6 Astra",
-          "reasoning": true,
-          "tool_call": true,
-          "attachment": true,
           "limit": {
             "context": 1050000,
             "input": 922000,
@@ -147,9 +192,6 @@
         },
         "gpt-6.1-sol": {
           "name": "GPT-6.1 Sol",
-          "reasoning": true,
-          "tool_call": true,
-          "attachment": true,
           "limit": {
             "context": 1050000,
             "input": 922000,
@@ -158,9 +200,6 @@
         },
         "gpt-6-luna": {
           "name": "GPT-6 Luna",
-          "reasoning": true,
-          "tool_call": true,
-          "attachment": true,
           "limit": {
             "context": 1050000,
             "input": 922000,
@@ -181,5 +220,5 @@
       }
     }
   },
-  "plugin": ["opencode-gemini-auth@latest", "@mohak34/opencode-notifier@latest"]
+  "plugins": ["@mohak34/opencode-notifier@1.1.1"]
 }
