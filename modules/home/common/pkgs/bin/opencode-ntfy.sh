@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly NTFY_URL="http://vps-oracle-0:8111/emre-opencode"
+NTFY_URL="$(< "${XDG_CONFIG_HOME:-$HOME/.config}/infra/services/ntfy")/emre-opencode"
+readonly NTFY_URL
 readonly DESKTOP_HOST="laptop-1"
 
 usage() {

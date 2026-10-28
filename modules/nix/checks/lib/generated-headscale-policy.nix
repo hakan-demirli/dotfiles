@@ -28,7 +28,9 @@ pkgs.testers.runNixOSTest {
     import json
     from pathlib import Path
 
-    policy = json.loads(Path("${aclFile}").read_text())
+    policy = json.loads("\n".join(
+        line for line in Path("${aclFile}").read_text().splitlines() if not line.startswith("//")
+    ))
     assert [
         rule for rule in policy["acls"]
         if "guest-0@" in rule["src"]
