@@ -15,6 +15,7 @@ let
   incompleteDir = "${downloadDir}/.incomplete";
   mediaDir = "${downloadDir}/media";
   tailnetUrl = "http://100.64.0.1";
+  impermanenceEnabled = host.impermanence.enable or false;
 
 in
 {
@@ -101,6 +102,36 @@ in
     };
 
     cluster-victoriametrics.targetDomain = "ts.sshr.polarbearvuzi.com";
+
+    cliproxyapi = {
+      enable = true;
+      settings = {
+        config-version = 8;
+        server.host = "";
+        management = {
+          secret-key = "";
+          disable-control-panel = true;
+        };
+        routing = {
+          strategy = "fill-first";
+          session-affinity = true;
+          session-affinity-rebind-on = "quota";
+          cooldown.save-cooldown-status = true;
+        };
+      };
+    };
+  };
+
+  cluster.firewall.tailnetOnlyTCPPorts = [ config.services.cliproxyapi.settings.server.port ];
+
+  environment.persistence = lib.mkIf impermanenceEnabled {
+    "/persist/system".directories = [
+      {
+        directory = "/var/lib/cliproxyapi";
+        inherit (config.services.cliproxyapi) user group;
+        mode = "0700";
+      }
+    ];
   };
 
   users.users.${primaryUser}.linger = true;

@@ -22,7 +22,7 @@
       ]
     },
     "proxy-anthropic": {
-      "baseUrl": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8317",
+      "baseUrl": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317",
       "api": "anthropic-messages",
       "apiKey": "local",
       "models": [
@@ -94,7 +94,7 @@
       ]
     },
     "proxy-openai": {
-      "baseUrl": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8317/v1",
+      "baseUrl": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
       "api": "openai-responses",
       "apiKey": "local",
       "models": [

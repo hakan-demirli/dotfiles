@@ -14,5 +14,10 @@
       src = [ "tag:cluster-user-0-fleet" ];
       dst = [ "tag:cluster-user-0-fleet-controller:8111" ];
     }
+    {
+      action = "accept";
+      src = [ "tag:cluster-user-0-fleet" ];
+      dst = [ "tag:cluster-user-0-fleet-controller:8317" ];
+    }
   ];
 }
