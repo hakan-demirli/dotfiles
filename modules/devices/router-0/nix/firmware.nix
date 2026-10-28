@@ -28,6 +28,10 @@ let
     CONFIG_TARGET_mediatek_filogic=y
     CONFIG_TARGET_mediatek_filogic_DEVICE_glinet_gl-be10000=y
 
+    CONFIG_DEVEL=y
+    CONFIG_TOOLCHAINOPTS=y
+    # CONFIG_GDB is not set
+
     CONFIG_PACKAGE_wpad-openssl=y
     # CONFIG_PACKAGE_wpad-basic-mbedtls is not set
 
