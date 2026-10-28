@@ -5,6 +5,7 @@ let
     aarch64-linux = "ubuntu-24.04-arm";
     aarch64-darwin = "macos-14";
   };
+  portableSystem = "x86_64-linux";
   costs = [
     "heavy"
     "light"
@@ -20,12 +21,17 @@ let
     else
       throw "checks.${system}.${name}.${attribute} is ${builtins.toJSON value}, expected one of: ${lib.concatStringsSep ", " allowed}";
 
+  scopeOf = trait "ciScope" [
+    "native"
+    "portable"
+  ] "native";
   costOf = trait "ciCost" costs "light";
 
-  jobs = inputs.nix-github-actions.lib.mkGithubMatrix {
-    inherit (inputs.self) checks;
-    inherit platforms;
-  };
+  checks = lib.mapAttrs (
+    system: lib.filterAttrs (name: _: scopeOf system name == "native" || system == portableSystem)
+  ) inputs.self.checks;
+
+  jobs = inputs.nix-github-actions.lib.mkGithubMatrix { inherit checks platforms; };
 in
 {
   flake.githubActions = jobs // {
