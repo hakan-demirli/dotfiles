@@ -54,10 +54,6 @@ fi
 
 tmux_harpoon_sync.sh
 
-if [[ $buffer_path != *"/default_path"* ]] && grep -q "^$buffer_path:" "$data_file"; then
-  tmux_harpoon_update.sh
-else
-  new_line="$tmux_window,$tmux_command,$buffer_name:$cursor_row:$cursor_col,$buffer_dir,$tmux_pane_path"
-  sed -i "1i$new_line" "$data_file"
-  tmux_harpoon_sync.sh
-fi
+new_line="$tmux_window,$tmux_command,$buffer_name:$cursor_row:$cursor_col,$buffer_dir,$tmux_pane_path"
+sed -i -e "1i$new_line" -e "/^$tmux_window,/d" "$data_file"
+tmux_harpoon_sync.sh
