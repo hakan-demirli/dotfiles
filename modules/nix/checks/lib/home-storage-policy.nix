@@ -26,7 +26,6 @@ let
     ".local/share/opencode" = "persistent";
     ".local/share/state" = "persistent";
     ".local/state/bash" = "persistent";
-    ".local/state/cliproxyapi" = "persistent";
     ".local/state/opencode" = "persistent";
     ".local/state/pi" = "persistent";
     ".local/state/wireplumber" = "persistent";

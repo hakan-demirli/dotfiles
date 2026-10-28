@@ -80,7 +80,7 @@
       "name": "Proxy Anthropic",
       "npm": "@ai-sdk/anthropic",
       "options": {
-        "baseURL": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8317/v1",
+        "baseURL": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
         "apiKey": "local"
       },
       "models": {
@@ -130,7 +130,7 @@
       "name": "Proxy OpenAI",
       "npm": "@ai-sdk/openai",
       "options": {
-        "baseURL": "http://server-dev-3.ts.sshr.polarbearvuzi.com:8317/v1",
+        "baseURL": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
         "apiKey": "local"
       },
       "models": {
@@ -181,10 +181,5 @@
       }
     }
   },
-  "plugin": [
-    "opencode-gemini-auth@latest",
-    "opencode-antigravity-auth-updated@latest",
-    "@mohak34/opencode-notifier@latest",
-    "./plugins/office"
-  ]
+  "plugin": ["opencode-gemini-auth@latest", "@mohak34/opencode-notifier@latest"]
 }
