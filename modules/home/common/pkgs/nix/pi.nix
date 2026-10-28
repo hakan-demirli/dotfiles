@@ -12,11 +12,18 @@ let
   cacheDir = "${config.xdg.cacheHome}/pi";
   settings = (pkgs.formats.json { }).generate "pi-settings.json" cfg.settings;
   proxyUrl = (import ../../lib.nix).serviceUrl inputs "cliproxyapi";
+  proxyApiKey = lib.optionalAttrs (config.sops.secrets ? "cliproxyapi/api-key") {
+    apiKey = "!cat ${config.sops.secrets."cliproxyapi/api-key".path}";
+  };
   models = (pkgs.formats.json { }).generate "models.json" (
     lib.recursiveUpdate (lib.importJSON ../../config/pi/models.json) {
       providers = {
-        proxy-anthropic.baseUrl = proxyUrl;
-        proxy-openai.baseUrl = "${proxyUrl}/v1";
+        proxy-anthropic = proxyApiKey // {
+          baseUrl = proxyUrl;
+        };
+        proxy-openai = proxyApiKey // {
+          baseUrl = "${proxyUrl}/v1";
+        };
       };
     }
   );

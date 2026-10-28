@@ -138,9 +138,7 @@
       "name": "Proxy Anthropic",
       "canonical": "anthropic",
       "package": "aisdk:@ai-sdk/anthropic",
-      "settings": {
-        "apiKey": "local"
-      },
+      "settings": {},
       "models": {
         "claude-opus-5-5": {
           "name": "Claude Opus 5.5",
@@ -176,9 +174,7 @@
       "name": "Proxy OpenAI",
       "canonical": "openai",
       "package": "aisdk:@ai-sdk/openai",
-      "settings": {
-        "apiKey": "local"
-      },
+      "settings": {},
       "models": {
         "gpt-6-astra": {
           "name": "GPT-6 Astra",

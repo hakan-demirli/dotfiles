@@ -31,12 +31,17 @@ let
   ];
 
   opencodeConfigDir = ../../config/opencode;
-  proxyUrl = "${(import ../../lib.nix).serviceUrl inputs "cliproxyapi"}/v1";
+  proxySettings = {
+    baseURL = "${(import ../../lib.nix).serviceUrl inputs "cliproxyapi"}/v1";
+  }
+  // lib.optionalAttrs (config.sops.secrets ? "cliproxyapi/api-key") {
+    apiKey = "{file:${config.sops.secrets."cliproxyapi/api-key".path}}";
+  };
   opencodeSettings = (pkgs.formats.json { }).generate "opencode.json" (
     lib.recursiveUpdate (lib.importJSON (opencodeConfigDir + "/opencode.json")) {
       providers = {
-        proxy-anthropic.settings.baseURL = proxyUrl;
-        proxy-openai.settings.baseURL = proxyUrl;
+        proxy-anthropic.settings = proxySettings;
+        proxy-openai.settings = proxySettings;
       };
     }
   );

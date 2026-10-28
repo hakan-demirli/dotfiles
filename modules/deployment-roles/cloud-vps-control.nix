@@ -113,6 +113,7 @@ in
           host = "";
           inherit (config.cluster.services.cliproxyapi) port;
         };
+        access.api-keys = [ { _secret = config.sops.secrets."cliproxyapi/api-key".path; } ];
         management = {
           secret-key = "";
           disable-control-panel = true;
@@ -135,6 +136,13 @@ in
         mode = "0700";
       }
     ];
+  };
+
+  sops.secrets."cliproxyapi/api-key" = { };
+
+  systemd.services.cliproxyapi = {
+    after = [ "sops-install-secrets.service" ];
+    requires = [ "sops-install-secrets.service" ];
   };
 
   users.users.${primaryUser}.linger = true;
