@@ -89,9 +89,12 @@ in
     })
 
     (lib.mkIf headless {
-      programs.hyprland = {
-        enable = true;
-        withUWSM = true;
+      programs = {
+        hyprland = {
+          enable = true;
+          withUWSM = true;
+        };
+        xwayland.defaultFontPath = "";
       };
 
       systemd.tmpfiles.rules = [
