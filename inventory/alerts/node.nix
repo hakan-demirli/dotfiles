@@ -1,5 +1,8 @@
 let
   inherit (import ./_templates.nix) host;
+  filesystems = ''fstype!~"tmpfs|overlay|squashfs|ramfs|devtmpfs"'';
+  perDevice = expression: "max by (job, instance, device, fstype) (${expression})";
+  usedFraction = perDevice "1 - node_filesystem_avail_bytes{${filesystems}} / node_filesystem_size_bytes{${filesystems}}";
 in
 {
   groups = [
@@ -32,33 +35,35 @@ in
         {
           alert = "DiskFillingFast";
           expr = ''
-            (
-              (node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|devtmpfs"}
-               - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|devtmpfs"})
-              / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|devtmpfs"}
-            ) > 0.90
+            ${perDevice "predict_linear(node_filesystem_avail_bytes{${filesystems}}[6h], 86400)"} < 0
+            and ${perDevice "node_filesystem_avail_bytes{${filesystems}} / node_filesystem_size_bytes{${filesystems}}"} < 0.2
           '';
+          for = "1h";
+          labels.severity = "warning";
+          annotations = {
+            summary = "${host} {{ $labels.device }} fills up within a day";
+            description = "Free space runs out within 24 hours at the rate of the last 6 hours.";
+          };
+        }
+
+        {
+          alert = "DiskAlmostFull";
+          expr = "${usedFraction} > 0.95";
           for = "10m";
           labels.severity = "warning";
           annotations = {
-            summary = "${host} {{ $labels.mountpoint }} is over 90% full";
+            summary = "${host} {{ $labels.device }} is over 95% full";
             description = "{{ $value | humanizePercentage }} used.";
           };
         }
 
         {
           alert = "DiskCritical";
-          expr = ''
-            (
-              (node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|devtmpfs"}
-               - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|devtmpfs"})
-              / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|devtmpfs"}
-            ) > 0.97
-          '';
+          expr = "${usedFraction} > 0.97";
           for = "2m";
           labels.severity = "critical";
           annotations = {
-            summary = "${host} {{ $labels.mountpoint }} is over 97% full";
+            summary = "${host} {{ $labels.device }} is over 97% full";
             description = "{{ $value | humanizePercentage }} used. Free space now.";
           };
         }
