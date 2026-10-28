@@ -128,6 +128,7 @@ assert intent.canHostReach "vps-oracle-0" "laptop-1" "9633";
 assert intent.canHostReach "vps-oracle-0" "router-0" "9100";
 assert intent.canHostReach "laptop-0" "vps-oracle-0" "9428";
 assert intent.canHostReach "laptop-0" "vps-oracle-0" "5101";
+assert intent.canHostReach "laptop-1" "vps-oracle-0" "8317";
 assert intent.canHostReach "server-dev-1" "laptop-1" "873";
 assert !(intent.canHostReach "vps-oracle-0" "laptop-1" "22");
 assert !(intent.canHostReach "vps-oracle-0" "router-0" "22");
@@ -270,6 +271,11 @@ pkgs.runCommand "codegen-smoke"
       done
     done
     pass "headscale-acl: controller monitoring paths present"
+
+    echo "$body" | jq -e \
+      '.acls | any(.action == "accept" and ((.src | index("tag:cluster-user-0-fleet")) != null) and ((.dst | index("tag:cluster-user-0-fleet-controller:8317")) != null))' >/dev/null \
+      || fail "headscale-acl: fleet access to cliproxyapi missing"
+    pass "headscale-acl: fleet access to cliproxyapi present"
 
     for pair in $clusterTagPairs; do
       cid="''${pair%=*}"
