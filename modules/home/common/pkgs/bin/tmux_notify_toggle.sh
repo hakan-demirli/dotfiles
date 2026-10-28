@@ -5,7 +5,7 @@ set -euo pipefail
 STATE_DIR="/tmp/tmux_notify_locks"
 mkdir -p "$STATE_DIR"
 
-NTFY_URL="http://vps-oracle-0:8111/emre-tmux"
+NTFY_URL="$(< "${XDG_CONFIG_HOME:-$HOME/.config}/infra/services/ntfy")/emre-tmux"
 
 PANE_ID=""
 SHELL_PID=""

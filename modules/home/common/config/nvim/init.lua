@@ -88,7 +88,6 @@ function _G.dotfiles_status_mode()
   return mode_names[mode] or mode:upper()
 end
 
--- tmux_harpoon_{add,update}.sh parse this mode/path/line format.
 vim.o.statusline = " %{v:lua.dotfiles_status_mode()} %f %m %= %l:%c "
 
 local map = vim.keymap.set
@@ -102,21 +101,8 @@ map("n", "<leader>=", function()
   vim.lsp.buf.format({ async = false })
 end, { desc = "Format buffer" })
 
-local function update_tmux_harpoon()
-  if vim.env.TMUX and vim.fn.executable("tmux_harpoon_update.sh") == 1 then
-    vim.fn.jobstart({ "tmux_harpoon_update.sh" }, { detach = true })
-  end
-end
-
-map("n", "gn", function()
-  update_tmux_harpoon()
-  vim.cmd.bnext()
-end, { desc = "Next buffer" })
-
-map("n", "gp", function()
-  update_tmux_harpoon()
-  vim.cmd.bprevious()
-end, { desc = "Previous buffer" })
+map("n", "gn", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "gp", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
 
 map("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
 map("n", "gy", vim.lsp.buf.type_definition, { desc = "Go to type definition" })

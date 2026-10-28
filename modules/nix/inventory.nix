@@ -10,7 +10,6 @@ let
   };
 
   upstreamCodegen = infra-lib.lib.mkCodegen { inherit lib inventory; };
-  extraHeadscalePolicy = import ../../inventory/tailnet-acl.nix;
   emptyClusterRules = [
     "^secrets/cluster\\.yml$"
   ]
@@ -18,39 +17,6 @@ let
     lib.filterAttrs (_: cluster: (cluster.secret_paths or { }) == { }) inventory.clusters
   );
   codegen = upstreamCodegen // {
-    headscaleAcl =
-      args@{ pkgs, ... }:
-      let
-        generated = upstreamCodegen.headscaleAcl args;
-      in
-      pkgs.runCommand "headscale-acl"
-        {
-          nativeBuildInputs = [ pkgs.python3 ];
-          extraPolicy = builtins.toJSON extraHeadscalePolicy;
-          passAsFile = [ "extraPolicy" ];
-        }
-        ''
-          mkdir -p $out
-          python3 - ${generated}/policy.hujson "$extraPolicyPath" $out/policy.hujson <<'PY'
-          import json
-          import pathlib
-          import sys
-
-          source = pathlib.Path(sys.argv[1]).read_text()
-          document = "\n".join(
-              line for line in source.splitlines() if not line.lstrip().startswith("//")
-          )
-          policy = json.loads(document)
-          extra = json.loads(pathlib.Path(sys.argv[2]).read_text())
-          for field in ("groups", "tagOwners"):
-              overlap = policy[field].keys() & extra[field].keys()
-              if overlap:
-                  raise ValueError(f"duplicate Headscale {field}: {sorted(overlap)}")
-              policy[field].update(extra[field])
-          policy["acls"].extend(extra["acls"])
-          pathlib.Path(sys.argv[3]).write_text(json.dumps(policy, separators=(",", ":")))
-          PY
-        '';
     sopsYaml =
       args@{ pkgs, ... }:
       let

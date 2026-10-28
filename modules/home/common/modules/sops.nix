@@ -118,6 +118,10 @@ in
           path = "${cfgHome}/secrets/claude/etz";
           mode = "0400";
         };
+        "cliproxyapi/api-key" = {
+          path = "${cfgHome}/secrets/cliproxyapi/api-key";
+          mode = "0400";
+        };
       };
     };
 

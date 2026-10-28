@@ -63,6 +63,21 @@
       clusters = [ ];
       public = [ ];
     };
+    services = {
+      cliproxyapi = {
+        port = 8317;
+        role = "controller";
+      };
+      ntfy = {
+        port = 8111;
+        role = "controller";
+      };
+      syslog = {
+        port = 5514;
+        role = "controller";
+        clients = [ "cluster-router-0" ];
+      };
+    };
   };
 
   keys = {

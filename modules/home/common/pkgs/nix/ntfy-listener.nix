@@ -1,5 +1,4 @@
 {
-  baseUrl ? "http://vps-oracle-0:8111",
   sources ? {
     alerts = "Alerts";
     emre-opencode = "opencode";
@@ -12,12 +11,13 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 let
   topics = lib.attrNames sources;
   topicStr = lib.concatStringsSep "," topics;
-  fullUrl = "${baseUrl}/${topicStr}";
+  fullUrl = "${(import ../../lib.nix).serviceUrl inputs "ntfy"}/${topicStr}";
   sourcesFile = pkgs.writeText "ntfy-sources.json" (builtins.toJSON sources);
   resolvedSoundPath =
     if soundPath == null then

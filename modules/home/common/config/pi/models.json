@@ -22,9 +22,7 @@
       ]
     },
     "proxy-anthropic": {
-      "baseUrl": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317",
       "api": "anthropic-messages",
-      "apiKey": "local",
       "models": [
         {
           "id": "claude-opus-5-5",
@@ -94,9 +92,7 @@
       ]
     },
     "proxy-openai": {
-      "baseUrl": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
       "api": "openai-responses",
-      "apiKey": "local",
       "models": [
         {
           "id": "gpt-6-astra",

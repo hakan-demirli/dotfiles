@@ -12,9 +12,7 @@ tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum | awk '{ print $1 }')
 cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
 
-if [[ ! -s $data_file ]]; then
-  tmux_harpoon_sync.sh
-fi
+tmux_harpoon_sync.sh
 
 tmux_harpoon_update.sh
 
@@ -24,15 +22,6 @@ if [[ -z $hook_to_switch ]] || [[ $hook_to_switch == '#'* ]]; then
 fi
 
 IFS=':,' read -r tmux_window_target tmux_command_target buffer_name_target cursor_row_target cursor_col_target buffer_dir_target tmux_pane_path_target <<< "$hook_to_switch"
-
-if [[ -z $tmux_window_target ]] || ! tmux has-session -t "$tmux_session_id:$tmux_window_target" 2> /dev/null; then
-  tmux_harpoon_sync.sh
-  hook_to_switch=$(sed -n "${idx}p" "$data_file")
-  if [[ -z $hook_to_switch ]] || [[ $hook_to_switch == '#'* ]]; then
-    exit 0
-  fi
-  IFS=':,' read -r tmux_window_target tmux_command_target buffer_name_target cursor_row_target cursor_col_target buffer_dir_target tmux_pane_path_target <<< "$hook_to_switch"
-fi
 
 if [[ -n $tmux_window_target ]] && tmux has-session -t "$tmux_session_id:$tmux_window_target" 2> /dev/null; then
   tmux select-window -t "$tmux_session_id:$tmux_window_target"

@@ -234,6 +234,7 @@ in
   };
 
   xdg.configFile = (lib.foldl' (acc: name: acc // (mkImmutable name)) { } immutableConfigEntries) // {
+    "infra/services/ntfy".text = (import ./lib.nix).serviceUrl inputs "ntfy";
     "git/ignore".source = ./config/git/ignore;
     "git/config".text =
       builtins.readFile ./config/git/config

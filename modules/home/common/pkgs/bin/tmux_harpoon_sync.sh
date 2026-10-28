@@ -4,12 +4,14 @@ set -euo pipefail
 bind_line=${1-}
 bind_window=${2-}
 
-IFS='|' read -r tmux_cwd tmux_session_id tmux_window_active tmux_pane_path <<< "$(tmux display-message -p '#{session_path}|#{session_id}|#{window_id}|#{pane_current_path}')"
+IFS='|' read -r tmux_cwd tmux_session_id tmux_window_active tmux_pane_path tmux_server <<< "$(tmux display-message -p '#{session_path}|#{session_id}|#{window_id}|#{pane_current_path}|#{pid}-#{start_time}')"
 tmux_cwd_hash=$(echo -n "$tmux_cwd" | md5sum)
 tmux_cwd_hash=${tmux_cwd_hash%% *}
 cache_dir="$HOME/.cache/tmux_harpoon"
 data_file="$cache_dir/$tmux_cwd_hash.csv"
 header="# window_id , command , file_name:r:c , file_path , workspace_dir"
+server_prefix="# tmux_server: "
+server_line="$server_prefix$tmux_server"
 
 declare -A window_default_line
 session_windows=()
@@ -21,11 +23,14 @@ done < <(tmux list-windows -t "$tmux_session_id" -F '#{window_id}|#{pane_current
 entries=()
 comments=()
 original=""
+file_server_line=""
 if [[ -f $data_file ]]; then
   while IFS= read -r line || [[ -n $line ]]; do
     original+="$line"$'\n'
     if [[ -z $line ]]; then
       continue
+    elif [[ $line == "$server_prefix"* ]]; then
+      file_server_line=$line
     elif [[ $line == '#'* ]]; then
       comments+=("$line")
     else
@@ -53,6 +58,9 @@ for i in "${!entries[@]}"; do
     rest=""
   fi
 
+  if [[ -n $file_server_line && $file_server_line != "$server_line" ]]; then
+    id=""
+  fi
   if [[ -n $bind_line && $((i + 1)) == "$bind_line" ]]; then
     id=$bind_window
   fi
@@ -100,7 +108,7 @@ if [[ $pad_entries -eq 1 ]]; then
   done
 fi
 
-printf -v content '%s\n' "${entries[@]}" "${comments[@]}"
+printf -v content '%s\n' "${entries[@]}" "${comments[@]}" "$server_line"
 if [[ $content != "$original" ]]; then
   if [[ ! -d $cache_dir ]]; then
     mkdir -p "$cache_dir"
