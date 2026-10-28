@@ -31,14 +31,19 @@ let
   ];
 
   opencodeConfigDir = ../../config/opencode;
-  opencodeConfigEntries =
-    if builtins.pathExists opencodeConfigDir then
-      lib.mapAttrsToList (name: _type: {
-        inherit name;
-        path = opencodeConfigDir + "/${name}";
-      }) (builtins.readDir opencodeConfigDir)
-    else
-      [ ];
+  proxyUrl = "${(import ../../lib.nix).serviceUrl inputs "cliproxyapi"}/v1";
+  opencodeSettings = (pkgs.formats.json { }).generate "opencode.json" (
+    lib.recursiveUpdate (lib.importJSON (opencodeConfigDir + "/opencode.json")) {
+      providers = {
+        proxy-anthropic.settings.baseURL = proxyUrl;
+        proxy-openai.settings.baseURL = proxyUrl;
+      };
+    }
+  );
+  opencodeConfigEntries = lib.mapAttrsToList (name: _type: {
+    inherit name;
+    path = if name == "opencode.json" then opencodeSettings else opencodeConfigDir + "/${name}";
+  }) (builtins.readDir opencodeConfigDir);
   opencodeConfig = pkgs.linkFarm "opencode-config" opencodeConfigEntries;
 
   requireServerPassword = pkgs.writeShellApplication {

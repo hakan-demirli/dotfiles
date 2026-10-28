@@ -139,7 +139,6 @@
       "canonical": "anthropic",
       "package": "aisdk:@ai-sdk/anthropic",
       "settings": {
-        "baseURL": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
         "apiKey": "local"
       },
       "models": {
@@ -178,7 +177,6 @@
       "canonical": "openai",
       "package": "aisdk:@ai-sdk/openai",
       "settings": {
-        "baseURL": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8317/v1",
         "apiKey": "local"
       },
       "models": {

@@ -178,6 +178,19 @@ in
       inherit (pkgs) config;
     };
 
+  serviceUrl =
+    inputs: name:
+    let
+      service =
+        inputs.self.lib.inventory.services.${name}
+          or (throw "the inventory declares no tailnet service '${name}'");
+      hostCount = builtins.length service.hosts;
+    in
+    if hostCount != 1 then
+      throw "tailnet service '${name}' has ${toString hostCount} serving hosts, but a client URL needs exactly one"
+    else
+      "http://${builtins.head service.hosts}:${toString service.port}";
+
   inherit mkHomeTargets;
 
   mkHomeConfigurations =

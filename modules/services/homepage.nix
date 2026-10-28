@@ -1,5 +1,6 @@
 {
   config,
+  cluster,
   inputs,
   lib,
   pkgs,
@@ -12,7 +13,7 @@ let
   services = [
     {
       name = "ntfy";
-      url = "http://${ts}:8111";
+      url = "http://${ts}:${toString cluster.services.ntfy.port}";
     }
     {
       name = "Deasciifier";

@@ -37,6 +37,7 @@ in
 
     reverse-ssh-server = {
       enable = true;
+      tailnetOnly = true;
       allowedTCPPorts = [
         42001
         42002
@@ -56,6 +57,7 @@ in
 
     transmission-cluster = {
       inherit downloadDir incompleteDir;
+      openPeerPorts = false;
       rpcWhitelist = "127.0.0.1,::1,100.64.*.*";
     };
 
@@ -107,7 +109,10 @@ in
       enable = true;
       settings = {
         config-version = 8;
-        server.host = "";
+        server = {
+          host = "";
+          inherit (config.cluster.services.cliproxyapi) port;
+        };
         management = {
           secret-key = "";
           disable-control-panel = true;
@@ -121,8 +126,6 @@ in
       };
     };
   };
-
-  cluster.firewall.tailnetOnlyTCPPorts = [ config.services.cliproxyapi.settings.server.port ];
 
   environment.persistence = lib.mkIf impermanenceEnabled {
     "/persist/system".directories = [

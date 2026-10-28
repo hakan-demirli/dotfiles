@@ -110,10 +110,9 @@
     };
   };
 
-  networking.firewall.interfaces.tailscale0 = {
-    allowedTCPPorts = [ 5514 ];
-    allowedUDPPorts = [ config.services.cluster-flow-collector.netflowPort ];
-  };
+  networking.firewall.interfaces.tailscale0.allowedUDPPorts = [
+    config.services.cluster-flow-collector.netflowPort
+  ];
 
   systemd.services = {
     vector = {
