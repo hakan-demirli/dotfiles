@@ -54,12 +54,17 @@
             if cfg == null then
               pkgs.runCommand "missing-${h}" { } "echo missing ${h}; exit 1"
             else
-              pkgs.runCommand "check-host-${h}" { target = cfg.config.system.build.toplevel; } ''
-                test -e "$target"
-                mkdir -p "$out"
-                remaining=${toString moduleCacheBudget}
-                ${lib.concatMapStringsSep "\n" retainModule kernelModules}
-              '';
+              pkgs.runCommand "check-host-${h}"
+                {
+                  target = cfg.config.system.build.toplevel;
+                  passthru.ciCost = "heavy";
+                }
+                ''
+                  test -e "$target"
+                  mkdir -p "$out"
+                  remaining=${toString moduleCacheBudget}
+                  ${lib.concatMapStringsSep "\n" retainModule kernelModules}
+                '';
         }) myHosts
       );
     in
