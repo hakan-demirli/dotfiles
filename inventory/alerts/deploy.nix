@@ -38,6 +38,20 @@
         }
 
         {
+          alert = "HomeBehindSystem";
+          expr = ''
+            fleet_home_manager_generation_info{revision_kind=~"git|unknown"}
+            unless on(host, revision) fleet_nixos_system_info
+          '';
+          for = "24h";
+          labels.severity = "warning";
+          annotations = {
+            summary = "{{ $labels.host }} home does not follow the system revision";
+            description = "{{ $labels.user }} runs Home Manager revision {{ reReplaceAll \"^(.{12}).*$\" \"$1\" $labels.revision }}. Check: journalctl --user -u fleet-home-upgrade";
+          };
+        }
+
+        {
           alert = "UpgradeStalled";
           expr = ''(time() - fleet_upgrade_last_success_timestamp_seconds) > 3 * 86400 unless on(host) fleet_upgrade_state{state="held"} == 1'';
           for = "1h";
