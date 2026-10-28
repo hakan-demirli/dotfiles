@@ -57,7 +57,7 @@
 
   monitoring = {
     enabled = true;
-    always_on = true;
+    always_on = false;
     exporters = [
       "node"
       "smartctl"
