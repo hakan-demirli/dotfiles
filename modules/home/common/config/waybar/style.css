@@ -31,7 +31,6 @@ tooltip {
 #hardware,
 #scripts,
 #custom-weather,
-#custom-timer,
 #backlight,
 #batteries,
 #battery-power,
@@ -191,10 +190,6 @@ tooltip {
 #batteries {
   margin-right: 0;
   border-radius: 8px 0px 0px 8px;
-}
-
-#custom-timer.active {
-  background-color: shade(@error, 0.7);
 }
 
 #custom-screen-record.idle {

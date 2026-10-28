@@ -163,7 +163,6 @@ rec {
       xremap
       xwayland-satellite
       (pickNur "youtube-sync")
-      (pickNur "riveroftime")
       (pickNur "gtk-applet")
       (pickNur "nix-treemap")
       (pickNur "umu-fzf")

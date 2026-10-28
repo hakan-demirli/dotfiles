@@ -49,7 +49,6 @@ let
     "qalculate"
     "qmk"
     "QtProject"
-    "quantifyself"
     "quickshell"
     "qutebrowser"
     "repx"
