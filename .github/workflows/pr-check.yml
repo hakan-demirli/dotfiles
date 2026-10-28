@@ -4,6 +4,7 @@ on:
     branches: [unstable]
 permissions:
   contents: read
+  pull-requests: read
 concurrency:
   group: pr-check-${{ github.event.pull_request.number }}
   cancel-in-progress: true
