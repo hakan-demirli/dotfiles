@@ -91,7 +91,6 @@ rec {
         zip
         (pickNur "uncomment")
         (pickNur "flake-updater")
-        (pickNur "raider")
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ verible ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [ cpufrequtils ]
