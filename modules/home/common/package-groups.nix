@@ -42,11 +42,8 @@ rec {
         bandwhich
         bash-language-server
         bat
-        cargo
-        clang-tools
         unstablePkgs.claude-code
         claudeMulti
-        clippy
         cmake-language-server
         diagnostic-languageserver
         fd
@@ -57,7 +54,6 @@ rec {
         gnumake
         helix
         htop
-        lldb
         lua-language-server
         marksman
         nixd
@@ -70,9 +66,6 @@ rec {
         pyright
         ripgrep
         ruff
-        rustc
-        rust-analyzer
-        rustfmt
         sendToLaptop
         shfmt
         systemctl-tui
