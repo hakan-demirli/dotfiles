@@ -42,12 +42,19 @@ in
 
         {
           alert = "DiskTemperatureHigh";
-          expr = "smartctl_device_temperature > 75";
+          expr = ''
+            smartctl_device_temperature{temperature_type="current"}
+            >= ignoring(temperature_type) smartctl_device_temperature{temperature_type="op_limit_max"}
+            or (
+              smartctl_device_temperature{temperature_type="current"} > 75
+              unless ignoring(temperature_type) smartctl_device_temperature{temperature_type="op_limit_max"}
+            )
+          '';
           for = "15m";
           labels.severity = "warning";
           annotations = {
             summary = "${host} disk {{ $labels.device }} is hot";
-            description = "{{ humanize $value }}°C for 15 minutes. Check the cooling.";
+            description = "{{ humanize $value }}°C for 15 minutes, at or above the drive's warning limit. Check the cooling.";
           };
         }
       ];

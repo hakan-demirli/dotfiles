@@ -25,6 +25,7 @@
               teamCount = toString (lib.length (lib.attrNames inventory.teams));
               unixTierCount = toString (lib.length (lib.attrNames inventory.unixAccessTiers));
               userCount = toString (lib.length (lib.attrNames inventory.users));
+              passthru.ciScope = "portable";
             }
             ''
               {

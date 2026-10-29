@@ -7,6 +7,7 @@
         pkgs.runCommand "check-shebangs"
           {
             src = inputs.self;
+            passthru.ciScope = "portable";
           }
           ''
             cp -r $src ./src

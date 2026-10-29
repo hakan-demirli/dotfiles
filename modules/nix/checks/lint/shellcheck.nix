@@ -8,6 +8,7 @@
           {
             nativeBuildInputs = [ pkgs.shellcheck ];
             src = inputs.self;
+            passthru.ciScope = "portable";
           }
           ''
             cp -r $src ./src

@@ -3,8 +3,7 @@ on:
   workflow_call:
 permissions:
   contents: read
+  pull-requests: read
 jobs:
   checks:
-    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@ccc1ac71f23a8c8d099ba86d9c4b9312ae4b3191
-  external-builds:
-    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@ccc1ac71f23a8c8d099ba86d9c4b9312ae4b3191
+    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@fb6406106d837996374a1aa2c3b829b6fde92ced

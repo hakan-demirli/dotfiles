@@ -12,6 +12,7 @@ _: {
                 file: file.hasExt "nix" || file.name == "statix.toml"
               ) ../../../..;
             };
+            passthru.ciScope = "portable";
           }
           ''
             cp -r $src ./src

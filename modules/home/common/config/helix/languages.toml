@@ -31,7 +31,6 @@ auto-format = true
 [[language]]
 name = "html"
 formatter = { command = 'prettier', args = ["--parser", "html"] }
-language-servers = ["html-preview-lsp"]
 
 [[language]]
 name = "json"
@@ -61,7 +60,7 @@ auto-format = true
 [[language]]
 name = "markdown"
 formatter = { command = 'prettier', args = ["--parser", "markdown"] }
-language-servers = ["marksman", "markdown-countdown-lsp"]
+language-servers = ["marksman"]
 
 [[language]]
 name = "toml"
@@ -157,9 +156,6 @@ args = [
 onEdit = true
 
 
-[language-server.markdown-countdown-lsp]
-command = "markdown-countdown-lsp"
-
 [language-server.veridian]
 command = "veridian"
 
@@ -182,9 +178,6 @@ command = "ltex-ls"
 [language-server.mdpls]
 command = "mdpls"
 config = { markdown.preview.serveStatic = true, markdown.preview.codeTheme = "github", markdown.preview.auto = true, markdown.preview.browser = "firefox" }
-
-[language-server.html-preview-lsp]
-command = "html-preview-lsp"
 
 [language-server.jdtls]
 command = "jdtls"

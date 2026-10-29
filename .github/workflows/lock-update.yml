@@ -44,11 +44,14 @@ jobs:
           rev=$(jq -er '.nodes["infra-lib"].locked.rev' flake.lock)
           [[ "$rev" =~ ^[0-9a-f]{40}$ ]]
           pin='hakan-demirli/infra-lib/\.github/workflows/[a-z-]+\.yml'
-          sed -i -E "s|($pin)@[0-9a-f]{40}|\1@$rev|g" .github/workflows/checks.yml
-          total=$(grep -cE "$pin@[0-9a-f]{40}" .github/workflows/checks.yml || true)
-          current=$(grep -cE "$pin@$rev\$" .github/workflows/checks.yml || true)
-          test "$total" -gt 0
-          test "$total" -eq "$current"
+          workflows=(.github/workflows/checks.yml .github/workflows/devices.yml)
+          for workflow in "${workflows[@]}"; do
+            sed -i -E "s|($pin)@[0-9a-f]{40}|\1@$rev|g" "$workflow"
+            total=$(grep -cE "$pin@[0-9a-f]{40}" "$workflow" || true)
+            current=$(grep -cE "$pin@$rev\$" "$workflow" || true)
+            test "$total" -gt 0
+            test "$total" -eq "$current"
+          done
       - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         id: update
         with:
@@ -60,6 +63,7 @@ jobs:
           add-paths: |
             flake.lock
             .github/workflows/checks.yml
+            .github/workflows/devices.yml
           delete-branch: true
           commit-message: 'chore: update flake inputs'
           title: 'chore: update flake inputs'
@@ -70,7 +74,7 @@ jobs:
           PR: ${{ steps.update.outputs.pull-request-number }}
         run: |
           set -euo pipefail
-          allowed=$'flake.lock\n.github/workflows/checks.yml'
+          allowed=$'flake.lock\n.github/workflows/checks.yml\n.github/workflows/devices.yml'
           changed=$(gh pr diff "$PR" --name-only)
           test -n "$changed"
           while IFS= read -r path; do

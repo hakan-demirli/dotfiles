@@ -24,7 +24,10 @@
             name = "home-${id}";
             value =
               pkgs.runCommand "check-home-${id}"
-                { target = inputs.self.homeConfigurations.${target.name}.activationPackage; }
+                {
+                  target = inputs.self.homeConfigurations.${target.name}.activationPackage;
+                  passthru.ciCost = "heavy";
+                }
                 ''
                   test -e "$target"
                   touch "$out"
