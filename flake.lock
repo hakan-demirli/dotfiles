@@ -174,11 +174,11 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1793217888,
-        "narHash": "sha256-Qu+ryaMqK8UNRbwreifilu/m79oyETvcuMbsALLRP68=",
+        "lastModified": 1793237596,
+        "narHash": "sha256-XPST2Bp6YA2Lm+BZBtwx1+fjJcCmms1ZQGIBVqGaP6g=",
         "owner": "hakan-demirli",
         "repo": "infra-lib",
-        "rev": "27158eb523d4e34ec98dd761e8246b0a5ca8419a",
+        "rev": "fb6406106d837996374a1aa2c3b829b6fde92ced",
         "type": "github"
       },
       "original": {
@@ -419,11 +419,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792200137,
-        "narHash": "sha256-CrtvAUJ2a0AWrshtSrGshNZ1t0zT1O+EkFUDyGNR3+A=",
+        "lastModified": 1793228817,
+        "narHash": "sha256-Ev/UZFYYqnnkHtmRtRerL64NBca1EolrwcNUurJdc/M=",
         "owner": "hakan-demirli",
         "repo": "NUR",
-        "rev": "62e5cb7f0baa0f01f2182c41c98206bb9f50982d",
+        "rev": "1cb21e565543e7d9cbec96be9ed64346a7b864c4",
         "type": "github"
       },
       "original": {
