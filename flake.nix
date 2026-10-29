@@ -11,6 +11,7 @@
     nixpkgs.follows = "infra-lib/nixpkgs";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-qmllint.url = "github:NixOS/nixpkgs/fe13242281a67641c0102cdb1087f0ebe586c7df";
+    nixpkgs-openwrt.url = "github:NixOS/nixpkgs/31ecbaca1bdefa45dffc409f0250bd8039ea0010";
     flake-parts.follows = "infra-lib/flake-parts";
     import-tree.follows = "infra-lib/import-tree";
     nix-github-actions = {

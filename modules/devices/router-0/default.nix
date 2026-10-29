@@ -13,9 +13,10 @@ let
     else
       facts.hostname;
 
-  openwrtSource = pkgs.callPackage ./nix/openwrt-source.nix { };
+  openwrtPkgs = inputs.nixpkgs-openwrt.legacyPackages.${system};
+  openwrtSource = openwrtPkgs.callPackage ./nix/openwrt-source.nix { };
   router-ui = inputs.nur.packages.${system}.router-ui;
-  firmware = pkgs.callPackage ./nix/firmware.nix { inherit openwrtSource router-ui; };
+  firmware = openwrtPkgs.callPackage ./nix/firmware.nix { inherit openwrtSource router-ui; };
 
   authorizedKeys = pkgs.writeText "router-0-authorized-keys" (
     pkgs.lib.concatStringsSep "\n" self.lib.kexecRootKeys + "\n"
@@ -83,10 +84,10 @@ in
     openwrt-source = openwrtSource;
   };
 
-  externalBuilds.firmware = pkgs.writeShellApplication {
+  externalBuilds.firmware = openwrtPkgs.writeShellApplication {
     name = "build-firmware";
     text = ''
-      exec ${pkgs.lib.getExe firmware} --output "''${CI_OUTPUT_DIR:?}"
+      exec ${openwrtPkgs.lib.getExe firmware} --output "''${CI_OUTPUT_DIR:?}"
     '';
   };
 
