@@ -25,7 +25,10 @@
     nixos-hardware.follows = "infra-lib/nixos-hardware";
     nix-darwin.follows = "infra-lib/nix-darwin";
 
-    nur.url = "github:hakan-demirli/NUR";
+    nur = {
+      url = "github:hakan-demirli/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
