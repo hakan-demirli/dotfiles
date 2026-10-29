@@ -7,5 +7,3 @@ permissions:
 jobs:
   checks:
     uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@ccc1ac71f23a8c8d099ba86d9c4b9312ae4b3191
-  external-builds:
-    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@ccc1ac71f23a8c8d099ba86d9c4b9312ae4b3191
