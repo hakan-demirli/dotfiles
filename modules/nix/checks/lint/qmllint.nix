@@ -18,6 +18,7 @@ in
               nativeBuildInputs = [ qmlPkgs.qt6.qtdeclarative ];
               src = inputs.self;
               LANG = "C.UTF-8";
+              passthru.ciScope = "portable";
             }
             ''
               if find "$src" -name '*.qml' -not -path "$src/${shellRoot}/*" | grep .; then
@@ -62,7 +63,7 @@ in
               touch $out
             ''
         else
-          pkgs.runCommand "check-qmllint" { } ''
+          pkgs.runCommand "check-qmllint" { passthru.ciScope = "portable"; } ''
             touch $out
           '';
     };

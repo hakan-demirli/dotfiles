@@ -8,6 +8,7 @@
           {
             nativeBuildInputs = [ pkgs.ripgrep ];
             src = inputs.self;
+            passthru.ciScope = "portable";
           }
           ''
             bin="$src/modules/home/common/pkgs/bin"

@@ -174,11 +174,11 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1793217888,
-        "narHash": "sha256-Qu+ryaMqK8UNRbwreifilu/m79oyETvcuMbsALLRP68=",
+        "lastModified": 1793237596,
+        "narHash": "sha256-XPST2Bp6YA2Lm+BZBtwx1+fjJcCmms1ZQGIBVqGaP6g=",
         "owner": "hakan-demirli",
         "repo": "infra-lib",
-        "rev": "27158eb523d4e34ec98dd761e8246b0a5ca8419a",
+        "rev": "fb6406106d837996374a1aa2c3b829b6fde92ced",
         "type": "github"
       },
       "original": {
@@ -299,6 +299,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-openwrt": {
+      "locked": {
+        "lastModified": 1793110635,
+        "narHash": "sha256-dhoW6VgFWlaodSY5jrBn+CF2FLmaUvDVgM7+C7T2+NM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "31ecbaca1bdefa45dffc409f0250bd8039ea0010",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "31ecbaca1bdefa45dffc409f0250bd8039ea0010",
+        "type": "github"
+      }
+    },
     "nixpkgs-qmllint": {
       "locked": {
         "lastModified": 1792094642,
@@ -376,22 +392,6 @@
         "type": "github"
       }
     },
-    "nixpkgs_5": {
-      "locked": {
-        "lastModified": 1789114715,
-        "narHash": "sha256-ugpsyk3NM2s87vXfUiIIiibbJ4Pp0JPS5p/3mfs+q+c=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "21a67dc470149f337cecafbe965d8d252a390518",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-26.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nur": {
       "inputs": {
         "flake-parts": "flake-parts_2",
@@ -414,14 +414,16 @@
     "nur_2": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs_5"
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1792200137,
-        "narHash": "sha256-CrtvAUJ2a0AWrshtSrGshNZ1t0zT1O+EkFUDyGNR3+A=",
+        "lastModified": 1793228817,
+        "narHash": "sha256-Ev/UZFYYqnnkHtmRtRerL64NBca1EolrwcNUurJdc/M=",
         "owner": "hakan-demirli",
         "repo": "NUR",
-        "rev": "62e5cb7f0baa0f01f2182c41c98206bb9f50982d",
+        "rev": "1cb21e565543e7d9cbec96be9ed64346a7b864c4",
         "type": "github"
       },
       "original": {
@@ -463,6 +465,7 @@
           "infra-lib",
           "nixpkgs"
         ],
+        "nixpkgs-openwrt": "nixpkgs-openwrt",
         "nixpkgs-qmllint": "nixpkgs-qmllint",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nur": "nur_2",

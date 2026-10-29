@@ -430,6 +430,7 @@ in
             {
               src = sourceFor (../../. + "/${diagramsPath}");
               generated = diagramsTheme;
+              passthru.ciScope = "portable";
             }
             ''
               if ! diff -u "$src/${diagramsPath}" "$generated"; then
@@ -448,6 +449,7 @@ in
             {
               src = sourceFor (../../. + "/${tonesPath}");
               generated = tones;
+              passthru.ciScope = "portable";
             }
             ''
               if ! diff -u "$src/${tonesPath}" "$generated"; then
@@ -471,6 +473,7 @@ in
                   ps.referencing
                 ]))
               ];
+              passthru.ciScope = "portable";
             }
             ''
               mapfile -t files < <(find "$src" -name '*.tokens.json' | sort)
@@ -491,6 +494,7 @@ in
             {
               src = sourceFor (lib.fileset.unions (map (path: ../../. + "/${homeRoot}/${path}") renderedPaths));
               inherit rendered;
+              passthru.ciScope = "portable";
             }
             ''
               failed=0
@@ -527,6 +531,7 @@ in
               {
                 src = sourceFor ../../modules/home/common/config/swaync/style.css;
                 nativeBuildInputs = [ pkgs.python3 ];
+                passthru.ciScope = "portable";
               }
               ''
                 python3 ${./coverage.py} \
@@ -536,7 +541,7 @@ in
                 touch "$out"
               ''
           else
-            pkgs.runCommand "check-theme-coverage" { } ''
+            pkgs.runCommand "check-theme-coverage" { passthru.ciScope = "portable"; } ''
               touch "$out"
             '';
 
@@ -556,6 +561,7 @@ in
                   pkgs.nerd-fonts.symbols-only
                 ];
               };
+              passthru.ciScope = "portable";
             }
             ''
               failed=0
@@ -611,6 +617,7 @@ in
                 ]
               );
               nativeBuildInputs = [ pkgs.ripgrep ];
+              passthru.ciScope = "portable";
             }
             ''
                   failed=0

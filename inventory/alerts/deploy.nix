@@ -6,12 +6,12 @@
       rules = [
         {
           alert = "RebootRequired";
-          expr = "max by (host) (fleet_nixos_reboot_required) == 1";
+          expr = "min_over_time((max by (host) (fleet_nixos_reboot_required))[7d:1h]) == 1";
           for = "1h";
           labels.severity = "warning";
           annotations = {
-            summary = "{{ $labels.host }} needs a reboot";
-            description = "Kernel or boot settings changed. Reboot to apply.";
+            summary = "{{ $labels.host }} has needed a reboot for a week";
+            description = "Kernel or boot settings changed at least 7 days ago. Reboot to apply.";
           };
         }
 
@@ -34,6 +34,24 @@
           annotations = {
             summary = "{{ $labels.host }} home upgrade failed";
             description = "{{ $labels.user }} is still on the previous Home Manager generation. Check: journalctl --user -u fleet-home-upgrade";
+          };
+        }
+
+        {
+          alert = "HomeBehindSystem";
+          expr = ''
+            count_over_time(
+              (
+                fleet_home_manager_generation_info{revision_kind=~"git|unknown"}
+                unless on(host, revision) fleet_nixos_system_info
+              )[24h:1h]
+            ) >= 24
+          '';
+          for = "15m";
+          labels.severity = "warning";
+          annotations = {
+            summary = "{{ $labels.host }} home does not follow the system revision";
+            description = "{{ $labels.user }} runs Home Manager revision {{ reReplaceAll \"^(.{12}).*$\" \"$1\" $labels.revision }}. Check: journalctl --user -u fleet-home-upgrade";
           };
         }
 

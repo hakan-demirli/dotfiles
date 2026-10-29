@@ -10,6 +10,7 @@ _: {
               root = ../../../..;
               fileset = pkgs.lib.fileset.fileFilter (file: file.hasExt "nix") ../../../..;
             };
+            passthru.ciScope = "portable";
           }
           ''
             cp -r $src ./src

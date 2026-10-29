@@ -35,6 +35,10 @@
   display: none;
 }
 
+#webextpanels-window > #sidebar-panel-header {
+  display: none !important;
+}
+
 tooltip {
   -moz-appearance: none !important;
   background: #1d1f2b !important;

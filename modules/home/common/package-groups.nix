@@ -42,11 +42,8 @@ rec {
         bandwhich
         bash-language-server
         bat
-        cargo
-        clang-tools
         unstablePkgs.claude-code
         claudeMulti
-        clippy
         cmake-language-server
         diagnostic-languageserver
         fd
@@ -57,7 +54,6 @@ rec {
         gnumake
         helix
         htop
-        lldb
         lua-language-server
         marksman
         nixd
@@ -70,9 +66,6 @@ rec {
         pyright
         ripgrep
         ruff
-        rustc
-        rust-analyzer
-        rustfmt
         sendToLaptop
         shfmt
         systemctl-tui
@@ -91,7 +84,6 @@ rec {
         zip
         (pickNur "uncomment")
         (pickNur "flake-updater")
-        (pickNur "raider")
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ verible ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [ cpufrequtils ]
@@ -164,7 +156,6 @@ rec {
       xremap
       xwayland-satellite
       (pickNur "youtube-sync")
-      (pickNur "riveroftime")
       (pickNur "gtk-applet")
       (pickNur "nix-treemap")
       (pickNur "umu-fzf")

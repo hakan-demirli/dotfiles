@@ -43,7 +43,7 @@ let
     }
     trap cleanup EXIT TERM INT
 
-    ${pkgs.hyprland}/bin/Hyprland -c ${hyprlandConfPath} &
+    ${config.programs.hyprland.package}/bin/Hyprland -c ${hyprlandConfPath} &
     HYPR_PID=$!
 
     for _ in $(seq 1 30); do
@@ -89,7 +89,13 @@ in
     })
 
     (lib.mkIf headless {
-      programs.hyprland.enable = true;
+      programs = {
+        hyprland = {
+          enable = true;
+          withUWSM = true;
+        };
+        xwayland.defaultFontPath = "";
+      };
 
       systemd.tmpfiles.rules = [
         "x /tmp/.X11-unix"

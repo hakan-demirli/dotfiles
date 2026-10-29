@@ -440,6 +440,47 @@ let
     * on() group_left(main_revision)
     label_replace(fleet_configuration_main_info, "main_revision", "$1", "short_revision", "(.*)")
   '';
+  homeFreshnessExpression = ''
+    label_replace(
+      (
+        (
+          fleet_home_manager_generation_info{revision_kind="git"}
+          * on(host, revision) group_left()
+          max by (host, revision) (fleet_nixos_system_info)
+          * 2
+        )
+        or on(host, user) (fleet_home_manager_generation_info{revision_kind="local"} * 0 + 1)
+        or on(host, user) (fleet_home_manager_generation_info{revision_kind="unknown"} * 0 + 3)
+        or on(host, user) (fleet_home_manager_generation_info{revision_kind="git"} * 0)
+      ),
+      "home_revision", "$1", "revision", "(.{1,12}).*"
+    )
+  '';
+  freshnessStatusOverrides = [
+    {
+      matcher = {
+        id = "byName";
+        options = "Status";
+      };
+      properties = [
+        {
+          id = "mappings";
+          value = freshnessMappings;
+        }
+        {
+          id = "custom.cellOptions";
+          value = {
+            mode = "basic";
+            type = "color-background";
+          };
+        }
+        {
+          id = "custom.width";
+          value = 190;
+        }
+      ];
+    }
+  ];
 
   withHost = expression: ''label_replace(${expression}, "host", "$1", "instance", "([^.:]+).*")'';
   failedUnitStates = ''node_systemd_unit_state{job="fleet-node",state="failed"} or fleet_user_systemd_unit_failed{job="fleet-node"}'';
@@ -2055,7 +2096,7 @@ let
           expression = configurationFreshnessExpression;
           x = 0;
           y = 73;
-          w = 24;
+          w = 14;
           fields = {
             host = 0;
             deployed_revision = 1;
@@ -2070,31 +2111,29 @@ let
             Value = "Status";
             version = "NixOS version";
           };
-          overrides = [
-            {
-              matcher = {
-                id = "byName";
-                options = "Status";
-              };
-              properties = [
-                {
-                  id = "mappings";
-                  value = freshnessMappings;
-                }
-                {
-                  id = "custom.cellOptions";
-                  value = {
-                    mode = "basic";
-                    type = "color-background";
-                  };
-                }
-                {
-                  id = "custom.width";
-                  value = 190;
-                }
-              ];
-            }
-          ];
+          overrides = freshnessStatusOverrides;
+        })
+        (mkTable {
+          id = 48;
+          title = "Home Freshness";
+          description = "Active Home Manager generation of each host owner compared with the system revision it follows. BEHIND clears at the next fleet-home-upgrade run. Dirty-tree builds show as local.";
+          expression = homeFreshnessExpression;
+          x = 14;
+          y = 73;
+          w = 10;
+          fields = {
+            host = 0;
+            user = 1;
+            home_revision = 2;
+            Value = 3;
+          };
+          renamedFields = {
+            host = "Host";
+            user = "User";
+            home_revision = "Home source";
+            Value = "Status";
+          };
+          overrides = freshnessStatusOverrides;
         })
         (mkRow {
           id = 34;
