@@ -13,4 +13,4 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   devices:
-    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@fb6406106d837996374a1aa2c3b829b6fde92ced
+    uses: hakan-demirli/infra-lib/.github/workflows/external-builds.yml@a6fab821053ca72cc23b6984a013c1056bbd695e
