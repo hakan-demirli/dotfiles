@@ -6,13 +6,15 @@ USE_PROCD=1
 START=96
 
 AUTHKEY=/etc/tailscale/authkey
-PREFS=--accept-dns=false
 
 boot() {
 	start
 }
 
 start_service() {
+	ROUTES=$(uci -q get router-tailscale.main.advertise_route | tr ' ' ',')
+	PREFS="--accept-dns=false --advertise-routes=$ROUTES"
+
 	procd_open_instance
 	procd_set_param command /bin/sh -c '
 		set -eu

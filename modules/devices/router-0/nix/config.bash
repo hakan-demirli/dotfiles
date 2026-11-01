@@ -192,6 +192,29 @@ for filename, token, value in (
     target.write_text(text.replace(token, value))
 ' "$stage/deploy.json" "$stage/root/etc/config/wireless" "$stage/root/etc/config/dhcp"
 
+  log "resolving the routed host leases"
+  read -ra routed_hosts <<< "${R0_ROUTED_HOSTS?internal error: R0_ROUTED_HOSTS unset}"
+  python3 -c '
+import json
+import pathlib
+import re
+import sys
+
+macs = json.load(open(sys.argv[1])).get("lan", {}).get("routed_hosts", {})
+target = pathlib.Path(sys.argv[2])
+text = target.read_text()
+for host in sys.argv[3:]:
+    mac = macs.get(host)
+    if not isinstance(mac, str) or not re.fullmatch(r"(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}", mac):
+        raise SystemExit(f"lan.routed_hosts.{host} must be a MAC address")
+    token = f"__ROUTED_HOST_MAC_{host}__"
+    if text.count(token) != 1:
+        raise SystemExit(f"expected one {token} in {target}")
+    text = text.replace(token, mac)
+target.write_text(text)
+' "$stage/deploy.json" "$stage/root/etc/config/dhcp" "${routed_hosts[@]}" \
+    || die "could not resolve the routed host leases from secrets/router-0/deploy.yaml"
+
   install -m0600 "$R0_AUTHORIZED_KEYS" "$stage/root/etc/dropbear/authorized_keys"
 
   if ((with_tailscale)); then
@@ -225,7 +248,7 @@ for filename, token, value in (
   } >> "$secret_material"
 fi
 
-for token in __IOT_WIFI_PASSWORD__ __LAN_WIFI_PASSWORD__ __SHELLY_PLUG_0_MAC__ __SWITCH_0_MAC__; do
+for token in __IOT_WIFI_PASSWORD__ __LAN_WIFI_PASSWORD__ __SHELLY_PLUG_0_MAC__ __SWITCH_0_MAC__ __ROUTED_HOST_MAC_; do
   if grep -rlF "$token" "$stage/root" > /dev/null 2>&1; then
     die "unresolved $token token remains in the staged tree"
   fi
