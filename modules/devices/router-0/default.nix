@@ -7,6 +7,8 @@
 }:
 let
   facts = self.lib.inventory.hosts.router-0;
+  lan = self.lib.inventory.networks.router-0-lan;
+  subnetRoutes = self.lib.inventory.subnetRoutes.router-0 or [ ];
   hostname =
     if facts.hostname == null then
       throw "router-0: inventory hostname must be set before generating firmware"
@@ -27,7 +29,7 @@ let
     import ./nix/config-overlay.nix (
       {
         inherit pkgs router-ui;
-        inherit hostname;
+        inherit hostname lan subnetRoutes;
         tailscaleLoginServer = facts.labels.tailscale_login_server;
       }
       // args
@@ -43,7 +45,7 @@ let
       pkgs.openssh
     ];
     text = ''
-      export R0_DEFAULT_IP=${facts.labels.lan_ip}
+      export R0_DEFAULT_IP=${lan.gateway_v4}
       export R0_EXPECTED_REVISION=${openwrtSource.upstreamVersion}
       export R0_EXPECTED_BUILD_ID=${firmware.buildId}
     ''
@@ -64,8 +66,9 @@ let
       pkgs.sops
     ];
     text = ''
-      export R0_DEFAULT_IP=${facts.labels.lan_ip}
+      export R0_DEFAULT_IP=${lan.gateway_v4}
       export R0_OVERLAY=${config-overlay}
+      export R0_ROUTED_HOSTS=${pkgs.lib.escapeShellArg (toString config-overlay.routedHosts)}
       export R0_OVERLAY_BOOTSTRAP=${config-overlay-bootstrap}
       export R0_WIFI_TO_UCI=${./nix/wifi-to-uci.py}
       export R0_AUTHORIZED_KEYS=${authorizedKeys}
@@ -114,8 +117,8 @@ in
     hardware_soc = facts.hardware.cpu_model;
     inherit hostname;
     needsRelaxedSandbox = false;
-    lan_ip = facts.labels.lan_ip;
-    lan_cidr = facts.labels.lan_cidr;
+    lan_ip = lan.gateway_v4;
+    lan_cidr = lan.prefix_v4;
     tailscale_tag = facts.labels.tailscale_tag;
     tailscale_login_server = facts.labels.tailscale_login_server;
   };

@@ -2,6 +2,8 @@
   pkgs,
   router-ui,
   hostname,
+  lan,
+  subnetRoutes ? [ ],
   tailscaleLoginServer ? null,
   bootstrap ? false,
 }:
@@ -12,6 +14,65 @@ let
 
   systemConfig = pkgs.writeText "system" (
     lib.replaceStrings [ "__HOSTNAME__" ] [ hostname ] (builtins.readFile ../files/etc/config/system)
+  );
+
+  lanPrefixLength = lib.toInt (lib.last (lib.splitString "/" lan.prefix_v4));
+  lanNetmask = lib.concatMapStringsSep "." (
+    octet:
+    let
+      bits = lib.min 8 (lib.max 0 (lanPrefixLength - 8 * octet));
+    in
+    toString (256 - lib.foldl' (acc: _: acc * 2) 1 (lib.range 1 (8 - bits)))
+  ) (lib.range 0 3);
+
+  networkConfig = pkgs.writeText "network" (
+    lib.replaceStrings [ "__LAN_IPADDR__" "__LAN_NETMASK__" ] [ lan.gateway_v4 lanNetmask ] (
+      builtins.readFile ../files/etc/config/network
+    )
+  );
+
+  routes =
+    let
+      foreign = lib.filter (route: route.network != lan.id) subnetRoutes;
+    in
+    lib.throwIf (foreign != [ ]) "router-0: subnet routes outside '${lan.id}' have no firewall zone: ${
+      lib.concatMapStringsSep ", " (route: route.id) foreign
+    }" (lib.optionals (!bootstrap) subnetRoutes);
+
+  routedHostMacToken = route: "__ROUTED_HOST_MAC_${route.id}__";
+
+  routedHostLeases = pkgs.writeText "dhcp-routed-hosts" (
+    lib.concatMapStrings (
+      route:
+      lib.concatStringsSep "\n" [
+        ""
+        "config host"
+        "\toption name '${route.id}'"
+        "\toption mac '${routedHostMacToken route}'"
+        "\toption ip '${route.ipv4}'"
+        "\toption dns '1'"
+        ""
+      ]
+    ) routes
+  );
+
+  routedHostForwards = pkgs.writeText "firewall-routed-hosts" (
+    lib.concatMapStrings (
+      route:
+      lib.concatStringsSep "\n" [
+        ""
+        "config rule"
+        "\toption name 'Allow-Tailnet-${route.id}'"
+        "\toption src 'tailscale'"
+        "\toption dest 'lan'"
+        "\toption dest_ip '${route.ipv4}'"
+        "\toption proto 'tcp'"
+        "\toption dest_port '${lib.concatMapStringsSep " " toString route.ports}'"
+        "\toption family 'ipv4'"
+        "\toption target 'ACCEPT'"
+        ""
+      ]
+    ) routes
   );
 
   travelmateBaseline = pkgs.writeText "travelmate-baseline" ''
@@ -66,21 +127,27 @@ let
     if tailscaleLoginServer == null then
       null
     else
-      pkgs.writeText "router-tailscale" ''
-        config bootstrap 'main'
-        	option login_server '${tailscaleLoginServer}'
-      '';
+      pkgs.writeText "router-tailscale" (
+        ''
+          config bootstrap 'main'
+          	option login_server '${tailscaleLoginServer}'
+        ''
+        + lib.concatMapStrings (route: "\tlist advertise_route '${route.prefix}'\n") routes
+      );
 in
 pkgs.runCommand "router-0-config-overlay"
   {
     passthru = {
       inherit bootstrap hostname tailscaleLoginServer;
-      requiredTokens = lib.optionals (!bootstrap) [
-        "__IOT_WIFI_PASSWORD__"
-        "__LAN_WIFI_PASSWORD__"
-        "__SHELLY_PLUG_0_MAC__"
-        "__SWITCH_0_MAC__"
-      ];
+      routedHosts = map (route: route.id) routes;
+      requiredTokens =
+        lib.optionals (!bootstrap) [
+          "__IOT_WIFI_PASSWORD__"
+          "__LAN_WIFI_PASSWORD__"
+          "__SHELLY_PLUG_0_MAC__"
+          "__SWITCH_0_MAC__"
+        ]
+        ++ map routedHostMacToken routes;
     };
   }
   ''
@@ -106,14 +173,16 @@ pkgs.runCommand "router-0-config-overlay"
       install -Dm0644 ${travelmateBaseline}            $out/root/etc/config/travelmate
     ''}
 
-    install -Dm0644 ${filesRoot}/etc/config/network    $out/root/etc/config/network
+    install -Dm0644 ${networkConfig}                   $out/root/etc/config/network
     install -Dm0644 ${filesRoot}/etc/config/firewall   $out/root/etc/config/firewall
     ${lib.optionalString (!bootstrap) ''
       cat ${switchWanBlock}                         >> $out/root/etc/config/firewall
+      cat ${routedHostForwards}                     >> $out/root/etc/config/firewall
     ''}
     install -Dm0644 ${filesRoot}/etc/config/dhcp       $out/root/etc/config/dhcp
     ${lib.optionalString (!bootstrap) ''
       cat ${shellyLease}                            >> $out/root/etc/config/dhcp
+      cat ${routedHostLeases}                       >> $out/root/etc/config/dhcp
     ''}
     install -Dm0644 ${filesRoot}/etc/config/dropbear   $out/root/etc/config/dropbear
     install -Dm0644 ${systemConfig}                    $out/root/etc/config/system

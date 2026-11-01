@@ -36,8 +36,6 @@
     device_type = "openwrt-be10000";
     tailscale_tag = "tag:router";
     tailscale_login_server = "sshr.polarbearvuzi.com";
-    lan_cidr = "192.168.69.0/24";
-    lan_ip = "192.168.69.1";
     wifi_wan = "true";
   };
 }

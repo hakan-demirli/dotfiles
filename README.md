@@ -103,9 +103,15 @@ A missing key fails `sops-install-secrets.service` (system) or `sops-nix.service
 Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`.
 Every node initially receives `tag:bootstrap` using preauth key in `secrets/bootstrap/tailscale.yaml`.
 Permanent tags are assigned manually without re-registering the node.
+Headscale users that the generated policy names are created on deploy.
+
+Machines that this repository does not manage are `inventory/routed-hosts/`.
+Their network sets the `tailnet_router`, and `access` grants TCP ports to teams or users.
+`nix run .#router-0-config` serves the route and pins the lease to the MAC in `lan.routed_hosts.<id>` of `secrets/router-0/deploy.yaml`.
 
 - `nix build .#diagrams-tailnet`
 - `sudo headscale nodes tag -i <id> -t tag:first,tag:second`.
+- `sudo headscale preauthkeys create --user <id> --expiration 24h` for a guest device.
 
 ## Non-NixOS Devices
 
