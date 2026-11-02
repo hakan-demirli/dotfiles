@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "keybinds": {
+    "session.tab.next": "alt+down,ctrl+down",
+    "session.tab.previous": "alt+up,ctrl+up",
+    "session.tab.select.1": "<leader>1,ctrl+alt+u",
+    "session.tab.select.2": "<leader>2,ctrl+alt+i",
+    "session.tab.select.3": "<leader>3,ctrl+alt+o",
+    "session.tab.select.4": "<leader>4,ctrl+alt+p",
+    "session.half.page.up": "none",
+    "which-key.scroll.up": "ctrl+alt+up"
+  }
+}

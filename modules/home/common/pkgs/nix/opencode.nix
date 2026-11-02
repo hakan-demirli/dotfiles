@@ -31,6 +31,7 @@ let
   ];
 
   opencodeConfigDir = ../../config/opencode;
+  opencodeCliSettings = opencodeConfigDir + "/cli.json";
   proxySettings = {
     baseURL = "${(import ../../lib.nix).serviceUrl inputs "cliproxyapi"}/v1";
   }
@@ -48,7 +49,7 @@ let
   opencodeConfigEntries = lib.mapAttrsToList (name: _type: {
     inherit name;
     path = if name == "opencode.json" then opencodeSettings else opencodeConfigDir + "/${name}";
-  }) (builtins.readDir opencodeConfigDir);
+  }) (removeAttrs (builtins.readDir opencodeConfigDir) [ "cli.json" ]);
   opencodeConfig = pkgs.linkFarm "opencode-config" opencodeConfigEntries;
 
   requireServerPassword = pkgs.writeShellApplication {
@@ -74,6 +75,25 @@ in
     sessionVariables = lib.optionalAttrs ((import ../../lib.nix).allowsPersonalData facts) {
       OPENCODE_URL = serverUrl;
     };
+
+    activation.configureOpencodeCli = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      run install -d -m 700 ${lib.escapeShellArg "${config.xdg.configHome}/opencode"}
+      if [[ ! -v DRY_RUN ]]; then
+        settings=${lib.escapeShellArg "${config.xdg.configHome}/opencode/cli.json"}
+        previous="$settings"
+        if [[ ! -f "$previous" ]]; then
+          previous=${pkgs.writeText "opencode-empty-cli.json" "{}"}
+        fi
+        next="$(mktemp "$settings.XXXXXX")"
+        if ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$previous" ${opencodeCliSettings} > "$next"; then
+          chmod 600 "$next"
+          mv -f "$next" "$settings"
+        else
+          rm -f "$next"
+          exit 1
+        fi
+      fi
+    '';
   };
 
   xdg.configFile.opencode = lib.mkIf (opencodeConfigEntries != [ ]) {
