@@ -14,13 +14,12 @@ let
   '';
 
   acpiOverrideZip = pkgs.fetchurl {
-    url = "https://github.com/user-attachments/files/33251307/acpi.zip";
-    hash = "sha256-4kCECL/RLOmejuZcDZ3aFEaxuGMKJFYC11PR7JRmFK4=";
+    url = "https://github.com/user-attachments/files/34321411/acpi.zip";
+    hash = "sha256-yHOt0R5nkYr8kXkJbmB7t33B8S9ZnLDNF79f6wR2zXo=";
   };
   acpiOverride = pkgs.runCommand "acpi-override" { nativeBuildInputs = [ pkgs.unzip ]; } ''
     mkdir -p kernel/firmware/acpi
     unzip -p ${acpiOverrideZip} dsdt.aml > kernel/firmware/acpi/dsdt.aml
-    unzip -p ${acpiOverrideZip} ssdt-laptoppc.aml > kernel/firmware/acpi/ssdt-laptoppc.aml
     find kernel | ${pkgs.cpio}/bin/cpio -H newc --create > $out
   '';
 
@@ -50,6 +49,7 @@ in
       prepend = [ "${acpiOverride}" ];
       kernelModules = [ ];
     };
+    kernelParams = [ "acpi=copy_dsdt" ];
     kernelModules = [
       "kvm-intel"
       "intel_ishtp_hid"
