@@ -76,6 +76,7 @@ in
       ".local/share/state" = "persistent";
       ".local/share/opencode" = "persistent";
       ".local/state/bash" = "persistent";
+      ".local/state/exodia" = "persistent";
       ".local/state/opencode" = "persistent";
       ".local/state/pi" = "persistent";
       ".local/state/wireplumber" = "persistent";
