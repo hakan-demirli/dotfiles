@@ -6,4 +6,4 @@ permissions:
   pull-requests: read
 jobs:
   checks:
-    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@fb6406106d837996374a1aa2c3b829b6fde92ced
+    uses: hakan-demirli/infra-lib/.github/workflows/checks.yml@0dc22f2cf5d3ff2e3e38b76190a7d1256e1be9a2
