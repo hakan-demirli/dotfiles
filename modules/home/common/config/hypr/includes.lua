@@ -112,7 +112,6 @@ hl.config({
     force_split = 0,
     preserve_split = true,
     smart_split = false,
-    special_scale_factor = 0.9,
     split_width_multiplier = 1.0,
     use_active_for_splits = true,
     default_split_ratio = 1.0,
@@ -120,7 +119,6 @@ hl.config({
 
   master = {
     allow_small_split = false,
-    special_scale_factor = 0.9,
     mfact = 0.55,
     new_status = "master",
     new_on_top = false,
