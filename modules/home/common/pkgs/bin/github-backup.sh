@@ -57,6 +57,20 @@ if [ -z "${GH_TOKEN:-}" ]; then
   exit 3
 fi
 
+TOKEN_LOGIN="$(
+  printf 'Authorization: Bearer %s\n' "$GH_TOKEN" \
+    | curl -fsS --retry 10 --retry-all-errors --retry-delay 6 --max-time 30 \
+      -H @- \
+      -H "Accept: application/vnd.github+json" \
+      https://api.github.com/user \
+    | jq -er '.login'
+)"
+
+if [ "$TOKEN_LOGIN" != "$USER" ]; then
+  echo "github-backup: GH_TOKEN belongs to '$TOKEN_LOGIN', expected '$USER'" >&2
+  exit 4
+fi
+
 mkdir -p "$CLONE_TO"
 
 export GHORG_SCM_TYPE="github"
@@ -64,8 +78,7 @@ export GHORG_CLONE_TYPE="user"
 export GHORG_BASE_URL="https://api.github.com/"
 export GHORG_ABSOLUTE_PATH_TO_CLONE_TO="$CLONE_TO"
 export GHORG_CLONE_WIKI="true"
-export GHORG_PRUNE="true"
-export GHORG_PRUNE_NO_CONFIRM="true"
+export GHORG_PRUNE="false"
 export GHORG_SKIP_ARCHIVED="false"
 export GHORG_SKIP_FORKS="true"
 export GHORG_GITHUB_TOKEN="$GH_TOKEN"

@@ -14,8 +14,10 @@ let
     runtimeInputs = [
       pkgs.bash
       pkgs.coreutils
+      pkgs.curl
       pkgs.git
       pkgs.ghorg
+      pkgs.jq
     ];
     text = builtins.readFile ../bin/github-backup.sh;
   };
