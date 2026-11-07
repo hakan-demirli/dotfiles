@@ -31,6 +31,19 @@ nix build .#intent-report
 nix build .#diagrams
 ```
 
+## Changes And Deploys
+
+Forgejo on `vps-oracle-0` holds the repositories at `http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001`. GitHub is a backup copy.
+
+1. Push a branch and open a pull request into `unstable`, the default branch.
+2. nixbot builds `hydraJobs` at `http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8010`. The `server-dev` hosts build for `x86_64-linux`. The merge needs `nixbot/nix-eval` and `nixbot/nix-build`.
+3. After `unstable` builds, the `promote-main` effect fast-forwards `main`. Only the `nixbot` account can push `main`.
+4. Hosts install `main` between 04:00 and 06:00 Europe/Zurich.
+
+A scheduled effect updates `flake.lock` every day at 07:17 UTC and merges the pull request when its build passes.
+
+Forgejo flake inputs need the tailnet. Install new hosts with Auto Deploy from a tailnet machine.
+
 ## NixOS
 
 ```bash
