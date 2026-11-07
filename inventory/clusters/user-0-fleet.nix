@@ -68,6 +68,10 @@
         port = 8317;
         role = "controller";
       };
+      forgejo = {
+        port = 3001;
+        role = "controller";
+      };
       ntfy = {
         port = 8111;
         role = "controller";

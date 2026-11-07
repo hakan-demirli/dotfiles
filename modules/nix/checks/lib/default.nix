@@ -23,6 +23,7 @@
   };
   grafana-navigation = import ./grafana-navigation.nix { inherit pkgs self; };
   file-transfer = import ./file-transfer.nix { inherit pkgs self lib; };
+  forgejo-repositories = import ./forgejo-repositories.nix { inherit pkgs self inputs; };
   intent = import ./intent.nix { inherit pkgs self; };
   inventory-eval = import ./inventory-eval.nix { inherit pkgs self lib; };
   installers = import ./installers.nix { inherit pkgs self; };

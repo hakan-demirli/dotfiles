@@ -16,6 +16,7 @@ let
   incompleteDir = "${downloadDir}/.incomplete";
   mediaDir = "${downloadDir}/media";
   tailnetUrl = "http://100.64.0.1";
+  forgeDomain = "${host.id}.ts.${config.services.tailscale.loginServerHost}";
   impermanenceEnabled = host.impermanence.enable or false;
 
 in
@@ -87,6 +88,10 @@ in
         name = "Alert rules";
         url = "${tailnetUrl}:${toString config.services.cluster-vmalert.listenPort}/";
       }
+      {
+        name = "Forgejo";
+        url = "${tailnetUrl}:${toString config.cluster.services.forgejo.port}/";
+      }
     ];
 
     homepage.extraLan = [
@@ -105,6 +110,41 @@ in
     };
 
     cluster-victoriametrics.targetDomain = "ts.sshr.polarbearvuzi.com";
+
+    cluster-forgejo = {
+      domain = forgeDomain;
+      listenPort = config.cluster.services.forgejo.port;
+      admin = {
+        username = "hakan-demirli";
+        email = "hakan-demirli@${forgeDomain}";
+        password = {
+          source = "sops";
+          sopsKeyName = "forgejo/admin-password";
+        };
+      };
+    };
+
+    # Fleet hosts fetch the flake without credentials; the port is tailnet-only.
+    forgejo.settings.service.REQUIRE_SIGNIN_VIEW = lib.mkForce false;
+
+    forgejo-repositories = {
+      repositories = {
+        dotfiles = { };
+        infra-lib = { };
+        NUR = { };
+        NURP.private = true;
+        state.private = true;
+        code_templates.private = true;
+      };
+      sshKeys = lib.unique (
+        lib.concatLists (
+          lib.mapAttrsToList (
+            _: user:
+            lib.optionals (lib.elem "fleet" user.admin_scopes && !(user.archived or false)) user.keys.ssh
+          ) cluster.users
+        )
+      );
+    };
 
     cliproxyapi = {
       enable = true;
