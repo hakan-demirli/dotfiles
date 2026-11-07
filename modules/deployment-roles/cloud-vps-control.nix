@@ -64,43 +64,56 @@ in
       rpcWhitelist = "127.0.0.1,::1,100.64.*.*";
     };
 
-    homepage.extraServices = [
-      {
-        name = "Transmission";
-        url = "${tailnetUrl}:9091/transmission/web/";
-      }
-      {
-        name = "Grafana";
-        url = "${tailnetUrl}:${toString config.services.cluster-grafana.listenPort}/";
-      }
-      {
-        name = "VictoriaMetrics";
-        url = "${tailnetUrl}:${toString config.services.cluster-victoriametrics.listenPort}/vmui/";
-      }
-      {
-        name = "VictoriaLogs";
-        url = "${tailnetUrl}:${toString config.services.cluster-victorialogs.listenPort}/select/vmui/";
-      }
-      {
-        name = "Alertmanager";
-        url = "${tailnetUrl}:${toString config.services.cluster-alertmanager.listenPort}/";
-      }
-      {
-        name = "Alert rules";
-        url = "${tailnetUrl}:${toString config.services.cluster-vmalert.listenPort}/";
-      }
-      {
-        name = "Forgejo";
-        url = "${tailnetUrl}:${toString config.cluster.services.forgejo.port}/";
-      }
-    ];
+    homepage = {
+      extraServices = [
+        {
+          name = "Transmission";
+          url = "${tailnetUrl}:9091/transmission/web/";
+        }
+        {
+          name = "Grafana";
+          url = "${tailnetUrl}:${toString config.services.cluster-grafana.listenPort}/";
+        }
+        {
+          name = "VictoriaMetrics";
+          url = "${tailnetUrl}:${toString config.services.cluster-victoriametrics.listenPort}/vmui/";
+        }
+        {
+          name = "VictoriaLogs";
+          url = "${tailnetUrl}:${toString config.services.cluster-victorialogs.listenPort}/select/vmui/";
+        }
+        {
+          name = "Alertmanager";
+          url = "${tailnetUrl}:${toString config.services.cluster-alertmanager.listenPort}/";
+        }
+        {
+          name = "Alert rules";
+          url = "${tailnetUrl}:${toString config.services.cluster-vmalert.listenPort}/";
+        }
+        {
+          name = "Forgejo";
+          url = "${tailnetUrl}:${toString config.cluster.services.forgejo.port}/";
+        }
+        {
+          name = "nixbot";
+          url = "${tailnetUrl}:${toString config.cluster.services.nixbot.port}/";
+        }
+      ];
 
-    homepage.extraLan = [
-      {
-        name = "plug-0";
-        url = "http://plug-0.lan";
-      }
-    ];
+      extraAddresses = [
+        {
+          name = "Deploy Plan";
+          url = config.cluster.autoUpgrade.planUrl;
+        }
+      ];
+
+      extraLan = [
+        {
+          name = "plug-0";
+          url = "http://plug-0.lan";
+        }
+      ];
+    };
 
     cluster-harmonia = {
       firewallInterface = config.services.tailscale.interfaceName;

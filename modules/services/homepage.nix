@@ -16,10 +16,6 @@ let
       url = "http://${ts}:${toString cluster.services.ntfy.port}";
     }
     {
-      name = "Deasciifier";
-      url = "http://${ts}:8200";
-    }
-    {
       name = "Jellyfin";
       url = "http://${ts}:8096";
     }
@@ -34,10 +30,6 @@ let
     {
       name = "Nix Cache";
       url = "http://${ts}:5101";
-    }
-    {
-      name = "Docker Registry";
-      url = "http://${ts}:5000";
     }
   ]
   ++ cfg.extraAddresses;
