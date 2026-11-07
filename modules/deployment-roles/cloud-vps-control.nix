@@ -3,6 +3,7 @@
   host,
   cluster,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -107,6 +108,18 @@ in
 
     cliproxyapi = {
       enable = true;
+      # v8.0.53 keeps Fable-only 429s model-scoped (router-for-me/CLIProxyAPI#7197);
+      # older releases cool the whole credential and block every model on it.
+      package = pkgs.cliproxyapi.overrideAttrs (_: {
+        version = "8.0.53";
+        src = pkgs.fetchFromGitHub {
+          owner = "router-for-me";
+          repo = "CLIProxyAPI";
+          tag = "v8.0.53";
+          hash = "sha256-XvrI11A4C4oe9vAe6j9uLxmKDZ989jZnAXHNrC0k1yA=";
+        };
+        vendorHash = "sha256-YZf38f5X+z/rICUQKHuzmZxkPH3AAap6XkIho/injVA=";
+      });
       settings = {
         config-version = 8;
         server = {
