@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   cluster,
   host,
   ...
@@ -11,12 +12,14 @@ let
   user = "nix-builder";
   clientKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJu+mS+liA9ur+EzcRcWnVNw0VccgCKnZedudl3ScqnO nix-build-farm";
   sopsKey = "nix-build-farm/ssh-key";
+  inherit (cluster.services.nix-build-farm) port;
 
   builders = cluster.hostsByDeploymentRole.server-dev;
   isBuilder = lib.elem host.id builders;
   remoteBuilders = lib.remove host.id builders;
 
   hostNameOf = id: "${id}.ts.${config.services.tailscale.loginServerHost}";
+  aliasOf = id: "nix-build-farm-${id}";
 
   threadsOf =
     hardware:
@@ -31,7 +34,7 @@ let
       inherit (cluster.hosts.${id}) hardware;
     in
     {
-      hostName = hostNameOf id;
+      hostName = aliasOf id;
       sshUser = user;
       sshKey = config.sops.secrets.${sopsKey}.path;
       protocol = "ssh-ng";
@@ -66,6 +69,48 @@ in
       };
 
       nix.settings.trusted-users = [ user ];
+
+      # The builder port is a tailnet-only cluster service, so it must stay out of
+      # services.openssh.ports, which openFirewall opens on every interface.
+      services.openssh = {
+        listenAddresses = lib.concatMap (
+          listenPort:
+          map
+            (addr: {
+              inherit addr;
+              port = listenPort;
+            })
+            [
+              "0.0.0.0"
+              "[::]"
+            ]
+        ) (config.services.openssh.ports ++ [ port ]);
+        extraConfig = ''
+          Match LocalPort ${toString port}
+            AllowUsers ${user}
+          Match User ${user}
+            AllowAgentForwarding no
+            AllowTcpForwarding no
+            PermitTTY no
+            X11Forwarding no
+        '';
+      };
+
+      # The builder serves the nix daemon, not slurm jobs; exempt it from session adoption.
+      security.pam.services.sshd.rules.account.${user} =
+        lib.mkIf (config.services.slurm-cluster.adoptSshSessions or false)
+          {
+            enable = true;
+            control = "sufficient";
+            modulePath = "${pkgs.linux-pam}/lib/security/pam_succeed_if.so";
+            args = [
+              "quiet"
+              "user"
+              "="
+              user
+            ];
+            order = config.security.pam.services.sshd.rules.account.wheel-bypass.order - 1;
+          };
     })
 
     (lib.mkIf cfg.offload {
@@ -77,12 +122,21 @@ in
         buildMachines = map machine remoteBuilders;
       };
 
-      programs.ssh.knownHosts = lib.genAttrs remoteBuilders (id: {
-        hostNames = [ (hostNameOf id) ];
-        publicKey =
-          cluster.hosts.${id}.labels.ssh_host_ed25519
-            or (throw "nix-build-farm: builder ${id} needs labels.ssh_host_ed25519 in its inventory entry");
-      });
+      programs.ssh = {
+        extraConfig = lib.concatMapStrings (id: ''
+          Host ${aliasOf id}
+            HostName ${hostNameOf id}
+            Port ${toString port}
+            HostKeyAlias ${hostNameOf id}
+        '') remoteBuilders;
+
+        knownHosts = lib.genAttrs remoteBuilders (id: {
+          hostNames = [ (hostNameOf id) ];
+          publicKey =
+            cluster.hosts.${id}.labels.ssh_host_ed25519
+              or (throw "nix-build-farm: builder ${id} needs labels.ssh_host_ed25519 in its inventory entry");
+        });
+      };
     })
   ];
 }
