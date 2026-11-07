@@ -21,6 +21,8 @@
     "infra:services/jellyfin"
     "infra:services/transmission"
     "infra:services/fail2ban"
+    "infra:services/forgejo"
+    "self:services/forgejo-repositories"
     "self:services/sops"
     "self:deployment-roles/cloud-vps-control"
   ];
