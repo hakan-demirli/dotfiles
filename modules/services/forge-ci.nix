@@ -112,7 +112,7 @@ in
       # The UI is reachable from the fleet's tailnet only.
       allowUnauthenticatedControl = true;
       evalWorkerCount = 2;
-      evalMaxMemorySize = 4096;
+      evalMaxMemorySize = 6144;
 
       gitea = {
         enable = true;
