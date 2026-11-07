@@ -76,6 +76,10 @@
         port = 8010;
         role = "controller";
       };
+      nix-build-farm = {
+        port = 2222;
+        role = "compute";
+      };
       ntfy = {
         port = 8111;
         role = "controller";
