@@ -118,7 +118,16 @@ in
 
       nix = {
         distributedBuilds = true;
-        settings.builders-use-substitutes = true;
+        settings = {
+          builders-use-substitutes = true;
+          # binfmt keeps running foreign binaries, but builds for the farm's systems
+          # wait for a free builder instead of overflowing into local emulation.
+          extra-platforms = lib.mkForce (
+            lib.subtractLists (lib.concatMap (machine: machine.systems) config.nix.buildMachines) (
+              lib.optionals config.boot.binfmt.addEmulatedSystemsToNixSandbox config.boot.binfmt.emulatedSystems
+            )
+          );
+        };
         buildMachines = map machine remoteBuilders;
       };
 
