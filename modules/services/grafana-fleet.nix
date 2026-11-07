@@ -7,6 +7,7 @@
   ...
 }:
 let
+  inherit (inputs.self.lib) forge;
   datasource = {
     type = "prometheus";
     uid = "\${datasource}";
@@ -111,10 +112,8 @@ let
 
       revision="$(
         curl -fsSL --connect-timeout 10 --max-time 30 \
-          -H 'Accept: application/vnd.github+json' \
-          -H 'User-Agent: fleet-revision-collector' \
-          https://api.github.com/repos/hakan-demirli/dotfiles/commits/main \
-          | jq -er '.sha | select(test("^[0-9a-f]{40}$"))'
+          ${lib.escapeShellArg "${forge.url}/api/v1/repos/${forge.owner}/dotfiles/branches/main"} \
+          | jq -er '.commit.id | select(test("^[0-9a-f]{40}$"))'
       )"
       shortRevision="''${revision:0:12}"
 

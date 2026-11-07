@@ -49,6 +49,7 @@
 
   labels = {
     tailscale_authority = "true";
+    ssh_host_ed25519 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFMzzmhlvCbmbpDDLdmFFCLWztz51qwdDS5IgrkIyEgO";
   };
 
   monitoring = {

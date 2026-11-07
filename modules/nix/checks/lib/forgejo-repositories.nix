@@ -60,8 +60,20 @@ pkgs.testers.runNixOSTest {
         forgejo.settings.service.REQUIRE_SIGNIN_VIEW = lib.mkForce false;
 
         forgejo-repositories = {
+          users.bot.email = "bot@example.com";
           repositories = {
-            demo = { };
+            demo = {
+              defaultBranch = "unstable";
+              topics = [ "ci" ];
+              collaborators.bot = "admin";
+              settings.allow_merge_commits = false;
+              branchProtections.release = {
+                enable_push = true;
+                enable_push_whitelist = true;
+                push_whitelist_usernames = [ "bot" ];
+                apply_to_admins = true;
+              };
+            };
             secret.private = true;
           };
           sshKeys = [ (lib.fileContents "${pushKey}/id_ed25519.pub") ];
@@ -115,6 +127,19 @@ pkgs.testers.runNixOSTest {
         assert repo_private("demo") is False
         assert repo_private("secret") is True
 
+    with subtest("declared repository policy is applied"):
+        demo = api_get("/repos/${adminUser}/demo")
+        assert demo["allow_merge_commits"] is False, demo
+        assert demo["default_branch"] == "unstable", demo
+        assert api_get("/repos/${adminUser}/demo/topics")["topics"] == ["ci"]
+        collaborators = api_get("/repos/${adminUser}/demo/collaborators")
+        assert [c["login"] for c in collaborators] == ["bot"], collaborators
+        permission = api_get("/repos/${adminUser}/demo/collaborators/bot/permission")
+        assert permission["permission"] == "admin", permission
+        protection = api_get("/repos/${adminUser}/demo/branch_protections/release")
+        assert protection["push_whitelist_usernames"] == ["bot"], protection
+        assert protection["apply_to_admins"] is True, protection
+
     with subtest("administrator pushes over the host sshd with a declared key"):
         forge.succeed("install -d -m 0700 /root/.ssh")
         forge.succeed("install -m 0600 ${pushKey}/id_ed25519 /root/.ssh/id_ed25519")
@@ -127,6 +152,21 @@ pkgs.testers.runNixOSTest {
         forge.succeed(
             "GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' "
             "git -C /tmp/seed push -q ssh://forgejo@localhost/${adminUser}/demo.git main"
+        )
+
+    with subtest("the default branch survives reprovisioning once it exists"):
+        forge.succeed(
+            "GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' "
+            "git -C /tmp/seed push -q ssh://forgejo@localhost/${adminUser}/demo.git main:unstable"
+        )
+        forge.succeed("systemctl restart forgejo-repositories.service")
+        assert api_get("/repos/${adminUser}/demo")["default_branch"] == "unstable"
+
+    with subtest("a protected branch refuses the administrator"):
+        forge.succeed("git -C /tmp/seed -c user.name=t -c user.email=t@example.com commit -q --allow-empty -m next")
+        forge.fail(
+            "GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' "
+            "git -C /tmp/seed push -q ssh://forgejo@localhost/${adminUser}/demo.git main:release"
         )
 
     with subtest("fleet hosts clone public repositories without credentials"):
@@ -145,8 +185,12 @@ pkgs.testers.runNixOSTest {
             "curl -sf " + auth + " -X POST -H 'Content-Type: application/json'"
             " -d '" + json.dumps({"title": "stray", "key": stray}) + "' " + api + "/user/keys"
         )
+        forge.succeed(
+            "curl -sf " + auth + " -X DELETE " + api + "/repos/${adminUser}/demo/collaborators/bot"
+        )
         forge.succeed("systemctl restart forgejo-repositories.service")
         assert repo_private("demo") is False
+        assert [c["login"] for c in api_get("/repos/${adminUser}/demo/collaborators")] == ["bot"]
         keys = api_get("/user/keys")
         assert [k["title"] for k in keys] == ["pusher@test"], keys
         listing = api_get("/repos/search?q=demo")

@@ -23,6 +23,8 @@
     "infra:services/fail2ban"
     "infra:services/forgejo"
     "self:services/forgejo-repositories"
+    "self:services/forge-ci"
+    "self:services/nix-build-farm"
     "self:services/sops"
     "self:deployment-roles/cloud-vps-control"
   ];

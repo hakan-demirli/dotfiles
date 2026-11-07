@@ -15,6 +15,7 @@
     "infra:services/apptainer"
     "infra:services/slurm"
     "self:services/sops"
+    "self:services/nix-build-farm"
     "self:deployment-roles/server-dev"
   ];
 }

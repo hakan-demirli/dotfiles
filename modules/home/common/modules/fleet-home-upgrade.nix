@@ -70,7 +70,7 @@ in
     };
     flake = lib.mkOption {
       type = lib.types.strMatching "[^?]+";
-      default = "github:hakan-demirli/dotfiles";
+      default = inputs.self.lib.forge.flake "dotfiles";
     };
     configuration = lib.mkOption {
       type = lib.types.str;
