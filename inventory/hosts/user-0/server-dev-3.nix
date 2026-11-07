@@ -52,6 +52,7 @@
 
   labels = {
     tailscale_authority = "true";
+    ssh_host_ed25519 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN4qFJ/vk+RG3CoCjSzvQLARdYKs+W4Ax3sU71HqdTTZ";
     nixos_hardware = "framework/desktop/amd-ai-max-300-series";
     nix_cache_public_key = "fleet-deploy-cache-1:AUwjF2bmOUGf3avvHUkJ6mKafc6O76ir5tCSWAxrIP4=";
   };

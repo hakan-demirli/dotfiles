@@ -1,6 +1,7 @@
 {
   config,
   host,
+  inputs,
   cluster,
   lib,
   pkgs,
@@ -115,7 +116,7 @@ in
       domain = forgeDomain;
       listenPort = config.cluster.services.forgejo.port;
       admin = {
-        username = "hakan-demirli";
+        username = inputs.self.lib.forge.owner;
         email = "hakan-demirli@${forgeDomain}";
         password = {
           source = "sops";

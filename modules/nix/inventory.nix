@@ -54,6 +54,17 @@ let
 
   hostFacts = infra-lib.lib.mkHostFacts inventory;
   kexecRootKeys = infra-lib.lib.mkKexecRootKeys inventory;
+
+  forge =
+    let
+      service = inventory.services.forgejo;
+    in
+    rec {
+      owner = "hakan-demirli";
+      url = "http://${lib.head service.hosts}.ts.sshr.polarbearvuzi.com:${toString service.port}";
+      repository = name: "${url}/${owner}/${name}.git";
+      flake = name: "git+${url}/${owner}/${name}";
+    };
 in
 {
   flake = {
@@ -65,6 +76,7 @@ in
         types
         hostFacts
         kexecRootKeys
+        forge
         ;
     };
 

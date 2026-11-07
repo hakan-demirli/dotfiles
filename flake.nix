@@ -6,7 +6,7 @@
     );
 
   inputs = {
-    infra-lib.url = "github:hakan-demirli/infra-lib";
+    infra-lib.url = "git+http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib";
 
     nixpkgs.follows = "infra-lib/nixpkgs";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -26,12 +26,17 @@
     nix-darwin.follows = "infra-lib/nix-darwin";
 
     nur = {
-      url = "github:hakan-demirli/NUR";
+      url = "git+http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     home-manager = {
       url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixbot = {
+      url = "github:Mic92/nixbot";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

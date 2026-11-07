@@ -176,15 +176,15 @@
       "locked": {
         "lastModified": 1793544858,
         "narHash": "sha256-pR3TBM/mufa0ediA5cHlYFWjS1ELOOsnGNqsaimmWJA=",
-        "owner": "hakan-demirli",
-        "repo": "infra-lib",
+        "ref": "refs/heads/main",
         "rev": "eace6dc6c82ae7fa6c8b26f1a8636b276126258f",
-        "type": "github"
+        "revCount": 98,
+        "type": "git",
+        "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib"
       },
       "original": {
-        "owner": "hakan-demirli",
-        "repo": "infra-lib",
-        "type": "github"
+        "type": "git",
+        "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib"
       }
     },
     "nix-darwin": {
@@ -246,6 +246,27 @@
       "original": {
         "owner": "nix-community",
         "repo": "nix-github-actions",
+        "type": "github"
+      }
+    },
+    "nixbot": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treefmt-nix": "treefmt-nix"
+      },
+      "locked": {
+        "lastModified": 1794053215,
+        "narHash": "sha256-VQiy/nPNa0282QTiLNPjMqSGhPJPU4djVB8G29N21Vg=",
+        "owner": "Mic92",
+        "repo": "nixbot",
+        "rev": "849c4fa2f8bd68968c4447316e41addcba520540",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "nixbot",
         "type": "github"
       }
     },
@@ -421,15 +442,15 @@
       "locked": {
         "lastModified": 1793228817,
         "narHash": "sha256-Ev/UZFYYqnnkHtmRtRerL64NBca1EolrwcNUurJdc/M=",
-        "owner": "hakan-demirli",
-        "repo": "NUR",
+        "ref": "refs/heads/main",
         "rev": "1cb21e565543e7d9cbec96be9ed64346a7b864c4",
-        "type": "github"
+        "revCount": 159,
+        "type": "git",
+        "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/NUR"
       },
       "original": {
-        "owner": "hakan-demirli",
-        "repo": "NUR",
-        "type": "github"
+        "type": "git",
+        "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/NUR"
       }
     },
     "root": {
@@ -457,6 +478,7 @@
           "nix-darwin"
         ],
         "nix-github-actions": "nix-github-actions_2",
+        "nixbot": "nixbot",
         "nixos-hardware": [
           "infra-lib",
           "nixos-hardware"
@@ -533,6 +555,27 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixbot",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780220602,
+        "narHash": "sha256-eynAfOmbmxJnkp7YewvCEbShNnnYJ9gLLqkzsYtBPeM=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "db947814a175b7ca6ded66e21383d938df01c227",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
         "type": "github"
       }
     }

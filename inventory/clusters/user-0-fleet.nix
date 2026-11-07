@@ -72,6 +72,10 @@
         port = 3001;
         role = "controller";
       };
+      nixbot = {
+        port = 8010;
+        role = "controller";
+      };
       ntfy = {
         port = 8111;
         role = "controller";
