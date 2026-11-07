@@ -18,6 +18,9 @@ let
   isBuilder = lib.elem host.id builders;
   remoteBuilders = lib.remove host.id builders;
 
+  # Systems a builder runs natively, beside its own.
+  nativeSystems = arch: [ arch ] ++ lib.optional (arch == "x86_64-linux") "i686-linux";
+
   hostNameOf = id: "${id}.ts.${config.services.tailscale.loginServerHost}";
   aliasOf = id: "nix-build-farm-${id}";
 
@@ -38,7 +41,7 @@ let
       sshUser = user;
       sshKey = config.sops.secrets.${sopsKey}.path;
       protocol = "ssh-ng";
-      systems = [ hardware.arch ];
+      systems = nativeSystems hardware.arch;
       maxJobs = lib.max 1 (threadsOf hardware / 8);
       speedFactor = threadsOf hardware;
       supportedFeatures = [

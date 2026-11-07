@@ -159,6 +159,9 @@ pkgs.testers.runNixOSTest {
             "GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' "
             "git -C /tmp/seed push -q ssh://forgejo@localhost/${adminUser}/demo.git main:unstable"
         )
+        forge.wait_until_succeeds(
+            "curl -sf " + auth + " " + api + "/repos/${adminUser}/demo/branches/unstable"
+        )
         forge.succeed("systemctl restart forgejo-repositories.service")
         assert api_get("/repos/${adminUser}/demo")["default_branch"] == "unstable"
 
