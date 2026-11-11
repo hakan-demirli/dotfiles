@@ -39,7 +39,6 @@
               pkgs.runCommand "check-host-${h}"
                 {
                   target = cfg.config.system.build.toplevel;
-                  passthru.ciCost = "heavy";
                 }
                 ''
                   test -e "$target"

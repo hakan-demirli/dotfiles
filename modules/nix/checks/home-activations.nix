@@ -26,7 +26,6 @@
               pkgs.runCommand "check-home-${id}"
                 {
                   target = inputs.self.homeConfigurations.${target.name}.activationPackage;
-                  passthru.ciCost = "heavy";
                 }
                 ''
                   test -e "$target"
