@@ -165,7 +165,6 @@
         "impermanence": "impermanence",
         "import-tree": "import-tree",
         "nix-darwin": "nix-darwin",
-        "nix-github-actions": "nix-github-actions",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-ceph": "nixpkgs-ceph",
@@ -174,11 +173,11 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1794430013,
-        "narHash": "sha256-bXTd7lgQDxeHQyqYBjEQS55vTbmc5gCqyn3HtnttAuo=",
+        "lastModified": 1794433384,
+        "narHash": "sha256-U0DyOXFVD1ROAxAOIoWgARDr2RL0Sfxpq9/deWS4+TU=",
         "ref": "refs/heads/main",
-        "rev": "8b8facc10e2345ee897e07f993706f83bb166ef5",
-        "revCount": 106,
+        "rev": "bc1b3fc844f1f3ad09ebfb9d30dbb74130efc6d2",
+        "revCount": 107,
         "type": "git",
         "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib"
       },
@@ -205,27 +204,6 @@
       "original": {
         "owner": "LnL7",
         "repo": "nix-darwin",
-        "type": "github"
-      }
-    },
-    "nix-github-actions": {
-      "inputs": {
-        "nixpkgs": [
-          "infra-lib",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1737420293,
-        "narHash": "sha256-F1G5ifvqTpJq7fdkT34e/Jy9VCyzd5XfJ9TO8fHhJWE=",
-        "owner": "nix-community",
-        "repo": "nix-github-actions",
-        "rev": "f4158fa080ef4503c8f4c820967d946c2af31ec9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-community",
-        "repo": "nix-github-actions",
         "type": "github"
       }
     },
