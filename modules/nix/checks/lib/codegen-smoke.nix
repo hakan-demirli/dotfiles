@@ -286,6 +286,11 @@ pkgs.runCommand "codegen-smoke"
       || fail "headscale-acl: fleet access to forgejo missing"
     pass "headscale-acl: fleet access to forgejo present"
 
+    echo "$body" | jq -e \
+      '.acls | any(.action == "accept" and ((.src | index("tag:cluster-user-0-fleet")) != null) and ((.dst | index("tag:cluster-user-0-fleet-controller:80")) != null))' >/dev/null \
+      || fail "headscale-acl: fleet access to tailnet sites missing"
+    pass "headscale-acl: fleet access to tailnet sites present"
+
     for pair in $clusterTagPairs; do
       cid="''${pair%=*}"
       tag="''${pair#*=}"
