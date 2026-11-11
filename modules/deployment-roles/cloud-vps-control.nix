@@ -21,7 +21,7 @@ let
   inherit (inputs.self.lib) tailnetZone;
   sites = {
     ${tailnetZone} = config.services.homepage.port;
-    "git.${tailnetZone}" = config.cluster.services.forgejo.port;
+    ${inputs.self.lib.forge.site} = config.cluster.services.forgejo.port;
     "ci.${tailnetZone}" = config.cluster.services.nixbot.port;
   };
   forgeDomain = "${host.id}.ts.${config.services.tailscale.loginServerHost}";
