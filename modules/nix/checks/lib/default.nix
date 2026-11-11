@@ -21,6 +21,7 @@
   generated-headscale-policy = import ./generated-headscale-policy.nix {
     inherit pkgs self inputs;
   };
+  github-mirrors = import ./github-mirrors.nix { inherit pkgs; };
   grafana-navigation = import ./grafana-navigation.nix { inherit pkgs self; };
   file-transfer = import ./file-transfer.nix { inherit pkgs self lib; };
   forgejo-repositories = import ./forgejo-repositories.nix { inherit pkgs self inputs; };
