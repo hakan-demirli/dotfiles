@@ -69,6 +69,7 @@ let
       url = "http://${lib.head service.hosts}.ts.sshr.polarbearvuzi.com:${toString service.port}";
       repository = name: "${url}/${owner}/${name}.git";
       flake = name: "git+${url}/${owner}/${name}";
+      remote = name: "http://${site}/${owner}/${name}";
     };
 in
 {

@@ -178,6 +178,19 @@ pkgs.runCommand "home-state-automation"
         assert storage_state.is_symlink()
         assert storage_history.resolve() == persistent / ".local/state/bash/history"
 
+        moved = environment("moved-remote")
+        moved_state, moved_history = paths(moved)
+        previous = root / "previous.git"
+        execute([git, "clone", "--mirror", str(remote), str(previous)], base)
+        moved_state.parent.mkdir(parents=True)
+        execute([git, "clone", "--branch", branch, str(previous), str(moved_state)], moved)
+        (moved_state / ".local/state/bash/history").write_text(history.read_text() + "after the move\n")
+        backup(moved)
+        moved_head = execute([git, "-C", str(moved_state), "rev-parse", "HEAD"], moved)
+        assert execute([git, "-C", str(moved_state), "remote", "get-url", "origin"], moved) == str(remote)
+        assert execute([git, "--git-dir", str(remote), "rev-parse", branch], moved) == moved_head
+        assert execute([git, "--git-dir", str(previous), "rev-parse", branch], moved) != moved_head
+
         notes_remote = root / "notes.git"
         execute([git, "init", "--bare", "--initial-branch=notes", str(notes_remote)], base)
         notes_seed = root / "notes-seed"

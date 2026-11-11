@@ -53,6 +53,7 @@ fi
 [[ $(git -C "$repo" rev-parse --show-toplevel) == "$repo" ]]
 exec 8> "$(git -C "$repo" rev-parse --path-format=absolute --git-path state-sync.lock)"
 flock -w 30 8
+git -C "$repo" remote set-url origin "$remote"
 
 if [[ $(git -C "$repo" symbolic-ref --quiet --short HEAD) == "$branch" ]]; then
   :
