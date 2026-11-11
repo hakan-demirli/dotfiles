@@ -58,4 +58,9 @@
       "smartctl"
     ];
   };
+
+  deploy.hold = {
+    reason = "ssd swap";
+    until = "2026-11-12";
+  };
 }
