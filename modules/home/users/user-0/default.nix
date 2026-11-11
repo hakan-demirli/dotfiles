@@ -1,5 +1,6 @@
 {
   lib,
+  inputs,
   opencode,
   profile,
   facts,
@@ -8,7 +9,7 @@
 }:
 let
   personal = (import ../../common/lib.nix).allowsPersonalData facts;
-  stateRemote = "https://github.com/hakan-demirli/state";
+  stateRemote = inputs.self.lib.forge.remote "state";
 in
 {
   imports = [
