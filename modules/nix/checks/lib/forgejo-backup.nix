@@ -82,8 +82,9 @@ pkgs.runCommand "forgejo-backup"
             return path
 
         def listing(*names, foreign=()):
-            return [{"name": name, "owner": {"login": owner}} for name in names] + [
-                {"name": name, "owner": {"login": "someone-else"}} for name in foreign
+            bulk = {"description": "x" * 70000}
+            return [{"name": name, "owner": {"login": owner}} | bulk for name in names] + [
+                {"name": name, "owner": {"login": "someone-else"}} | bulk for name in foreign
             ]
 
         work = root / "work"
