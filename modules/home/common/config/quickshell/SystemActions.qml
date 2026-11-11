@@ -52,7 +52,7 @@ Singleton {
     }
 
     function setPowerProfile(profile) {
-        run(["hp-power", profile]);
+        run(["power-profile", profile]);
     }
 
     function setRefreshPolicy(policy) {
@@ -114,7 +114,7 @@ Singleton {
     PollingCommand {
         id: powerStatus
 
-        command: ["hp-power", "json"]
+        command: ["power-profile", "json"]
         interval: 5000
         onOutput: text => {
             const status = root.parseJson(text);

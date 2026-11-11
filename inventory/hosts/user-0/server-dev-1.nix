@@ -27,6 +27,7 @@
     ram_mib = 65536;
     arch = "x86_64-linux";
     gpu = "amd";
+    mainboard = "minisforum-ms-a2";
   };
 
   disko = {

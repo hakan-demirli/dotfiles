@@ -130,7 +130,7 @@
   },
   "group/battery-power": {
     "orientation": "horizontal",
-    "modules": ["battery", "custom/hp-power"]
+    "modules": ["battery", "custom/power-profile"]
   },
   "battery": {
     "align": 0.5,
@@ -152,11 +152,11 @@
     "tooltip": true,
     "tooltip-format": "{timeTo}\nPower: {power} W\nHealth: {health}%\nCycles: {cycles}",
     "menu": "on-click",
-    "menu-file": "~/.config/waybar/menu/hp-power.xml",
+    "menu-file": "~/.config/waybar/menu/power-profile.xml",
     "menu-actions": {
-      "turbo": "hp-power turbo",
-      "balanced": "hp-power balanced",
-      "silent": "hp-power silent"
+      "turbo": "power-profile turbo",
+      "balanced": "power-profile balanced",
+      "silent": "power-profile silent"
     },
     "on-click-right": "kitty --hold --title battery-status battery_status.py",
   },
@@ -219,20 +219,20 @@
       "logout": "gtk-applet-power-menu  --action logout"
     },
   },
-  "custom/hp-power": {
+  "custom/power-profile": {
     "justify": "center",
-    "exec-if": "command -v hp-power",
-    "exec": "hp-power waybar",
+    "exec-if": "command -v power-profile",
+    "exec": "power-profile json",
     "return-type": "json",
     "interval": 5,
     "format": "{}\n ",
     "tooltip": true,
     "menu": "on-click",
-    "menu-file": "~/.config/waybar/menu/hp-power.xml",
+    "menu-file": "~/.config/waybar/menu/power-profile.xml",
     "menu-actions": {
-      "turbo": "hp-power turbo",
-      "balanced": "hp-power balanced",
-      "silent": "hp-power silent"
+      "turbo": "power-profile turbo",
+      "balanced": "power-profile balanced",
+      "silent": "power-profile silent"
     }
   },
   "custom/refresh-rate": {

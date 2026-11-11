@@ -242,28 +242,28 @@ menu.touch-menu menuitem {
 }
 
 #battery,
-#custom-hp-power {
+#custom-power-profile {
   background: transparent;
   margin: 0;
 }
 
-#custom-hp-power {
+#custom-power-profile {
   padding: 0 2px 0 0;
 }
 
-#custom-hp-power.turbo {
+#custom-power-profile.turbo {
   color: @primary;
 }
 
-#custom-hp-power.balanced {
+#custom-power-profile.balanced {
   color: @tertiary;
 }
 
-#custom-hp-power.silent {
+#custom-power-profile.silent {
   color: @on-surface;
 }
 
-#custom-hp-power.unknown {
+#custom-power-profile.unknown {
   color: @outline;
 }
 

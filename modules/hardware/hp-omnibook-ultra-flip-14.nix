@@ -1,8 +1,4 @@
-{
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 let
   ishFirmwareZip = pkgs.fetchurl {
     url = "https://github.com/user-attachments/files/27080938/ish.zip";
@@ -22,21 +18,10 @@ let
     unzip -p ${acpiOverrideZip} dsdt.aml > kernel/firmware/acpi/dsdt.aml
     find kernel | ${pkgs.cpio}/bin/cpio -H newc --create > $out
   '';
-
-  hpPower = pkgs.writeShellScriptBin "hp-power" ''
-    export PATH=${
-      lib.makeBinPath [
-        pkgs.coreutils
-        pkgs.gawk
-        pkgs.kmod
-        pkgs.msr-tools
-        pkgs.util-linux
-      ]
-    }
-    ${builtins.readFile ./hp-power.sh}
-  '';
 in
 {
+  imports = [ ../system/power-profile.nix ];
+
   boot = {
     initrd = {
       availableKernelModules = [
@@ -61,34 +46,18 @@ in
     '';
   };
 
-  environment.systemPackages = [
-    hpPower
-    pkgs.msr-tools
-  ];
-
-  security.sudo.extraRules = [
-    {
-      groups = [ "wheel" ];
-      commands =
-        map
-          (mode: {
-            command = "${hpPower}/bin/hp-power ${mode}";
-            options = [
-              "NOPASSWD"
-              "NOSETENV"
-            ];
-          })
-          [
-            "turbo"
-            "balanced"
-            "silent"
-          ];
-    }
-  ];
-
-  systemd.tmpfiles.rules = [ "d /run/hp-power 0755 root root -" ];
+  environment.systemPackages = [ pkgs.msr-tools ];
 
   hardware = {
+    powerProfile = {
+      backend = ./hp-omnibook-ultra-flip-14-power.sh;
+      runtimeInputs = [
+        pkgs.coreutils
+        pkgs.gawk
+        pkgs.kmod
+        pkgs.msr-tools
+      ];
+    };
     sensor.iio.enable = true;
     firmware = [ ishFirmware ];
   };

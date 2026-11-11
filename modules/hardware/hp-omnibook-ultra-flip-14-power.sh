@@ -6,40 +6,11 @@ RAPL=/sys/class/powercap/intel-rapl:0
 MMIO=/sys/class/powercap/intel-rapl-mmio:0
 PLATFORM_PROFILE=/sys/firmware/acpi/platform_profile
 EC_IO=/sys/kernel/debug/ec/ec0/io
-LOCK_FILE=/run/hp-power/lock
-STATE_FILE=/run/hp-power/state
-SUDO=/run/wrappers/bin/sudo
 EC_AFAN_OFFSET=45
 EC_AFAN_VALID="00 08 11 18 22 28 33 44 55 66 77 88"
 MSR_HWP_REQUEST=0x774
 MSR_HWP_CAPS=0x771
 HWP_MAX_VALID="01 13 1a 26 30 37"
-
-need_root() {
-  local self
-  [ "$(id -u)" -eq 0 ] && return 0
-  self=$(readlink -f "$0") || exit 1
-  [ -x "$SUDO" ] || {
-    echo "sudo wrapper not found at $SUDO" >&2
-    exit 1
-  }
-  exec "$SUDO" -- "$self" "$@"
-}
-
-acquire_lock() {
-  mkdir -p "${LOCK_FILE%/*}"
-  exec 9> "$LOCK_FILE"
-  flock -x 9
-}
-
-publish_state() {
-  local mode=$1 staged
-  staged=$(mktemp "${STATE_FILE%/*}/.state.XXXXXX") || return 1
-  if ! printf '%s\n' "$mode" > "$staged" || ! chmod 0644 "$staged" || ! mv -f "$staged" "$STATE_FILE"; then
-    rm -f "$staged"
-    return 1
-  fi
-}
 
 write_to() {
   local path=$1 val=$2 actual
@@ -223,19 +194,6 @@ set_hwp() {
 
 read_w() { awk '{printf "%d", $1/1000000}' "$1" 2> /dev/null || echo "?"; }
 
-read_applied_mode() {
-  local mode
-  if [ -r "$STATE_FILE" ] && IFS= read -r mode < "$STATE_FILE"; then
-    case "$mode" in
-      turbo | balanced | silent)
-        printf '%s' "$mode"
-        return 0
-        ;;
-    esac
-  fi
-  printf '%s' unknown
-}
-
 read_fan_rpm() {
   local path rpm
   for path in /sys/devices/platform/PNP0C0B:00/hwmon/hwmon*/fan1_input; do
@@ -244,24 +202,10 @@ read_fan_rpm() {
     case "$rpm" in
       "" | *[!0-9]*) continue ;;
     esac
-    printf '%s' "$rpm"
+    printf '%s\n' "$rpm"
     return 0
   done
-  printf '%s' unknown
-}
-
-cmd_json() {
-  local mode label rpm
-  mode=$(read_applied_mode)
-  rpm=$(read_fan_rpm)
-  case "$mode" in
-    turbo) label=Turbo ;;
-    balanced) label=Balanced ;;
-    silent) label=Silent ;;
-    *) label=Unknown ;;
-  esac
-  printf '{"text":"󰈐","class":"%s","tooltip":"HP power: %s\\nFan: %s RPM"}\n' \
-    "$mode" "$label" "$rpm"
+  return 1
 }
 
 cmd_status() {
@@ -269,7 +213,6 @@ cmd_status() {
   ac=$(cat /sys/class/power_supply/AC*/online 2> /dev/null | head -1)
   : "${ac:=?}"
   pp=$(cat "$PLATFORM_PROFILE" 2> /dev/null) || pp="(readback broken)"
-  echo "Last applied profile  : $(read_applied_mode)"
   echo "AC online            : $ac"
   echo "RAPL PL1 / PL2 (W)   : $(read_w $RAPL/constraint_0_power_limit_uw) / $(read_w $RAPL/constraint_1_power_limit_uw)"
   if [ -d "$MMIO" ]; then
@@ -301,8 +244,6 @@ cmd_status() {
 
 apply() {
   local mode=$1 pl1=$2 pl2=$3 gov=$4 epp=$5 profile=$6 afan=$7 hwp_max=$8 fail=0
-  acquire_lock
-  logger -t hp-power -- "applying $mode (caller=${SUDO_USER:-root})" || true
   echo "==> $mode: PL=${pl1}/${pl2}W gov=$gov EPP=$epp profile=$profile AFAN=0x$afan HWP=0x$hwp_max"
   set_rapl "$pl1" "$pl2" || fail=1
   set_governor "$gov" || fail=1
@@ -310,32 +251,19 @@ apply() {
   set_platform_profile "$profile" || fail=1
   set_afan "$afan" || fail=1
   set_hwp "$hwp_max" || fail=1
-  if [ "$fail" -ne 0 ]; then
-    logger -t hp-power -- "failed $mode" || true
-    echo "Profile application failed. State was not updated." >&2
-    return 1
-  fi
-  publish_state "$mode" || {
-    logger -t hp-power -- "applied $mode but failed to publish state" || true
-    echo "Profile applied but failed to publish state." >&2
-    return 1
-  }
-  logger -t hp-power -- "applied $mode" || true
-  echo
-  cmd_status
+  return "$fail"
 }
 
-cmd_turbo() {
-  need_root turbo
-  apply turbo 37 95 performance performance performance 00 37
-}
-cmd_balanced() {
-  need_root balanced
-  apply balanced 28 55 performance performance balanced 44 1a
-}
-cmd_silent() {
-  need_root silent
-  apply silent 15 25 powersave power cool 88 13
+cmd_apply() {
+  case "${1:-}" in
+    turbo) apply turbo 37 95 performance performance performance 00 37 ;;
+    balanced) apply balanced 28 55 performance performance balanced 44 1a ;;
+    silent) apply silent 15 25 powersave power cool 88 13 ;;
+    *)
+      echo "unknown mode: ${1:-}" >&2
+      return 2
+      ;;
+  esac
 }
 
 parse_hex2() {
@@ -351,11 +279,9 @@ parse_hex2() {
 }
 
 cmd_afan() {
-  need_root afan "$@"
-  acquire_lock
   if [ -z "${1:-}" ]; then
     echo "EC AFAN (0x2D) = 0x$(read_afan)"
-    echo "valid: $EC_AFAN_VALID  (0x00=max fans, 0x88=most passive, see hp-power help)"
+    echo "valid: $EC_AFAN_VALID  (0x00=max fans, 0x88=most passive, see power-profile help)"
     return 0
   fi
   local hex
@@ -364,8 +290,6 @@ cmd_afan() {
 }
 
 cmd_hwp() {
-  need_root hwp "$@"
-  acquire_lock
   if [ -z "${1:-}" ]; then
     local val caps lo
     val=$(read_hwp_request)
@@ -444,8 +368,6 @@ probe_row() {
 }
 
 cmd_probe() {
-  need_root probe "$@"
-  acquire_lock
   ensure_ec_sys || return 1
 
   local lo=0 hi=0x88 settle=4
@@ -485,8 +407,6 @@ cmd_probe() {
 }
 
 cmd_monitor() {
-  need_root monitor "$@"
-  acquire_lock
   ensure_ec_sys || return 1
 
   local hex
@@ -508,22 +428,17 @@ cmd_monitor() {
 
 cmd_help() {
   cat << 'EOF'
-usage: hp-power {status|json|turbo|balanced|silent|afan|hwp|probe|monitor|help}
+Board: HP OmniBook Ultra Flip 14 (Lunar Lake)
 
-Manual override. No daemons, no auto. What you set stays set until next call or reboot.
-
-  status                  current state
-  json                    machine-readable power profile and fan state
-  turbo      [sudo]       PL=37/95W perf perf perf  AFAN=0x00 HWP=0x37 (~5.5GHz)
-  balanced   [sudo]       PL=28/55W perf perf bal   AFAN=0x44 HWP=0x1a (~2.6GHz)
-  silent     [sudo]       PL=15/25W save power cool AFAN=0x88 HWP=0x13 (~1.9GHz)
+  turbo                   PL=37/95W perf perf perf  AFAN=0x00 HWP=0x37 (~5.5GHz)
+  balanced                PL=28/55W perf perf bal   AFAN=0x44 HWP=0x1a (~2.6GHz)
+  silent                  PL=15/25W save power cool AFAN=0x88 HWP=0x13 (~1.9GHz)
   afan [hex] [sudo]       read or write EC byte 0x2D
   hwp  [hex] [sudo]       read or write MSR 0x774 max_perf. valid: 01 13 1a 26 30 37
   probe      [sudo]       sweep AFAN 0x88->0x00 showing fan RPM + temps
   probe --all             sweep full range 0xff->0x00
   probe LO HI             sweep hex range (e.g. probe 70 90)
   monitor [hex] [sudo]    live-watch fans at AFAN=hex (default 0x88). Ctrl-C to stop
-  help                    this
 
 AFAN values (EC offset 0x2D, from DSDT + probing):
   0x00       max cooling, both fans ~3400/4000 RPM
@@ -543,32 +458,33 @@ Bypass allowlists: HP_POWER_AFAN_ALLOW_ANY=1 / HP_POWER_HWP_ALLOW_ANY=1
 EOF
 }
 
-case "${1:-status}" in
+cmd_run() {
+  local cmd=${1:-}
+  shift
+  case "$cmd" in
+    afan) cmd_afan "$@" ;;
+    hwp) cmd_hwp "$@" ;;
+    probe | p) cmd_probe "$@" ;;
+    monitor | m) cmd_monitor "$@" ;;
+    *)
+      echo "unknown command: $cmd" >&2
+      return 2
+      ;;
+  esac
+}
+
+case "${1:-}" in
+  apply) cmd_apply "${2:-}" ;;
   status) cmd_status ;;
-  json | waybar) cmd_json ;;
-  turbo | t) cmd_turbo ;;
-  balanced | b) cmd_balanced ;;
-  silent | s | battery | bat) cmd_silent ;;
-  afan)
+  rpm) read_fan_rpm ;;
+  commands) printf '%s\n' afan hwp probe p monitor m ;;
+  run)
     shift
-    cmd_afan "$@"
+    cmd_run "$@"
     ;;
-  hwp)
-    shift
-    cmd_hwp "$@"
-    ;;
-  probe | p)
-    shift
-    cmd_probe "$@"
-    ;;
-  monitor | m)
-    shift
-    cmd_monitor "$@"
-    ;;
-  help | -h | --help) cmd_help ;;
+  help) cmd_help ;;
   *)
-    echo "unknown subcommand: ${1:-}" >&2
-    cmd_help >&2
+    echo "usage: ${0##*/} {apply MODE|status|rpm|commands|run COMMAND...|help}" >&2
     exit 2
     ;;
 esac
