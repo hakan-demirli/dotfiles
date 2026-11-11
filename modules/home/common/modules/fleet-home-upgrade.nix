@@ -16,6 +16,7 @@ let
     runtimeInputs = [
       pkgs.coreutils
       pkgs.curl
+      pkgs.git
       pkgs.jq
       pkgs.nix
     ];
