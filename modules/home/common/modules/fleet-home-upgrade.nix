@@ -9,7 +9,7 @@
 let
   cfg = config.fleetHomeUpgrade;
   plan = inputs.self.lib.intent.deployPlan;
-  managed = plan.controller != null && plan.hosts ? ${facts.id};
+  managed = plan.controller != null && (plan.hosts.${facts.id}.delivery or null) == "pull";
 
   upgrade = pkgs.writeShellApplication {
     name = "fleet-home-upgrade";

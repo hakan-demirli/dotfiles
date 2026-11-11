@@ -68,4 +68,7 @@
   labels = {
     tailscale_auth_key = "false";
   };
+
+  # Shared with other people: it reaches no private service and receives only its own closure.
+  deploy.delivery = "push";
 }
