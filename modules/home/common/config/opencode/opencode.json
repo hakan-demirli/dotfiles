@@ -154,8 +154,8 @@
             "output": 128000
           }
         },
-        "claude-fable-5-1": {
-          "name": "Claude Fable 5.1",
+        "claude-fable-5-2": {
+          "name": "Claude Fable 5.2",
           "limit": {
             "context": 1000000,
             "output": 128000
