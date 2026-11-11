@@ -9,7 +9,8 @@
 }:
 let
   personal = (import ../../common/lib.nix).allowsPersonalData facts;
-  stateRemote = inputs.self.lib.forge.remote "state";
+  inherit (inputs.self.lib) forge inventory;
+  stateRemote = forge.remote "state";
 in
 {
   imports = [
@@ -32,6 +33,13 @@ in
     (import ../../common/pkgs/nix/notes_backup.nix {
       remote = stateRemote;
       branch = "nocon";
+    })
+  ]
+  ++ lib.optionals (personal && lib.elem facts.id inventory.services.forgejo.hosts) [
+    (import ../../common/pkgs/nix/github_mirrors.nix {
+      inherit (forge) owner;
+      forge = forge.web;
+      excluded = [ "state" ];
     })
   ];
 
