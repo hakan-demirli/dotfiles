@@ -29,7 +29,10 @@ in
   ++ lib.optionals (personal && profile == "desktop") [
     ./wallpaper.nix
     (import ../../common/pkgs/nix/ntfy-listener.nix { })
-    (import ../../common/pkgs/nix/github_backup.nix { })
+    (import ../../common/pkgs/nix/forgejo_backup.nix {
+      inherit (forge) owner;
+      forge = forge.web;
+    })
     (import ../../common/pkgs/nix/notes_backup.nix {
       remote = stateRemote;
       branch = "nocon";

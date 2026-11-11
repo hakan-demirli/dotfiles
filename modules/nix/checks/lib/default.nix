@@ -24,6 +24,7 @@
   github-mirrors = import ./github-mirrors.nix { inherit pkgs; };
   grafana-navigation = import ./grafana-navigation.nix { inherit pkgs self; };
   file-transfer = import ./file-transfer.nix { inherit pkgs self lib; };
+  forgejo-backup = import ./forgejo-backup.nix { inherit pkgs; };
   forgejo-repositories = import ./forgejo-repositories.nix { inherit pkgs self inputs; };
   intent = import ./intent.nix { inherit pkgs self; };
   inventory-eval = import ./inventory-eval.nix { inherit pkgs self lib; };

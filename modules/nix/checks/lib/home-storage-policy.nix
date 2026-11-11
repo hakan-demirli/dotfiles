@@ -64,7 +64,7 @@ let
   userServiceCommands =
     map (name: builtins.head actual.systemd.user.services.${name}.Service.ExecStart)
       [
-        "github-backup"
+        "forgejo-backup"
         "notes-backup"
         "ntfy-listener"
         "state-backup"
