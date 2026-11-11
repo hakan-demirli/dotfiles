@@ -19,7 +19,7 @@ LINK_NAME = ".hydrate"
 REPOS_DIRNAME = "repos"
 METADATA_NAME = ".hydrate-project.json"
 METADATA_VERSION = 1
-DEFAULT_REPO_URL = "https://github.com/hakan-demirli/hydrate"
+DEFAULT_REPO_URL = "http://git.home.arpa/hakan-demirli/hydrate"
 
 
 class HydrateError(RuntimeError):
