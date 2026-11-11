@@ -54,8 +54,8 @@ page=1
 while :; do
   batch=$(forgejo "/repos/search?limit=50&page=$page")
   [[ $(jq '.data | length' <<< "$batch") -gt 0 ]] || break
-  repositories=$(jq -c --arg owner "$owner" --argjson batch "$batch" \
-    '. + [$batch.data[] | select(.owner.login == $owner) | .name]' <<< "$repositories")
+  owned=$(jq -c --arg owner "$owner" '[.data[] | select(.owner.login == $owner) | .name]' <<< "$batch")
+  repositories=$(jq -c --argjson owned "$owned" '. + $owned' <<< "$repositories")
   page=$((page + 1))
 done
 

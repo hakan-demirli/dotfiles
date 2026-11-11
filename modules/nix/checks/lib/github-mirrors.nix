@@ -86,7 +86,7 @@ pkgs.runCommand "github-mirrors"
             self.synced = []
 
         def add(self, name, repository_owner=owner, **flags):
-            self.repositories.append({"name": name, "owner": {"login": repository_owner}, "archived": False, "mirror": False, "fork": False, "empty": False} | flags)
+            self.repositories.append({"name": name, "owner": {"login": repository_owner}, "archived": False, "mirror": False, "fork": False, "empty": False, "description": "x" * 70000} | flags)
 
         def route(self, method, path, query, body):
             parts = path.removeprefix("/api/v1/").split("/")
