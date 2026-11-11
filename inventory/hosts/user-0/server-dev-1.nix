@@ -30,7 +30,7 @@
   };
 
   disko = {
-    root_disk = "/dev/disk/by-id/nvme-Lexar_SSD_NM790_4TB_QKP899R000033P2202";
+    root_disk = "/dev/disk/by-id/nvme-SAMSUNG_MZ1L23T8HBLA-00A07_S667NT0WB01649";
     layout = "btrfs-lvm";
     managed = true;
     swap_size = "32G";
