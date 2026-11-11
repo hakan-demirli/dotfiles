@@ -20,7 +20,7 @@
     cpu_model = "Intel(R) Core(TM) Ultra 7 258V";
     ram_mib = 32768;
     arch = "x86_64-linux";
-    mainboard = "lunarlake-hp";
+    mainboard = "hp-omnibook-ultra-flip-14";
   };
 
   disko = {

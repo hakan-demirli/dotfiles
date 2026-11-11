@@ -28,6 +28,7 @@
     ram_mib = 24576;
     arch = "x86_64-linux";
     gpu = "amd+nvidia";
+    mainboard = "asus-tuf-a15";
   };
 
   disko = {
