@@ -164,15 +164,16 @@ in
       enable = true;
       # v8.0.53 keeps Fable-only 429s model-scoped (router-for-me/CLIProxyAPI#7197);
       # older releases cool the whole credential and block every model on it.
+      # v8.0.63 presents Claude Code 2.1.321, which Claude Fable 5.2 requires.
       package = pkgs.cliproxyapi.overrideAttrs (_: {
-        version = "8.0.53";
+        version = "8.0.64";
         src = pkgs.fetchFromGitHub {
           owner = "router-for-me";
           repo = "CLIProxyAPI";
-          tag = "v8.0.53";
-          hash = "sha256-XvrI11A4C4oe9vAe6j9uLxmKDZ989jZnAXHNrC0k1yA=";
+          tag = "v8.0.64";
+          hash = "sha256-X/G9jGelmB0RUnc8Eyw5QdXmBVywz2610TknILzkV8c=";
         };
-        vendorHash = "sha256-YZf38f5X+z/rICUQKHuzmZxkPH3AAap6XkIho/injVA=";
+        vendorHash = "sha256-02Qqrs9lQ0kE+Tnk/SWvlkLXGSh8RQPxRawFZogRYNc=";
       });
       settings = {
         config-version = 8;
