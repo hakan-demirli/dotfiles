@@ -1,7 +1,7 @@
 terminal = "kitty"
 browser = "MOZ_ENABLE_WAYLAND=1 firefox"
 launcher = "pkill tofi || tofi-drun --drun-launch=true"
-filemanager = "lf_cd_hyprland.sh"
+filemanager = "yazi_cd_desktop.sh"
 editor = "hx"
 locker = "hyprlock"
 

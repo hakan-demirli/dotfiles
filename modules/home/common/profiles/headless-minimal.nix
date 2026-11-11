@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 {
   programs = {
     fzf.enable = true;
@@ -17,6 +17,7 @@
 
     yazi = {
       enable = true;
+      package = pkgs.yazi.override { extraPackages = [ pkgs.ffmpegthumbnailer ]; };
       enableBashIntegration = true;
       shellWrapperName = "f";
     };

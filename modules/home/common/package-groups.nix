@@ -12,6 +12,15 @@ let
   );
   sendToLaptop = pkgs.callPackage ./pkgs/nix/send-to-laptop.nix { };
 
+  helixWithEditorTools = pkgs.symlinkJoin {
+    name = "helix-with-editor-tools-${lib.getVersion pkgs.helix}";
+    paths = [ pkgs.helix ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/hx --suffix PATH : ${lib.makeBinPath (import ./editor-tools.nix pkgs)}
+    '';
+  };
+
   autoRefresh = pkgs.writeShellApplication {
     name = "auto_refresh";
     runtimeInputs = [ pkgs.python3 ];
@@ -38,55 +47,31 @@ rec {
     lib.filter (package: package != null) (
       [
         aichat
-        asm-lsp
-        bandwhich
-        bash-language-server
         bat
         unstablePkgs.claude-code
         claudeMulti
-        cmake-language-server
-        diagnostic-languageserver
         fd
         ffmpeg-full
-        ffmpegthumbnailer
         file
-        ghostscript
         gnumake
-        helix
-        htop
-        lua-language-server
-        marksman
-        nixd
+        helixWithEditorTools
         nixfmt
         openssl
         ouch
-        p7zip
         parallel-full
-        prettier
-        pyright
         ripgrep
-        ruff
         sendToLaptop
         shfmt
-        systemctl-tui
-        taplo
-        texlab
         trash-cli
         tree
-        unzip
-        usbutils
-        uwu-colors
         verilator
-        vscode-langservers-extracted
         wget
-        yaml-language-server
         yek
         zip
         (pickNur "uncomment")
         (pickNur "flake-updater")
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ verible ]
-      ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [ cpufrequtils ]
     );
 
   development = minimal ++ developmentAdditions;
@@ -105,7 +90,6 @@ rec {
       dragon-drop
       drawio
       exfatprogs
-      feh
       gamescope
       grim
       hypridle
@@ -113,14 +97,11 @@ rec {
       kdePackages.breeze-icons
       kdePackages.kolourpaint
       kdePackages.qtimageformats
-      kooha
       libnotify
       libqalculate-fzf
-      libva-utils
       localsend
       mangohud
       material-symbols
-      mesa-demos
       moonlight-qt
       mpv
       nerd-fonts.symbols-only
@@ -143,21 +124,16 @@ rec {
       ttf-wps-fonts
       udiskie
       umu-launcher
-      vulkan-tools
-      wayland-utils
       wayscriber
       winetricks
       wineWow64Packages.wayland
-      wl-clip-persist
       wl-clipboard
-      wlr-randr
       wttrbar
       xdg-terminal-exec
       xremap
       xwayland-satellite
       (pickNur "youtube-sync")
       (pickNur "gtk-applet")
-      (pickNur "nix-treemap")
       (pickNur "umu-fzf")
     ];
 
