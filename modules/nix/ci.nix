@@ -98,6 +98,9 @@ in
           outputs.effects.update = effects.flakeUpdate {
             forgeType = "gitea";
             updateBranch = "automation/update-flake-inputs";
+            # Each run starts over from the channel instead of reusing a stale branch.
+            baseMergeBranch = "unstable";
+            baseMergeMethod = "reset";
             autoMergeMethod = "rebase";
             pullRequestTitle = "chore: update flake inputs";
             commitSummary = "chore: update flake inputs";
