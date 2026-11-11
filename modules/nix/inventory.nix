@@ -55,6 +55,9 @@ let
   hostFacts = infra-lib.lib.mkHostFacts inventory;
   kexecRootKeys = infra-lib.lib.mkKexecRootKeys inventory;
 
+  # Private names served to the tailnet; home.arpa is reserved for this (RFC 8375).
+  tailnetZone = "home.arpa";
+
   forge =
     let
       service = inventory.services.forgejo;
@@ -77,6 +80,7 @@ in
         hostFacts
         kexecRootKeys
         forge
+        tailnetZone
         ;
     };
 

@@ -16,7 +16,14 @@ let
   downloadDir = "${primaryHome}/Downloads";
   incompleteDir = "${downloadDir}/.incomplete";
   mediaDir = "${downloadDir}/media";
-  tailnetUrl = "http://100.64.0.1";
+  tailnetAddress = "100.64.0.1";
+  tailnetUrl = "http://${tailnetAddress}";
+  inherit (inputs.self.lib) tailnetZone;
+  sites = {
+    ${tailnetZone} = config.services.homepage.port;
+    "git.${tailnetZone}" = config.cluster.services.forgejo.port;
+    "ci.${tailnetZone}" = config.cluster.services.nixbot.port;
+  };
   forgeDomain = "${host.id}.ts.${config.services.tailscale.loginServerHost}";
   impermanenceEnabled = host.impermanence.enable or false;
 
@@ -26,6 +33,30 @@ in
     sops.bootstrap.passwordAccount = "root";
 
     openssh.settings.PermitRootLogin = lib.mkForce "no";
+
+    # Each name gets its own route, so a network that claims the zone is never asked for it.
+    headscale.settings.dns = {
+      extra_records = lib.mapAttrsToList (name: _: {
+        inherit name;
+        type = "A";
+        value = tailnetAddress;
+      }) sites;
+      nameservers.split = lib.mapAttrs (
+        _: _: config.services.headscale.settings.dns.nameservers.global
+      ) sites;
+    };
+
+    # The public listener also carries these names; only tailnet peers are served.
+    caddy.virtualHosts = lib.mapAttrs' (
+      name: port:
+      lib.nameValuePair "http://${name}" {
+        extraConfig = ''
+          @outside not remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48
+          abort @outside
+          reverse_proxy 127.0.0.1:${toString port}
+        '';
+      }
+    ) sites;
 
     headscale-server = {
       enable = true;
