@@ -11,6 +11,7 @@
     vimAlias = true;
     defaultEditor = false;
     plugins = [ pkgs.vimPlugins.nvim-lspconfig ];
+    extraPackages = import ../editor-tools.nix pkgs;
   };
 
 }
