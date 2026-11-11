@@ -291,6 +291,16 @@ pkgs.runCommand "codegen-smoke"
       || fail "headscale-acl: fleet access to tailnet sites missing"
     pass "headscale-acl: fleet access to tailnet sites present"
 
+    echo "$body" | jq -e \
+      '.acls | any(.action == "accept" and .src == ["tag:fleet-deploy-controller"] and .dst == ["tag:cluster-shared-server-1:22"])' >/dev/null \
+      || fail "headscale-acl: deploy push to shared-server-1 missing"
+    pass "headscale-acl: deploy push to shared-server-1 present"
+
+    echo "$body" | jq -e \
+      '[.acls[] | select((.src | index("tag:cluster-shared-server-1")) != null) | .dst[]] | all(test(":(80|3001|5101)$") | not)' >/dev/null \
+      || fail "headscale-acl: shared-server-1 reaches forgejo, the tailnet sites or a cache"
+    pass "headscale-acl: shared-server-1 reaches no forge, site or cache"
+
     for pair in $clusterTagPairs; do
       cid="''${pair%=*}"
       tag="''${pair#*=}"
