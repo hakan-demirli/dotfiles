@@ -90,7 +90,7 @@ let
       && !(home.config.systemd.user.services ? state-autopush)
       && !(home.config.systemd.user.services ? state-backup)
       && !(home.config.systemd.user.services ? notes-backup)
-      && !(home.config.systemd.user.services ? github-backup)
+      && !(home.config.systemd.user.services ? forgejo-backup)
       && !(home.config.systemd.user.services ? opencode-serve)
       && !(home.config.systemd.user.services ? sops-nix)
       && home.config.sops.secrets == { }
