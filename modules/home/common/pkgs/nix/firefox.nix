@@ -81,6 +81,7 @@ let
     })
   ];
 in
+{ inputs, ... }:
 {
   programs.firefox = {
     enable = true;
@@ -224,6 +225,8 @@ in
         "widget.use-xdg-desktop-portal.file-picker" = 1;
         "browser.tabs.tabmanager.enabled" = true;
         "network.trr.mode" = 2;
+        # The public DNS-over-HTTPS resolver does not know the tailnet names.
+        "network.trr.excluded-domains" = inputs.self.lib.tailnetZone;
         "extensions.webextensions.restrictedDomains" = "";
         "privacy.resistFingerprinting.block_mozAddonManager" = true;
         "browser.translations.select.enable" = false;
