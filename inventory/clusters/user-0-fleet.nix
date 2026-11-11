@@ -76,6 +76,12 @@
         port = 8010;
         role = "controller";
       };
+      # Caddy serves the home.arpa names here and keeps port 80 public for ACME.
+      tailnet-sites = {
+        port = 80;
+        role = "controller";
+        firewall = "public";
+      };
       nix-build-farm = {
         port = 2222;
         role = "compute";
