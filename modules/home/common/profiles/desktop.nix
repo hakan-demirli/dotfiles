@@ -103,7 +103,7 @@ in
     automount = true;
     settings = {
       program_options = {
-        file_manager = "${pkgs.kitty}/bin/kitty -e ${pkgs.yazi}/bin/yazi";
+        file_manager = "${pkgs.kitty}/bin/kitty -e ${lib.getExe config.programs.yazi.package}";
       };
     };
   };
