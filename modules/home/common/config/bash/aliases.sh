@@ -60,15 +60,9 @@ alias txs='tmux switch-client -n'
 alias txkw='tmux kill-window -t'
 alias txlw='tmux list-windows'
 
-if command -v asus-fan-profile > /dev/null 2>&1; then
-  alias fan-turbo='asus-fan-profile turbo'
-  alias fan-performance='asus-fan-profile performance'
-  alias fan-silent='asus-fan-profile silent'
-fi
-
-if command -v hp-power > /dev/null 2>&1; then
-  alias fan-turbo='hp-power turbo'
-  alias fan-performance='hp-power balanced'
-  alias fan-silent='hp-power silent'
-  alias fan-status='hp-power status'
+if command -v power-profile > /dev/null 2>&1; then
+  alias power-turbo='power-profile turbo'
+  alias power-balanced='power-profile balanced'
+  alias power-silent='power-profile silent'
+  alias power-status='power-profile status'
 fi
