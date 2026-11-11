@@ -64,6 +64,8 @@ let
     in
     rec {
       owner = "hakan-demirli";
+      # The name people use; fleet hosts keep fetching from the machine URL.
+      site = "git.${tailnetZone}";
       url = "http://${lib.head service.hosts}.ts.sshr.polarbearvuzi.com:${toString service.port}";
       repository = name: "${url}/${owner}/${name}.git";
       flake = name: "git+${url}/${owner}/${name}";
