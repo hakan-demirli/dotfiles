@@ -5,7 +5,7 @@
 }:
 let
   testlib = import (inputs.infra-lib + "/modules/nix/checks/lib/lib.nix") { inherit pkgs; };
-  generatedPolicy = "${self.packages.${pkgs.system}.headscale-acl}/policy.hujson";
+  generatedPolicy = "${self.packages.${pkgs.stdenv.hostPlatform.system}.headscale-acl}/policy.hujson";
   mkServer =
     { ... }:
     {

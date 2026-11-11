@@ -6,7 +6,7 @@
 let
   inherit (pkgs) lib;
   testlib = import (inputs.infra-lib + "/modules/nix/checks/lib/lib.nix") { inherit pkgs; };
-  aclFile = "${self.packages.${pkgs.system}.headscale-acl}/policy.hujson";
+  aclFile = "${self.packages.${pkgs.stdenv.hostPlatform.system}.headscale-acl}/policy.hujson";
   headscaleUsers = lib.unique (
     lib.filter (username: username != null) (
       lib.mapAttrsToList (_: user: user.headscale_user or null) self.lib.inventory.users
