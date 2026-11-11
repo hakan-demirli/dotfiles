@@ -34,16 +34,14 @@ in
 
     openssh.settings.PermitRootLogin = lib.mkForce "no";
 
-    # Each name gets its own route, so a network that claims the zone is never asked for it.
     headscale.settings.dns = {
       extra_records = lib.mapAttrsToList (name: _: {
         inherit name;
         type = "A";
         value = tailnetAddress;
       }) sites;
-      nameservers.split = lib.mapAttrs (
-        _: _: config.services.headscale.settings.dns.nameservers.global
-      ) sites;
+      # Clients route each listed name to Tailscale, ahead of a network that claims the zone.
+      search_domains = lib.attrNames sites;
     };
 
     # The public listener also carries these names; only tailnet peers are served.
