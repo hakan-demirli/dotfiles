@@ -37,6 +37,12 @@
     swap_size = "32G";
   };
 
+  local_storage = {
+    tmp.disk = "/dev/disk/by-id/nvme-Micron_2210_MTFDHBA512QFD_20352A3C4F7C";
+    scratch.disk = "/dev/disk/by-id/nvme-Lexar_SSD_NM790_4TB_QKP899R000033P2202";
+    persistent_tmp = [ "opencode" ];
+  };
+
   impermanence = {
     enable = true;
     rollback_backend = "btrfs";
