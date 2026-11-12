@@ -173,11 +173,11 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1794433384,
-        "narHash": "sha256-U0DyOXFVD1ROAxAOIoWgARDr2RL0Sfxpq9/deWS4+TU=",
+        "lastModified": 1794443141,
+        "narHash": "sha256-4VrM7d+vsZfBUeZA8a6ikYciNAVENrefJV19PcWTCDQ=",
         "ref": "refs/heads/main",
-        "rev": "bc1b3fc844f1f3ad09ebfb9d30dbb74130efc6d2",
-        "revCount": 107,
+        "rev": "3a2d307fd35df8c1227649511d292574064ed0fd",
+        "revCount": 109,
         "type": "git",
         "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib"
       },
