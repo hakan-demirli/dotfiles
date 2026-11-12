@@ -60,8 +60,5 @@
     ];
   };
 
-  deploy.hold = {
-    reason = "ssd swap";
-    until = "2026-11-12";
-  };
+  deploy.hold.reason = "local storage moves /tmp at the next reboot";
 }
