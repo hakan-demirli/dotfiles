@@ -163,7 +163,7 @@ in
       listenPort = config.cluster.services.forgejo.port;
       admin = {
         username = inputs.self.lib.forge.owner;
-        email = "hakan-demirli@${forgeDomain}";
+        inherit (inputs.self.lib.forge.identities.owner) email;
         password = {
           source = "sops";
           sopsKeyName = "forgejo/admin-password";
