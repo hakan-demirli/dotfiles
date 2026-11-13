@@ -72,6 +72,19 @@ let
       flake = name: "git+${url}/${owner}/${name}";
       remote = name: "${web}/${owner}/${name}";
     };
+
+  opencode =
+    let
+      service = inventory.services.opencode;
+    in
+    {
+      inherit (service) port;
+      # Only hosts that may hold personal data run the server.
+      hosts = lib.filter (
+        id: (import ../home/common/lib.nix).allowsPersonalData inventory.hosts.${id}
+      ) service.hosts;
+      url = id: "http://${id}.ts.sshr.polarbearvuzi.com:${toString service.port}";
+    };
 in
 {
   flake = {
@@ -84,6 +97,7 @@ in
         hostFacts
         kexecRootKeys
         forge
+        opencode
         tailnetZone
         ;
     };

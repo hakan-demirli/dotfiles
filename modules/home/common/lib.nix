@@ -123,10 +123,16 @@ let
               ) inputs.self.lib.inventory.hosts
             );
 
-      opencodeEndpoint = {
-        address = "127.0.0.1";
-        port = 4096;
-      };
+      opencodeEndpoint =
+        host:
+        let
+          inherit (inputs.self.lib) opencode;
+        in
+        {
+          address = "127.0.0.1";
+          listenAddress = if host != null && lib.elem host.id opencode.hosts then "::" else "127.0.0.1";
+          inherit (opencode) port;
+        };
 
       discoveredUsers =
         if !builtins.pathExists homeRoot then
@@ -153,7 +159,7 @@ let
             // {
               user = uid;
               name = "${uid}.${pname}";
-              opencode = opencodeEndpoint;
+              opencode = opencodeEndpoint (pcfg.host or null);
             }
           );
         }

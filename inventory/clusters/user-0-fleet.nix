@@ -90,6 +90,10 @@
         port = 8111;
         role = "controller";
       };
+      opencode = {
+        port = 4096;
+        role = "compute";
+      };
       syslog = {
         port = 5514;
         role = "controller";
