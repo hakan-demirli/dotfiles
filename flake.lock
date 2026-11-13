@@ -215,15 +215,16 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1794475042,
-        "narHash": "sha256-3LONGj1ZR+wtga6LnmL2gfeXntRA9w7LXGssZx9Tfac=",
-        "owner": "Mic92",
+        "lastModified": 1794596685,
+        "narHash": "sha256-ghq3rq4MmeWtxYRffuIwpdpnq9/hM3KKFcVi4ZMnQqk=",
+        "owner": "hakan-demirli",
         "repo": "nixbot",
-        "rev": "171a8c77d6e8e2b5b99ce5870c042a2dbc2cda62",
+        "rev": "c0d385ef405c903d9e3bd8527baadba57b62b099",
         "type": "github"
       },
       "original": {
-        "owner": "Mic92",
+        "owner": "hakan-demirli",
+        "ref": "flake-update-fast-forward-only",
         "repo": "nixbot",
         "type": "github"
       }
