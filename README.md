@@ -37,6 +37,7 @@ Forgejo on `vps-oracle-0` holds the repositories at `http://vps-oracle-0.ts.sshr
 
 1. Push a branch and open a pull request into `unstable`, the default branch.
 2. nixbot builds `hydraJobs` at `http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8010`. The `server-dev` hosts build for `x86_64-linux`. The merge needs `nixbot/nix-eval` and `nixbot/nix-build`.
+   Forgejo merges fast-forward only, so the commits land as they are. If `unstable` moved, rebase the branch onto it and push again.
 3. After `unstable` builds, the `promote-main` effect fast-forwards `main`. Only the `nixbot` account can push `main`.
 4. Hosts install `main` between 04:00 and 06:00 Europe/Zurich.
 

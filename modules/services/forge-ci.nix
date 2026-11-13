@@ -26,13 +26,16 @@ let
     "nixbot/nix-build"
   ];
 
+  # Forgejo writes rebased and squashed commits again under the merging account.
   linearHistory = {
     allow_merge_commits = false;
-    allow_rebase = true;
+    allow_rebase = false;
     allow_rebase_explicit = false;
-    allow_squash_merge = true;
+    allow_squash_merge = false;
     allow_fast_forward_only_merge = true;
-    default_merge_style = "rebase";
+    default_merge_style = "fast-forward-only";
+    allow_rebase_update = true;
+    default_update_style = "rebase";
     default_delete_branch_after_merge = true;
   };
 
