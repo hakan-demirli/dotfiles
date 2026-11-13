@@ -64,6 +64,17 @@ let
     in
     rec {
       owner = "hakan-demirli";
+      # Commit identities that GitHub links to accounts, so the mirrors show them.
+      identities = {
+        owner = {
+          name = owner;
+          email = "ehdemirli@proton.me";
+        };
+        bot = {
+          name = "hakan-demirli-infra-dependencies[bot]";
+          email = "328803426+hakan-demirli-infra-dependencies[bot]@users.noreply.github.com";
+        };
+      };
       # The name people use; fleet hosts keep fetching from the machine URL.
       site = "git.${tailnetZone}";
       web = "http://${site}";

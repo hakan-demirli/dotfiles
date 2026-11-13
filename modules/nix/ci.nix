@@ -27,6 +27,7 @@ let
   ciSystems = lib.unique (map archOf ([ ciHost ] ++ inventory.hostsByDeploymentRole.server-dev));
   ciPkgs = inputs.nixpkgs.legacyPackages.${archOf ciHost};
   effects = inputs.nixbot.lib.effects { pkgs = ciPkgs; };
+  inherit (inputs.self.lib.forge.identities) bot;
 in
 {
   flake = {
@@ -72,16 +73,23 @@ in
             hour = 7;
             minute = 17;
           };
-          outputs.effects.update = effects.flakeUpdate {
-            forgeType = "gitea";
-            updateBranch = "automation/update-flake-inputs";
-            # Each run starts over from the channel instead of reusing a stale branch.
-            baseMergeBranch = "unstable";
-            baseMergeMethod = "reset";
-            autoMergeMethod = "rebase";
-            pullRequestTitle = "chore: update flake inputs";
-            commitSummary = "chore: update flake inputs";
-          };
+          outputs.effects.update =
+            (effects.flakeUpdate {
+              forgeType = "gitea";
+              updateBranch = "automation/update-flake-inputs";
+              # Each run starts over from the channel instead of reusing a stale branch.
+              baseMergeBranch = "unstable";
+              baseMergeMethod = "reset";
+              autoMergeMethod = "fast-forward-only";
+              pullRequestTitle = "chore: update flake inputs";
+              commitSummary = "chore: update flake inputs";
+            }).overrideAttrs
+              {
+                GIT_AUTHOR_NAME = bot.name;
+                GIT_AUTHOR_EMAIL = bot.email;
+                GIT_COMMITTER_NAME = bot.name;
+                GIT_COMMITTER_EMAIL = bot.email;
+              };
         };
       };
   };
