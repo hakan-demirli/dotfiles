@@ -127,7 +127,11 @@ in
           name = "nixbot";
           url = "${tailnetUrl}:${toString config.cluster.services.nixbot.port}/";
         }
-      ];
+      ]
+      ++ map (id: {
+        name = "OpenCode ${id}";
+        url = "${inputs.self.lib.opencode.url id}/";
+      }) inputs.self.lib.opencode.hosts;
 
       extraAddresses = [
         {

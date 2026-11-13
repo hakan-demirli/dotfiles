@@ -1,5 +1,6 @@
 {
   address,
+  listenAddress,
   port,
 }:
 {
@@ -23,7 +24,9 @@ let
     '';
   });
 
-  serverUrl = "http://${address}:${toString port}";
+  urlOf = host: "http://${if lib.hasInfix ":" host then "[${host}]" else host}:${toString port}";
+  serverUrl = urlOf address;
+  listenUrl = urlOf listenAddress;
 
   serviceEnvFile = "${config.home.homeDirectory}/.config/secrets/environment";
   commonServiceEnv = [
@@ -56,7 +59,7 @@ let
     name = "opencode-require-server-password";
     text = ''
       if [[ -z "''${OPENCODE_SERVER_PASSWORD:-}" ]]; then
-        echo "opencode-serve: OPENCODE_SERVER_PASSWORD is unset, refusing to serve unauthenticated on ${serverUrl}" >&2
+        echo "opencode-serve: OPENCODE_SERVER_PASSWORD is unset, refusing to serve unauthenticated on ${listenUrl}" >&2
         exit 1
       fi
     '';
@@ -103,7 +106,7 @@ in
 
   systemd.user.services.opencode-serve = lib.mkIf ((import ../../lib.nix).allowsPersonalData facts) {
     Unit = {
-      Description = "OpenCode node server on ${serverUrl}";
+      Description = "OpenCode node server on ${listenUrl}";
       Wants = [ "sops-nix.service" ];
       After = [ "sops-nix.service" ];
       X-Restart-Triggers = [ "${opencodeConfig}" ];
@@ -113,7 +116,7 @@ in
       EnvironmentFile = serviceEnvFile;
       Environment = commonServiceEnv;
       ExecStartPre = "${requireServerPassword}/bin/opencode-require-server-password";
-      ExecStart = "${opencodePackage}/bin/opencode serve --hostname ${address} --port ${toString port}";
+      ExecStart = "${opencodePackage}/bin/opencode serve --hostname ${listenAddress} --port ${toString port}";
       Restart = "always";
       RestartSec = 10;
       RestartSteps = 5;

@@ -131,6 +131,7 @@ assert intent.canHostReach "laptop-0" "vps-oracle-0" "5101";
 assert intent.canHostReach "laptop-1" "vps-oracle-0" "8317";
 assert intent.canHostReach "server-dev-1" "vps-oracle-0" "8317";
 assert intent.canHostReach "server-dev-1" "vps-oracle-0" "8111";
+assert intent.canHostReach "laptop-1" "server-dev-1" "4096";
 assert intent.canHostReach "router-0" "vps-oracle-0" "5514";
 assert !(intent.canHostReach "router-0" "vps-oracle-0" "8317");
 assert intent.canHostReach "server-dev-1" "laptop-1" "873";
