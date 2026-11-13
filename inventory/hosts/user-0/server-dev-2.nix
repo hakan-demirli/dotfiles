@@ -26,7 +26,7 @@
     cpu_threads_per_core = 2;
     cpu_logical_count = 20;
     cpu_model = "12th Gen Intel(R) Core(TM) i7-12700";
-    ram_mib = 32768;
+    ram_mib = 65536;
     arch = "x86_64-linux";
   };
 
