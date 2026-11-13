@@ -215,11 +215,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1794312608,
-        "narHash": "sha256-JohsRVoqkk3aavySG6p3nhiJRWJUpOb95lLDhQDrd4k=",
+        "lastModified": 1794475042,
+        "narHash": "sha256-3LONGj1ZR+wtga6LnmL2gfeXntRA9w7LXGssZx9Tfac=",
         "owner": "Mic92",
         "repo": "nixbot",
-        "rev": "ddeaa60cf8293d80c31bd2a81988f674f4c8821f",
+        "rev": "171a8c77d6e8e2b5b99ce5870c042a2dbc2cda62",
         "type": "github"
       },
       "original": {
@@ -312,11 +312,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1793977579,
-        "narHash": "sha256-WrSODdZFVIs/Hh2NzC0bY+ROByi0bATg8WfePX8dPj8=",
+        "lastModified": 1794495034,
+        "narHash": "sha256-E0hYoioqUtM2XmPPvYYpJgdADF5AW9oOoPSEiM9dTHQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4fe25e12eb9f4c744966dd3de5a05246cf098601",
+        "rev": "2074cc672349f14240fb7ea90d509e0b643e9dd4",
         "type": "github"
       },
       "original": {
@@ -398,11 +398,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793228817,
-        "narHash": "sha256-Ev/UZFYYqnnkHtmRtRerL64NBca1EolrwcNUurJdc/M=",
+        "lastModified": 1794433384,
+        "narHash": "sha256-DWEqg+fmSxM3jPW4epAcmk8YWxHpcczYS6hdHjlHUus=",
         "ref": "refs/heads/main",
-        "rev": "1cb21e565543e7d9cbec96be9ed64346a7b864c4",
-        "revCount": 159,
+        "rev": "e56e7f5a1cca72b43879b8f64066c418e9f3a0fe",
+        "revCount": 160,
         "type": "git",
         "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/NUR"
       },
