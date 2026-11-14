@@ -174,15 +174,16 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1794622534,
-        "narHash": "sha256-0e70gVrPEO8Ucl79N+6CRQU2spiwx+IBddFq7lKet1E=",
-        "ref": "refs/heads/main",
-        "rev": "c81f7df8edd76750e26fb1e09f25e6b9f1eb0f97",
-        "revCount": 112,
+        "lastModified": 1794626306,
+        "narHash": "sha256-L9KNwVyJZ0shC7uInp8s/g/z8QJQO/5DTiHOUoQgs88=",
+        "ref": "main",
+        "rev": "a14eb275bb9587b3cafdec82edf62010b04ca6c9",
+        "revCount": 113,
         "type": "git",
         "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib"
       },
       "original": {
+        "ref": "main",
         "type": "git",
         "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib"
       }
@@ -217,16 +218,15 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1794596685,
-        "narHash": "sha256-ghq3rq4MmeWtxYRffuIwpdpnq9/hM3KKFcVi4ZMnQqk=",
-        "owner": "hakan-demirli",
+        "lastModified": 1794475042,
+        "narHash": "sha256-3LONGj1ZR+wtga6LnmL2gfeXntRA9w7LXGssZx9Tfac=",
+        "owner": "Mic92",
         "repo": "nixbot",
-        "rev": "c0d385ef405c903d9e3bd8527baadba57b62b099",
+        "rev": "171a8c77d6e8e2b5b99ce5870c042a2dbc2cda62",
         "type": "github"
       },
       "original": {
-        "owner": "hakan-demirli",
-        "ref": "flake-update-fast-forward-only",
+        "owner": "Mic92",
         "repo": "nixbot",
         "type": "github"
       }
