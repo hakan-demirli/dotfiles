@@ -27,6 +27,17 @@
         }
 
         {
+          alert = "UpgradeHeld";
+          expr = ''fleet_upgrade_state{state="held"} == 1'';
+          for = "1h";
+          labels.severity = "warning";
+          annotations = {
+            summary = "{{ $labels.host }} upgrade is held ({{ $labels.reason }})";
+            description = "Check: journalctl -u fleet-upgrade";
+          };
+        }
+
+        {
           alert = "HomeUpgradeFailed";
           expr = ''fleet_user_systemd_unit_failed{name="fleet-home-upgrade.service"} == 1'';
           for = "15m";
