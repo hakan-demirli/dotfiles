@@ -6,7 +6,7 @@
     );
 
   inputs = {
-    infra-lib.url = "git+http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib";
+    infra-lib.url = "git+http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib?ref=main";
 
     nixpkgs.follows = "infra-lib/nixpkgs";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

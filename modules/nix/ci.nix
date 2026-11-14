@@ -26,7 +26,6 @@ let
   archOf = id: inventory.hosts.${id}.hardware.arch;
   ciSystems = lib.unique (map archOf ([ ciHost ] ++ inventory.hostsByDeploymentRole.server-dev));
   ciPkgs = inputs.nixpkgs.legacyPackages.${archOf ciHost};
-  effects = inputs.nixbot.lib.effects { pkgs = ciPkgs; };
   inherit (inputs.self.lib.forge.identities) bot;
 in
 {
@@ -45,8 +44,8 @@ in
     herculesCI =
       { primaryRepo, ... }:
       inputs.infra-lib.lib.mkForgeFlow {
-        inherit effects primaryRepo bot;
-        inherit (ciPkgs) git;
+        pkgs = ciPkgs;
+        inherit primaryRepo bot;
         update = {
           hour = 7;
           minute = 17;
