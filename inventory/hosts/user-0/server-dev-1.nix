@@ -65,6 +65,4 @@
       "smartctl"
     ];
   };
-
-  deploy.hold.reason = "local storage moves /tmp at the next reboot";
 }
