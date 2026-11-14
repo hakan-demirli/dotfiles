@@ -39,6 +39,29 @@ let
     default_delete_branch_after_merge = true;
   };
 
+  # Pull requests land on unstable once nixbot builds them; the promote-main effect fast-forwards main.
+  promoted = {
+    defaultBranch = "unstable";
+    topics = [ bot ];
+    collaborators.${bot} = "admin";
+    settings = linearHistory;
+    branchProtections = {
+      unstable = {
+        enable_push = false;
+        enable_status_check = true;
+        status_check_contexts = requiredStatuses;
+        required_approvals = 0;
+        apply_to_admins = true;
+      };
+      main = {
+        enable_push = true;
+        enable_push_whitelist = true;
+        push_whitelist_usernames = [ bot ];
+        apply_to_admins = true;
+      };
+    };
+  };
+
   mintToken = pkgs.writeShellApplication {
     name = "forge-ci-token";
     runtimeInputs = [
@@ -75,32 +98,8 @@ in
       users.${bot}.email = "${bot}@${forge.domain}";
 
       repositories = {
-        dotfiles = {
-          defaultBranch = "unstable";
-          topics = [ bot ];
-          collaborators.${bot} = "admin";
-          settings = linearHistory;
-          branchProtections = {
-            unstable = {
-              enable_push = false;
-              enable_status_check = true;
-              status_check_contexts = requiredStatuses;
-              required_approvals = 0;
-              apply_to_admins = true;
-            };
-            main = {
-              enable_push = true;
-              enable_push_whitelist = true;
-              push_whitelist_usernames = [ bot ];
-              apply_to_admins = true;
-            };
-          };
-        };
-
-        infra-lib = {
-          topics = [ bot ];
-          collaborators.${bot} = "admin";
-        };
+        dotfiles = promoted;
+        infra-lib = promoted;
       };
     };
 
