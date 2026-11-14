@@ -27,12 +27,6 @@ in
   ++ lib.optional ((facts.location.kind or null) == "laptop") ../pkgs/nix/low_battery_notify.nix;
 
   home = {
-    file = {
-      ".claude/settings.json" = lib.mkIf (builtins.pathExists ../config/claude/settings.json) {
-        source = ../config/claude/settings.json;
-      };
-    };
-
     pointerCursor = {
       enable = true;
       name = "Dracula-cursors";

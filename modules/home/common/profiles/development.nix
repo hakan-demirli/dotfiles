@@ -3,6 +3,7 @@
   home = {
     packages = [ pkgs.tea ];
     sessionVariables.GITEA_INSTANCE_URL = inputs.self.lib.forge.web;
+    file.".claude/settings.json".source = ../config/claude/settings.json;
   };
 
   programs = {
