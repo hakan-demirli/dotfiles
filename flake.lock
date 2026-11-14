@@ -165,6 +165,7 @@
         "impermanence": "impermanence",
         "import-tree": "import-tree",
         "nix-darwin": "nix-darwin",
+        "nixbot": "nixbot",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-ceph": "nixpkgs-ceph",
@@ -173,11 +174,11 @@
         "srvos": "srvos"
       },
       "locked": {
-        "lastModified": 1794597111,
-        "narHash": "sha256-hhgN8g5fh9poU3rfywj9w5fjdsYUmOnyYq5mBCFkoYw=",
+        "lastModified": 1794622534,
+        "narHash": "sha256-0e70gVrPEO8Ucl79N+6CRQU2spiwx+IBddFq7lKet1E=",
         "ref": "refs/heads/main",
-        "rev": "b7aa8a81cfd19501da10e25464c5c1a258cea832",
-        "revCount": 110,
+        "rev": "c81f7df8edd76750e26fb1e09f25e6b9f1eb0f97",
+        "revCount": 112,
         "type": "git",
         "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/infra-lib"
       },
@@ -210,6 +211,7 @@
     "nixbot": {
       "inputs": {
         "nixpkgs": [
+          "infra-lib",
           "nixpkgs"
         ],
         "treefmt-nix": "treefmt-nix"
@@ -436,7 +438,10 @@
           "infra-lib",
           "nix-darwin"
         ],
-        "nixbot": "nixbot",
+        "nixbot": [
+          "infra-lib",
+          "nixbot"
+        ],
         "nixos-hardware": [
           "infra-lib",
           "nixos-hardware"
@@ -519,6 +524,7 @@
     "treefmt-nix": {
       "inputs": {
         "nixpkgs": [
+          "infra-lib",
           "nixbot",
           "nixpkgs"
         ]
