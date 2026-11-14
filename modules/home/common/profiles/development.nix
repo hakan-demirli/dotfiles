@@ -1,4 +1,10 @@
-_: {
+{ pkgs, inputs, ... }:
+{
+  home = {
+    packages = [ pkgs.tea ];
+    sessionVariables.GITEA_INSTANCE_URL = inputs.self.lib.forge.web;
+  };
+
   programs = {
     gh = {
       enable = true;
