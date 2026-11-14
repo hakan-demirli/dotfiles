@@ -10,13 +10,15 @@ let
   homeDir = config.home.homeDirectory;
   cfgHome = "${homeDir}/.config";
   sopsFile = ../../users + "/${cfg.identity}/secrets/secrets.yaml";
+  inherit (inputs.self.lib) forge;
+  inherit (config.sops) placeholder;
   gitCredentialHelper = pkgs.writeShellApplication {
     name = "git-credential-sops-readonly";
     runtimeInputs = [ pkgs.git ];
     text = ''
       case "''${1:-}" in
         get)
-          store_file=${lib.escapeShellArg config.sops.secrets.git_tokens.path}
+          store_file=${lib.escapeShellArg config.sops.templates.git_tokens.path}
           if [[ -r "$store_file" ]]; then
             exec git credential-store --file "$store_file" get
           fi
@@ -95,18 +97,13 @@ in
           path = "${homeDir}/.ssh/id_ed25519_gitlab_ethz";
           mode = "0600";
         };
-        "git_tokens" = {
-          mode = "0400";
-        };
+        "github/token" = { };
+        "gitlab/token" = { };
+        "forgejo/token" = { };
         "git_users" = {
           path = "${cfgHome}/git/git_users";
         };
-        "nixauth" = {
-          path = "${cfgHome}/nix/nixauth";
-        };
-        "environment" = {
-          path = "${cfgHome}/secrets/environment";
-        };
+        "environment" = { };
         "questa_license.dat" = {
           path = "${cfgHome}/secrets/questa_license.dat";
         };
@@ -121,6 +118,30 @@ in
         "cliproxyapi/api-key" = {
           path = "${cfgHome}/secrets/cliproxyapi/api-key";
           mode = "0400";
+        };
+      };
+
+      templates = {
+        "git_tokens" = {
+          path = "${cfgHome}/sops-nix/secrets/git_tokens";
+          content = ''
+            https://${forge.owner}:${placeholder."github/token"}@github.com
+            https://${forge.owner}:${placeholder."gitlab/token"}@gitlab.com
+            http://${forge.owner}:${placeholder."forgejo/token"}@${forge.site}
+          '';
+        };
+        "nixauth" = {
+          path = "${cfgHome}/nix/nixauth";
+          content = ''
+            access-tokens = github.com=${placeholder."github/token"}
+          '';
+        };
+        "environment" = {
+          path = "${cfgHome}/secrets/environment";
+          content = ''
+            ${placeholder.environment}
+            GH_TOKEN=${placeholder."github/token"}
+          '';
         };
       };
     };

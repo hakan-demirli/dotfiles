@@ -66,7 +66,7 @@ let
       home.config.homeSops.enable
       && home.config.systemd.user.services ? state-backup
       && home.config.home.stateRepository.path == "/home/emre/.local/share/state"
-      && home.config.sops.secrets ? git_tokens
+      && home.config.sops.templates ? git_tokens
       && home.config.systemd.user.services ? opencode-serve
     ) trusted;
     missing-home-key-fails = lib.all (
@@ -94,6 +94,7 @@ let
       && !(home.config.systemd.user.services ? opencode-serve)
       && !(home.config.systemd.user.services ? sops-nix)
       && home.config.sops.secrets == { }
+      && home.config.sops.templates == { }
       && !(home.config.homeStorage.paths ? ".config/sops/age")
       && !(home.config.homeStorage.paths ? ".local/share/opencode")
       && !lib.hasInfix "sops-readonly" home.config.xdg.configFile."git/config".text

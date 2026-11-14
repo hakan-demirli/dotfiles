@@ -244,6 +244,8 @@ in
             path = ./git_sign
         [credential "https://github.com"]
             helper = sops-readonly
+        [credential "https://gitlab.com"]
+            helper = sops-readonly
         [credential "http://${inputs.self.lib.forge.site}"]
             helper = sops-readonly
       '';
