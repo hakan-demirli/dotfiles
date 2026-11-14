@@ -401,6 +401,16 @@ let
           index = 3;
           text = "UNKNOWN";
         };
+        "4" = {
+          color = "orange";
+          index = 4;
+          text = "HELD";
+        };
+        "5" = {
+          color = "red";
+          index = 5;
+          text = "FAILED";
+        };
       };
     }
   ];
@@ -421,40 +431,44 @@ let
       };
     }
   ];
-  configurationFreshnessExpression = ''
-    label_replace(
-      (
+  freshnessExpression =
+    {
+      info,
+      key,
+      revisionLabel,
+    }:
+    let
+      upgradeState = state: ''
+        ${info} * on(host) group_left() max by (host) (fleet_upgrade_state{state="${state}"} == 1)
+      '';
+    in
+    ''
+      label_replace(
         (
-          fleet_nixos_system_info{revision_kind="git"}
-          * on(revision) group_left()
-          fleet_configuration_main_info
-          * 2
-        )
-        or on(host) (fleet_nixos_system_info{revision_kind="local"} * 0 + 1)
-        or on(host) (fleet_nixos_system_info{revision_kind="unknown"} * 0 + 3)
-        or on(host) (fleet_nixos_system_info{revision_kind="git"} * 0)
-      ),
-      "deployed_revision", "$1", "revision", "(.{1,12}).*"
-    )
+          (${info}{revision_kind="git"} * on(revision) group_left() fleet_configuration_main_info * 2)
+          or on(${key}) (${upgradeState "failed"} * 5)
+          or on(${key}) (${upgradeState "held"} * 4)
+          or on(${key}) (${info}{revision_kind="local"} * 0 + 1)
+          or on(${key}) (${info}{revision_kind="unknown"} * 0 + 3)
+          or on(${key}) (${info} * 0)
+        ),
+        "${revisionLabel}", "$1", "revision", "(.{1,12}).*"
+      )
+    '';
+  configurationFreshnessExpression = ''
+    ${freshnessExpression {
+      info = "fleet_nixos_system_info";
+      key = "host";
+      revisionLabel = "deployed_revision";
+    }}
     * on() group_left(main_revision)
     label_replace(fleet_configuration_main_info, "main_revision", "$1", "short_revision", "(.*)")
   '';
-  homeFreshnessExpression = ''
-    label_replace(
-      (
-        (
-          fleet_home_manager_generation_info{revision_kind="git"}
-          * on(host, revision) group_left()
-          max by (host, revision) (fleet_nixos_system_info)
-          * 2
-        )
-        or on(host, user) (fleet_home_manager_generation_info{revision_kind="local"} * 0 + 1)
-        or on(host, user) (fleet_home_manager_generation_info{revision_kind="unknown"} * 0 + 3)
-        or on(host, user) (fleet_home_manager_generation_info{revision_kind="git"} * 0)
-      ),
-      "home_revision", "$1", "revision", "(.{1,12}).*"
-    )
-  '';
+  homeFreshnessExpression = freshnessExpression {
+    info = "fleet_home_manager_generation_info";
+    key = "host, user";
+    revisionLabel = "home_revision";
+  };
   freshnessStatusOverrides = [
     {
       matcher = {
@@ -2091,7 +2105,7 @@ let
         (mkTable {
           id = 26;
           title = "Configuration Freshness";
-          description = "Deployed source compared with dotfiles main. BEHIND is normal during a rollout. Path and dirty-tree builds show as local.";
+          description = "Deployed source compared with dotfiles main.";
           expression = configurationFreshnessExpression;
           x = 0;
           y = 73;
@@ -2115,7 +2129,7 @@ let
         (mkTable {
           id = 48;
           title = "Home Freshness";
-          description = "Active Home Manager generation of each host owner compared with the system revision it follows. BEHIND clears at the next fleet-home-upgrade run. Dirty-tree builds show as local.";
+          description = "Home Manager source compared with dotfiles main.";
           expression = homeFreshnessExpression;
           x = 14;
           y = 73;
