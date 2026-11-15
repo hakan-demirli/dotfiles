@@ -61,4 +61,6 @@
     services = "headscale,reverse-ssh,slurm-master,ntfy,homepage,jellyfin,transmission,harmonia,victoriametrics,grafana";
     nix_cache_public_key = "binary-cache-key:YUqGpOpjoO0zIREJVH0PAdjy9L3DWi917Z8/eFqQqy8=";
   };
+
+  tailnet_exit_node = true;
 }
