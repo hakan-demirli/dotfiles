@@ -13,7 +13,10 @@
 # Development Standards
 
 - Follow the existing repo/code style. Do NOT add comments if repo does not have. Do NOT create arbitrary dirs.
-- Commit messages: short semantic subject only (e.g. "fix(tmux): drop stale ids"). NO commit body.
+- Follow the existing repo commit style.
+- Follow the existing repo PR/MR style.
+- If there is no style, for commit messages use short semantic subject only (e.g. "fix(tmux): drop stale ids"). NO commit body.
+- If there is no style, for pull requests do not write PR body.
 - No hacks or bandaids unless EXPLICILY asked for.
 - Always design for long term professional quality software architecture.
 - Always follow best practices for performance, scalability and readability.
