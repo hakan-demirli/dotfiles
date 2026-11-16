@@ -1,4 +1,4 @@
-<img width="1921" height="1081" alt="Image" src="https://github.com/user-attachments/assets/3922fbba-ec02-4a65-9da7-54690810e899" />
+![Desktop](https://github.com/user-attachments/assets/3922fbba-ec02-4a65-9da7-54690810e899)
 
 |          |                                                         |
 | -------- | ------------------------------------------------------- |
@@ -10,46 +10,36 @@
 
 ## Layout
 
-| Path                                          | Purpose                                                     |
-| --------------------------------------------- | ----------------------------------------------------------- |
-| `inventory/`                                  | Users, Unix tiers, deployment/topology, hosts, and clusters |
-| `modules/hosts/`                              | Host-specific NixOS modules                                 |
-| `modules/{deployment-roles,services,system}/` | Reusable NixOS behavior                                     |
-| `modules/home/`                               | Rootless, standalone Home Manager tree                      |
-| `modules/devices/`                            | Self-contained non-NixOS device builds                      |
-| `modules/nix/`                                | Flake outputs, checks, installers, and codegen              |
-| `secrets/`                                    | SOPS-encrypted data and age identity envelopes              |
+| Path                                          | Purpose                                                           |
+| --------------------------------------------- | ----------------------------------------------------------------- |
+| `inventory/`                                  | Users, hosts, clusters, networks, roles, access tiers, and alerts |
+| `modules/hosts/`                              | Host-specific NixOS modules                                       |
+| `modules/hardware/`                           | Machine-model modules and power tuning                            |
+| `modules/{deployment-roles,services,system}/` | Reusable NixOS behavior                                           |
+| `modules/home/`                               | Rootless, standalone Home Manager tree                            |
+| `modules/pkgs/`                               | Packages shared by NixOS and Home Manager                         |
+| `modules/theme/`                              | Theme tokens and templates                                        |
+| `modules/diagrams/`                           | Diagram builds                                                    |
+| `modules/devices/`                            | Self-contained non-NixOS device builds                            |
+| `modules/nix/`                                | Flake outputs, checks, installers, and codegen                    |
+| `secrets/`                                    | SOPS-encrypted data and age identity envelopes                    |
 
-## Develop And Inspect
+## Develop
 
 ```bash
 nix develop
 nix flake check
-nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
 nix run .#inventory-dump
 nix build .#intent-report
 nix build .#diagrams
 ```
 
-## Changes And Deploys
-
-Forgejo on `vps-oracle-0` holds the repositories at `http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001`. GitHub is a backup copy.
-
-1. Push a branch and open a pull request into `unstable`, the default branch.
-2. nixbot builds `hydraJobs` at `http://vps-oracle-0.ts.sshr.polarbearvuzi.com:8010`. The `server-dev` hosts build for `x86_64-linux`. The merge needs `nixbot/nix-eval` and `nixbot/nix-build`.
-   Forgejo merges fast-forward only, so the commits land as they are. If `unstable` moved, rebase the branch onto it and push again.
-3. After `unstable` builds, the `promote-main` effect fast-forwards `main`. Only the `nixbot` account can push `main`.
-4. Hosts install `main` between 04:00 and 06:00 Europe/Zurich.
-
-A scheduled effect updates `flake.lock` every day at 07:17 UTC and merges the pull request when its build passes.
-
-Forgejo flake inputs need the tailnet. Install new hosts with Auto Deploy from a tailnet machine.
+Open pull requests into `unstable` on Forgejo. GitHub is a backup copy.
 
 ## NixOS
 
 ```bash
-sudo nixos-rebuild switch --flake .#laptop-1
-nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
+sudo nixos-rebuild switch --flake .#<host>
 ```
 
 ### Fresh Install
@@ -62,30 +52,17 @@ nix build .#nixosConfigurations.laptop-1.config.system.build.toplevel
 4. Install: `nixos-install --root /mnt --flake .#<host> --no-root-passwd`.
 5. Reboot.
 
-#### ARM Bootstrap
+ARM: `nix build .#kexec --system aarch64-linux`, run `result` as root on the host, then install as above.
 
-`nix build .#kexec --system aarch64-linux`, copy `result` to the host, run it as root, then follow the fresh install flow.
-
-#### Auto Deploy
-
-`nix run .#install-<host>` and type `WIPE <host>`
+Remote: `nix run .#install-<host>` and type `WIPE <host>`.
 
 ## Home Manager
 
-On the target host:
-
 ```bash
-home-manager switch --flake .
-home-manager switch --flake '.#user-0@vps-oracle-0'
+home-manager switch --flake '.#<user>@<host>'
 ```
 
-Initial setup (personal/leased hosts). Activation refuses to run until the Home Manager age key is installed:
-
-```bash
-nix run path:.#deploy-home-secrets
-```
-
-### Without Nix
+Without Nix:
 
 ```bash
 nix build '.#homeConfigurations."user-0@headless".config.home.portablehome'
@@ -103,29 +80,29 @@ nix build '.#homeConfigurations."user-0@headless".config.home.portablehome'
 | Home Manager      | `modules/home/users/user-0/secrets/secrets.yaml` | `secrets/identities/home-user-0.age.key.enc` | `~/.config/sops/age/keys.txt`                              |
 | Laptop Wi-Fi      | `secrets/wifi/credentials.yaml`                  | `secrets/wifi/age.key.enc`                   | `~/.config/sops/age/wifi.key`                              |
 
-Deploy Home Manager and NixOS secrets separately, as the target user:
+Install the keys as the target user:
 
 ```bash
 nix run path:.#deploy-home-secrets
 nix run path:.#deploy-system-secrets
 ```
 
-A missing key fails `sops-install-secrets.service` (system) or `sops-nix.service` (user). Fleet Overview lists both under Failed Units.
-
 ## Tailnet
 
-Headscale runs on `vps-oracle-0` at `https://sshr.polarbearvuzi.com`.
-Every node initially receives `tag:bootstrap` using preauth key in `secrets/bootstrap/tailscale.yaml`.
-Permanent tags are assigned manually without re-registering the node.
-Headscale users that the generated policy names are created on deploy.
+Hosts join with the pre-auth key in `secrets/bootstrap/tailscale.yaml` (`bootstrap-deploy --with-tailscale`).
 
-Machines that this repository does not manage are `inventory/routed-hosts/`.
-Their network sets the `tailnet_router`, and `access` grants TCP ports to teams or users.
-`nix run .#router-0-config` serves the route and pins the lease to the MAC in `lan.routed_hosts.<id>` of `secrets/router-0/deploy.yaml`.
+```bash
+nix build .#diagrams-tailnet
+sudo headscale nodes tag -i <id> -t tag:first,tag:second
+```
 
-- `nix build .#diagrams-tailnet`
-- `sudo headscale nodes tag -i <id> -t tag:first,tag:second`.
-- `sudo headscale preauthkeys create --user <id> --expiration 24h` for a guest device.
+A guest device gets its own short-lived key:
+
+```bash
+sudo headscale preauthkeys create --user <id> --expiration 24h
+```
+
+Hosts that this repository does not manage are in `inventory/routed-hosts/`.
 
 ## Non-NixOS Devices
 
