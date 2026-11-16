@@ -13,6 +13,7 @@
     "infra:system/virtualisation"
     "infra:services/tailscale"
     "infra:services/apptainer"
+    "infra:services/bees"
     "infra:services/slurm"
     "self:services/sops"
     "self:services/nix-build-farm"

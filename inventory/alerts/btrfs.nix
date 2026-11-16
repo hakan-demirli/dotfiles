@@ -45,6 +45,16 @@ in
             description = "Unallocated and free metadata space total {{ humanize1024 $value }}B. New files fail with 'No space left on device' while df still reports free space. Delete data, then run 'btrfs balance start -dusage=25' on the mount point.";
           };
         }
+
+        {
+          alert = "BeesStopped";
+          expr = ''avg_over_time(node_systemd_unit_state{name="beesd@root.service", state="active"}[1h]) < 0.5'';
+          labels.severity = "warning";
+          annotations = {
+            summary = "${host} bees ran less than half of the last hour";
+            description = "Deduplication is behind, so the disk fills faster. Read 'journalctl -u beesd@root'; restarts after signal KILL are OOM kills.";
+          };
+        }
       ];
     }
   ];
