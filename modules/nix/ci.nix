@@ -49,6 +49,7 @@ in
         update = {
           hour = 7;
           minute = 17;
+          merge = "manual";
         };
       };
   };
