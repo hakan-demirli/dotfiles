@@ -76,6 +76,7 @@ in
     paths = {
       ".cache" = "persistent";
       ".local/share/direnv" = "persistent";
+      ".local/share/wayscriber" = "persistent";
       Desktop = "persistent";
       Documents = "persistent";
       Downloads = "persistent";

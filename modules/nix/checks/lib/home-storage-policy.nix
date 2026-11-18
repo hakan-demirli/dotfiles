@@ -25,6 +25,7 @@ let
     ".local/share/direnv" = "persistent";
     ".local/share/opencode" = "persistent";
     ".local/share/state" = "persistent";
+    ".local/share/wayscriber" = "persistent";
     ".local/state/bash" = "persistent";
     ".local/state/exodia" = "persistent";
     ".local/state/opencode" = "persistent";
