@@ -401,11 +401,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794433384,
-        "narHash": "sha256-DWEqg+fmSxM3jPW4epAcmk8YWxHpcczYS6hdHjlHUus=",
+        "lastModified": 1794982611,
+        "narHash": "sha256-b70bKuCgCroT1yN6fDqhb1+Sez5Ilo4KldxOt61rpi8=",
         "ref": "refs/heads/main",
-        "rev": "e56e7f5a1cca72b43879b8f64066c418e9f3a0fe",
-        "revCount": 160,
+        "rev": "a371ad86f2b8a91d597285c7d146218082d6cd37",
+        "revCount": 162,
         "type": "git",
         "url": "http://vps-oracle-0.ts.sshr.polarbearvuzi.com:3001/hakan-demirli/NUR"
       },
