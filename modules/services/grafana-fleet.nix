@@ -753,7 +753,7 @@ let
       uid = fleetLogsUid;
       title = "Show Slurm controller and worker messages";
       manager = "system";
-      unit = lib.escapeURL "slurmctld.service|slurmd.service";
+      unit = lib.escapeURL "slurmctld.service|slurmdbd.service|slurmd.service";
     })
   ];
   fleetDashboardLinks = [
