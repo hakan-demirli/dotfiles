@@ -19,6 +19,17 @@ in
         }
 
         {
+          alert = "SlurmAccountingDown";
+          expr = ''max by (instance) (node_systemd_unit_state{name="slurmdbd.service", state="active"}) == 0'';
+          for = "5m";
+          labels.severity = "warning";
+          annotations = {
+            summary = "slurmdbd on ${host} is down";
+            description = "sacct shows no new jobs. slurmctld keeps the job records until slurmdbd returns. Check: journalctl -u slurmdbd";
+          };
+        }
+
+        {
           alert = "SlurmNodesDown";
           expr = "max by (partition) (slurm_partition_nodes_down) > 0";
           for = "15m";
