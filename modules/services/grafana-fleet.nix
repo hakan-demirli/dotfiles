@@ -1269,7 +1269,7 @@ let
         (mkStat {
           id = 3;
           title = "Highest CPU";
-          expression = "topk(1, ${withHost ''(1 - avg by(instance) (rate(node_cpu_seconds_total{job="fleet-node",mode="idle"}[5m]))) * 100''})";
+          expression = "topk(1, ${withHost ''(1 - sum by(instance) (rate(node_cpu_seconds_total{job="fleet-node",mode="idle"}[5m])) / sum by(instance) (rate(node_cpu_seconds_total{job="fleet-node"}[5m]))) * 100''})";
           legend = "{{host}}";
           textMode = "value_and_name";
           x = 4;
@@ -1563,7 +1563,7 @@ let
           max = 100;
           targets = [
             (mkTarget {
-              expression = withHost ''(1 - avg by(instance) (rate(node_cpu_seconds_total{job="fleet-node",mode="idle"}[$__rate_interval]))) * 100'';
+              expression = withHost ''(1 - sum by(instance) (rate(node_cpu_seconds_total{job="fleet-node",mode="idle"}[$__rate_interval])) / sum by(instance) (rate(node_cpu_seconds_total{job="fleet-node"}[$__rate_interval]))) * 100'';
               legend = "{{host}}";
               refId = "A";
             })
