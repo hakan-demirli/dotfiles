@@ -191,6 +191,22 @@ pkgs.runCommand "home-state-automation"
         assert execute([git, "--git-dir", str(remote), "rev-parse", branch], moved) == moved_head
         assert execute([git, "--git-dir", str(previous), "rev-parse", branch], moved) != moved_head
 
+        diverged = environment("diverged")
+        diverged_state, diverged_history = paths(diverged)
+        backup(diverged)
+        crashed = root / "crashed"
+        execute([git, "clone", "--branch", branch, str(remote), str(crashed)], base)
+        crashed_history = crashed / ".local/state/bash/history"
+        crashed_history.write_text(crashed_history.read_text() + "pushed before a crash\n")
+        execute([git, "-C", str(crashed), "commit", "-am", "lost locally"], base)
+        execute([git, "-C", str(crashed), "push", "origin", branch], base)
+        diverged_history.write_text(diverged_history.read_text() + "after the crash\n")
+        backup(diverged)
+        merged = execute([git, "--git-dir", str(remote), "show", branch + ":.local/state/bash/history"], diverged)
+        assert {"pushed before a crash", "after the crash"} <= set(merged.splitlines()), merged
+        assert diverged_history.read_text() == merged + "\n"
+        assert execute([git, "-C", str(diverged_state), "rev-parse", "HEAD"], diverged) == execute([git, "--git-dir", str(remote), "rev-parse", branch], diverged)
+
         notes_remote = root / "notes.git"
         execute([git, "init", "--bare", "--initial-branch=notes", str(notes_remote)], base)
         notes_seed = root / "notes-seed"

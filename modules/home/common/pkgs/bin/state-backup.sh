@@ -79,4 +79,16 @@ git -C "$repo" add -- .local/state/bash/history
 if ! git -C "$repo" diff --cached --quiet -- .local/state/bash/history; then
   git -C "$repo" commit --no-gpg-sign --only -m "Auto-commit on $(date +'%Y-%m-%d %H:%M:%S')" -- .local/state/bash/history
 fi
+if git -C "$repo" ls-remote --exit-code --heads origin "refs/heads/$branch" > /dev/null; then
+  git -C "$repo" fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch"
+  if ! git -C "$repo" merge-base --is-ancestor "origin/$branch" HEAD; then
+    attributes=$(git -C "$repo" rev-parse --path-format=absolute --git-path info/attributes)
+    mkdir -p "$(dirname "$attributes")"
+    printf '%s\n' '/.local/state/bash/history merge=union' > "$attributes"
+    git -C "$repo" merge --no-gpg-sign --no-edit "origin/$branch"
+  fi
+else
+  result=$?
+  [[ $result == 2 ]] || exit "$result"
+fi
 git -C "$repo" push origin "$branch"
