@@ -28,6 +28,7 @@ let
     ".local/share/wayscriber" = "persistent";
     ".local/state/bash" = "persistent";
     ".local/state/exodia" = "persistent";
+    ".local/state/nwg-displays" = "persistent";
     ".local/state/opencode" = "persistent";
     ".local/state/pi" = "persistent";
     ".local/state/wireplumber" = "persistent";

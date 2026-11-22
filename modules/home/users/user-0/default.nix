@@ -77,6 +77,7 @@ in
       ".cache" = "persistent";
       ".local/share/direnv" = "persistent";
       ".local/share/wayscriber" = "persistent";
+      ".local/state/nwg-displays" = "persistent";
       Desktop = "persistent";
       Documents = "persistent";
       Downloads = "persistent";

@@ -1,7 +1,17 @@
 mainMod = "SUPER"
 
-require("monitors")
-require("workspaces")
+local function optional_require(module)
+  local ok, err = pcall(require, module)
+  if not ok then
+    local missing = "module '" .. module .. "' not found:"
+    if tostring(err):sub(1, #missing) ~= missing then
+      error(err, 0)
+    end
+  end
+end
+
+require("defaults.monitors")
+require("defaults.workspaces")
 
 require("includes")
 
@@ -11,17 +21,13 @@ do
     local name = (h:read("*l") or ""):gsub("%s+", "")
     h:close()
     if name ~= "" then
-      local module = "hosts." .. name
-      local ok, err = pcall(require, module)
-      if not ok then
-        local missing = "module '" .. module .. "' not found:"
-        if tostring(err):sub(1, #missing) ~= missing then
-          error(err, 0)
-        end
-      end
+      optional_require("hosts." .. name)
     end
   end
 end
+
+optional_require("monitors")
+optional_require("workspaces")
 
 hl.layer_rule({ name = "blur-tofi", match = { namespace = "tofi" }, blur = true })
 hl.layer_rule({ name = "no-anim-hyprpicker", match = { namespace = "hyprpicker" }, no_anim = true })

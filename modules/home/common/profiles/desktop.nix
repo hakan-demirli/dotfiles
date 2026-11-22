@@ -22,6 +22,7 @@ in
 
     (import ../pkgs/nix/firefox.nix { username = "emre"; })
     ../pkgs/nix/cmf_headphoned.nix
+    ../pkgs/nix/nwg-displays.nix
     ../pkgs/nix/screen-record.nix
   ]
   ++ lib.optional ((facts.location.kind or null) == "laptop") ../pkgs/nix/low_battery_notify.nix;
